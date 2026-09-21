@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>星尘</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 45%, #141c3a 0%, #0a0e1f 48%, #04050c 100%);
+    cursor: crosshair;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* 全屏时取消 body 边距，并让画布真正铺满 */
+  body:fullscreen {
+    background: #04050c;
+  }
+  body:-webkit-full-screen {
+    background: #04050c;
+  }
+
+  #stars {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<script>
+(() => {
+  "use strict";
+
+  const canvas = document.getElementById("stars");
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const TAU = Math.PI * 2;
+
+  /* ── 状态 ───────────────────────────────── */
+  let W = 0, H = 0, DPR = 1;
+  let particles = [];
+  let lastTime = performance.now();
+  let mode = "interactive";           // "interactive" | "view"
+
+  const pointer = { x: -9999, y: -9999, hover: false, down: false };
+
+  /* ── 物理参数 ───────────────────────────── */
+  const CFG = {
+    /* 外观 */
+    linkDist:       110,
+    mouseR:         160,
+
+    /* 引力 —— 1/(d+SOFT) 柔性衰减 */
+    G:              16,
+    SOFT:           70,
+    DEAD:           60,      // 平衡环带半径
+    REBOUND:        0.55,    // 环带内软回弹
+
+    /* 阻尼 —— 连续阻尼产生螺旋沉降 */
+    gravDamp:       0.978,
+    airDamp:        0.995,
+
+    /* 悬停排斥 —— 二次衰减 */
+    hoverRepel:     0.60,
+
+    /* 密度 */
+    density:        4200,
+    maxInteractive: 380,
+    maxView:        480
+  };
+
+  const LINK2 = CFG.linkDist * CFG.linkDist;
+
+  /* ── 尺寸自适应 ─────────────────────────── */
+  function targetCount() {
+    const base = (W * H) / CFG.density;
+    if (mode === "view") {
+      return Math.round(Math.min(CFG.maxView, Math.max(180, base * 1.6)));
+    }
+    return Math.round(Math.min(CFG.maxInteractive, Math.max(120, base)));
+  }
+
+  function makeParticle() {
+    const angle = Math.random() * TAU;
+    const speed = 0.06 + Math.random() * 0.26;
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      vx: 0, vy: 0,                  // 物理速度
+      r: 0.7 + Math.random() * 1.6,
+      hue: 185 + Math.random() * 95,
+      pulse: Math.random() * TAU,
+      fade: 0
+    };
+  }
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    canvas.width  = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    canvas.style.width  = W + "px";
+    canvas.style.height = H + "px";
+
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    const t = targetCount();
+    if (particles.length > t) particles.length = t;
+    while (particles.length < t) particles.push(makeParticle());
+  }
+
+  /* ── 粒子更新 ───────────────────────────── */
+  function updateParticle(p, dt) {
+    const gravDamp = Math.pow(CFG.gravDamp, dt);
+    const airDamp  = Math.pow(CFG.airDamp,  dt);
+
+    if (mode === "interactive" && pointer.hover) {
+      const ax = pointer.x - p.x;
+      const ay = pointer.y - p.y;
+      const d2 = ax * ax + ay * ay;
+      const d  = Math.sqrt(d2) || 0.0001;
+      const ux = ax / d;
+      const uy = ay / d;
+
+      if (pointer.down) {
+        /* 引力 + 软回弹 + 粘滞阻尼 → 螺旋沉降 */
+        const acc = CFG.G / (d + CFG.SOFT) * dt;
+        p.vx += ux * acc;
+        p.vy += uy * acc;
+
+        if (d < CFG.DEAD) {
+          const t = 1 - d / CFG.DEAD;
+          const bounce = CFG.REBOUND * t * t * dt;
+          p.vx -= ux * bounce;
+          p.vy -= uy * bounce;
+        }
+
+        p.vx *= gravDamp;
+        p.vy *= gravDamp;
+
+      } else if (d < CFG.mouseR) {
+        /* 悬停排斥（二次衰减） */
+        const t = 1 - d / CFG.mouseR;
+        const force = t * t * CFG.hoverRepel * dt;
+        p.vx -= ux * force;
+        p.vy -= uy * force;
+      }
+    }
+
+    // 常态空气阻力
+    p.vx *= airDamp;
+    p.vy *= airDamp;
+
+    // 位移
+    p.x += (p.dx + p.vx) * dt;
+    p.y += (p.dy + p.vy) * dt;
+
+    // 边界环绕
+    const m = 30;
+    if (p.x < -m) p.x = W + m;
+    else if (p.x > W + m) p.x = -m;
+    if (p.y < -m) p.y = H + m;
+    else if (p.y > H + m) p.y = -m;
+
+    // 脉冲 + 淡入
+    p.pulse += 0.05 * dt;
+    if (p.fade < 1) p.fade = Math.min(1, p.fade + 0.025 * dt);
+  }
+
+  /* ── 绘制 ───────────────────────────────── */
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = "round";
+
+    const n = particles.length;
+    const linkAlpha = 0.28 * Math.min(1, 240 / Math.max(n, 1));
+
+    /* 1. 粒子之间的连线 */
+    for (let i = 0; i < n; i++) {
+      const a = particles[i];
+      const ax = a.x, ay = a.y;
+
+      for (let j = i + 1; j < n; j++) {
+        const b = particles[j];
+        const dx = ax - b.x;
+        const dy = ay - b.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > LINK2) continue;
+
+        const alpha = (1 - Math.sqrt(d2) / CFG.linkDist) * linkAlpha;
+        ctx.strokeStyle = `hsla(${(a.hue + b.hue) * 0.5}, 90%, 74%, ${alpha})`;
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(ax, ay);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+
+    /* 2. 鼠标光晕与连线（仅交互模式） */
+    if (mode === "interactive" && pointer.hover) {
+      const glow = pointer.down ? 0.24 : 0.10;
+      const g = ctx.createRadialGradient(
+        pointer.x, pointer.y, 0,
+        pointer.x, pointer.y, 200
+      );
+      g.addColorStop(0, `rgba(140, 170, 255, ${glow})`);
+      g.addColorStop(1, "rgba(140, 170, 255, 0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(pointer.x, pointer.y, 200, 0, TAU);
+      ctx.fill();
+
+      const R2 = CFG.mouseR * CFG.mouseR;
+      for (const p of particles) {
+        const dx = p.x - pointer.x;
+        const dy = p.y - pointer.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > R2) continue;
+
+        const alpha = (1 - Math.sqrt(d2) / CFG.mouseR) * 0.32;
+        ctx.strokeStyle = `hsla(${p.hue}, 95%, 78%, ${alpha})`;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(pointer.x, pointer.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+    }
+
+    /* 3. 粒子本体 */
+    for (const p of particles) {
+      const r = p.r * (1 + 0.35 * Math.sin(p.pulse));
+      ctx.globalAlpha = p.fade;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, TAU);
+      ctx.fillStyle = `hsla(${p.hue}, 95%, 76%, 0.9)`;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* ── 粒子数量平滑增减 ───────────────────── */
+  function adapt() {
+    const t = targetCount();
+    if (particles.length < t) {
+      const add = Math.min(3, t - particles.length);
+      for (let i = 0; i < add; i++) particles.push(makeParticle());
+    } else if (particles.length > t) {
+      particles.length -= Math.min(3, particles.length - t);
+    }
+  }
+
+  /* ── 主循环 ─────────────────────────────── */
+  function frame(now) {
+    const dt = Math.min((now - lastTime) / 16.667, 3);
+    lastTime = now;
+
+    adapt();
+    for (const p of particles) updateParticle(p, dt);
+    draw();
+
+    requestAnimationFrame(frame);
+  }
+
+  /* ── 指针事件 ───────────────────────────── */
+  function setPointer(e) {
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
+    pointer.hover = true;
+  }
+
+  window.addEventListener("pointermove", setPointer, { passive: true });
+
+  window.addEventListener("pointerdown", (e) => {
+    setPointer(e);
+    pointer.down = true;
+  }, { passive: true });
+
+  function release() {
+    if (!pointer.down) return;
+    pointer.down = false;
+
+    if (mode !== "interactive") return;
+
+    const R = 150, R2 = R * R;
+    for (const p of particles) {
+      const dx = p.x - pointer.x;
+      const dy = p.y - pointer.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > R2) continue;
+
+      const d = Math.sqrt(d2) || 0.001;
+      const t = 1 - d / R;
+      const kick = t * t * 1.6;
+      p.vx += (dx / d) * kick * (0.6 + Math.random() * 0.8);
+      p.vy += (dy / d) * kick * (0.6 + Math.random() * 0.8);
+    }
+  }
+
+  window.addEventListener("pointerup", release, { passive: true });
+  window.addEventListener("pointercancel", release, { passive: true });
+
+  window.addEventListener("pointerleave", () => {
+    pointer.hover = false;
+    pointer.down = false;
+  }, { passive: true });
+
+  window.addEventListener("blur", () => {
+    pointer.hover = false;
+    pointer.down = false;
+  });
+
+  /* ── 全屏切换 ───────────────────────────── */
+  function isFullscreen() {
+    return !!(document.fullscreenElement ||
+              document.webkitFullscreenElement ||
+              document.msFullscreenElement);
+  }
+
+  function enterFullscreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen)            el.requestFullscreen().catch(() => {});
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.msRequestFullscreen)     el.msRequestFullscreen();
+  }
+
+  function exitFullscreen() {
+    if (document.exitFullscreen)            document.exitFullscreen().catch(() => {});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.msExitFullscreen)     document.msExitFullscreen();
+  }
+
+  function toggleFullscreen() {
+    if (isFullscreen()) exitFullscreen();
+    else enterFullscreen();
+  }
+
+  /* 全屏状态变化时重新适配画布尺寸 */
+  function onFullscreenChange() {
+    // 浏览器会在切换后更新视口，延后一帧再适配
+    requestAnimationFrame(() => {
+      resize();
+      lastTime = performance.now();   // 避免 dt 突跳
+    });
+  }
+
+  ["fullscreenchange", "webkitfullscreenchange", "MSFullscreenChange"]
+    .forEach(evt => document.addEventListener(evt, onFullscreenChange, false));
+
+  /* ── 键盘事件：S 观赏模式 / F 全屏 ─────── */
+  window.addEventListener("keydown", (e) => {
+    if (e.repeat) return;
+
+    const key = e.key ? e.key.toLowerCase() : "";
+
+    if (key === "s") {
+      /* 观赏模式切换 */
+      mode = (mode === "view") ? "interactive" : "view";
+      pointer.down = false;
+      pointer.hover = false;
+      document.body.style.cursor = (mode === "view") ? "none" : "crosshair";
+
+    } else if (key === "f") {
+      /* 全屏切换 */
+      e.preventDefault();
+      toggleFullscreen();
+    }
+  });
+
+  /* ── 窗口尺寸 ───────────────────────────── */
+  let rt;
+  window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(resize, 150);
+  }, { passive: true });
+
+  /* ── 启动 ───────────────────────────────── */
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
