@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Photaxis-lab</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; font-family:"Microsoft YaHei","PingFang SC",sans-serif; }
+  body { background:linear-gradient(160deg,#0f2027 0%,#203a43 50%,#2c5364 100%); display:flex; justify-content:center; align-items:center; }
+  #app { width:100%; max-width:560px; height:100%; max-height:900px; position:relative; display:flex; flex-direction:column; padding:16px; }
+
+  #topbar { display:flex; justify-content:space-between; align-items:center; padding:6px 4px; gap:10px; }
+  #scoreBox { background:rgba(255,255,255,.12); backdrop-filter:blur(6px); border-radius:40px; padding:8px 22px; color:#ffd54f; font-size:22px; font-weight:bold; letter-spacing:1px; box-shadow:0 4px 15px rgba(0,0,0,.25); }
+  #scoreBox span { font-size:30px; }
+  #clockBox { background:rgba(255,255,255,.12); backdrop-filter:blur(6px); border-radius:40px; padding:8px 18px; color:#b3e5fc; font-size:18px; font-weight:bold; letter-spacing:1px; font-variant-numeric:tabular-nums; box-shadow:0 4px 15px rgba(0,0,0,.25); }
+  #btns { display:flex; gap:8px; margin-left:auto; }
+  #muteBtn, #rankBtn { background:rgba(255,255,255,.12); border:none; border-radius:50%; width:44px; height:44px; color:#fff; font-size:20px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.25); }
+  #quitBtn { background:rgba(239,83,80,.22); border:none; border-radius:50%; width:44px; height:44px; color:#ff8a80; font-size:20px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.25); }
+
+  #questionArea { text-align:center; padding:10px 0 2px; color:#fff; }
+  #qHead { display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
+  #qLabel { font-size:17px; color:#9fd8f5; letter-spacing:2px; }
+  #cd { min-width:58px; font-size:19px; font-weight:bold; color:#ffd54f; background:rgba(255,255,255,.10); border-radius:30px; padding:3px 14px; font-variant-numeric:tabular-nums; box-shadow:inset 0 0 0 1px rgba(255,213,79,.28); transition:color .2s, background .2s; }
+  #cd.urgent { color:#fff; background:#ff5252; box-shadow:0 0 16px rgba(255,82,82,.6); animation:cdPulse .5s ease-in-out infinite; }
+  @keyframes cdPulse { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.12);} }
+  #question { font-size:52px; font-weight:bold; margin:6px 0 2px; text-shadow:0 0 30px rgba(120,200,255,.5); letter-spacing:4px; }
+  #hint { font-size:15px; color:rgba(255,255,255,.65); margin-top:2px; }
+  #progress { width:60%; height:6px; background:rgba(255,255,255,.15); border-radius:3px; margin:8px auto 0; overflow:hidden; }
+  #progressFill { height:100%; width:0%; background:linear-gradient(90deg,#4fc3f7,#ffd54f); border-radius:3px; transition:width .4s; }
+
+  #midArea { flex:1; display:flex; align-items:center; justify-content:center; position:relative; min-height:60px; }
+  #feedback { position:absolute; font-size:56px; font-weight:bold; opacity:0; transition:all .35s; pointer-events:none; text-shadow:0 4px 20px rgba(0,0,0,.4); }
+  #feedback.show { opacity:1; transform:scale(1.25); }
+  #feedback.correct { color:#69f0ae; }
+  #feedback.wrong { color:#ff5252; }
+
+  #bubbleArea { display:flex; justify-content:space-around; align-items:flex-end; padding:8px 4px 20px; min-height:300px; }
+  .bubble { width:118px; height:118px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font-size:30px; font-weight:bold; color:#fff; user-select:none;
+    background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.35), rgba(255,255,255,0) 42%), linear-gradient(145deg,#26c6da,#0097a7);
+    box-shadow:0 10px 28px rgba(0,0,0,.35), inset 0 -6px 14px rgba(0,0,0,.18);
+    animation:float 3.2s ease-in-out infinite; transition:transform .12s;
+  }
+  .bubble:nth-child(2){ animation-delay:.6s; background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.35), rgba(255,255,255,0) 42%), linear-gradient(145deg,#7e57c2,#5e35b1); }
+  .bubble:nth-child(3){ animation-delay:1.2s; background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.35), rgba(255,255,255,0) 42%), linear-gradient(145deg,#ffa726,#ef6c00); }
+  .bubble:active { transform:scale(.92); }
+  .bubble.good { background:linear-gradient(145deg,#66bb6a,#2e7d32); animation:none; transform:scale(1.12); }
+  .bubble.bad  { background:linear-gradient(145deg,#ef5350,#c62828); animation:none; transform:scale(.85); opacity:.6; }
+  .bubble.dim  { opacity:.35; }
+  @keyframes float { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-16px); } }
+  .bubble.good, .bubble.bad { animation:none; }
+
+  #overlay { position:absolute; inset:0; background:rgba(8,16,24,.92); backdrop-filter:blur(8px); display:none; justify-content:center; align-items:center; z-index:99; border-radius:18px; }
+  #overlay.show { display:flex; }
+  #overlayCard { text-align:center; color:#fff; padding:26px 20px; width:100%; max-height:96%; overflow-y:auto; }
+  #overlayTitle { font-size:42px; font-weight:bold; margin-bottom:10px; }
+  #overlaySub { font-size:18px; color:rgba(255,255,255,.85); margin-bottom:8px; line-height:1.7; }
+  #lbTable { width:100%; border-collapse:collapse; margin-top:12px; }
+  #lbTable th { color:rgba(255,255,255,.5); font-weight:normal; font-size:11px; padding:4px 4px; text-align:left; letter-spacing:.5px; }
+  #lbTable td { padding:6px 4px; font-size:14px; color:#fff; text-align:left; border-top:1px solid rgba(255,255,255,.08); }
+  #lbTable td.tm { font-variant-numeric:tabular-nums; font-weight:bold; color:#ffd54f; }
+  #lbTable tr.me td { background:rgba(255,213,79,.13); }
+  #lbTable tr.me td.tm { color:#fff; }
+  #lbEmpty { color:rgba(255,255,255,.55); font-size:16px; padding:16px 0 4px; }
+  #lbFoot { color:rgba(255,255,255,.4); font-size:12px; margin-top:10px; letter-spacing:.5px; }
+  #btnRow { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
+  #btnRow button { background:linear-gradient(145deg,#4fc3f7,#0288d1); border:none; color:#fff; font-size:17px; font-weight:bold; padding:12px 26px; border-radius:40px; cursor:pointer; box-shadow:0 6px 18px rgba(2,136,209,.35); }
+  #btnRow button.ghost { background:rgba(255,255,255,.08); box-shadow:none; }
+  #btnRow button.danger { background:linear-gradient(145deg,#ef5350,#c62828); box-shadow:0 6px 18px rgba(229,57,53,.3); }
+  #btnRow button:active { transform:scale(.95); }
+  #sidWrap { display:flex; flex-direction:column; align-items:center; gap:14px; margin:8px 0 2px; }
+  #sidLbl { font-size:15px; color:#9fd8f5; letter-spacing:2px; }
+  #sidIn { width:72%; max-width:280px; background:rgba(255,255,255,.1); border:2px solid rgba(255,255,255,.25); border-radius:14px; color:#fff; font-size:22px; text-align:center; padding:10px 8px; letter-spacing:2px; outline:none; }
+  #sidIn:focus { border-color:#4fc3f7; box-shadow:0 0 0 3px rgba(79,195,247,.25); }
+  #sidIn.err { border-color:#ff5252; animation:shake .35s; }
+  #accIn, #pwdIn, #dynIn { width:72%; max-width:280px; background:rgba(255,255,255,.1); border:2px solid rgba(255,255,255,.25); border-radius:14px; color:#fff; font-size:18px; text-align:center; padding:11px 8px; letter-spacing:2px; outline:none; }
+  #accIn:focus { border-color:#4fc3f7; box-shadow:0 0 0 3px rgba(79,195,247,.25); }
+  #pwdIn:focus { border-color:#ffd54f; box-shadow:0 0 0 3px rgba(255,213,79,.25); }
+  #dynIn:focus { border-color:#81c784; box-shadow:0 0 0 3px rgba(129,199,132,.25); }
+  #accIn.err, #pwdIn.err, #dynIn.err { border-color:#ff5252; animation:shake .35s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  #sidTip { font-size:13px; color:rgba(255,255,255,.5); letter-spacing:.5px; }
+  #verifyingTip { font-size:13px; color:#ffd54f; letter-spacing:1px; margin-top:4px; }
+
+  input.secure-input {
+    -webkit-text-security: disc;
+    text-security: disc;
+    font-family: "text-security-disc", monospace;
+  }
+  input.secure-input::-ms-reveal,
+  input.secure-input::-ms-clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  input.secure-input::-webkit-contacts-auto-fill-button,
+  input.secure-input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+  }
+
+  #modeSwitch {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 84px;
+    height: 28px;
+    display: none;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 14px;
+    padding: 2px;
+    cursor: pointer;
+    box-sizing: border-box;
+    z-index: 5;
+    user-select: none;
+  }
+  #modeSwitch.show { display: flex; }
+
+  .modeOpt {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: rgba(255,255,255,.55);
+    z-index: 2;
+    position: relative;
+    transition: color .2s;
+  }
+  .modeOpt.active { color: #fff; }
+
+  .modeThumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 22px;
+    background: linear-gradient(145deg,#4fc3f7,#0288d1);
+    border-radius: 11px;
+    box-shadow: 0 2px 6px rgba(2,136,209,.45);
+    transition: transform .22s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .rankModeTabs { display:flex; gap:8px; justify-content:center; margin-bottom:8px; }
+  .rankModeTab {
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.25);
+    color:rgba(255,255,255,.7);
+    padding:6px 18px;
+    border-radius:20px;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:all .18s;
+  }
+  .rankModeTab.active { background:rgba(79,195,247,.28); border-color:#4fc3f7; color:#fff; }
+  .rankModeTab:active { transform:scale(.95); }
+
+  .admHint { font-size:13px; color:rgba(255,255,255,.55); margin-bottom:12px; letter-spacing:.5px; line-height:1.6; }
+  #admList { display:flex; flex-direction:column; gap:12px; text-align:left; }
+  .admCard { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.13); border-radius:14px; padding:12px 12px 14px; }
+  .admCardHead { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .admNo { font-size:13px; color:#9fd8f5; font-weight:bold; letter-spacing:1px; }
+  .admDel { background:rgba(239,83,80,.16); border:1px solid rgba(239,83,80,.5); color:#ff8a80; border-radius:20px; font-size:12px; padding:4px 12px; cursor:pointer; font-family:inherit; }
+  .admDel:active { transform:scale(.94); }
+  .admField { display:flex; flex-direction:column; gap:4px; margin-bottom:9px; }
+  .admField label { font-size:11px; color:rgba(255,255,255,.45); letter-spacing:1px; }
+  .admIn { width:100%; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); border-radius:9px; color:#fff; font-size:15px; padding:7px 10px; outline:none; font-family:inherit; -webkit-appearance:none; }
+  .admIn:focus { border-color:#4fc3f7; box-shadow:0 0 0 2px rgba(79,195,247,.2); }
+  .admGrid2 { display:grid; grid-template-columns:1fr 1.6fr; gap:8px; }
+  .admGrid4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; }
+  .admGrid4 .admIn, .admGrid2 .admIn { text-align:center; }
+  #toast { position:absolute; left:50%; bottom:34px; transform:translateX(-50%) translateY(12px); background:rgba(0,0,0,.85); color:#69f0ae; padding:11px 24px; border-radius:30px; font-size:15px; letter-spacing:.5px; opacity:0; transition:all .3s; pointer-events:none; z-index:200; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  #title { text-align:center; color:rgba(255,255,255,.45); font-size:12px; letter-spacing:2px; padding:2px 0 0; }
+  #title a { color:inherit; text-decoration:none; cursor:pointer; transition:color .18s; }
+  #title a:hover { color:rgba(255,255,255,.75); text-decoration:underline; }
+  #title a:active { color:#4fc3f7; }
+
+  #integrityToast {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    background: rgba(0,0,0,.9);
+    color: #69f0ae;
+    padding: 9px 16px;
+    font-size: 12px;
+    font-family: monospace;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+    z-index: 9999;
+    max-width: 70vw;
+    word-break: break-all;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div id="scoreBox">🏆 <span id="score">0</span>/100</div>
+    <div id="clockBox">⏱ <span id="clock">0:00</span></div>
+    <div id="btns">
+      <button id="quitBtn" onclick="quitGame()" title="放弃本局" style="display:none;">✕</button>
+      <button id="rankBtn" onclick="showRank()" title="通关排行榜">📊</button>
+      <button id="muteBtn" onclick="toggleMute()">🔊</button>
+    </div>
+  </div>
+
+  <div id="questionArea">
+    <div id="qHead"><div id="qLabel"></div><div id="cd">⏱ 10</div></div>
+    <div id="question"></div>
+    <div id="hint">点击下方对应的选项（每题限时 <span id="cdSec"></span> 秒）</div>
+    <div id="progress"><div id="progressFill"></div></div>
+  </div>
+
+  <div id="midArea"><div id="feedback"></div></div>
+
+  <div id="bubbleArea">
+    <div class="bubble" data-i="0" onclick="pick(0)"></div>
+    <div class="bubble" data-i="1" onclick="pick(1)"></div>
+    <div class="bubble" data-i="2" onclick="pick(2)"></div>
+  </div>
+  <div id="title"><a href="https://photaxis-lab.github.io" target="_blank" rel="noopener noreferrer">Photaxis-lab copy right 2026</a></div>
+
+  <div id="overlay">
+    <div id="modeSwitch" onclick="toggleModeSwitch(event)">
+      <div class="modeOpt" data-m="U">U</div>
+      <div class="modeOpt" data-m="E">E</div>
+      <div class="modeOpt" data-m="H">H</div>
+      <div class="modeThumb" id="modeThumb"></div>
+    </div>
+    <div id="overlayCard">
+      <div id="overlayTitle"></div>
+      <div id="overlaySub"></div>
+      <div id="btnRow"></div>
+    </div>
+  </div>
+</div>
+
+<script id="hashLib">
+const SHA256_K = [
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+];
+
+function sha256(input) {
+  const str = String(input == null ? '' : input);
+  const bytes = [];
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    if (c < 0x80) bytes.push(c);
+    else if (c < 0x800) {
+      bytes.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+    } else if (c < 0xd800 || c >= 0xe000) {
+      bytes.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+    } else {
+      i++;
+      const c2 = str.charCodeAt(i);
+      const cp = 0x10000 + (((c & 0x3ff) << 10) | (c2 & 0x3ff));
+      bytes.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 0x3f), 0x80 | ((cp >> 6) & 0x3f), 0x80 | (cp & 0x3f));
+    }
+  }
+  const len = bytes.length;
+  bytes.push(0x80);
+  while (bytes.length % 64 !== 56) bytes.push(0);
+  const bitLenHi = Math.floor(len * 8 / 0x100000000);
+  const bitLenLo = (len * 8) >>> 0;
+  bytes.push((bitLenHi >>> 24) & 0xff, (bitLenHi >>> 16) & 0xff, (bitLenHi >>> 8) & 0xff, bitLenHi & 0xff);
+  bytes.push((bitLenLo >>> 24) & 0xff, (bitLenLo >>> 16) & 0xff, (bitLenLo >>> 8) & 0xff, bitLenLo & 0xff);
+
+  let h0 = 0x6a09e667, h1 = 0xbb67ae85, h2 = 0x3c6ef372, h3 = 0xa54ff53a;
+  let h4 = 0x510e527f, h5 = 0x9b05688c, h6 = 0x1f83d9ab, h7 = 0x5be0cd19;
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+
+  for (let i = 0; i < bytes.length; i += 64) {
+    const w = new Array(64);
+    for (let j = 0; j < 16; j++) {
+      w[j] = (bytes[i + j*4] << 24) | (bytes[i + j*4 + 1] << 16) | (bytes[i + j*4 + 2] << 8) | bytes[i + j*4 + 3];
+    }
+    for (let j = 16; j < 64; j++) {
+      const s0 = rotr(w[j-15], 7) ^ rotr(w[j-15], 18) ^ (w[j-15] >>> 3);
+      const s1 = rotr(w[j-2], 17) ^ rotr(w[j-2], 19) ^ (w[j-2] >>> 10);
+      w[j] = (w[j-16] + s0 + w[j-7] + s1) | 0;
+    }
+    let a = h0, b = h1, c = h2, d = h3, e = h4, f = h5, g = h6, h = h7;
+    for (let j = 0; j < 64; j++) {
+      const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+      const ch = (e & f) ^ ((~e) & g);
+      const t1 = (h + S1 + ch + SHA256_K[j] + w[j]) | 0;
+      const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (S0 + maj) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0;
+      d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0;
+    h4 = (h4 + e) | 0; h5 = (h5 + f) | 0; h6 = (h6 + g) | 0; h7 = (h7 + h) | 0;
+  }
+  return [h0, h1, h2, h3, h4, h5, h6, h7].map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+</script>
+
+<script id="mainScript">
+(function () {
+'use strict';
+
+function _j() {
+  let r = '';
+  for (let i = 0; i < arguments.length; i++) r += arguments[i];
+  return r;
+}
+
+const _k1 = 'Photaxis';
+const _k2 = '-lab';
+const _k3 = '::sec';
+const _k4 = 'ure::v3';
+const _k5 = '::2024';
+const _k6 = '::x9K2mQ';
+const HASH_SALT = _j(_k1, _k2, _k3, _k4, _k5, _k6);
+
+const _g1 = 'Photaxis';
+const _g2 = '-lab::sig';
+const _g3 = 'nature::in';
+const _g4 = 'tegrity::';
+const _g5 = 'v1::Zq7Wm3';
+const SIG_KEY = _j(_g1, _g2, _g3, _g4, _g5);
+
+const HASH_ROUNDS = 10000;
+
+function hashPassword(input) {
+  const str = String(input == null ? '' : input);
+  let h = sha256(HASH_SALT + str);
+  for (let i = 0; i < HASH_ROUNDS; i++) {
+    h = sha256(h + HASH_SALT + i);
+  }
+  return h;
+}
+
+function signRec(r) {
+  const parts = [
+    SIG_KEY,
+    String(r.sid || ''),
+    Number(r.t) || 0,
+    Number(r.r) || 0,
+    Number(r.w) || 0,
+    Number(r.o) || 0,
+    Number(r.n) || 0,
+    String(r.dt || ''),
+    Number(r.cnt) || 1,
+    String(r.mode || 'U')
+  ];
+  return sha256(JSON.stringify(parts));
+}
+
+const _a1 = 'bGVucy5waG90';
+const _a2 = 'YXhpc0BvdXRs';
+const _a3 = 'b29rLmNvbQ==';
+const _A0 = _j(_a1, _a2, _a3);
+
+const _p1 = 'cGhvdGF4aX';
+const _p2 = 'MtbGFiLmdp';
+const _p3 = 'dGh1Yi5pbw==';
+const _P0 = _j(_p1, _p2, _p3);
+
+let _AH = null, _PH = null, _hashReady = false, _hashComputing = false;
+
+function _selfCheck(){
+  try {
+    if (typeof sha256 !== 'function') return false;
+    if (sha256('') !== 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855') return false;
+    if (typeof hashPassword !== 'function') return false;
+    return true;
+  } catch(e){
+    return false;
+  }
+}
+
+function initAdminHashes(){
+  if (_hashReady) return true;
+  if (_hashComputing) return false;
+  _hashComputing = true;
+  try {
+    if (!_selfCheck()) throw new Error('self-check failed');
+    const a = atob(_A0);
+    const p = atob(_P0);
+    if (!a || !p || a.length < 3 || p.length < 3) throw new Error('bad credentials');
+    _AH = hashPassword(a);
+    _PH = hashPassword(p);
+    if (!_AH || _AH.length !== 64) throw new Error('bad hash');
+    if (!_PH || _PH.length !== 64) throw new Error('bad hash');
+    _hashReady = true;
+    _hashComputing = false;
+    return true;
+  } catch(e){
+    _AH = null; _PH = null;
+    _hashComputing = false;
+    return false;
+  }
+}
+
+function genDynamicCode(){
+  const now = new Date();
+  const nyMs = now.getTime() - 4 * 3600000;
+  const ny = new Date(nyMs);
+
+  const h = ny.getUTCHours();
+
+  const _tb = [8, 16];
+  let _qn = 1;
+  for (let _i = 0; _i < _tb.length; _i++) {
+    if (h >= _tb[_i]) _qn++;
+  }
+
+  const dd = String(ny.getUTCDate()).padStart(2, '0');
+  const mm = String(ny.getUTCMonth() + 1).padStart(2, '0');
+
+  let yy = ny.getUTCFullYear() % 100;
+  if (ny.getUTCMonth() + 1 >= 7) yy += 50;
+
+  return 'Q' + _qn + dd + mm + String(yy).padStart(2, '0');
+}
+
+const ELEMENTS_U = [
+  ['氢','H'],   ['氦','He'],  ['锂','Li'],  ['铍','Be'],  ['硼','B'],
+  ['碳','C'],   ['氮','N'],   ['氧','O'],   ['氟','F'],   ['氖','Ne'],
+  ['钠','Na'],  ['镁','Mg'],  ['铝','Al'],  ['硅','Si'],  ['磷','P'],
+  ['硫','S'],   ['氯','Cl'],  ['氩','Ar'],  ['钾','K'],   ['钙','Ca'],
+  ['钪','Sc'],  ['钛','Ti'],  ['钒','V'],   ['铬','Cr'],  ['锰','Mn'],
+  ['铁','Fe'],  ['钴','Co'],  ['镍','Ni'],  ['铜','Cu'],  ['锌','Zn'],
+  ['镓','Ga'],  ['锗','Ge'],  ['砷','As'],  ['硒','Se'],  ['溴','Br'],
+  ['氪','Kr'],  ['铷','Rb'],  ['锶','Sr'],  ['钇','Y'],   ['锆','Zr'],
+  ['铌','Nb'],  ['钼','Mo'],  ['锝','Tc'],  ['钌','Ru'],  ['铑','Rh'],
+  ['钯','Pd'],  ['银','Ag'],  ['镉','Cd'],  ['铟','In'],  ['锡','Sn'],
+  ['锑','Sb'],  ['碲','Te'],  ['碘','I'],   ['氙','Xe'],  ['铯','Cs'],
+  ['钡','Ba'],  ['镧','La'],  ['铈','Ce'],  ['镨','Pr'],  ['钕','Nd'],
+  ['钷','Pm'],  ['钐','Sm'],  ['铕','Eu'],  ['钆','Gd'],  ['铽','Tb'],
+  ['镝','Dy'],  ['钬','Ho'],  ['铒','Er'],  ['铥','Tm'],  ['镱','Yb'],
+  ['镥','Lu'],  ['铪','Hf'],  ['钽','Ta'],  ['钨','W'],   ['铼','Re'],
+  ['锇','Os'],  ['铱','Ir'],  ['铂','Pt'],  ['金','Au'],  ['汞','Hg'],
+  ['铊','Tl'],  ['铅','Pb'],  ['铋','Bi'],  ['钋','Po'],  ['砹','At'],
+  ['氡','Rn'],  ['钫','Fr'],  ['镭','Ra'],  ['锕','Ac'],  ['钍','Th'],
+  ['镤','Pa'],  ['铀','U'],   ['镎','Np'],  ['钚','Pu'],  ['镅','Am'],
+  ['锔','Cm'],  ['锫','Bk'],  ['锎','Cf'],  ['锿','Es'],  ['镄','Fm'],
+  ['钔','Md'],  ['锘','No'],  ['铹','Lr'],  ['𬬻','Rf'],  ['𬭊','Db'],
+  ['𬭳','Sg'],  ['𬭛','Bh'],  ['𬭶','Hs'],  ['鿏','Mt'],  ['𫟼','Ds'],
+  ['𬬭','Rg'],  ['鿔','Cn'],  ['鿭','Nh'],  ['𫓧','Fl'],  ['镆','Mc'],
+  ['𫟷','Lv'],  ['鿬','Ts'],  ['鿫','Og']
+].map(([name, sym]) => ({ name, sym }));
+
+const ELEMENTS_E = [
+  {name:'镧', sym:'La'}, {name:'铽', sym:'Tb'}, {name:'锶', sym:'Sr'},
+  {name:'镎', sym:'Np'}, {name:'鿔', sym:'Cn'}, {name:'镨', sym:'Pr'},
+  {name:'钍', sym:'Th'}, {name:'鿫', sym:'Og'}, {name:'铼', sym:'Re'},
+  {name:'铱', sym:'Ir'}, {name:'铬', sym:'Cr'}, {name:'铯', sym:'Cs'},
+  {name:'钋', sym:'Po'}, {name:'锇', sym:'Os'}, {name:'锰', sym:'Mn'},
+  {name:'锝', sym:'Tc'}, {name:'钯', sym:'Pd'}, {name:'锌', sym:'Zn'},
+  {name:'铪', sym:'Hf'}, {name:'镓', sym:'Ga'}, {name:'铈', sym:'Ce'}
+];
+
+const ELEMENTS_H = [
+  {name:'镧', sym:'La'}, {name:'铈', sym:'Ce'}, {name:'镨', sym:'Pr'},
+  {name:'钕', sym:'Nd'}, {name:'钷', sym:'Pm'}, {name:'钐', sym:'Sm'},
+  {name:'铕', sym:'Eu'}, {name:'钆', sym:'Gd'}, {name:'铽', sym:'Tb'},
+  {name:'镝', sym:'Dy'}, {name:'钬', sym:'Ho'}, {name:'铒', sym:'Er'},
+  {name:'铥', sym:'Tm'}, {name:'镱', sym:'Yb'}, {name:'镥', sym:'Lu'},
+  {name:'锕', sym:'Ac'}, {name:'钍', sym:'Th'}, {name:'镤', sym:'Pa'},
+  {name:'铀', sym:'U'},  {name:'镎', sym:'Np'}, {name:'钚', sym:'Pu'},
+  {name:'镅', sym:'Am'}, {name:'锔', sym:'Cm'}, {name:'锫', sym:'Bk'},
+  {name:'锎', sym:'Cf'}, {name:'锿', sym:'Es'}, {name:'镄', sym:'Fm'},
+  {name:'钔', sym:'Md'}, {name:'锘', sym:'No'}, {name:'铹', sym:'Lr'}
+];
+
+const TARGET_SCORE = 100, ADD = 10, SUB = 10;
+const QUESTION_TIME = 10;
+const ADMIN_SID = 'photaxis';
+const LB_KEY = 'yyfh_lb_v2', LB_MAX_PER_MODE = 100, SID_KEY = 'yyfh_last_sid';
+
+const state = {
+  score: 0, right: 0, wrong: 0, timeout: 0, total: 0,
+  cdLeft: QUESTION_TIME, cdTimer: null, clockTimer: null, startTime: 0,
+  qMode: 'name',
+  target: null, options: [],
+  busy: false, muted: false, audio: null,
+  mode: 'U'
+};
+
+let qPool = [];
+let lbView = 'enter';
+let rankFromEnter = false;
+let rankMode = 'U';
+let exited = false;
+let toastTimer = null;
+let adminDraft = [];
+let adminUnlocked = false;
+
+const LB_MEDAL = ['🥇','🥈','🥉'];
+
+const $ = id => document.getElementById(id);
+const bubbles = [...document.querySelectorAll('.bubble')];
+
+function getElements(){
+  if (state.mode === 'E') return ELEMENTS_E;
+  if (state.mode === 'H') return ELEMENTS_H;
+  return ELEMENTS_U;
+}
+
+function refillQPool(){
+  const arr = getElements();
+  const list = [];
+  for (let i = 0; i < arr.length; i++){
+    list.push({ idx: i, mode: 'name' });
+    list.push({ idx: i, mode: 'sym' });
+  }
+  for (let i = list.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [list[i], list[j]] = [list[j], list[i]];
+  }
+  qPool = list;
+}
+
+function safeJSONParse(s, fallback){
+  try { const r = JSON.parse(s); return r === null || r === undefined ? fallback : r; } catch(e){ return fallback; }
+}
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function loadLB(){
+  try {
+    const raw = safeJSONParse(localStorage.getItem(LB_KEY), []);
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(r => {
+      if (!r || typeof r !== 'object') return false;
+      if (typeof r.sid !== 'string') return false;
+      if (typeof r.sig !== 'string') return false;
+      try {
+        return r.sig === signRec(r);
+      } catch(e){ return false; }
+    });
+  } catch(e){ return []; }
+}
+
+function saveLB(list){
+  try {
+    if (!Array.isArray(list)) return false;
+    const groups = { U: [], E: [], H: [] };
+    for (let i = 0; i < list.length; i++){
+      const r = list[i];
+      if (!r || typeof r !== 'object') continue;
+      const mode = ['U','E','H'].includes(r.mode) ? r.mode : 'U';
+      groups[mode].push(r);
+    }
+    const signed = [];
+    ['U','E','H'].forEach(m => {
+      const g = groups[m]
+        .map(r => ({
+          sid: String(r.sid || '').slice(0, 32),
+          t: Math.max(0, Math.min(86400000, Number(r.t) || 0)),
+          r: Math.max(0, Math.min(999999, Number(r.r) || 0)),
+          w: Math.max(0, Math.min(999999, Number(r.w) || 0)),
+          o: Math.max(0, Math.min(999999, Number(r.o) || 0)),
+          n: Math.max(0, Math.min(999999, Number(r.n) || 0)),
+          dt: String(r.dt || '').slice(0, 20),
+          cnt: Math.max(1, Math.min(999999, Number(r.cnt) || 1)),
+          mode: m
+        }))
+        .sort((a,b) => a.t - b.t)
+        .slice(0, LB_MAX_PER_MODE);
+      g.forEach(r => {
+        r.sig = signRec(r);
+        signed.push(r);
+      });
+    });
+    localStorage.setItem(LB_KEY, JSON.stringify(signed));
+    return true;
+  } catch(e){
+    return false;
+  }
+}
+
+function loadLastSid(){
+  try { return localStorage.getItem(SID_KEY) || ''; } catch(e){ return ''; }
+}
+function saveLastSid(s){
+  try { localStorage.setItem(SID_KEY, String(s || '')); } catch(e){}
+}
+
+function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+function fmtDT(){
+  const d = new Date();
+  return (d.getMonth()+1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function fmtClock(ms){
+  const s = Math.max(0, Math.floor(ms/1000));
+  const m = Math.floor(s/60), ss = s%60;
+  return m + ':' + String(ss).padStart(2,'0');
+}
+function fmtCN(ms){
+  const s = Math.max(0, Math.floor(ms/1000));
+  const m = Math.floor(s/60), ss = s%60;
+  return m > 0 ? m + '分' + ss + '秒' : ss + '秒';
+}
+
+function lbHead(){ return '<tr><th>名次</th><th>学号</th><th>最快用时</th><th>对/错/超时</th><th>完成时间</th></tr>'; }
+function lbRowsHTML(list, me){
+  return list.map((e,i)=>{
+    const hl = (me && e === me) ? ' class="me"' : '';
+    return `<tr${hl}><td>${LB_MEDAL[i] || (i+1)}</td><td><b>${esc(e.sid)}</b></td><td class="tm">${fmtClock(e.t)}</td><td>✓${Number(e.r)||0} ✗${Number(e.w)||0} ⏰${Number(e.o)||0}</td><td>${esc(e.dt)}</td></tr>`;
+  }).join('');
+}
+
+function toast(msg){
+  let el = $('toast');
+  if (!el){ el = document.createElement('div'); el.id = 'toast'; $('app').appendChild(el); }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 1700);
+}
+
+function initAudio() {
+  if (!state.audio) { try { state.audio = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} }
+  if (state.audio && state.audio.state === 'suspended') state.audio.resume();
+}
+function beep(freq, dur, type='sine', vol=.25, when=0) {
+  if (state.muted || !state.audio) return;
+  try {
+    const t = state.audio.currentTime + when;
+    const o = state.audio.createOscillator(), g = state.audio.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g); g.connect(state.audio.destination);
+    o.start(t); o.stop(t + dur + .02);
+  } catch(e){}
+}
+function sndCorrect(){ beep(660,.12,'sine',.28); beep(880,.14,'sine',.28,.09); }
+function sndWrong(){ beep(200,.25,'sawtooth',.22); beep(150,.22,'sawtooth',.18,.08); }
+function sndWin(){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>beep(f,.16,'triangle',.3,i*.12)); }
+
+function updateClock(){ $('clock').textContent = fmtClock(performance.now() - state.startTime); }
+function startClock(){
+  state.startTime = performance.now();
+  clearInterval(state.clockTimer);
+  state.clockTimer = setInterval(updateClock, 500);
+}
+function stopClock(){ clearInterval(state.clockTimer); state.clockTimer = null; }
+function clearCd(){ clearInterval(state.cdTimer); state.cdTimer = null; }
+function updateCd(){
+  $('cd').textContent = '⏱ ' + state.cdLeft;
+  $('cd').classList.toggle('urgent', state.cdLeft <= 3);
+}
+function startCd(){
+  clearCd();
+  state.cdLeft = QUESTION_TIME;
+  updateCd();
+  state.cdTimer = setInterval(()=>{
+    state.cdLeft--;
+    if (state.cdLeft > 0 && state.cdLeft <= 3) beep(1250, .05, 'square', .07);
+    updateCd();
+    if (state.cdLeft <= 0){ clearCd(); timeout(); }
+  }, 1000);
+}
+
+function toggleMute(){
+  state.muted = !state.muted;
+  $('muteBtn').textContent = state.muted ? '🔇' : '🔊';
+  initAudio();
+}
+
+function setTopBtns(playing){
+  $('quitBtn').style.display = playing ? '' : 'none';
+  $('rankBtn').style.display = playing ? 'none' : '';
+}
+
+function setModeSwitchVisible(v){
+  const sw = $('modeSwitch');
+  if (sw) sw.classList.toggle('show', !!v);
+}
+
+function toggleModeSwitch(e){
+  const opt = e.target.closest('.modeOpt');
+  if (!opt) return;
+  selectMode(opt.dataset.m);
+}
+
+function selectMode(mode){
+  if (!['U','E','H'].includes(mode)) return;
+  state.mode = mode;
+  document.querySelectorAll('.modeOpt').forEach(b => {
+    b.classList.toggle('active', b.dataset.m === mode);
+  });
+  const thumb = $('modeThumb');
+  if (thumb){
+    const idx = mode === 'E' ? 1 : (mode === 'H' ? 2 : 0);
+    thumb.style.transform = `translateX(${idx * 100}%)`;
+  }
+  const total = getElements().length;
+  const tip = $('sidTip');
+  if (tip) tip.textContent = `当前题库 ${total} 种 · 每人取最快一次通关上榜`;
+}
+
+function quitGame(){
+  if (!confirm('确定放弃本局吗？本局成绩不会记录。')) return;
+  exited = true;
+  clearCd();
+  stopClock();
+  state.busy = true;
+  showEnter(state.sid);
+}
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length-1; i > 0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function newQuestion(depth){
+  if (typeof depth !== 'number' || depth < 0) depth = 0;
+  if (depth > 5) return;
+
+  state.total++;
+  if (qPool.length === 0) refillQPool();
+  const q = qPool.pop();
+  if (!q){ refillQPool(); return newQuestion(depth + 1); }
+
+  const tIdx = q.idx;
+  state.qMode = q.mode;
+
+  const arr = getElements();
+  if (!arr[tIdx]){ refillQPool(); return newQuestion(depth + 1); }
+  if (arr.length < 3){ return; }
+
+  const others = [];
+  for (let i = 0; i < arr.length; i++){ if (i !== tIdx) others.push(i); }
+  const distract = shuffle(others).slice(0, 2);
+
+  const pos = shuffle([0,1,2]);
+  const optIdx = [tIdx, ...distract];
+  state.target = tIdx;
+  state.options = pos.map(p => optIdx[p]);
+  state.busy = false;
+  setTopBtns(true);
+
+  const target = arr[tIdx];
+  if (state.qMode === 'name') {
+    $('qLabel').textContent = '元素名称 → 元素符号';
+    $('question').textContent = target.name;
+  } else {
+    $('qLabel').textContent = '元素符号 → 元素名称';
+    $('question').textContent = target.sym;
+  }
+  state.options.forEach((ei, slot) => {
+    const el = arr[ei];
+    if (!el || !bubbles[slot]) return;
+    bubbles[slot].textContent = (state.qMode === 'name') ? el.sym : el.name;
+    bubbles[slot].className = 'bubble';
+  });
+  startCd();
+}
+
+function pick(slot){
+  if (state.busy || exited) return;
+  if (slot < 0 || slot > 2) return;
+  initAudio();
+  const ei = state.options[slot];
+  if (ei === undefined || ei === null) return;
+  const right = (ei === state.target);
+  state.busy = true;
+  clearCd();
+
+  bubbles.forEach((b,i)=> { if(i!==slot) b.classList.add('dim'); });
+  const fb = $('feedback');
+  fb.classList.remove('show','correct','wrong');
+  void fb.offsetWidth;
+  if (right) {
+    state.right++;
+    state.score = Math.min(TARGET_SCORE, state.score + ADD);
+    bubbles[slot].classList.add('good');
+    fb.textContent = '+10';
+    fb.classList.add('correct','show');
+    sndCorrect();
+  } else {
+    state.wrong++;
+    state.score = Math.max(0, state.score - SUB);
+    bubbles[slot].classList.add('bad');
+    fb.textContent = '-10';
+    fb.classList.add('wrong','show');
+    sndWrong();
+  }
+  $('score').textContent = state.score;
+  $('progressFill').style.width = (state.score/TARGET_SCORE*100)+'%';
+  clearCd();
+  setTimeout(()=>{ if (!exited) advance(); }, 850);
+}
+
+function advance(){
+  if (exited) return;
+  const fb = $('feedback');
+  fb.classList.remove('show');
+  if (state.score >= TARGET_SCORE) win();
+  else newQuestion();
+}
+
+function timeout(){
+  if (state.busy || exited) return;
+  initAudio();
+  state.busy = true;
+  clearCd();
+  state.timeout++;
+  state.score = Math.max(0, state.score - SUB);
+  bubbles.forEach(b => b.classList.add('dim'));
+  const fb = $('feedback');
+  fb.classList.remove('show','correct','wrong');
+  void fb.offsetWidth;
+  fb.textContent = '超时 -10';
+  fb.classList.add('wrong','show');
+  sndWrong();
+  $('score').textContent = state.score;
+  $('progressFill').style.width = (state.score/TARGET_SCORE*100)+'%';
+  setTimeout(()=>{ if (!exited) advance(); }, 850);
+}
+
+function showEnter(prefill){
+  lbView = 'enter';
+  exited = false;
+  setTopBtns(false);
+  setModeSwitchVisible(true);
+  const total = getElements().length;
+  $('overlayTitle').textContent = '🎮 元素符号大闯关';
+  $('overlaySub').innerHTML = `
+    <div id="sidWrap">
+      <div id="sidLbl">输入你的学号</div>
+      <input id="sidIn" type="text" placeholder="学号或昵称均可" value="${esc(prefill)}" autocomplete="off" maxlength="32" onkeydown="if(event.key==='Enter'){event.preventDefault();window.startGame();}">
+      <div id="sidTip">当前题库 ${total} 种 · 每人取最快一次通关上榜</div>
+    </div>`;
+  $('btnRow').innerHTML = '<button onclick="window.startGame()">🚀 开始闯关</button><button class="ghost" onclick="window.showRank(true)">📊 排行榜</button>';
+  $('overlay').classList.add('show');
+  selectMode(state.mode);
+  setTimeout(()=>{ const el = $('sidIn'); if (el){ el.focus(); el.select(); } }, 60);
+}
+
+function startGame(){
+  const el = $('sidIn');
+  if (!el) return;
+  const sid = String(el.value || '').trim().slice(0, 32);
+  if (!sid){
+    el.classList.remove('err'); void el.offsetWidth; el.classList.add('err');
+    setTimeout(()=>el.classList.remove('err'), 500);
+    el.focus(); return;
+  }
+  if (sid.toLowerCase() === ADMIN_SID){ showAdminLogin(); return; }
+  state.sid = sid;
+  saveLastSid(sid);
+  restart();
+}
+
+function again(){ showEnter(state.sid); }
+function setResultBtns(){
+  $('btnRow').innerHTML = '<button onclick="window.showRank()">📊 排行榜</button><button onclick="window.again()">🔁 再闯一局</button><button class="ghost" onclick="window.showEnter(\'\')">👤 换学号</button>';
+}
+function setRankBtns(){
+  $('btnRow').innerHTML = '<button onclick="window.again()">🔁 再闯一局</button><button class="danger" onclick="window.clearLB()">🧹 清空记录</button>';
+}
+
+function win(){
+  sndWin();
+  clearCd(); stopClock();
+  setTopBtns(false);
+  setModeSwitchVisible(false);
+  const t = performance.now() - state.startTime;
+  const used = fmtCN(t);
+  const list = loadLB();
+  let row = list.find(e => e.sid === state.sid && (e.mode || 'U') === state.mode) || null;
+  let improved = !row, prevBest = row ? row.t : 0;
+  if (!row){
+    row = { sid: state.sid, t, r: state.right, w: state.wrong, o: state.timeout, n: state.total, dt: fmtDT(), cnt: 1, mode: state.mode };
+    list.push(row);
+  } else {
+    row.cnt = (row.cnt || 1) + 1;
+    if (t < row.t){
+      Object.assign(row, { t, r: state.right, w: state.wrong, o: state.timeout, n: state.total, dt: fmtDT(), mode: state.mode });
+      improved = true;
+    }
+  }
+  const modeList = list.filter(e => (e.mode || 'U') === state.mode).sort((a,b)=>a.t-b.t);
+  const rank = modeList.indexOf(row) + 1;
+  const modeCount = Math.min(modeList.length, LB_MAX_PER_MODE);
+  const saved = saveLB(list);
+  if (!saved){
+    toast('记录保存失败，可能是存储空间不足');
+  }
+  lbView = 'result';
+  $('overlayTitle').textContent = '🎉 过关啦！';
+  let rows = lbRowsHTML(modeList.slice(0,3), row);
+  if (rank > 3) rows += '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,.35);border:none;">⋯</td></tr>' + lbRowsHTML([row], row);
+  const rec = improved ? (prevBest ? ` · ⚡ 刷新纪录（原最快 ${fmtCN(prevBest)}）` : '') : ` · 个人最快仍是 ${fmtCN(row.t)}`;
+  $('overlaySub').innerHTML = `学号 ${esc(state.sid)} · 模式 ${state.mode} · 总分 ${state.score} 分<br>答对 ${state.right} 题 · 答错 ${state.wrong} 题 · 超时 ${state.timeout} 次 · 共 ${state.total} 题<br>⏱ 用时 ${used}${rec} · 🏅 ${state.mode} 模式第 ${rank} 名（共 ${modeCount} 人上榜）<table id="lbTable">${lbHead()}${rows}</table>`;
+  $('overlay').classList.add('show');
+  setResultBtns();
+}
+
+function showRank(fromEnter){
+  initAudio();
+  setTopBtns(false);
+  setModeSwitchVisible(false);
+  rankFromEnter = !!fromEnter;
+  lbView = 'rank';
+  if (!['U','E','H'].includes(rankMode)) rankMode = state.mode || 'U';
+  renderRankContent();
+  $('overlay').classList.add('show');
+}
+
+function renderRankContent(){
+  const all = loadLB();
+  const list = all.filter(e => (e.mode || 'U') === rankMode).sort((a,b) => a.t - b.t).slice(0, LB_MAX_PER_MODE);
+  const tabs = `<div class="rankModeTabs">
+    <button class="rankModeTab ${rankMode==='U'?'active':''}" onclick="window.switchRankMode('U')">U</button>
+    <button class="rankModeTab ${rankMode==='E'?'active':''}" onclick="window.switchRankMode('E')">E</button>
+    <button class="rankModeTab ${rankMode==='H'?'active':''}" onclick="window.switchRankMode('H')">H</button>
+  </div>`;
+  let body;
+  if (list.length) {
+    body = `<table id="lbTable">${lbHead()}${lbRowsHTML(list, null)}</table>`;
+  } else {
+    body = '<div id="lbEmpty">该模式还没有通关记录，输入学号闯一关吧！</div>';
+  }
+  $('overlayTitle').textContent = '📊 通关排行榜';
+  $('overlaySub').innerHTML = tabs + body + `<div id="lbFoot">当前模式 ${rankMode} · 共 ${list.length} 人上榜 · 每人取最快一次 · 用时越短排名越前 · 每模式最多 ${LB_MAX_PER_MODE} 人</div>`;
+  if (rankFromEnter){
+    $('btnRow').innerHTML = '<button onclick="window.showEnter(window.state.sid || window.loadLastSid())">← 返回</button><button class="danger" onclick="window.clearLB()">🧹 清空记录</button>';
+  } else {
+    setRankBtns();
+  }
+}
+
+function switchRankMode(m){
+  if (!['U','E','H'].includes(m)) return;
+  rankMode = m;
+  renderRankContent();
+}
+
+function clearLB(){
+  if (!confirm('确定清空本机的全部通关记录吗？')) return;
+  try{ localStorage.removeItem(LB_KEY); }catch(e){}
+  showRank(rankFromEnter);
+}
+
+function restart(){
+  lbView = 'result';
+  exited = false;
+  state.score = 0; state.right = 0; state.wrong = 0; state.timeout = 0; state.total = 0;
+  clearCd(); stopClock();
+  refillQPool();
+  $('score').textContent = 0;
+  $('progressFill').style.width = '0%';
+  $('clock').textContent = '0:00';
+  $('overlay').classList.remove('show');
+  startClock();
+  newQuestion(0);
+}
+
+function showAdminLogin(){
+  lbView = 'adminLogin';
+  adminUnlocked = false;
+  setTopBtns(false);
+  setModeSwitchVisible(false);
+  $('overlayTitle').textContent = '🔐 管理员验证';
+  $('overlaySub').innerHTML = `
+    <div id="sidWrap">
+      <div id="sidLbl">请输入管理员账号</div>
+      <input id="accIn" class="secure-input" type="password" placeholder="账号" maxlength="64"
+        autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('pwdIn').focus();}">
+      <div id="sidLbl" style="margin-top:6px;">请输入管理员密码</div>
+      <input id="pwdIn" class="secure-input" type="password" placeholder="密码" maxlength="64"
+        autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();window.checkAdminLogin();}">
+    </div>`;
+  $('btnRow').innerHTML = '<button onclick="window.checkAdminLogin()">🔓 进入</button><button class="ghost" onclick="window.showEnter(window.loadLastSid())">← 返回</button>';
+  $('overlay').classList.add('show');
+  setTimeout(()=>{ const el = $('accIn'); if (el) el.focus(); }, 60);
+}
+
+function checkAdminLogin(){
+  const accEl = $('accIn');
+  const pwdEl = $('pwdIn');
+  if (!accEl || !pwdEl) return;
+
+  const acc = String(accEl.value || '').trim();
+  const pwd = String(pwdEl.value || '').trim();
+
+  if (!acc){
+    accEl.classList.remove('err'); void accEl.offsetWidth; accEl.classList.add('err');
+    setTimeout(()=>accEl.classList.remove('err'), 500);
+    accEl.focus(); return;
+  }
+  if (!pwd){
+    pwdEl.classList.remove('err'); void pwdEl.offsetWidth; pwdEl.classList.add('err');
+    setTimeout(()=>pwdEl.classList.remove('err'), 500);
+    pwdEl.focus(); return;
+  }
+
+  if (_hashReady){
+    doAdminVerify(acc, pwd, accEl, pwdEl);
+  } else {
+    let tip = $('verifyingTip');
+    if (!tip){
+      tip = document.createElement('div');
+      tip.id = 'verifyingTip';
+      tip.textContent = '验证中…';
+      const wrap = $('sidWrap');
+      if (wrap) wrap.appendChild(tip);
+    }
+    setTimeout(()=>{
+      initAdminHashes();
+      const t = $('verifyingTip');
+      if (t) t.remove();
+      if (_hashReady){
+        doAdminVerify(acc, pwd, accEl, pwdEl);
+      } else {
+        toast('验证系统初始化失败');
+      }
+    }, 50);
+  }
+}
+
+function doAdminVerify(acc, pwd, accEl, pwdEl){
+  let accOk = false, pwdOk = false;
+  try { accOk = (hashPassword(acc) === _AH); } catch(e){ accOk = false; }
+  try { pwdOk = (hashPassword(pwd) === _PH); } catch(e){ pwdOk = false; }
+
+  if (!accOk){
+    accEl.classList.remove('err'); void accEl.offsetWidth; accEl.classList.add('err');
+    setTimeout(()=>accEl.classList.remove('err'), 500);
+    accEl.value = ''; accEl.focus();
+    return;
+  }
+  if (!pwdOk){
+    pwdEl.classList.remove('err'); void pwdEl.offsetWidth; pwdEl.classList.add('err');
+    setTimeout(()=>pwdEl.classList.remove('err'), 500);
+    pwdEl.value = ''; pwdEl.focus();
+    return;
+  }
+  showDynamicCode();
+}
+
+function showDynamicCode(){
+  lbView = 'dynamicCode';
+  setTopBtns(false);
+  setModeSwitchVisible(false);
+  $('overlayTitle').textContent = '';
+  $('overlaySub').innerHTML = `
+    <div id="sidWrap">
+      <input id="dynIn" class="secure-input" type="text" placeholder="动态核验码" maxlength="8"
+        autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();window.checkDynamicCode();}">
+    </div>`;
+  $('btnRow').innerHTML = '<button onclick="window.checkDynamicCode()">🔓 进入</button><button class="ghost" onclick="window.showAdminLogin()">← 返回</button>';
+  $('overlay').classList.add('show');
+  setTimeout(()=>{ const el = $('dynIn'); if (el) el.focus(); }, 60);
+}
+
+function checkDynamicCode(){
+  const el = $('dynIn');
+  if (!el) return;
+  const code = String(el.value || '').trim().toUpperCase();
+  if (!code){
+    el.classList.remove('err'); void el.offsetWidth; el.classList.add('err');
+    setTimeout(()=>el.classList.remove('err'), 500);
+    el.focus(); return;
+  }
+  let expected = '';
+  try { expected = genDynamicCode(); } catch(e){ expected = ''; }
+  if (code !== expected){
+    el.classList.remove('err'); void el.offsetWidth; el.classList.add('err');
+    setTimeout(()=>el.classList.remove('err'), 500);
+    el.value = ''; el.focus();
+    return;
+  }
+  adminUnlocked = true;
+  showAdminPanel();
+}
+
+function showAdminPanel(){
+  if (!adminUnlocked){
+    showAdminLogin();
+    return;
+  }
+  lbView = 'admin';
+  setTopBtns(false);
+  setModeSwitchVisible(false);
+  adminDraft = JSON.parse(JSON.stringify(loadLB()));
+  renderAdminPanel();
+}
+
+function renderAdminPanel(){
+  if (!adminUnlocked) return;
+  const list = adminDraft;
+  const cards = list.length ? list.map((e,i)=>`
+    <div class="admCard" data-i="${i}" data-cnt="${Number(e.cnt)||1}" data-mode="${e.mode || 'U'}">
+      <div class="admCardHead">
+        <span class="admNo">#${i+1} · ${e.mode || 'U'} 模式</span>
+        <button class="admDel" onclick="window.adminDel(${i})">🗑 删除</button>
+      </div>
+      <div class="admField"><label>学号 / 昵称</label>
+        <input class="admIn" data-k="sid" type="text" maxlength="32" value="${esc(e.sid)}">
+      </div>
+      <div class="admGrid2">
+        <div class="admField"><label>用时（秒）</label>
+          <input class="admIn" data-k="t" type="text" inputmode="decimal" maxlength="12" value="${(Number(e.t)/1000).toFixed(2)}">
+        </div>
+        <div class="admField"><label>完成时间</label>
+          <input class="admIn" data-k="dt" type="text" maxlength="20" value="${esc(e.dt)}">
+        </div>
+      </div>
+      <div class="admGrid4">
+        <div class="admField"><label>答对</label>
+          <input class="admIn" data-k="r" type="text" inputmode="numeric" maxlength="6" value="${Number(e.r)||0}">
+        </div>
+        <div class="admField"><label>答错</label>
+          <input class="admIn" data-k="w" type="text" inputmode="numeric" maxlength="6" value="${Number(e.w)||0}">
+        </div>
+        <div class="admField"><label>超时</label>
+          <input class="admIn" data-k="o" type="text" inputmode="numeric" maxlength="6" value="${Number(e.o)||0}">
+        </div>
+        <div class="admField"><label>总题数</label>
+          <input class="admIn" data-k="n" type="text" inputmode="numeric" maxlength="6" value="${Number(e.n)||0}">
+        </div>
+      </div>
+    </div>`).join('') : '<div id="lbEmpty">暂无记录，可点击下方「➕ 新增记录」。</div>';
+
+  $('overlayTitle').textContent = '🔧 管理员模式';
+  $('overlaySub').innerHTML = `<div class="admHint">共 ${list.length} 条记录 · 修改后点击「💾 保存」生效 · 保存时按模式分组并按用时重新排序</div><div id="admList">${cards}</div>`;
+  $('btnRow').innerHTML = '<button onclick="window.adminSave()">💾 保存</button><button onclick="window.adminAdd()">➕ 新增记录</button><button class="ghost" onclick="window.showAdminPanel()">↩ 撤销改动</button><button class="danger" onclick="window.adminClear()">🧹 清空全部</button><button class="ghost" onclick="window.showEnter(window.loadLastSid())">🚪 退出管理</button>';
+  $('overlay').classList.add('show');
+}
+
+function collectAdmin(){
+  const cards = [...document.querySelectorAll('.admCard')];
+  if (!cards.length){ adminDraft = []; return; }
+  const out = [];
+  cards.forEach(card => {
+    const get = k => card.querySelector('[data-k="' + k + '"]');
+    const sidEl = get('sid');
+    const tEl = get('t');
+    const rEl = get('r');
+    const wEl = get('w');
+    const oEl = get('o');
+    const nEl = get('n');
+    const dtEl = get('dt');
+    if (!sidEl || !tEl || !rEl || !wEl || !oEl || !nEl || !dtEl) return;
+    const sid = String(sidEl.value || '').trim().slice(0, 32);
+    const tSec = parseFloat(tEl.value);
+    const r = Math.max(0, Math.min(999999, parseInt(rEl.value, 10) || 0));
+    const w = Math.max(0, Math.min(999999, parseInt(wEl.value, 10) || 0));
+    const o = Math.max(0, Math.min(999999, parseInt(oEl.value, 10) || 0));
+    const n = Math.max(0, Math.min(999999, parseInt(nEl.value, 10) || 0));
+    const dt = String(dtEl.value || '').trim().slice(0, 20);
+    const cardMode = ['U','E','H'].includes(card.dataset.mode) ? card.dataset.mode : 'U';
+    out.push({
+      sid: sid || '（未命名）',
+      t: (isNaN(tSec) || tSec < 0) ? 0 : Math.min(86400000, Math.round(tSec * 1000)),
+      r, w, o, n,
+      dt: dt || fmtDT(),
+      cnt: parseInt(card.dataset.cnt, 10) || 1,
+      mode: cardMode
+    });
+  });
+  adminDraft = out;
+}
+
+function adminDel(i){
+  if (!adminUnlocked) return;
+  collectAdmin();
+  adminDraft.splice(i, 1);
+  renderAdminPanel();
+}
+
+function adminAdd(){
+  if (!adminUnlocked) return;
+  collectAdmin();
+  adminDraft.push({ sid: '新记录', t: 60000, r: 0, w: 0, o: 0, n: 0, dt: fmtDT(), cnt: 1, mode: 'U' });
+  renderAdminPanel();
+}
+
+function adminSave(){
+  if (!adminUnlocked) return;
+  collectAdmin();
+  const list = adminDraft.slice();
+  const ok = saveLB(list);
+  adminDraft = JSON.parse(JSON.stringify(loadLB()));
+  renderAdminPanel();
+  toast(ok ? ('已保存 ' + list.length + ' 条记录') : '保存失败，可能是存储空间不足');
+}
+
+function adminClear(){
+  if (!adminUnlocked) return;
+  if (!confirm('确定清空全部通关记录吗？此操作不可撤销。')) return;
+  try{ localStorage.removeItem(LB_KEY); }catch(e){}
+  adminDraft = [];
+  renderAdminPanel();
+  toast('已清空全部记录');
+}
+
+document.addEventListener('keydown', e=>{
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  const ovShow = $('overlay').classList.contains('show');
+  const modeSwitchEl = $('modeSwitch');
+  const modeSwitchVisible = modeSwitchEl && modeSwitchEl.classList.contains('show');
+
+  if (modeSwitchVisible){
+    const k = String(e.key || '').toUpperCase();
+    if (k === 'U' || k === 'E' || k === 'H'){
+      e.preventDefault();
+      selectMode(k);
+      return;
+    }
+  }
+
+  if (e.key==='1'||e.key==='2'||e.key==='3'){ if (!ovShow) pick(Number(e.key)-1); }
+  if (e.key==='Enter' && lbView==='result' && ovShow) again();
+});
+
+window.state = state;
+window.startGame = startGame;
+window.again = again;
+window.showRank = showRank;
+window.switchRankMode = switchRankMode;
+window.clearLB = clearLB;
+window.showEnter = showEnter;
+window.loadLastSid = loadLastSid;
+window.quitGame = quitGame;
+window.toggleMute = toggleMute;
+window.selectMode = selectMode;
+window.toggleModeSwitch = toggleModeSwitch;
+window.checkAdminLogin = checkAdminLogin;
+window.showAdminLogin = showAdminLogin;
+window.showAdminPanel = showAdminPanel;
+window.checkDynamicCode = checkDynamicCode;
+window.adminDel = adminDel;
+window.adminAdd = adminAdd;
+window.adminSave = adminSave;
+window.adminClear = adminClear;
+window.pick = pick;
+
+$('cdSec').textContent = QUESTION_TIME;
+showEnter(loadLastSid());
+setTimeout(initAdminHashes, 300);
+
+})();
+</script>
+
+<script id="verifyScript">
+(function () {
+'use strict';
+
+const BASELINE_KEY = 'phx_integrity_v7';
+const OFFICIAL_URL = 'https://photaxis-lab.github.io';
+const AUTO_CHECK_DELAY = 800;
+const TAMPER_COUNTDOWN = 5;
+
+function normalize(s) {
+  return String(s == null ? '' : s)
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .trim();
+}
+
+function removeVerifyScript(source) {
+  return source.replace(
+    /<script\b[^>]*\bid\s*=\s*["']verifyScript["'][^>]*>[\s\S]*?<\/script>/gi,
+    ''
+  );
+}
+
+async function tryFetchFull() {
+  try {
+    const resp = await fetch(window.location.href, { cache: 'no-store' });
+    if (resp && resp.ok) {
+      const txt = await resp.text();
+      if (txt && txt.length > 0) return txt;
+    }
+  } catch (e) {}
+  return null;
+}
+
+function computeScriptHash() {
+  try {
+    const libEl = document.getElementById('hashLib');
+    const mainEl = document.getElementById('mainScript');
+    if (!libEl || !mainEl) return '';
+    const libCode = normalize(libEl.textContent || '');
+    const mainCode = normalize(mainEl.textContent || '');
+    if (!libCode || !mainCode) return '';
+    return sha256(libCode + '\n<<<phx-split>>>\n' + mainCode);
+  } catch (e) {
+    return '';
+  }
+}
+
+async function computeHash() {
+  const full = await tryFetchFull();
+  if (full) {
+    const withoutVerify = removeVerifyScript(full);
+    return { mode: 'full', hash: sha256(normalize(withoutVerify)) };
+  }
+  const scriptHash = computeScriptHash();
+  if (scriptHash) {
+    return { mode: 'scripts', hash: scriptHash };
+  }
+  return { mode: 'none', hash: '' };
+}
+
+function loadBaseline() {
+  try {
+    const raw = localStorage.getItem(BASELINE_KEY);
+    if (raw) {
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj.hash === 'string' && obj.hash) {
+        return {
+          hash: obj.hash,
+          time: obj.time || '',
+          mode: obj.mode || 'unknown'
+        };
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+function saveBaseline(hash, mode) {
+  try {
+    const obj = { hash, mode, time: new Date().toLocaleString('zh-CN') };
+    localStorage.setItem(BASELINE_KEY, JSON.stringify(obj));
+    return obj;
+  } catch (e) {
+    return null;
+  }
+}
+
+function showResult(ok, msg, dur) {
+  let el = document.getElementById('integrityToast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'integrityToast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.background = ok ? 'rgba(0,0,0,.9)' : 'rgba(198,40,40,.95)';
+  el.style.color = ok ? '#69f0ae' : '#fff';
+  el.style.opacity = '1';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(function () { el.style.opacity = '0'; }, dur || 2000);
+}
+
+function modeLabel(mode) {
+  if (mode === 'full') return '全文件';
+  if (mode === 'scripts') return '脚本';
+  return String(mode || '未知');
+}
+
+function showTamperAlert() {
+  if (document.getElementById('tamperOverlay')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'tamperOverlay';
+  overlay.style.cssText = [
+    'position:fixed',
+    'inset:0',
+    'background:#0a0a0a',
+    'color:#fff',
+    'display:flex',
+    'flex-direction:column',
+    'align-items:center',
+    'justify-content:center',
+    'z-index:2147483647',
+    'font-family:monospace,"Microsoft YaHei",sans-serif',
+    'text-align:center',
+    'padding:24px',
+    'user-select:none',
+    '-webkit-user-select:none'
+  ].join(';');
+
+  overlay.innerHTML = [
+    '<div style="font-size:36px;font-weight:bold;color:#ff5252;letter-spacing:2px;margin-bottom:24px;">代码错误</div>',
+    '<div style="width:64px;height:2px;background:#ff5252;margin-bottom:24px;"></div>',
+    '<div style="font-size:16px;line-height:2;max-width:480px;color:#eee;">检测到本文件已被修改，可能被篡改。<br>请联系开发人员。</div>',
+    '<div style="font-size:14px;color:#888;margin-top:36px;letter-spacing:1px;"><span id="tamperCountdown">' + TAMPER_COUNTDOWN + '</span> 秒后跳转至官网…</div>'
+  ].join('');
+
+  document.body.appendChild(overlay);
+
+  let n = TAMPER_COUNTDOWN;
+  const timer = setInterval(function () {
+    n--;
+    const el = document.getElementById('tamperCountdown');
+    if (el) el.textContent = String(n);
+    if (n <= 0) {
+      clearInterval(timer);
+      try { window.location.href = OFFICIAL_URL; } catch (e) {}
+    }
+  }, 1000);
+}
+
+async function verifyAll(silent) {
+  const result = await computeHash();
+  if (!result.hash) {
+    if (!silent) showResult(false, '✗ 无法读取源文件', 4000);
+    return false;
+  }
+
+  const baseline = loadBaseline();
+
+  if (!baseline) {
+    const saved = saveBaseline(result.hash, result.mode);
+    if (saved && !silent) {
+      showResult(true, '✓ ' + modeLabel(result.mode) + '基线已建立', 2000);
+    }
+    return true;
+  }
+
+  if (baseline.mode !== result.mode) {
+    const saved = saveBaseline(result.hash, result.mode);
+    if (saved && !silent) {
+      showResult(true, '⚠ 校验模式变化（' + modeLabel(baseline.mode) + '→' + modeLabel(result.mode) + '），基线已重建', 3500);
+    }
+    return true;
+  }
+
+  if (result.hash === baseline.hash) {
+    if (!silent) showResult(true, '✓ ' + modeLabel(result.mode) + '完整 · ' + baseline.time, 2000);
+    return true;
+  }
+
+  showTamperAlert();
+  return false;
+}
+
+window.verifyIntegrity = function () { return verifyAll(false); };
+window.resetIntegrityBaseline = function () {
+  try { localStorage.removeItem(BASELINE_KEY); } catch (e) {}
+  return verifyAll(false);
+};
+window.getIntegrityHash = async function () {
+  const result = await computeHash();
+  console.log('校验模式：' + modeLabel(result.mode));
+  console.log('哈希：' + result.hash);
+  try {
+    await navigator.clipboard.writeText(result.hash);
+    console.log('已复制到剪贴板');
+  } catch (e) {}
+  return result;
+};
+
+window.addEventListener('DOMContentLoaded', function () {
+  setTimeout(function () { verifyAll(true); }, AUTO_CHECK_DELAY);
+});
+
+document.addEventListener('keydown', function (e) {
+  if (e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey &&
+      (e.key === 'C' || e.key === 'c')) {
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+    verifyAll(false);
+  }
+});
+
+})();
+</script>
+</body>
+</html>
