@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SLC.Leo 航班飞行时间计算器</title>
+<style>
+:root{
+  --ink:#e8eefc;
+  --ink-2:#a3b4d1;
+  --ink-3:#6d80a0;
+  --ink-4:#4a5a78;
+  --line:rgba(120,165,235,.14);
+  --line-2:rgba(120,165,235,.22);
+  --glass:rgba(11,17,36,.55);
+  --blue:#38bdf8;
+  --blue-2:#0ea5e9;
+  --blue-soft:rgba(56,189,248,.10);
+  --blue-line:rgba(56,189,248,.30);
+  --orange:#fb923c;
+  --radius-lg:24px;
+  --radius:18px;
+  --radius-sm:13px;
+  --shadow:0 24px 60px -22px rgba(0,0,0,.75), 0 8px 24px -12px rgba(0,0,0,.5);
+  --glow:0 0 30px -6px rgba(56,189,248,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+html,body{min-height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  background:radial-gradient(circle at 50% 45%, #141c3a 0%, #0a0e1f 48%, #04050c 100%);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+#bg{
+  position:fixed;inset:0;width:100%;height:100%;
+  display:block;pointer-events:none;z-index:0;
+}
+
+.app{
+  position:relative;z-index:1;
+  width:100%;max-width:700px;margin:0 auto;
+  padding:calc(env(safe-area-inset-top,0px) + 30px) 16px calc(env(safe-area-inset-bottom,0px) + 30px);
+}
+
+/* ============ HERO ============ */
+.hero{text-align:center;margin-bottom:20px;padding:0 6px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(56,189,248,.08);
+  border:1px solid rgba(56,189,248,.22);
+  color:var(--blue);
+  font-size:10.5px;font-weight:800;letter-spacing:1.8px;
+  padding:6px 14px 6px 12px;border-radius:100px;margin-bottom:14px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 0 24px -8px rgba(56,189,248,.5);
+}
+.hero-badge svg{width:12px;height:12px;transform:rotate(-15deg);}
+.hero h1{
+  font-size:27px;font-weight:800;letter-spacing:-.7px;line-height:1.15;
+  color:#fff;
+  text-shadow:0 0 40px rgba(56,189,248,.28), 0 2px 20px rgba(0,0,0,.6);
+}
+.hero p{color:var(--ink-3);font-size:12.5px;margin-top:9px;letter-spacing:.2px;line-height:1.5;}
+
+/* ============ CARD ============ */
+.card{
+  background:var(--glass);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  padding:20px;margin-bottom:14px;
+  position:relative;overflow:visible;
+}
+.card::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), transparent 40%);
+}
+/* 选择器打开时把整张卡片提升到最上层（双保险） */
+.card.is-active{ z-index: 100; }
+
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;position:relative;}
+.card-title{
+  font-size:10.5px;font-weight:800;color:var(--ink-3);
+  letter-spacing:1.7px;text-transform:uppercase;
+}
+
+/* ============ MAP CARD（顶部） ============ */
+.card-map{padding:18px 18px 16px;}
+.map-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;gap:10px;
+}
+.map-legend{display:flex;align-items:center;gap:12px;}
+.map-legend .lg{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10.5px;color:var(--ink-3);font-weight:700;letter-spacing:.3px;
+}
+.map-legend .lg i{
+  width:8px;height:8px;border-radius:50%;display:block;
+  box-shadow:0 0 8px currentColor;
+}
+.map-legend .lg.o{color:var(--blue);}
+.map-legend .lg.o i{background:var(--blue);}
+.map-legend .lg.d{color:var(--orange);}
+.map-legend .lg.d i{background:var(--orange);}
+
+.map-wrap{
+  position:relative;width:100%;
+  border-radius:16px;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% 40%, rgba(20,45,90,.55) 0%, rgba(6,10,24,.85) 75%),
+    linear-gradient(180deg, rgba(8,14,32,.9), rgba(4,7,18,.95));
+  border:1px solid rgba(80,130,210,.18);
+  box-shadow:
+    inset 0 0 60px -20px rgba(56,189,248,.18),
+    0 8px 32px -14px rgba(0,0,0,.8);
+}
+.map-wrap::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
+  border-radius:inherit;
+  background:
+    radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(4,5,12,.55) 100%);
+}
+#mapCanvas{
+  display:block;width:100%;height:auto;
+  position:relative;z-index:1;
+}
+.map-empty{
+  position:absolute;inset:0;z-index:3;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--ink-4);letter-spacing:.6px;font-weight:600;
+  pointer-events:none;transition:opacity .3s;
+}
+.map-empty.hide{opacity:0;}
+
+/* ============ ROUTE ============ */
+.route-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:end;position:relative;}
+.picker{position:relative;min-width:0;}
+.picker-label{
+  font-size:10.5px;font-weight:800;color:var(--ink-3);letter-spacing:1.3px;
+  margin-bottom:8px;display:flex;align-items:center;gap:6px;
+}
+.picker-label::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.16), 0 0 12px rgba(56,189,248,.8);
+}
+.picker.dest .picker-label::before{
+  background:var(--orange);box-shadow:0 0 0 3px rgba(251,146,60,.16), 0 0 12px rgba(251,146,60,.8);
+}
+.combo{position:relative;}
+.combo input{
+  width:100%;padding:13px 14px;font-size:15px;font-weight:700;letter-spacing:-.15px;
+  color:var(--ink);background:rgba(8,13,28,.6);
+  border:1.6px solid var(--line-2);border-radius:var(--radius-sm);
+  outline:none;transition:.18s ease;font-family:inherit;text-overflow:ellipsis;
+}
+.combo input::placeholder{color:var(--ink-4);font-weight:500;font-size:13.5px;letter-spacing:0;}
+.combo input:hover{background:rgba(12,19,40,.75);border-color:rgba(120,165,235,.32);}
+.combo input:focus{
+  background:rgba(10,16,36,.9);border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(56,189,248,.12), 0 0 24px -8px rgba(56,189,248,.6);
+}
+
+/* dropdown */
+.dropdown{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  z-index: 9999;
+  background:rgba(9,15,32,.96);
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  border:1px solid var(--line-2);border-radius:var(--radius);
+  box-shadow:0 28px 70px -16px rgba(0,0,0,.9), 0 0 40px -20px rgba(56,189,248,.5);
+  max-height:320px;overflow-y:auto;padding:6px;
+  animation:ddpop .16s cubic-bezier(.2,.9,.3,1.1);
+}
+@keyframes ddpop{from{opacity:0;transform:translateY(-6px) scale(.99);}to{opacity:1;transform:none;}}
+.dropdown::-webkit-scrollbar{width:8px;}
+.dropdown::-webkit-scrollbar-thumb{background:rgba(120,165,235,.25);border-radius:10px;}
+.dropdown::-webkit-scrollbar-thumb:hover{background:rgba(120,165,235,.4);}
+.group-title{font-size:10px;font-weight:800;color:var(--ink-4);letter-spacing:1.6px;padding:10px 12px 6px;}
+.item{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:11px;cursor:pointer;transition:background .12s ease;}
+.item:hover,.item.active{background:var(--blue-soft);}
+.item .code{
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--blue);
+  background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.22);
+  min-width:48px;text-align:center;padding:4px 7px;border-radius:7px;flex-shrink:0;
+}
+.item:hover .code,.item.active .code{background:rgba(56,189,248,.2);border-color:var(--blue-line);}
+.item .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.item .city{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item .name{font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.item .country{font-size:10.5px;color:var(--ink-4);font-weight:600;flex-shrink:0;letter-spacing:.2px;}
+.dropdown .empty{padding:26px;text-align:center;color:var(--ink-3);font-size:13.5px;}
+
+.swap-btn{
+  flex-shrink:0;width:48px;height:48px;border-radius:50%;
+  background:rgba(56,189,248,.08);
+  border:1.6px solid var(--line-2);
+  color:var(--blue);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:.28s cubic-bezier(.2,.9,.3,1.2);
+  box-shadow:0 4px 16px -6px rgba(0,0,0,.6);
+}
+.swap-btn svg{width:20px;height:20px;transition:transform .38s cubic-bezier(.2,.9,.3,1.2);}
+.swap-btn:hover{
+  background:linear-gradient(135deg,var(--blue),var(--blue-2));
+  border-color:var(--blue);color:#04121f;
+  box-shadow:var(--glow);
+}
+.swap-btn:hover svg{transform:rotate(180deg);}
+.swap-btn:active{transform:scale(.92);}
+
+/* ============ RESULT ============ */
+.route-viz{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:4px 4px 18px;}
+.rp{text-align:center;min-width:0;}
+.rp-code{
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;
+  font-size:22px;font-weight:800;letter-spacing:.5px;color:#fff;line-height:1.15;
+  text-shadow:0 0 24px rgba(56,189,248,.4);
+}
+.rp-city{font-size:12px;font-weight:600;color:var(--ink-3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-line{position:relative;min-width:70px;height:34px;display:flex;align-items:center;justify-content:center;}
+.rp-line::before{
+  content:"";position:absolute;left:0;right:0;top:50%;height:0;
+  border-top:1.5px dashed rgba(120,165,235,.35);transform:translateY(-50%);
+}
+.rp-line .dot{
+  position:absolute;width:6px;height:6px;border-radius:50%;background:var(--blue);
+  top:50%;transform:translateY(-50%);
+  box-shadow:0 0 0 3px rgba(56,189,248,.15), 0 0 14px rgba(56,189,248,.9);
+}
+.rp-line .dot.l{left:0;}
+.rp-line .dot.r{right:0;background:var(--orange);box-shadow:0 0 0 3px rgba(251,146,60,.15), 0 0 14px rgba(251,146,60,.9);}
+.rp-plane{
+  position:relative;z-index:1;width:26px;height:26px;color:var(--blue);
+  background:rgba(9,15,32,.9);border-radius:50%;padding:4px;
+  box-shadow:0 0 20px -2px rgba(56,189,248,.8);
+  transform:rotate(90deg);
+}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.stat{
+  background:linear-gradient(155deg, rgba(56,189,248,.07), rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.14);
+  border-radius:16px;padding:15px 16px;position:relative;overflow:hidden;
+}
+.stat::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120px 60px at 100% 0%, rgba(56,189,248,.10), transparent 70%);
+}
+.stat-label{font-size:10.5px;font-weight:800;color:var(--ink-3);letter-spacing:1.1px;text-transform:uppercase;margin-bottom:9px;}
+.stat-value{
+  font-size:25px;font-weight:800;letter-spacing:-.9px;line-height:1.05;color:#fff;
+  font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:2px;
+  text-shadow:0 0 26px rgba(56,189,248,.3);
+}
+.stat-value small{font-size:12.5px;font-weight:700;color:var(--ink-3);letter-spacing:0;margin-left:4px;text-shadow:none;}
+.stat-sub{font-size:11.5px;color:var(--ink-3);margin-top:7px;font-weight:600;}
+.tz-bar{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  margin-top:13px;padding:12px 14px;
+  background:rgba(8,13,28,.5);
+  border:1px solid var(--line);border-radius:14px;
+  font-size:12.5px;color:var(--ink-2);line-height:1.5;
+}
+.tz-bar b{color:var(--ink);font-weight:800;}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.2);
+  border-radius:8px;padding:4px 9px;
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;
+  font-size:11.5px;font-weight:800;color:var(--blue);letter-spacing:.3px;
+}
+.chip.to{color:var(--orange);border-color:rgba(251,146,60,.24);background:rgba(251,146,60,.08);}
+
+/* ============ TIME ============ */
+.field label{
+  display:block;font-size:10.5px;font-weight:800;color:var(--ink-3);
+  letter-spacing:1.2px;text-transform:uppercase;margin-bottom:9px;
+}
+input[type="datetime-local"]{
+  width:100%;padding:14px 15px;font-size:15px;font-weight:700;letter-spacing:-.1px;
+  color:var(--ink);background:rgba(8,13,28,.6);
+  border:1.6px solid var(--line-2);border-radius:var(--radius-sm);
+  outline:none;transition:.18s ease;font-family:inherit;
+  font-variant-numeric:tabular-nums;-webkit-appearance:none;
+}
+input[type="datetime-local"]:hover{background:rgba(12,19,40,.75);}
+input[type="datetime-local"]:focus{
+  background:rgba(10,16,36,.9);border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(56,189,248,.12), 0 0 24px -8px rgba(56,189,248,.6);
+}
+input[type="datetime-local"]::-webkit-calendar-picker-indicator{
+  cursor:pointer;opacity:.5;filter:invert(1) sepia(1) saturate(3) hue-rotate(160deg);
+}
+.arrival-card{
+  margin-top:15px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(400px 120px at 100% 0%, rgba(255,255,255,.14), transparent 60%),
+    linear-gradient(135deg, #0b3f66 0%, #0e6a9e 50%, #0ea5e9 100%);
+  border-radius:18px;padding:19px 21px;color:#fff;
+  border:1px solid rgba(125,211,252,.28);
+  box-shadow:0 20px 46px -20px rgba(14,165,233,.7), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.arrival-card::before{
+  content:"";position:absolute;top:0;bottom:0;left:0;width:4px;
+  background:linear-gradient(180deg,#7dd3fc,#38bdf8);
+  box-shadow:0 0 24px rgba(125,211,252,.9);
+}
+.arrival-card::after{
+  content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.16), transparent 70%);pointer-events:none;
+}
+.arrival-label{
+  font-size:10.5px;font-weight:800;letter-spacing:1.4px;color:#bae6fd;
+  text-transform:uppercase;margin-bottom:11px;position:relative;
+}
+.arrival-label span{color:#fff;letter-spacing:.4px;text-transform:none;font-weight:800;}
+.arrival-value{
+  font-size:25px;font-weight:800;letter-spacing:-.9px;line-height:1.2;color:#fff;
+  font-variant-numeric:tabular-nums;position:relative;
+  text-shadow:0 2px 20px rgba(0,0,0,.3);
+}
+.arrival-value .wd{font-size:14.5px;font-weight:700;color:#bae6fd;margin:0 4px;}
+.arrival-value .plus{
+  display:inline-block;font-size:11.5px;font-weight:800;
+  background:rgba(255,255,255,.2);color:#fff;
+  border:1px solid rgba(255,255,255,.3);
+  padding:2px 8px;border-radius:7px;vertical-align:middle;margin-left:8px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.arrival-sub{font-size:12px;color:#a5d8f5;margin-top:10px;line-height:1.7;position:relative;}
+.arrival-sub b{color:#fff;font-weight:800;}
+
+/* ============ FOOTER ============ */
+.footer{margin-top:22px;text-align:center;}
+.footer-note{
+  font-size:11px;color:var(--ink-4);line-height:1.8;padding:0 8px;margin-bottom:20px;
+}
+.footer-note b{color:var(--ink-3);font-weight:700;}
+.signature{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:10px;font-weight:700;letter-spacing:1.4px;
+  color:var(--ink-3);text-decoration:none;
+  padding:8px 16px;border-radius:100px;
+  border:1px solid rgba(120,165,235,.14);
+  background:rgba(8,13,28,.45);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:.28s cubic-bezier(.2,.9,.3,1.2);
+}
+.signature .amp{color:var(--blue);opacity:.7;}
+.signature .dot{
+  width:5px;height:5px;border-radius:50%;background:var(--blue);
+  box-shadow:0 0 10px rgba(56,189,248,.9);
+  animation:blink 2.6s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:.35;}50%{opacity:1;}}
+.signature:hover{
+  color:var(--blue);
+  border-color:rgba(56,189,248,.4);
+  background:rgba(56,189,248,.08);
+  box-shadow:0 0 28px -8px rgba(56,189,248,.7);
+  transform:translateY(-1px);
+}
+.signature:active{transform:translateY(0) scale(.97);}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:560px){
+  .app{padding:calc(env(safe-area-inset-top,0px) + 20px) 12px calc(env(safe-area-inset-bottom,0px) + 24px);}
+  .hero h1{font-size:21px;}
+  .hero p{font-size:12px;}
+  .card{padding:16px;border-radius:20px;}
+  .card-map{padding:14px 14px 12px;}
+  .route-grid{grid-template-columns:1fr;gap:10px;}
+  .swap-btn{align-self:center;transform:rotate(90deg);margin:2px 0;}
+  .swap-btn:active{transform:rotate(90deg) scale(.92);}
+  .stats-grid{grid-template-columns:1fr;gap:10px;}
+  .stat-value{font-size:22px;}
+  .rp-code{font-size:19px;}
+  .rp-line{min-width:50px;height:30px;}
+  .arrival-value{font-size:20px;}
+  .arrival-value .wd{font-size:13px;}
+  .tz-bar{font-size:12px;}
+  .signature{font-size:9px;letter-spacing:1.1px;padding:7px 13px;}
+  .map-legend{gap:9px;}
+  .map-legend .lg{font-size:9.5px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="app">
+
+  <header class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M21.5 15.5v-1.8l-7.7-4.7V3.2c0-.72-.58-1.3-1.3-1.3s-1.3.58-1.3 1.3V9L3.5 13.7v1.8l7.7-2.4v5.7l-2.3 1.7v1.4L12 21.3l3.1.6v-1.4l-2.3-1.7v-5.7l7.7 2.4z"/>
+      </svg>
+      <span>STARDUST FLIGHT</span>
+    </div>
+    <h1>航班飞行时间计算器</h1>
+    <p>全球主要机场 · 真实航班计划时间校准 · 航线星图可视化</p>
+  </header>
+
+  <!-- ========== 1. 世界地图（置顶） ========== -->
+  <section class="card card-map">
+    <div class="map-meta">
+      <span class="card-title" style="margin:0">航线地图</span>
+      <div class="map-legend">
+        <span class="lg o"><i></i>出发</span>
+        <span class="lg d"><i></i>到达</span>
+      </div>
+    </div>
+    <div class="map-wrap" id="mapWrap">
+      <canvas id="mapCanvas"></canvas>
+      <div class="map-empty" id="mapEmpty">选择出发地与目的地以显示航线</div>
+    </div>
+  </section>
+
+  <!-- ========== 2. 航线选择 ========== -->
+  <section class="card">
+    <div class="card-head"><span class="card-title">航线选择</span></div>
+    <div class="route-grid">
+      <div class="picker" id="pickerOrigin">
+        <div class="picker-label">出发地</div>
+        <div class="combo">
+          <input type="text" placeholder="城市 / 机场 / 三字码" autocomplete="off" spellcheck="false">
+          <div class="dropdown" hidden></div>
+        </div>
+      </div>
+
+      <button class="swap-btn" id="swapBtn" title="互换出发地与目的地" aria-label="互换">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 4v13"/><path d="m4 7 3-3 3 3"/>
+          <path d="M17 20V7"/><path d="m20 17-3 3-3-3"/>
+        </svg>
+      </button>
+
+      <div class="picker dest" id="pickerDest">
+        <div class="picker-label">目的地</div>
+        <div class="combo">
+          <input type="text" placeholder="城市 / 机场 / 三字码" autocomplete="off" spellcheck="false">
+          <div class="dropdown" hidden></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3. 结果 ========== -->
+  <section class="card" id="resultCard" hidden>
+    <div class="route-viz">
+      <div class="rp">
+        <div class="rp-code" id="routeFromCode">—</div>
+        <div class="rp-city" id="routeFromCity">—</div>
+      </div>
+      <div class="rp-line">
+        <span class="dot l"></span><span class="dot r"></span>
+        <svg class="rp-plane" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M21.5 15.5v-1.8l-7.7-4.7V3.2c0-.72-.58-1.3-1.3-1.3s-1.3.58-1.3 1.3V9L3.5 13.7v1.8l7.7-2.4v5.7l-2.3 1.7v1.4L12 21.3l3.1.6v-1.4l-2.3-1.7v-5.7l7.7 2.4z"/>
+        </svg>
+      </div>
+      <div class="rp">
+        <div class="rp-code" id="routeToCode">—</div>
+        <div class="rp-city" id="routeToCity">—</div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-label">飞行距离</div>
+        <div class="stat-value" id="distVal">—</div>
+        <div class="stat-sub" id="distSub">大圆距离</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">预计飞行时间</div>
+        <div class="stat-value" id="durVal">—</div>
+        <div class="stat-sub" id="durSub">参考现实航班</div>
+      </div>
+    </div>
+
+    <div class="tz-bar" id="tzBar"></div>
+  </section>
+
+  <!-- ========== 4. 到达时间换算 ========== -->
+  <section class="card" id="timeCard" hidden>
+    <div class="card-head"><span class="card-title">到达时间换算</span></div>
+    <div class="field">
+      <label for="depTime">出发时间 · 出发地当地时间</label>
+      <input type="datetime-local" id="depTime">
+    </div>
+    <div class="arrival-card">
+      <div class="arrival-label">到达时间 · <span id="arrCity">目的地</span> 当地时间</div>
+      <div class="arrival-value" id="arrVal">—</div>
+      <div class="arrival-sub" id="arrSub"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-note">
+      飞行时间基于<b>大圆距离</b>与<b>500+ 条真实航班计划时间</b>分段速度模型估算。<br>
+      模型已考虑东西方向差异（顺风/逆风）与长途绕行系数。<br>
+      实际航班受机型、航路、天气等影响，通常存在 <b>±30 分钟</b>偏差 · 时差按<b>标准时间</b>计算，不含夏令时。
+    </div>
+    <a class="signature" href="https://photaxis-lab.github.io" target="_blank" rel="noopener noreferrer">
+      <span class="dot"></span>
+      <span>PHOTAXIS-LAB <span class="amp">&amp;</span> JOY CLOUD FLIGHT LAB</span>
+    </a>
+  </footer>
+
+</div>
+
+<script>
+/* ============================================================
+   机场数据
+   ============================================================ */
+const RAW = [
+["PEK","北京","首都国际机场","中国",40.0799,116.6031,480],
+["PKX","北京","大兴国际机场","中国",39.5098,116.4105,480],
+["PVG","上海","浦东国际机场","中国",31.1443,121.8083,480],
+["SHA","上海","虹桥国际机场","中国",31.1979,121.3363,480],
+["CAN","广州","白云国际机场","中国",23.3924,113.2988,480],
+["SZX","深圳","宝安国际机场","中国",22.6393,113.8107,480],
+["TFU","成都","天府国际机场","中国",30.3125,104.4417,480],
+["CTU","成都","双流国际机场","中国",30.5785,103.9471,480],
+["CKG","重庆","江北国际机场","中国",29.7192,106.6417,480],
+["HGH","杭州","萧山国际机场","中国",30.2295,120.4344,480],
+["XIY","西安","咸阳国际机场","中国",34.4471,108.7516,480],
+["NKG","南京","禄口国际机场","中国",31.7420,118.8622,480],
+["WUH","武汉","天河国际机场","中国",30.7838,114.2081,480],
+["CSX","长沙","黄花国际机场","中国",28.1892,113.2196,480],
+["CGO","郑州","新郑国际机场","中国",34.5197,113.8408,480],
+["TAO","青岛","胶东国际机场","中国",36.2661,120.3744,480],
+["XMN","厦门","高崎国际机场","中国",24.5440,118.1277,480],
+["TSN","天津","滨海国际机场","中国",39.1244,117.3462,480],
+["KMG","昆明","长水国际机场","中国",25.1019,102.9292,480],
+["URC","乌鲁木齐","地窝堡国际机场","中国",43.9071,87.4742,480],
+["SHE","沈阳","桃仙国际机场","中国",41.6398,123.4833,480],
+["DLC","大连","周水子国际机场","中国",38.9657,121.5386,480],
+["HRB","哈尔滨","太平国际机场","中国",45.6234,126.2500,480],
+["TNA","济南","遥墙国际机场","中国",36.8572,117.2160,480],
+["FOC","福州","长乐国际机场","中国",25.9351,119.6633,480],
+["NNG","南宁","吴圩国际机场","中国",22.6083,108.1722,480],
+["KWE","贵阳","龙洞堡国际机场","中国",26.5385,106.8007,480],
+["HAK","海口","美兰国际机场","中国",19.9349,110.4589,480],
+["SYX","三亚","凤凰国际机场","中国",18.3029,109.4123,480],
+["LHW","兰州","中川国际机场","中国",36.5152,103.6205,480],
+["TYN","太原","武宿国际机场","中国",37.7469,112.6284,480],
+["HFE","合肥","新桥国际机场","中国",31.7800,117.2983,480],
+["KHN","南昌","昌北国际机场","中国",28.8650,115.9000,480],
+["SJW","石家庄","正定国际机场","中国",38.2807,114.6963,480],
+["HET","呼和浩特","白塔国际机场","中国",40.8514,111.8241,480],
+["INC","银川","河东国际机场","中国",38.3216,106.3931,480],
+["XNN","西宁","曹家堡国际机场","中国",36.5275,102.0430,480],
+["LXA","拉萨","贡嘎国际机场","中国",29.2978,90.9119,480],
+["ZUH","珠海","金湾国际机场","中国",22.0064,113.3760,480],
+["WUX","无锡","硕放国际机场","中国",31.4944,120.4292,480],
+["NGB","宁波","栎社国际机场","中国",29.8267,121.4619,480],
+["WNZ","温州","龙湾国际机场","中国",27.9122,120.8522,480],
+["HKG","香港","香港国际机场","中国香港",22.3080,113.9185,480],
+["MFM","澳门","澳门国际机场","中国澳门",22.1496,113.5916,480],
+["TPE","台北","桃园国际机场","中国台湾",25.0777,121.2328,480],
+["KHH","高雄","小港国际机场","中国台湾",22.5771,120.3499,480],
+["NRT","东京","成田国际机场","日本",35.7720,140.3929,540],
+["HND","东京","羽田机场","日本",35.5494,139.7798,540],
+["KIX","大阪","关西国际机场","日本",34.4347,135.2440,540],
+["NGO","名古屋","中部国际机场","日本",34.8584,136.8054,540],
+["CTS","札幌","新千岁机场","日本",42.7752,141.6923,540],
+["FUK","福冈","福冈机场","日本",33.5859,130.4506,540],
+["OKA","冲绳","那霸机场","日本",26.1958,127.6459,540],
+["ICN","首尔","仁川国际机场","韩国",37.4602,126.4407,540],
+["GMP","首尔","金浦国际机场","韩国",37.5583,126.7906,540],
+["PUS","釜山","金海国际机场","韩国",35.1795,128.9382,540],
+["UBN","乌兰巴托","成吉思汗国际机场","蒙古",47.6431,106.8195,480],
+["SIN","新加坡","樟宜机场","新加坡",1.3644,103.9915,480],
+["BKK","曼谷","素万那普机场","泰国",13.6900,100.7501,420],
+["DMK","曼谷","廊曼国际机场","泰国",13.9126,100.6068,420],
+["HKT","普吉","普吉国际机场","泰国",8.1132,98.3169,420],
+["KUL","吉隆坡","吉隆坡国际机场","马来西亚",2.7456,101.7099,480],
+["CGK","雅加达","苏加诺-哈达国际机场","印度尼西亚",-6.1256,106.6559,420],
+["DPS","巴厘岛","伍拉·赖国际机场","印度尼西亚",-8.7482,115.1672,480],
+["MNL","马尼拉","尼诺伊·阿基诺国际机场","菲律宾",14.5086,121.0198,480],
+["HAN","河内","内排国际机场","越南",21.2212,105.8072,420],
+["SGN","胡志明市","新山一国际机场","越南",10.8188,106.6520,420],
+["PNH","金边","金边国际机场","柬埔寨",11.5466,104.8441,420],
+["RGN","仰光","仰光国际机场","缅甸",16.9073,96.1332,390],
+["VTE","万象","瓦岱国际机场","老挝",17.9883,102.5633,420],
+["BWN","斯里巴加湾","文莱国际机场","文莱",4.9442,114.9283,480],
+["DEL","德里","英迪拉·甘地国际机场","印度",28.5562,77.1000,330],
+["BOM","孟买","贾特拉帕蒂·希瓦吉国际机场","印度",19.0896,72.8656,330],
+["BLR","班加罗尔","肯佩戈达国际机场","印度",13.1986,77.7066,330],
+["MAA","金奈","金奈国际机场","印度",12.9941,80.1709,330],
+["CCU","加尔各答","内塔吉·苏巴斯机场","印度",22.6547,88.4467,330],
+["HYD","海得拉巴","拉吉夫·甘地国际机场","印度",17.2403,78.4294,330],
+["DAC","达卡","沙阿贾拉勒国际机场","孟加拉国",23.8433,90.3978,360],
+["KTM","加德满都","特里布万国际机场","尼泊尔",27.6966,85.3591,345],
+["CMB","科伦坡","班达拉奈克国际机场","斯里兰卡",7.1808,79.8841,330],
+["KHI","卡拉奇","真纳国际机场","巴基斯坦",24.9065,67.1608,300],
+["LHE","拉合尔","阿拉马·伊克巴尔国际机场","巴基斯坦",31.5216,74.4036,300],
+["ISB","伊斯兰堡","伊斯兰堡国际机场","巴基斯坦",33.5607,72.8516,300],
+["MLE","马累","维拉纳国际机场","马尔代夫",4.1918,73.5291,300],
+["DXB","迪拜","迪拜国际机场","阿联酋",25.2532,55.3657,240],
+["AUH","阿布扎比","扎耶德国际机场","阿联酋",24.4330,54.6511,240],
+["DOH","多哈","哈马德国际机场","卡塔尔",25.2731,51.6080,180],
+["KWI","科威特城","科威特国际机场","科威特",29.2266,47.9689,180],
+["RUH","利雅得","哈立德国王国际机场","沙特",24.9576,46.6988,180],
+["JED","吉达","阿卜杜勒-阿齐兹国王机场","沙特",21.6796,39.1565,180],
+["BAH","麦纳麦","巴林国际机场","巴林",26.2708,50.6336,180],
+["MCT","马斯喀特","马斯喀特国际机场","阿曼",23.5933,58.2844,240],
+["TLV","特拉维夫","本·古里安机场","以色列",32.0114,34.8867,120],
+["BEY","贝鲁特","拉菲克·哈里里国际机场","黎巴嫩",33.8209,35.4884,120],
+["AMM","安曼","阿丽亚王后国际机场","约旦",31.7226,35.9932,180],
+["IKA","德黑兰","伊玛目霍梅尼国际机场","伊朗",35.4161,51.1522,210],
+["LHR","伦敦","希思罗机场","英国",51.4700,-0.4543,0],
+["LGW","伦敦","盖特威克机场","英国",51.1537,-0.1821,0],
+["MAN","曼彻斯特","曼彻斯特机场","英国",53.3537,-2.2750,0],
+["EDI","爱丁堡","爱丁堡机场","英国",55.9500,-3.3725,0],
+["BHX","伯明翰","伯明翰机场","英国",52.4539,-1.7480,0],
+["GLA","格拉斯哥","格拉斯哥机场","英国",55.8719,-4.4331,0],
+["CDG","巴黎","戴高乐机场","法国",49.0097,2.5479,60],
+["ORY","巴黎","奥利机场","法国",48.7233,2.3794,60],
+["NCE","尼斯","尼斯蓝色海岸机场","法国",43.6584,7.2159,60],
+["MRS","马赛","马赛普罗旺斯机场","法国",43.4393,5.2214,60],
+["LYS","里昂","里昂圣埃克絮佩里机场","法国",45.7256,5.0811,60],
+["FRA","法兰克福","法兰克福机场","德国",50.0379,8.5622,60],
+["MUC","慕尼黑","慕尼黑机场","德国",48.3537,11.7750,60],
+["BER","柏林","勃兰登堡机场","德国",52.3667,13.5033,60],
+["HAM","汉堡","汉堡机场","德国",53.6304,9.9882,60],
+["DUS","杜塞尔多夫","杜塞尔多夫机场","德国",51.2895,6.7668,60],
+["STR","斯图加特","斯图加特机场","德国",48.6899,9.2220,60],
+["CGN","科隆","科隆/波恩机场","德国",50.8659,7.1427,60],
+["AMS","阿姆斯特丹","史基浦机场","荷兰",52.3105,4.7683,60],
+["BRU","布鲁塞尔","布鲁塞尔机场","比利时",50.9014,4.4844,60],
+["LUX","卢森堡","卢森堡机场","卢森堡",49.6233,6.2044,60],
+["MAD","马德里","巴拉哈斯机场","西班牙",40.4936,-3.5668,60],
+["BCN","巴塞罗那","埃尔普拉特机场","西班牙",41.2974,2.0833,60],
+["VLC","瓦伦西亚","瓦伦西亚机场","西班牙",39.4893,-0.4816,60],
+["AGP","马拉加","马拉加机场","西班牙",36.6749,-4.4991,60],
+["SVQ","塞维利亚","塞维利亚机场","西班牙",37.4180,-5.8931,60],
+["FCO","罗马","菲乌米奇诺机场","意大利",41.8003,12.2389,60],
+["MXP","米兰","马尔彭萨机场","意大利",45.6306,8.7281,60],
+["NAP","那不勒斯","那不勒斯国际机场","意大利",40.8860,14.2908,60],
+["VCE","威尼斯","马可·波罗机场","意大利",45.5053,12.3519,60],
+["ZRH","苏黎世","苏黎世机场","瑞士",47.4647,8.5492,60],
+["GVA","日内瓦","日内瓦机场","瑞士",46.2381,6.1090,60],
+["VIE","维也纳","维也纳国际机场","奥地利",48.1103,16.5697,60],
+["CPH","哥本哈根","凯斯楚普机场","丹麦",55.6180,12.6508,60],
+["ARN","斯德哥尔摩","阿兰达机场","瑞典",59.6519,17.9186,60],
+["OSL","奥斯陆","加勒穆恩机场","挪威",60.1939,11.1004,60],
+["HEL","赫尔辛基","万塔机场","芬兰",60.3172,24.9633,120],
+["DUB","都柏林","都柏林机场","爱尔兰",53.4213,-6.2701,0],
+["LIS","里斯本","里斯本机场","葡萄牙",38.7756,-9.1354,0],
+["OPO","波尔图","波尔图机场","葡萄牙",41.2481,-8.6814,0],
+["PRG","布拉格","瓦茨拉夫·哈维尔机场","捷克",50.1008,14.2600,60],
+["WAW","华沙","肖邦机场","波兰",52.1657,20.9671,60],
+["BUD","布达佩斯","李斯特国际机场","匈牙利",47.4369,19.2556,60],
+["ATH","雅典","雅典国际机场","希腊",37.9364,23.9445,120],
+["IST","伊斯坦布尔","伊斯坦布尔机场","土耳其",41.2753,28.7519,180],
+["SVO","莫斯科","谢列梅捷沃机场","俄罗斯",55.9726,37.4146,180],
+["DME","莫斯科","多莫杰多沃机场","俄罗斯",55.4088,37.9063,180],
+["LED","圣彼得堡","普尔科沃机场","俄罗斯",59.8003,30.2625,180],
+["KBP","基辅","鲍里斯波尔机场","乌克兰",50.3450,30.8947,120],
+["OTP","布加勒斯特","奥托佩尼机场","罗马尼亚",44.5711,26.0850,120],
+["SOF","索菲亚","索菲亚机场","保加利亚",42.6967,23.4114,120],
+["BEG","贝尔格莱德","尼古拉·特斯拉机场","塞尔维亚",44.8184,20.3091,60],
+["ZAG","萨格勒布","萨格勒布机场","克罗地亚",45.7429,16.0688,60],
+["KEF","雷克雅未克","凯夫拉维克机场","冰岛",63.9850,-22.6056,0],
+["JFK","纽约","肯尼迪国际机场","美国",40.6413,-73.7781,-300],
+["EWR","纽约","纽瓦克自由国际机场","美国",40.6895,-74.1745,-300],
+["LGA","纽约","拉瓜迪亚机场","美国",40.7769,-73.8740,-300],
+["LAX","洛杉矶","洛杉矶国际机场","美国",33.9416,-118.4085,-480],
+["ORD","芝加哥","奥黑尔国际机场","美国",41.9742,-87.9073,-360],
+["SFO","旧金山","旧金山国际机场","美国",37.6213,-122.3790,-480],
+["SEA","西雅图","塔科马国际机场","美国",47.4502,-122.3088,-480],
+["BOS","波士顿","洛根国际机场","美国",42.3656,-71.0096,-300],
+["IAD","华盛顿","杜勒斯国际机场","美国",38.9531,-77.4565,-300],
+["DCA","华盛顿","里根国家机场","美国",38.8512,-77.0402,-300],
+["ATL","亚特兰大","哈茨菲尔德-杰克逊机场","美国",33.6407,-84.4277,-300],
+["MIA","迈阿密","迈阿密国际机场","美国",25.7959,-80.2870,-300],
+["DFW","达拉斯","沃思堡国际机场","美国",32.8998,-97.0403,-360],
+["IAH","休斯顿","乔治·布什洲际机场","美国",29.9902,-95.3368,-360],
+["DEN","丹佛","丹佛国际机场","美国",39.8561,-104.6737,-420],
+["LAS","拉斯维加斯","哈里·里德国际机场","美国",36.0840,-115.1537,-480],
+["PHX","凤凰城","天港国际机场","美国",33.4342,-112.0116,-420],
+["PHL","费城","费城国际机场","美国",39.8744,-75.2424,-300],
+["MCO","奥兰多","奥兰多国际机场","美国",28.4312,-81.3081,-300],
+["MSP","明尼阿波利斯","圣保罗国际机场","美国",44.8848,-93.2223,-360],
+["DTW","底特律","都会韦恩县机场","美国",42.2162,-83.3554,-300],
+["CLT","夏洛特","道格拉斯国际机场","美国",35.2144,-80.9473,-300],
+["SAN","圣迭戈","圣迭戈国际机场","美国",32.7338,-117.1933,-480],
+["PDX","波特兰","波特兰国际机场","美国",45.5898,-122.5951,-480],
+["SLC","盐湖城","盐湖城国际机场","美国",40.7899,-111.9791,-420],
+["HNL","檀香山","丹尼尔·井上国际机场","美国",21.3187,-157.9225,-600],
+["ANC","安克雷奇","泰德·史蒂文斯机场","美国",61.1743,-149.9962,-540],
+["YYZ","多伦多","皮尔逊国际机场","加拿大",43.6777,-79.6248,-300],
+["YVR","温哥华","温哥华国际机场","加拿大",49.1967,-123.1815,-480],
+["YUL","蒙特利尔","特鲁多国际机场","加拿大",45.4706,-73.7408,-300],
+["YYC","卡尔加里","卡尔加里国际机场","加拿大",51.1315,-114.0106,-420],
+["YOW","渥太华","麦克唐纳-卡蒂埃机场","加拿大",45.3225,-75.6692,-300],
+["YEG","埃德蒙顿","埃德蒙顿国际机场","加拿大",53.3097,-113.5800,-420],
+["MEX","墨西哥城","贝尼托·华雷斯机场","墨西哥",19.4361,-99.0719,-360],
+["CUN","坎昆","坎昆国际机场","墨西哥",21.0365,-86.8771,-300],
+["GDL","瓜达拉哈拉","瓜达拉哈拉机场","墨西哥",20.5218,-103.3110,-360],
+["MTY","蒙特雷","蒙特雷国际机场","墨西哥",25.7785,-100.1070,-360],
+["HAV","哈瓦那","何塞·马蒂国际机场","古巴",22.9892,-82.4091,-300],
+["SJO","圣何塞","胡安·圣玛丽亚机场","哥斯达黎加",9.9939,-84.2088,-360],
+["PTY","巴拿马城","托库门国际机场","巴拿马",9.0714,-79.3835,-300],
+["BOG","波哥大","埃尔多拉多国际机场","哥伦比亚",4.7016,-74.1469,-300],
+["LIM","利马","豪尔赫·查韦斯机场","秘鲁",-12.0219,-77.1143,-300],
+["UIO","基多","苏克雷元帅机场","厄瓜多尔",-0.1292,-78.3575,-300],
+["SCL","圣地亚哥","阿图罗·梅里诺机场","智利",-33.3930,-70.7858,-240],
+["EZE","布宜诺斯艾利斯","埃塞萨国际机场","阿根廷",-34.8222,-58.5358,-180],
+["GRU","圣保罗","瓜鲁柳斯国际机场","巴西",-23.4356,-46.4731,-180],
+["GIG","里约热内卢","加利昂国际机场","巴西",-22.8090,-43.2506,-180],
+["BSB","巴西利亚","巴西利亚国际机场","巴西",-15.8697,-47.9208,-180],
+["MVD","蒙得维的亚","卡拉斯科国际机场","乌拉圭",-34.8384,-56.0308,-180],
+["CCS","加拉加斯","迈克蒂亚国际机场","委内瑞拉",10.6012,-66.9910,-240],
+["LPB","拉巴斯","埃尔阿尔托国际机场","玻利维亚",-16.5133,-68.1923,-240],
+["CAI","开罗","开罗国际机场","埃及",30.1219,31.4056,120],
+["JNB","约翰内斯堡","奥利弗·坦博机场","南非",-26.1392,28.2460,120],
+["CPT","开普敦","开普敦国际机场","南非",-33.9715,18.6021,120],
+["NBO","内罗毕","乔莫·肯雅塔机场","肯尼亚",-1.3192,36.9278,180],
+["ADD","亚的斯亚贝巴","博莱国际机场","埃塞俄比亚",8.9779,38.7993,180],
+["LOS","拉各斯","穆尔塔拉·穆罕默德机场","尼日利亚",6.5774,3.3212,60],
+["ACC","阿克拉","科托卡国际机场","加纳",5.6052,-0.1668,0],
+["CMN","卡萨布兰卡","穆罕默德五世机场","摩洛哥",33.3675,-7.5900,60],
+["TUN","突尼斯","突尼斯-迦太基机场","突尼斯",36.8510,10.2272,60],
+["ALG","阿尔及尔","胡阿里·布迈丁机场","阿尔及利亚",36.6910,3.2154,60],
+["DAR","达累斯萨拉姆","朱利叶斯·尼雷尔机场","坦桑尼亚",-6.8781,39.2026,180],
+["FIH","金沙萨","恩吉利国际机场","刚果（金）",-4.3858,15.4446,60],
+["LAD","罗安达","夸德罗机场","安哥拉",-8.8583,13.2312,60],
+["HRE","哈拉雷","罗伯特·穆加贝机场","津巴布韦",-17.9318,31.0928,120],
+["MPL","马普托","马普托国际机场","莫桑比克",-25.9208,32.5726,120],
+["MRU","毛里求斯","拉姆古兰爵士机场","毛里求斯",-20.4302,57.6836,240],
+["SEZ","塞舌尔","塞舌尔国际机场","塞舌尔",-4.6743,55.5218,240],
+["WDH","温得和克","霍齐亚·库塔科机场","纳米比亚",-22.4799,17.4709,120],
+["GBE","哈博罗内","塞雷茨·卡马机场","博茨瓦纳",-24.5552,25.9182,120],
+["SYD","悉尼","金斯福德·史密斯机场","澳大利亚",-33.9399,151.1753,600],
+["MEL","墨尔本","图拉马林机场","澳大利亚",-37.6690,144.8410,600],
+["BNE","布里斯班","布里斯班机场","澳大利亚",-27.3842,153.1175,600],
+["PER","珀斯","珀斯机场","澳大利亚",-31.9403,115.9669,480],
+["ADL","阿德莱德","阿德莱德机场","澳大利亚",-34.9450,138.5306,570],
+["AKL","奥克兰","奥克兰机场","新西兰",-37.0082,174.7850,720],
+["WLG","惠灵顿","惠灵顿机场","新西兰",-41.3272,174.8053,720],
+["CHC","基督城","基督城机场","新西兰",-43.4894,172.5320,720],
+["NAN","楠迪","楠迪国际机场","斐济",-17.7554,177.4434,720],
+["NOU","努美阿","通图塔国际机场","新喀里多尼亚",-22.0146,166.2129,660],
+["POM","莫尔兹比港","杰克逊斯国际机场","巴布亚新几内亚",-9.4434,147.2200,600],
+["GUM","关岛","安东尼奥·汪帕特机场","关岛",13.4834,144.7960,600]
+];
+
+const AIRPORTS = RAW.map(a => ({iata:a[0],city:a[1],name:a[2],country:a[3],lat:a[4],lon:a[5],tz:a[6]}));
+const BY_IATA = {}; AIRPORTS.forEach(a => BY_IATA[a.iata] = a);
+const HOT = ['PEK','PVG','CAN','HKG','NRT','ICN','SIN','BKK','LHR','CDG','FRA','JFK','LAX','SYD','DXB'];
+
+/* ============================================================
+   世界地图数据
+   ============================================================ */
+const LAND = [
+  [[-168,65],[-166,68],[-163,70],[-160,70.5],[-155,71],[-150,70.5],[-145,70],[-140,69.5],[-135,69],[-130,69.5],[-125,70],[-120,69.5],[-115,69],[-110,68.5],[-105,68.5],[-100,68],[-95,68.5],[-90,68.5],[-85,69],[-82,69],[-80,72],[-78,73],[-75,72],[-72,71],[-70,70],[-68,69],[-66,67],[-64,64],[-63,62],[-64,60],[-66,59],[-68,58],[-70,57],[-70,55],[-72,54],[-75,52],[-78,51],[-79,49],[-78,47],[-77,46],[-75,45],[-73,44],[-71,43],[-69,44],[-67,45],[-65,45.5],[-63,45.5],[-60,47],[-62,44],[-64,42],[-66,41],[-68,40],[-70,40],[-72,39],[-74,39],[-76,37],[-78,34],[-80,32],[-81,29],[-81,26],[-82,25],[-83,25],[-84,27],[-85,30],[-88,30],[-90,29],[-92,29],[-94,29],[-96,28],[-97,26],[-98,24],[-97,21],[-95,19],[-92,19],[-90,20],[-88,18],[-87,15],[-85,13],[-83,10],[-81,8],[-79,8],[-80,10],[-82,12],[-84,13],[-87,14],[-90,15],[-92,16],[-95,16],[-97,17],[-100,18],[-103,19],[-105,20],[-106,23],[-108,25],[-110,26],[-112,27],[-114,28],[-115,30],[-117,32],[-120,34],[-122,37],[-124,40],[-124,43],[-124,46],[-124,48],[-125,50],[-128,52],[-130,54],[-132,55],[-135,58],[-137,59],[-140,60],[-145,60],[-150,59],[-155,58],[-158,57],[-160,56],[-162,55],[-165,55],[-166,57],[-165,59],[-164,60],[-166,62],[-168,65]],
+  [[-45,60],[-42,62],[-38,65],[-32,68],[-27,70],[-22,72],[-20,75],[-22,78],[-25,80],[-32,82],[-42,83],[-52,82],[-58,80],[-60,76],[-58,72],[-54,68],[-50,64],[-45,60]],
+  [[-77,8],[-75,10],[-71,12],[-66,11],[-60,10],[-55,8],[-52,5],[-50,2],[-48,0],[-44,-1],[-40,-3],[-37,-5],[-35,-7],[-36,-10],[-38,-13],[-39,-16],[-42,-21],[-45,-23],[-48,-25],[-50,-28],[-53,-32],[-56,-34],[-58,-35],[-60,-37],[-62,-39],[-63,-41],[-65,-43],[-66,-45],[-68,-48],[-68,-51],[-69,-53],[-72,-54],[-74,-53],[-73,-50],[-74,-47],[-73,-44],[-73,-42],[-73,-40],[-73,-37],[-72,-35],[-71,-32],[-71,-29],[-71,-26],[-70,-23],[-70,-20],[-71,-18],[-75,-16],[-77,-13],[-79,-10],[-81,-7],[-81,-5],[-80,-3],[-80,0],[-78,3],[-77,5],[-77,8]],
+  [[-17,15],[-16,19],[-14,22],[-11,26],[-8,30],[-5,33],[-1,35],[3,36],[8,37],[10,37],[13,37],[18,37],[22,37],[25,35],[28,34],[31,32],[33,31],[35,28],[36,25],[37,22],[38,19],[40,16],[42,13],[43,12],[45,11],[48,11],[51,11],[51,8],[50,5],[48,3],[45,0],[43,-3],[40,-8],[40,-12],[40,-16],[38,-19],[36,-22],[33,-25],[31,-28],[29,-31],[27,-33],[25,-34],[23,-34],[20,-34],[18,-34],[16,-32],[14,-28],[13,-24],[13,-20],[12,-17],[11,-13],[9,-9],[9,-5],[9,-2],[8,1],[8,5],[5,7],[2,9],[-1,10],[-4,11],[-8,10],[-11,10],[-14,10],[-16,12],[-17,15]],
+  [[-9,43],[-5,44],[-2,43],[-1,44],[-2,46],[-4,47],[-3,48],[0,49],[2,51],[4,52],[6,53],[8,54],[10,54],[12,55],[14,56],[16,57],[18,58],[20,60],[23,62],[25,65],[28,67],[30,68],[25,70],[20,70],[17,69],[14,67],[12,65],[10,63],[7,61],[5,60],[6,58],[8,57],[9,55],[8,54],[10,53],[13,54],[17,54],[20,54],[24,55],[27,56],[30,57],[32,58],[34,60],[36,61],[40,62],[45,62],[48,62],[50,60],[52,58],[55,57],[58,58],[62,60],[66,62],[70,64],[74,66],[78,67],[82,68],[86,68],[90,69],[95,70],[100,71],[105,71],[110,72],[115,73],[120,73],[125,74],[130,75],[135,75],[140,74],[145,73],[150,71],[155,69],[160,68],[165,67],[170,67],[175,67],[180,66],[180,63],[178,62],[175,61],[172,60],[170,59],[167,57],[163,56],[160,54],[157,52],[155,50],[153,48],[150,46],[145,44],[140,43],[137,42],[135,41],[132,42],[130,42],[128,41],[126,40],[124,39],[122,40],[121,39],[119,38],[117,37],[120,36],[122,35],[120,34],[118,32],[116,30],[113,29],[110,28],[108,27],[105,26],[104,24],[102,22],[100,21],[98,20],[97,18],[94,17],[92,16],[89,15],[87,13],[85,11],[83,9],[80,8],[77,8],[74,10],[73,13],[72,16],[73,19],[74,22],[76,25],[78,27],[80,29],[82,31],[84,33],[86,35],[88,37],[89,39],[87,22],[85,20],[83,17],[80,13],[78,9],[77,8],[75,12],[74,15],[73,18],[72,21],[70,23],[68,24],[66,25],[62,25],[58,25],[57,25],[55,26],[52,28],[50,30],[48,30],[48,28],[52,25],[56,24],[58,22],[56,18],[52,16],[48,14],[45,13],[43,12],[42,15],[40,18],[38,22],[36,25],[35,28],[34,30],[35,33],[36,36],[34,36],[30,36],[28,37],[26,38],[24,38],[22,38],[21,39],[19,40],[18,40],[16,38],[15,37],[13,38],[12,38],[10,44],[8,44],[6,43],[3,43],[0,40],[-2,38],[-4,37],[-6,36],[-8,37],[-9,39],[-9,43]],
+  [[-5,50],[-2,53],[-3,55],[-5,58],[-7,57],[-5,54],[-6,53],[-5,50]],
+  [[-10,52],[-6,52],[-6,54],[-10,55],[-10,52]],
+  [[-24,65],[-14,65],[-14,66],[-22,67],[-24,65]],
+  [[130,31],[132,34],[136,35],[139,35],[141,40],[142,45],[145,44],[141,41],[138,37],[135,34],[131,31],[130,31]],
+  [[121,18],[122,14],[124,10],[126,7],[124,6],[121,6],[120,10],[120,14],[121,18]],
+  [[95,5],[98,3],[102,0],[105,-3],[104,-6],[102,-5],[98,1],[95,5]],
+  [[105,-6],[110,-7],[114,-8],[114,-9],[108,-8],[105,-6]],
+  [[109,2],[113,3],[117,4],[119,1],[117,-3],[112,-3],[109,-1],[109,2]],
+  [[119,1],[122,1],[125,2],[124,0],[121,-2],[119,-3],[119,1]],
+  [[131,-1],[136,-2],[141,-3],[146,-5],[150,-6],[147,-9],[141,-9],[136,-8],[131,-1]],
+  [[113,-22],[114,-26],[115,-32],[118,-35],[123,-34],[129,-32],[134,-33],[138,-35],[141,-38],[146,-39],[150,-37],[153,-32],[153,-28],[152,-25],[151,-24],[149,-20],[147,-19],[145,-15],[143,-11],[142,-11],[141,-15],[140,-17],[139,-17],[137,-12],[136,-12],[133,-11],[130,-12],[129,-15],[125,-14],[122,-14],[118,-20],[114,-22],[113,-22]],
+  [[145,-41],[148,-41],[148,-43],[145,-43],[145,-41]],
+  [[173,-35],[178,-38],[174,-41],[170,-46],[166,-45],[172,-40],[173,-35]],
+  [[43,-13],[48,-13],[50,-16],[48,-25],[45,-25],[43,-20],[43,-13]],
+  [[80,6],[82,7],[82,10],[80,9],[80,6]],
+  [[120,22],[122,25],[120,25],[120,22]],
+  [[109,18],[111,20],[110,20],[109,18]],
+  [[142,46],[143,48],[144,51],[143,54],[142,52],[141,48],[142,46]]
+];
+
+/* ============================================================
+   地理计算
+   ============================================================ */
+const DEG = Math.PI / 180;
+function haversine(lat1, lon1, lat2, lon2){
+  const R = 6371.0088;
+  const dLat = (lat2 - lat1) * DEG, dLon = (lon2 - lon1) * DEG;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*DEG) * Math.cos(lat2*DEG) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+function estimateFlightTime(km, lon1, lon2){
+  let dLon = lon2 - lon1;
+  if (dLon > 180) dLon -= 360;
+  if (dLon < -180) dLon += 360;
+  const isEastbound = dLon > 0 && km > 1500;
+  let overhead, speed, detour;
+  if (km < 600) { overhead = 18; speed = isEastbound ? 550 : 530; detour = 1.00; }
+  else if (km < 1500) { overhead = 22; speed = isEastbound ? 650 : 630; detour = 1.00; }
+  else if (km < 3000) { overhead = 25; speed = isEastbound ? 730 : 700; detour = 1.02; }
+  else if (km < 5000) { overhead = 28; speed = isEastbound ? 780 : 740; detour = 1.04; }
+  else if (km < 8000) { overhead = 30; speed = isEastbound ? 820 : 760; detour = 1.06; }
+  else if (km < 10000) { overhead = 32; speed = isEastbound ? 850 : 780; detour = 1.08; }
+  else { overhead = 34; speed = isEastbound ? 880 : 800; detour = 1.08 + (km - 10000) / 75000; }
+  return Math.round(overhead + (km * detour / speed) * 60);
+}
+
+/* ============================================================
+   格式化
+   ============================================================ */
+const pad2 = n => String(n).padStart(2,'0');
+function fmtNumber(n){ return n.toLocaleString('en-US', { maximumFractionDigits:0 }); }
+function fmtDuration(mins){
+  const h = Math.floor(mins / 60), m = Math.round(mins % 60);
+  return h === 0 ? `${m}分钟` : `${h}小时${pad2(m)}分`;
+}
+function fmtOffset(mins){
+  const sign = mins >= 0 ? '+' : '-', a = Math.abs(mins);
+  return `UTC${sign}${pad2(Math.floor(a/60))}:${pad2(a%60)}`;
+}
+const WEEKDAYS = ['周日','周一','周二','周三','周四','周五','周六'];
+function fmtDateTime(ms){
+  const d = new Date(ms);
+  return {
+    text:`${d.getUTCFullYear()}年${d.getUTCMonth()+1}月${d.getUTCDate()}日`,
+    weekday:WEEKDAYS[d.getUTCDay()],
+    time:`${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())}`,
+    dayStamp:Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+  };
+}
+
+/* ============================================================
+   星空背景
+   ============================================================ */
+const bgCanvas = document.getElementById('bg');
+const bgCtx = bgCanvas.getContext('2d', { alpha: true });
+const TAU = Math.PI * 2;
+let W = 0, H = 0, DPR = 1;
+let particles = [];
+let lastTime = performance.now();
+let dashOffset = 0;
+
+const CFG = { linkDist: 108, density: 3400, maxCount: 400 };
+const LINK2 = CFG.linkDist * CFG.linkDist;
+
+function targetCount(){
+  const base = (W * H) / CFG.density;
+  return Math.round(Math.min(CFG.maxCount, Math.max(140, base)));
+}
+function makeParticle(){
+  const a = Math.random() * TAU;
+  const s = 0.05 + Math.random() * 0.24;
+  return {
+    x: Math.random() * W, y: Math.random() * H,
+    dx: Math.cos(a) * s, dy: Math.sin(a) * s,
+    r: 0.6 + Math.random() * 1.5,
+    hue: 190 + Math.random() * 85,
+    pulse: Math.random() * TAU, fade: 0
+  };
+}
+function resizeBg(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  bgCanvas.width  = Math.floor(W * DPR);
+  bgCanvas.height = Math.floor(H * DPR);
+  bgCanvas.style.width = W + 'px';
+  bgCanvas.style.height = H + 'px';
+  bgCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const t = targetCount();
+  if (particles.length > t) particles.length = t;
+  while (particles.length < t) particles.push(makeParticle());
+}
+function updateParticle(p, dt){
+  p.x += p.dx * dt; p.y += p.dy * dt;
+  const m = 30;
+  if (p.x < -m) p.x = W + m; else if (p.x > W + m) p.x = -m;
+  if (p.y < -m) p.y = H + m; else if (p.y > H + m) p.y = -m;
+  p.pulse += 0.045 * dt;
+  if (p.fade < 1) p.fade = Math.min(1, p.fade + 0.022 * dt);
+}
+function adaptParticles(){
+  const t = targetCount();
+  if (particles.length < t){
+    const add = Math.min(4, t - particles.length);
+    for (let i = 0; i < add; i++) particles.push(makeParticle());
+  } else if (particles.length > t){
+    particles.length -= Math.min(4, particles.length - t);
+  }
+}
+function drawBg(){
+  bgCtx.clearRect(0, 0, W, H);
+  const n = particles.length;
+  const linkAlpha = 0.22 * Math.min(1, 220 / Math.max(n, 1));
+  bgCtx.lineCap = 'round';
+  for (let i = 0; i < n; i++){
+    const a = particles[i];
+    for (let j = i + 1; j < n; j++){
+      const b = particles[j];
+      const dx = a.x - b.x, dy = a.y - b.y;
+      const d2 = dx*dx + dy*dy;
+      if (d2 > LINK2) continue;
+      const alpha = (1 - Math.sqrt(d2) / CFG.linkDist) * linkAlpha;
+      bgCtx.strokeStyle = `hsla(${(a.hue + b.hue) * 0.5}, 92%, 74%, ${alpha})`;
+      bgCtx.lineWidth = 0.65;
+      bgCtx.beginPath();
+      bgCtx.moveTo(a.x, a.y); bgCtx.lineTo(b.x, b.y);
+      bgCtx.stroke();
+    }
+  }
+  for (const p of particles){
+    const r = p.r * (1 + 0.32 * Math.sin(p.pulse));
+    bgCtx.globalAlpha = p.fade * 0.92;
+    bgCtx.beginPath();
+    bgCtx.arc(p.x, p.y, r, 0, TAU);
+    bgCtx.fillStyle = `hsla(${p.hue}, 96%, 78%, 0.95)`;
+    bgCtx.fill();
+  }
+  bgCtx.globalAlpha = 1;
+}
+
+/* ============================================================
+   航线地图
+   ============================================================ */
+const mapWrap   = document.getElementById('mapWrap');
+const mapCanvas = document.getElementById('mapCanvas');
+const mapEmpty  = document.getElementById('mapEmpty');
+
+let mapW = 0, mapH = 0, mapDpr = 1;
+let mapStatic = null;
+
+const MAP_LAT_MAX = 85, MAP_LAT_MIN = -85;
+
+function mapProj(lon, lat){
+  return {
+    x: (lon + 180) / 360 * mapW,
+    y: (MAP_LAT_MAX - lat) / (MAP_LAT_MAX - MAP_LAT_MIN) * mapH
+  };
+}
+
+function buildMapStatic(){
+  mapStatic = document.createElement('canvas');
+  mapStatic.width  = Math.floor(mapW * mapDpr);
+  mapStatic.height = Math.floor(mapH * mapDpr);
+  const c = mapStatic.getContext('2d');
+  c.setTransform(mapDpr, 0, 0, mapDpr, 0, 0);
+  c.lineJoin = 'round';
+  c.lineCap = 'round';
+
+  const oceanGrad = c.createRadialGradient(mapW * 0.5, mapH * 0.42, 10, mapW * 0.5, mapH * 0.42, mapW * 0.72);
+  oceanGrad.addColorStop(0, 'rgba(14, 30, 62, 0.55)');
+  oceanGrad.addColorStop(1, 'rgba(4, 8, 20, 0.85)');
+  c.fillStyle = oceanGrad;
+  c.fillRect(0, 0, mapW, mapH);
+
+  c.strokeStyle = 'rgba(80, 135, 215, 0.11)';
+  c.lineWidth = 0.5;
+  for (let lon = -180; lon <= 180; lon += 20){
+    const a = mapProj(lon, MAP_LAT_MAX), b = mapProj(lon, MAP_LAT_MIN);
+    c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke();
+  }
+  for (let lat = -80; lat <= 80; lat += 20){
+    const a = mapProj(-180, lat), b = mapProj(180, lat);
+    c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke();
+  }
+  {
+    const a = mapProj(-180, 0), b = mapProj(180, 0);
+    c.strokeStyle = 'rgba(96, 160, 245, 0.24)';
+    c.lineWidth = 0.8;
+    c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke();
+  }
+  c.strokeStyle = 'rgba(80, 140, 220, 0.16)';
+  c.lineWidth = 0.5;
+  c.setLineDash([3, 5]);
+  for (const lat of [23.5, -23.5]){
+    const a = mapProj(-180, lat), b = mapProj(180, lat);
+    c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke();
+  }
+  c.setLineDash([]);
+
+  for (const poly of LAND){
+    if (!poly.length) continue;
+    c.beginPath();
+    for (let i = 0; i < poly.length; i++){
+      const p = mapProj(poly[i][0], poly[i][1]);
+      if (i === 0) c.moveTo(p.x, p.y);
+      else c.lineTo(p.x, p.y);
+    }
+    c.closePath();
+
+    const landGrad = c.createLinearGradient(0, 0, 0, mapH);
+    landGrad.addColorStop(0, 'rgba(52, 108, 188, 0.20)');
+    landGrad.addColorStop(0.5, 'rgba(46, 100, 180, 0.16)');
+    landGrad.addColorStop(1, 'rgba(40, 92, 170, 0.12)');
+    c.fillStyle = landGrad;
+    c.fill();
+
+    c.shadowColor = 'rgba(96, 165, 250, 0.55)';
+    c.shadowBlur = 6;
+    c.strokeStyle = 'rgba(120, 185, 255, 0.62)';
+    c.lineWidth = 0.75;
+    c.stroke();
+    c.shadowBlur = 0;
+  }
+
+  const vig = c.createRadialGradient(mapW * 0.5, mapH * 0.5, Math.min(mapW, mapH) * 0.28, mapW * 0.5, mapH * 0.5, Math.max(mapW, mapH) * 0.72);
+  vig.addColorStop(0, 'rgba(4,7,18,0)');
+  vig.addColorStop(1, 'rgba(4,7,18,0.75)');
+  c.fillStyle = vig;
+  c.fillRect(0, 0, mapW, mapH);
+}
+
+function toVec(lat, lon){
+  const φ = lat * DEG, λ = lon * DEG;
+  return [Math.cos(φ)*Math.cos(λ), Math.cos(φ)*Math.sin(λ), Math.sin(φ)];
+}
+function fromVec(v){
+  const [x,y,z] = v;
+  return [Math.atan2(z, Math.sqrt(x*x + y*y)) / DEG, Math.atan2(y, x) / DEG];
+}
+function greatCirclePoints(a, b, steps){
+  const v1 = toVec(a.lat, a.lon), v2 = toVec(b.lat, b.lon);
+  const dot = Math.min(1, Math.max(-1, v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2]));
+  const ω = Math.acos(dot);
+  const out = [];
+  for (let i = 0; i <= steps; i++){
+    const t = i / steps;
+    let v;
+    if (ω < 1e-6) v = v1;
+    else {
+      const s1 = Math.sin((1 - t) * ω) / Math.sin(ω);
+      const s2 = Math.sin(t * ω) / Math.sin(ω);
+      v = [v1[0]*s1 + v2[0]*s2, v1[1]*s1 + v2[1]*s2, v1[2]*s1 + v2[2]*s2];
+    }
+    out.push(fromVec(v));
+  }
+  return out;
+}
+function buildMapSegments(o, d){
+  const pts = greatCirclePoints(o, d, 160);
+  const segs = [];
+  let cur = [], prevX = null;
+  for (const [lat, lon] of pts){
+    const p = mapProj(lon, lat);
+    if (prevX !== null && Math.abs(p.x - prevX) > mapW * 0.5){
+      if (cur.length > 1) segs.push(cur);
+      cur = [];
+    }
+    cur.push(p);
+    prevX = p.x;
+  }
+  if (cur.length > 1) segs.push(cur);
+  return segs;
+}
+
+function drawMap(){
+  if (!mapStatic || !mapW || !mapH) return;
+  const c = mapCanvas.getContext('2d');
+  c.clearRect(0, 0, mapW, mapH);
+  c.drawImage(mapStatic, 0, 0, mapW, mapH);
+
+  const o = originPicker.value, d = destPicker.value;
+  if (!o || !d){
+    mapEmpty.classList.remove('hide');
+    return;
+  }
+  mapEmpty.classList.add('hide');
+
+  const segs = buildMapSegments(o, d);
+  const pulse = (Math.sin(performance.now() / 520) + 1) / 2;
+
+  c.lineCap = 'round';
+  c.lineJoin = 'round';
+
+  for (const seg of segs){
+    c.beginPath();
+    c.moveTo(seg[0].x, seg[0].y);
+    for (let i = 1; i < seg.length; i++) c.lineTo(seg[i].x, seg[i].y);
+    c.strokeStyle = 'rgba(56, 189, 248, 0.16)';
+    c.lineWidth = 6;
+    c.stroke();
+
+    const grad = c.createLinearGradient(seg[0].x, seg[0].y, seg[seg.length-1].x, seg[seg.length-1].y);
+    grad.addColorStop(0,   'rgba(56, 189, 248, 0.95)');
+    grad.addColorStop(0.5, 'rgba(147, 197, 253, 0.9)');
+    grad.addColorStop(1,   'rgba(251, 146, 60, 0.95)');
+    c.beginPath();
+    c.moveTo(seg[0].x, seg[0].y);
+    for (let i = 1; i < seg.length; i++) c.lineTo(seg[i].x, seg[i].y);
+    c.strokeStyle = grad;
+    c.lineWidth = 1.8;
+    c.stroke();
+
+    c.beginPath();
+    c.moveTo(seg[0].x, seg[0].y);
+    for (let i = 1; i < seg.length; i++) c.lineTo(seg[i].x, seg[i].y);
+    c.setLineDash([3, 10]);
+    c.lineDashOffset = -dashOffset * 1.2;
+    c.strokeStyle = 'rgba(224, 242, 254, 0.85)';
+    c.lineWidth = 1.8;
+    c.stroke();
+    c.setLineDash([]);
+  }
+
+  const pO = mapProj(o.lon, o.lat);
+  const pD = mapProj(d.lon, d.lat);
+
+  function marker(p, colorHex, rgbStr){
+    c.beginPath();
+    c.arc(p.x, p.y, 4 + pulse * 6, 0, TAU);
+    c.strokeStyle = `rgba(${rgbStr}, ${0.55 - pulse * 0.4})`;
+    c.lineWidth = 1.4;
+    c.stroke();
+
+    c.beginPath();
+    c.arc(p.x, p.y, 3.2, 0, TAU);
+    c.fillStyle = colorHex;
+    c.shadowColor = colorHex;
+    c.shadowBlur = 16;
+    c.fill();
+    c.shadowBlur = 0;
+  }
+  marker(pO, '#38bdf8', '56,189,248');
+  marker(pD, '#fb923c', '251,146,60');
+
+  const mainSeg = segs.reduce((a,b) => b.length > a.length ? b : a, segs[0]);
+  if (mainSeg && mainSeg.length > 2){
+    const t = (performance.now() / 11000) % 1;
+    const idx = Math.min(mainSeg.length - 2, Math.floor(t * (mainSeg.length - 1)));
+    const p1 = mainSeg[idx], p2 = mainSeg[idx + 1];
+    const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    c.save();
+    c.translate(p1.x, p1.y);
+    c.rotate(ang);
+    c.beginPath();
+    c.arc(0, 0, 8, 0, TAU);
+    c.fillStyle = 'rgba(8, 14, 30, 0.88)';
+    c.fill();
+    c.strokeStyle = 'rgba(56, 189, 248, 0.65)';
+    c.lineWidth = 1;
+    c.stroke();
+    c.beginPath();
+    c.moveTo(4.5, 0);
+    c.lineTo(-3, -3.2);
+    c.lineTo(-1.6, 0);
+    c.lineTo(-3, 3.2);
+    c.closePath();
+    c.fillStyle = '#7dd3fc';
+    c.shadowColor = 'rgba(56,189,248,0.9)';
+    c.shadowBlur = 10;
+    c.fill();
+    c.restore();
+  }
+}
+
+function resizeMap(){
+  const rect = mapWrap.getBoundingClientRect();
+  const w = Math.max(1, Math.floor(rect.width));
+  const h = Math.round(w * (MAP_LAT_MAX - MAP_LAT_MIN) / 360);
+  mapDpr = Math.min(window.devicePixelRatio || 1, 2);
+  mapW = w; mapH = h;
+  mapCanvas.width  = Math.floor(w * mapDpr);
+  mapCanvas.height = Math.floor(h * mapDpr);
+  mapCanvas.style.width  = w + 'px';
+  mapCanvas.style.height = h + 'px';
+  const c = mapCanvas.getContext('2d');
+  c.setTransform(mapDpr, 0, 0, mapDpr, 0, 0);
+  buildMapStatic();
+  drawMap();
+}
+
+/* ============================================================
+   主循环
+   ============================================================ */
+function frame(now){
+  const dt = Math.min((now - lastTime) / 16.667, 3);
+  lastTime = now;
+  dashOffset += dt * 0.55;
+
+  adaptParticles();
+  for (const p of particles) updateParticle(p, dt);
+  drawBg();
+  drawMap();
+
+  requestAnimationFrame(frame);
+}
+
+/* ============================================================
+   机场选择器
+   ============================================================ */
+function createPicker(rootId, onChange){
+  const root = document.getElementById(rootId);
+  const input = root.querySelector('input');
+  const dropdown = root.querySelector('.dropdown');
+  let selected = null, list = [], active = -1;
+
+  function matchScore(a, q){
+    const iata = a.iata.toLowerCase(), city = a.city.toLowerCase(), name = a.name.toLowerCase();
+    if (iata === q) return 0;
+    if (city === q) return 1;
+    if (iata.startsWith(q)) return 2;
+    if (city.startsWith(q)) return 3;
+    if (name.startsWith(q)) return 4;
+    if (iata.includes(q)) return 5;
+    if (city.includes(q)) return 6;
+    if (name.includes(q)) return 7;
+    if (a.country.toLowerCase().includes(q)) return 8;
+    return -1;
+  }
+  function buildList(query){
+    const q = (query || '').trim().toLowerCase();
+    if (!q){
+      const hot = HOT.map(c => BY_IATA[c]).filter(Boolean);
+      return { hot, rest: [] };
+    }
+    const scored = [];
+    for (const a of AIRPORTS){
+      const s = matchScore(a, q);
+      if (s >= 0) scored.push([s, a]);
+    }
+    scored.sort((x,y) => x[0] - y[0] || x[1].city.localeCompare(y[1].city, 'zh'));
+    return { hot:null, rest: scored.map(x => x[1]).slice(0, 60) };
+  }
+  function itemHTML(a, idx){
+    return `<div class="item${idx === active ? ' active' : ''}" data-idx="${idx}">
+      <span class="code">${a.iata}</span>
+      <span class="info"><span class="city">${a.city}</span><span class="name">${a.name}</span></span>
+      <span class="country">${a.country}</span></div>`;
+  }
+  function render(){
+    const grouped = buildList(input.value);
+    active = -1;
+    if (grouped.hot){
+      list = grouped.hot;
+      dropdown.innerHTML = `<div class="group-title">热门城市</div>` + list.map((a,i) => itemHTML(a,i)).join('');
+    } else {
+      list = grouped.rest;
+      if (!list.length){ dropdown.innerHTML = `<div class="empty">未找到匹配的机场</div>`; return; }
+      dropdown.innerHTML = list.map((a,i) => itemHTML(a,i)).join('');
+    }
+  }
+  function open(){
+    render();
+    dropdown.hidden = false;
+    const card = root.closest('.card');
+    if (card) card.classList.add('is-active');
+  }
+  function close(){
+    dropdown.hidden = true;
+    active = -1;
+    const card = root.closest('.card');
+    if (card) card.classList.remove('is-active');
+  }
+  function scrollActive(){
+    const el = dropdown.querySelector('.item.active');
+    if (el) el.scrollIntoView({ block:'nearest' });
+  }
+  function choose(a){
+    selected = a;
+    input.value = `${a.city} (${a.iata})`;
+    input.blur(); close();
+    onChange && onChange();
+  }
+  function chooseByIndex(i){ if (i >= 0 && i < list.length) choose(list[i]); }
+  function refreshActive(){
+    dropdown.querySelectorAll('.item').forEach((el, i) => el.classList.toggle('active', i === active));
+    scrollActive();
+  }
+
+  input.addEventListener('focus', () => { open(); input.select(); });
+  input.addEventListener('input', () => { selected = null; dropdown.hidden = false; render(); onChange && onChange(); });
+  input.addEventListener('keydown', e => {
+    if (dropdown.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp')){ open(); e.preventDefault(); return; }
+    if (e.key === 'ArrowDown'){ e.preventDefault(); active = Math.min(active + 1, list.length - 1); refreshActive(); }
+    else if (e.key === 'ArrowUp'){ e.preventDefault(); active = Math.max(active - 1, 0); refreshActive(); }
+    else if (e.key === 'Enter'){ e.preventDefault(); chooseByIndex(active >= 0 ? active : 0); }
+    else if (e.key === 'Escape'){ close(); input.blur(); }
+  });
+  dropdown.addEventListener('mousedown', e => {
+    const item = e.target.closest('.item');
+    if (!item) return;
+    e.preventDefault();
+    chooseByIndex(parseInt(item.dataset.idx, 10));
+  });
+  document.addEventListener('click', e => { if (!root.contains(e.target)) close(); });
+
+  return {
+    get value(){ return selected; },
+    set value(a){
+      selected = a || null;
+      input.value = a ? `${a.city} (${a.iata})` : '';
+      close();
+    }
+  };
+}
+
+/* ============================================================
+   主逻辑
+   ============================================================ */
+const originPicker = createPicker('pickerOrigin', recalc);
+const destPicker   = createPicker('pickerDest',   recalc);
+const depTimeInput = document.getElementById('depTime');
+
+const resultCard    = document.getElementById('resultCard');
+const timeCard      = document.getElementById('timeCard');
+const routeFromCode = document.getElementById('routeFromCode');
+const routeFromCity = document.getElementById('routeFromCity');
+const routeToCode   = document.getElementById('routeToCode');
+const routeToCity   = document.getElementById('routeToCity');
+const distVal       = document.getElementById('distVal');
+const distSub       = document.getElementById('distSub');
+const durVal        = document.getElementById('durVal');
+const durSub        = document.getElementById('durSub');
+const tzBar         = document.getElementById('tzBar');
+const arrCity       = document.getElementById('arrCity');
+const arrVal        = document.getElementById('arrVal');
+const arrSub        = document.getElementById('arrSub');
+
+function defaultDepTime(){
+  const d = new Date();
+  d.setMinutes(0, 0, 0);
+  d.setHours(d.getHours() + 1);
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+function parseLocalInput(str){
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(str);
+  if (!m) return null;
+  return { y:+m[1], mo:+m[2], d:+m[3], h:+m[4], mi:+m[5] };
+}
+
+function recalc(){
+  const o = originPicker.value;
+  const d = destPicker.value;
+
+  if (!o || !d){
+    resultCard.hidden = true;
+    timeCard.hidden = true;
+    return;
+  }
+
+  const dist = haversine(o.lat, o.lon, d.lat, d.lon);
+  const dur  = estimateFlightTime(dist, o.lon, d.lon);
+  const tzDiff = d.tz - o.tz;
+
+  routeFromCode.textContent = o.iata; routeFromCity.textContent = o.city;
+  routeToCode.textContent   = d.iata; routeToCity.textContent   = d.city;
+
+  resultCard.hidden = false;
+  distVal.innerHTML = `${fmtNumber(dist)}<small>km</small>`;
+  distSub.textContent = `大圆距离 · ${o.iata} → ${d.iata}`;
+  durVal.textContent = fmtDuration(dur);
+
+  let dLon = d.lon - o.lon;
+  if (dLon > 180)  dLon -= 360;
+  if (dLon < -180) dLon += 360;
+  const isEast = dLon > 0 && dist > 1500;
+  durSub.textContent = dist > 1500
+    ? (isEast ? '东行 · 顺风加成' : '西行 · 逆风减缓')
+    : '基于真实航班计划时间';
+
+  let tzText;
+  if (tzDiff === 0){
+    tzText = `<b>${d.city}</b>与<b>${o.city}</b>没有时差`;
+  } else {
+    const absH = Math.abs(tzDiff) / 60;
+    const absStr = Number.isInteger(absH) ? absH : absH.toFixed(1);
+    const faster = tzDiff > 0 ? d.city : o.city;
+    const slower = tzDiff > 0 ? o.city : d.city;
+    tzText = `<b>${faster}</b> 比 <b>${slower}</b> 快 <b>${absStr} 小时</b>`;
+  }
+
+  tzBar.innerHTML = `
+    <span class="chip">${o.iata} ${fmtOffset(o.tz)}</span>
+    <span style="color:#4a5a78;font-weight:700">→</span>
+    <span class="chip to">${d.iata} ${fmtOffset(d.tz)}</span>
+    <span>${tzText}</span>`;
+
+  timeCard.hidden = false;
+  arrCity.textContent = d.city;
+
+  const dep = parseLocalInput(depTimeInput.value);
+  if (!dep){
+    arrVal.textContent = '—';
+    arrSub.textContent = '请填写出发时间';
+    return;
+  }
+
+  const depUtcMs   = Date.UTC(dep.y, dep.mo - 1, dep.d, dep.h, dep.mi) - o.tz * 60000;
+  const arrUtcMs   = depUtcMs + dur * 60000;
+  const arrLocalMs = arrUtcMs + d.tz * 60000;
+
+  const arr = fmtDateTime(arrLocalMs);
+  const depStamp = Date.UTC(dep.y, dep.mo - 1, dep.d);
+  const dayDiff  = Math.round((arr.dayStamp - depStamp) / 86400000);
+
+  const plusTag = dayDiff !== 0
+    ? `<span class="plus">${dayDiff > 0 ? '+' : ''}${dayDiff} 天</span>`
+    : '';
+
+  arrVal.innerHTML = `${arr.text} <span class="wd">${arr.weekday}</span> ${arr.time}${plusTag}`;
+
+  const depLocalStr = `${dep.y}年${dep.mo}月${dep.d}日 ${pad2(dep.h)}:${pad2(dep.mi)}（${o.city}）`;
+  const tzStr = tzDiff >= 0 ? `+${Math.abs(tzDiff)/60}` : `−${Math.abs(tzDiff)/60}`;
+
+  arrSub.innerHTML =
+    `从 <b>${depLocalStr}</b> 起飞 · 飞行 <b>${fmtDuration(dur)}</b> · 时差 <b>${tzStr}h</b><br>` +
+    `以上为 <b>${d.city}</b> 当地时间，已自动换算时差`;
+}
+
+/* 一键互换 */
+document.getElementById('swapBtn').addEventListener('click', () => {
+  const o = originPicker.value;
+  const d = destPicker.value;
+  if (!o && !d) return;
+  originPicker.value = d;
+  destPicker.value = o;
+  recalc();
+});
+
+/* ============================================================
+   事件监听 & 启动
+   ============================================================ */
+let rt;
+window.addEventListener('resize', () => {
+  clearTimeout(rt);
+  rt = setTimeout(() => { resizeBg(); resizeMap(); }, 140);
+}, { passive: true });
+window.addEventListener('orientationchange', () => {
+  clearTimeout(rt);
+  rt = setTimeout(() => { resizeBg(); resizeMap(); }, 260);
+}, { passive: true });
+
+/* 全屏（F 键） */
+const rootEl = document.documentElement;
+const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement ||
+                     document.mozFullScreenElement || document.msFullscreenElement);
+function toggleFs(){
+  if (isFs()){
+    const exit = document.exitFullscreen || document.webkitExitFullscreen ||
+                 document.mozCancelFullScreen || document.msExitFullscreen;
+    if (exit) exit.call(document);
+  } else {
+    const req = rootEl.requestFullscreen || rootEl.webkitRequestFullscreen ||
+                rootEl.mozRequestFullScreen || rootEl.msRequestFullscreen;
+    if (req){ const r = req.call(rootEl); if (r && r.catch) r.catch(()=>{}); }
+  }
+}
+["fullscreenchange","webkitfullscreenchange","mozfullscreenchange","MSFullscreenChange"]
+  .forEach(ev => document.addEventListener(ev, () => {
+    requestAnimationFrame(() => setTimeout(() => { resizeBg(); resizeMap(); }, 80));
+  }));
+window.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  if (e.key.toLowerCase() === 'f') toggleFs();
+});
+
+/* 初始化 */
+resizeBg();
+resizeMap();
+
+depTimeInput.value = defaultDepTime();
+depTimeInput.addEventListener('input', recalc);
+
+originPicker.value = BY_IATA['PEK'];
+destPicker.value   = BY_IATA['JFK'];
+
+recalc();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
