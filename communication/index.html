@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0e1116">
-<title>IP 通讯 · 加密</title>
+<title>海鸥通讯</title>
 <link rel="manifest" id="pwaManifest">
 <link rel="icon" id="pwaIcon">
 <style>
@@ -17,6 +17,7 @@
   --bg-rgba:rgba(14,17,22,.45);
   --body-bg:radial-gradient(circle at 50% 45%,#141c3a 0%,#0a0e1f 48%,#04050c 100%);
   --stars-opacity:1;
+  --brand-grad:linear-gradient(135deg,#4f8cff,#3ecf8e);
 }
 [data-theme="light"]{
   --bg:#f2f4f8;--panel:#ffffff;--panel2:#f6f8fc;--line:#e2e6ee;
@@ -26,6 +27,7 @@
   --bg-rgba:rgba(242,244,248,.55);
   --body-bg:radial-gradient(circle at 50% 45%,#e6ecfa 0%,#eef2f8 48%,#e0e4ec 100%);
   --stars-opacity:.35;
+  --brand-grad:linear-gradient(135deg,#2f6fe4,#1ea96c);
 }
 html,body{height:100%}
 body{
@@ -37,7 +39,6 @@ body{
   user-select:none;
   transition:background .25s,color .25s;
 }
-/* 星空背景 */
 #stars-bg{
   position:fixed;inset:0;z-index:0;
   display:block;width:100%;height:100%;
@@ -56,9 +57,28 @@ main{position:relative;z-index:1}
 
 .topbar{height:58px;flex:0 0 58px;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--panel-rgba);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);overflow-x:auto}
 .topbar::-webkit-scrollbar{display:none}
-.brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:15px;flex:0 0 auto}
-.brand .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
-.brand .dot.off{background:var(--red);box-shadow:0 0 10px var(--red)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px;letter-spacing:.3px;flex:0 0 auto}
+.brand .logo{
+  width:28px;height:28px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--brand-grad);
+  box-shadow:0 3px 12px rgba(79,140,255,.4);
+  position:relative;overflow:hidden;
+}
+.brand .logo svg{width:17px;height:17px;display:block}
+.brand .logo .net-dot{
+  position:absolute;right:-1px;bottom:-1px;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--green);
+  border:2px solid var(--panel);
+  box-shadow:0 0 6px var(--green);
+}
+.brand .logo .net-dot.off{background:var(--red);box-shadow:0 0 6px var(--red)}
+.brand .name{
+  background:var(--brand-grad);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
 .spacer{flex:1;min-width:8px}
 .myip{display:flex;align-items:center;gap:9px;font-size:13px;flex:0 0 auto}
 .myip .label{color:var(--muted)}
@@ -80,7 +100,8 @@ main{position:relative;z-index:1}
 main{flex:1;display:flex;min-height:0}
 .sidebar{width:300px;flex:0 0 300px;background:var(--panel-rgba);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
 .side-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;font-size:12px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;gap:8px}
-.side-head .title{flex:1}
+.side-head .title{flex:1;display:flex;align-items:center;gap:6px}
+.side-head .title::before{content:'';width:4px;height:12px;border-radius:2px;background:var(--brand-grad)}
 .btn-add{background:rgba(79,140,255,.13);color:var(--accent);border:1px solid rgba(79,140,255,.25);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;transition:.18s;font-family:inherit}
 .btn-add:hover{background:rgba(79,140,255,.22)}
 .search-box{padding:0 14px 8px}
@@ -146,14 +167,22 @@ main{flex:1;display:flex;min-height:0}
 .typing-hint .dots i:nth-child(2){animation-delay:.2s}
 .typing-hint .dots i:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
-.empty-head{color:var(--muted);font-size:14px}
+.empty-head{color:var(--muted);font-size:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.empty-head .welcome-logo{width:38px;height:38px;border-radius:12px;background:var(--brand-grad);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(79,140,255,.35)}
+.empty-head .welcome-logo svg{width:22px;height:22px}
+.empty-head .welcome-title{font-size:16px;font-weight:700;color:var(--text)}
+.empty-head .welcome-sub{font-size:12.5px;color:var(--muted);line-height:1.6}
 .pinned-bar{background:rgba(240,180,41,.1);border-bottom:1px solid rgba(240,180,41,.25);padding:8px 18px;display:flex;align-items:center;gap:10px;font-size:12.5px;cursor:pointer;transition:.15s}
 .pinned-bar:hover{background:rgba(240,180,41,.18)}
 .pinned-bar .pb-icon{color:var(--orange);flex:0 0 auto}
 .pinned-bar .pb-text{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
 .pinned-bar .pb-count{color:var(--orange);font-size:11px;font-family:ui-monospace,Menlo,monospace;flex:0 0 auto}
 .messages{flex:1;overflow-y:auto;padding:18px 18px 10px;display:flex;flex-direction:column;gap:12px}
-.empty-chat{margin:auto;color:var(--muted);font-size:13.5px;text-align:center;line-height:2}
+.empty-chat{margin:auto;color:var(--muted);font-size:13.5px;text-align:center;line-height:2;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:280px}
+.empty-chat .ec-logo{width:56px;height:56px;border-radius:16px;background:var(--brand-grad);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(79,140,255,.4);opacity:.9}
+.empty-chat .ec-logo svg{width:32px;height:32px}
+.empty-chat .ec-title{font-size:15px;font-weight:600;color:var(--text);opacity:.9}
+.empty-chat .ec-sub{font-size:12.5px;color:var(--muted);line-height:1.7}
 .time-divider{align-self:center;font-size:11px;color:var(--muted);padding:6px 12px;background:rgba(255,255,255,.045);border-radius:20px;margin:8px 0;font-family:ui-monospace,Menlo,monospace}
 [data-theme="light"] .time-divider{background:rgba(0,0,0,.04)}
 .sys-msg{align-self:center;font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.045);padding:4px 12px;border-radius:20px;font-family:ui-monospace,Menlo,monospace;max-width:80%;text-align:center}
@@ -221,13 +250,14 @@ main{flex:1;display:flex;min-height:0}
 .site-footer{flex:0 0 34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--panel-rgba);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line)}
 .site-footer a{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);text-decoration:none;padding:3px 10px;border-radius:7px;transition:.18s;font-family:ui-monospace,Menlo,monospace}
 .site-footer a:hover{color:var(--accent);background:rgba(79,140,255,.1)}
-.site-footer .dot-mark{width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#4f8cff,#3ecf8e);box-shadow:0 0 6px rgba(79,140,255,.5)}
+.site-footer .dot-mark{width:6px;height:6px;border-radius:50%;background:var(--brand-grad);box-shadow:0 0 6px rgba(79,140,255,.5)}
 .overlay{position:fixed;inset:0;background:rgba(6,8,12,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .overlay.show{display:flex;animation:fade .18s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 .dialog{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.55);animation:pop .22s cubic-bezier(.2,1.1,.5,1);margin:auto;max-height:90vh;overflow-y:auto}
 @keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
-.dialog h3{font-size:16px;margin-bottom:6px;font-weight:600}
+.dialog h3{font-size:16px;margin-bottom:6px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dialog h3::before{content:'';width:4px;height:16px;border-radius:2px;background:var(--brand-grad)}
 .dialog .sub{font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:16px}
 .dialog label{display:block;margin-bottom:14px}
 .dialog label span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
@@ -331,7 +361,7 @@ main{flex:1;display:flex;min-height:0}
 .rk-row .rk-idx{width:22px;height:22px;border-radius:6px;background:rgba(79,140,255,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;flex:0 0 auto}
 .rk-row .rk-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rk-row .rk-val{font-size:12px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;flex:0 0 auto}
-@media (max-width:720px){.sidebar{width:240px;flex:0 0 240px}.myip{display:none}.messages{padding:14px 12px 8px}.composer{padding:10px 12px 14px}.msg{max-width:88%}.site-footer{flex:0 0 30px;height:30px}.c-time{display:none}.head-name{font-size:14px}.stats-grid{grid-template-columns:1fr}}
+@media (max-width:720px){.sidebar{width:240px;flex:0 0 240px}.myip{display:none}.messages{padding:14px 12px 8px}.composer{padding:10px 12px 14px}.msg{max-width:88%}.site-footer{flex:0 0 30px;height:30px}.c-time{display:none}.head-name{font-size:14px}.stats-grid{grid-template-columns:1fr}.brand{font-size:15px}}
 </style>
 </head>
 <body>
@@ -339,7 +369,17 @@ main{flex:1;display:flex;min-height:0}
 <canvas id="stars-bg"></canvas>
 
 <header class="topbar">
-  <div class="brand"><span class="dot" id="netDot" title="网络状态"></span><span data-i18n="brand">IP 通讯</span></div>
+  <div class="brand">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- 海鸥造型 -->
+        <path d="M3 13c1.5-1.5 3-2 4.5-2 2 0 3.5 1 5 2.5 1.5 1.5 3 2.5 5 2.5 1.5 0 3-.5 4.5-2"/>
+        <path d="M4 11c1.2-1.2 2.4-1.8 3.6-1.8 1.6 0 2.8.8 4 2 1.2 1.2 2.4 2 4 2 1.2 0 2.4-.6 3.6-1.8" opacity=".65"/>
+      </svg>
+      <span class="net-dot" id="netDot" title="网络状态"></span>
+    </div>
+    <span class="name" data-i18n="brand">海鸥通讯</span>
+  </div>
   <div class="spacer"></div>
   <div class="myip"><span class="label" data-i18n="myIp">本机 IP</span><code id="myIpVal" class="ipval loading" data-i18n="fetching">获取中…</code></div>
   <select id="statusSelect" class="status-select" title="Status">
@@ -347,7 +387,7 @@ main{flex:1;display:flex;min-height:0}
     <option value="away" data-i18n="away">🟡 离开</option>
     <option value="dnd" data-i18n="dnd">🔴 勿扰</option>
   </select>
-  <button id="installBtn" class="icon-btn install" title="安装到桌面">
+  <button id="installBtn" class="icon-btn install" data-i18n-title="installBtn" title="安装到桌面">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
   </button>
   <button id="searchBtn" class="icon-btn" data-i18n-title="searchBtn" title="搜索消息 (Ctrl+K)">
@@ -380,7 +420,7 @@ main{flex:1;display:flex;min-height:0}
   </aside>
 
   <section class="chat">
-    <div class="chat-head" id="chatHead"><div class="empty-head" data-i18n="noSelection">未选择联系人</div></div>
+    <div class="chat-head" id="chatHead"></div>
     <div id="pinnedBar"></div>
     <div class="messages" id="messages"></div>
     <div class="quote-preview" id="quotePreview">
@@ -720,7 +760,6 @@ window.StarsBG = (function(){
     rafId = requestAnimationFrame(frame);
   }
 
-  /* 指针事件：UI 元素上不触发 */
   function isUIElement(el){
     if(!el || !el.closest) return false;
     return !!el.closest('.topbar, .sidebar, .chat-head, .composer, .site-footer, .overlay, .ctxmenu, .lightbox, button, input, select, textarea, .dialog');
@@ -757,7 +796,6 @@ window.StarsBG = (function(){
   window.addEventListener("pointerleave", () => { pointer.hover = false; pointer.down = false; }, { passive: true });
   window.addEventListener("blur", () => { pointer.hover = false; pointer.down = false; });
 
-  /* 键盘：S 观赏模式 */
   window.addEventListener("keydown", (e) => {
     if(e.repeat) return;
     if(isUIElement(e.target)) return;
@@ -767,7 +805,6 @@ window.StarsBG = (function(){
     }
   });
 
-  /* 尺寸 */
   let rt;
   window.addEventListener("resize", () => {
     clearTimeout(rt);
@@ -785,7 +822,6 @@ window.StarsBG = (function(){
     if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
   }
 
-  /* 首次尺寸 */
   resize();
 
   return { start, stop, resize };
@@ -798,10 +834,12 @@ window.StarsBG = (function(){
 
 /* ============ i18n ============ */
 const I18N={
-zh:{brand:'IP 通讯',myIp:'本机 IP',fetching:'获取中…',failed:'获取失败',online:'🟢 在线',away:'🟡 离开',dnd:'🔴 勿扰',
+zh:{brand:'海鸥通讯',myIp:'本机 IP',fetching:'获取中…',failed:'获取失败',online:'🟢 在线',away:'🟡 离开',dnd:'🔴 勿扰',
 searchBtn:'搜索消息 (Ctrl+K)',qrBtn:'分享我的联系方式',scanBtn:'扫一扫添加',themeBtn:'切换主题',dataBtn:'数据管理',setBtn:'设置',refreshBtn:'手动获取本机 IP 并广播',installBtn:'安装到桌面',
 contacts:'联系人',add:'＋ 添加',searchContacts:'搜索联系人…',fpInit:'密钥指纹：初始化中…',fpPrefix:'我的密钥指纹：',
 noContacts:'暂无联系人',noContactsHint:'点击「＋ 添加」输入对方 IP',noMatch:'没有匹配的联系人',
+welcomeTitle:'欢迎使用海鸥通讯',welcomeSub:'端到端加密 · 跨网络通讯',
+emptyChatTitle:'海鸥通讯',emptyChatSub:'从左侧选择联系人，<br>或点击「＋ 添加」输入对方 IP',
 addTitle:'添加联系人',ipLabel:'对方 IP 地址',ipPh:'例如 192.168.1.23',nameLabel:'备注名称',namePh:'选填，默认使用 IP',cancel:'取消',confirmAdd:'添加',
 loopbackHint:'🏠 检测到回环地址（127.x.x.x），将作为本地联系人处理，跳过密钥交换和加密验证。',
 delTitle:'删除联系人',delConfirm:'确定要删除',delHint:'该联系人的全部聊天记录将一并删除，此操作不可撤销。',delBtn:'删除',
@@ -846,10 +884,12 @@ tStarsOn:'已开启星空背景',tStarsOff:'已关闭星空背景',
 tLocalOnly:'🏠 本地回环联系人，仅在本浏览器标签页间通信',
 tRetryProbe:'正在重试与「',tRetryProbe2:'」的密钥交换…'},
 
-en:{brand:'IP Chat',myIp:'My IP',fetching:'Fetching…',failed:'Failed',online:'🟢 Online',away:'🟡 Away',dnd:'🔴 DND',
+en:{brand:'Seagull Chat',myIp:'My IP',fetching:'Fetching…',failed:'Failed',online:'🟢 Online',away:'🟡 Away',dnd:'🔴 DND',
 searchBtn:'Search messages (Ctrl+K)',qrBtn:'Share my contact',scanBtn:'Scan to add',themeBtn:'Toggle theme',dataBtn:'Data management',setBtn:'Settings',refreshBtn:'Fetch and broadcast my IP',installBtn:'Install to desktop',
 contacts:'Contacts',add:'＋ Add',searchContacts:'Search contacts…',fpInit:'Fingerprint: initializing…',fpPrefix:'My key fingerprint: ',
 noContacts:'No contacts yet',noContactsHint:'Click "＋ Add" to enter an IP',noMatch:'No matching contacts',
+welcomeTitle:'Welcome to Seagull Chat',welcomeSub:'End-to-end encrypted · Cross-network',
+emptyChatTitle:'Seagull Chat',emptyChatSub:'Pick a contact on the left,<br>or click "＋ Add" to enter an IP',
 addTitle:'Add contact',ipLabel:'Peer IP address',ipPh:'e.g. 192.168.1.23',nameLabel:'Display name',namePh:'Optional, defaults to IP',cancel:'Cancel',confirmAdd:'Add',
 loopbackHint:'🏠 Loopback address detected (127.x.x.x). Will be treated as a local contact — key exchange and encryption are skipped.',
 delTitle:'Delete contact',delConfirm:'Delete',delHint:'All chat history with this contact will be permanently deleted. This cannot be undone.',delBtn:'Delete',
@@ -894,10 +934,12 @@ tStarsOn:'Stardust background on',tStarsOff:'Stardust background off',
 tLocalOnly:'🏠 Local loopback contact — communicates only between tabs of this browser',
 tRetryProbe:'Retrying key exchange with "',tRetryProbe2:'"…'},
 
-fr:{brand:'Messagerie IP',myIp:'Mon IP',fetching:'Chargement…',failed:'Échec',online:'🟢 En ligne',away:'🟡 Absent',dnd:'🔴 Ne pas déranger',
+fr:{brand:'Messagerie Goéland',myIp:'Mon IP',fetching:'Chargement…',failed:'Échec',online:'🟢 En ligne',away:'🟡 Absent',dnd:'🔴 Ne pas déranger',
 searchBtn:'Rechercher (Ctrl+K)',qrBtn:'Partager mon contact',scanBtn:'Scanner',themeBtn:'Changer de thème',dataBtn:'Gestion des données',setBtn:'Paramètres',refreshBtn:'Récupérer et diffuser mon IP',installBtn:'Installer sur le bureau',
 contacts:'Contacts',add:'＋ Ajouter',searchContacts:'Rechercher un contact…',fpInit:'Empreinte : initialisation…',fpPrefix:'Mon empreinte : ',
 noContacts:'Aucun contact',noContactsHint:'Cliquez « ＋ Ajouter » pour saisir une IP',noMatch:'Aucun contact correspondant',
+welcomeTitle:'Bienvenue sur Messagerie Goéland',welcomeSub:'Chiffré de bout en bout · Inter-réseau',
+emptyChatTitle:'Messagerie Goéland',emptyChatSub:'Choisissez un contact à gauche,<br>ou cliquez « ＋ Ajouter »',
 addTitle:'Ajouter un contact',ipLabel:'Adresse IP du pair',ipPh:'ex. 192.168.1.23',nameLabel:'Nom affiché',namePh:'Optionnel, par défaut l\'IP',cancel:'Annuler',confirmAdd:'Ajouter',
 loopbackHint:'🏠 Adresse de bouclage détectée (127.x.x.x). Traitée comme contact local — échange de clés et chiffrement ignorés.',
 delTitle:'Supprimer le contact',delConfirm:'Supprimer',delHint:'Tout l\'historique sera supprimé définitivement. Action irréversible.',delBtn:'Supprimer',
@@ -925,7 +967,7 @@ msgPhIdle:'Sélectionnez un contact…',msgPhEnter:'Écrire (Entrée pour envoye
 sendBtn:'Envoyer',noSelection:'Aucun contact sélectionné',emptyChat:'Aucun message. Dites bonjour 👋',emptySelect:'Choisissez un contact à gauche,<br>ou cliquez « ＋ Ajouter »',
 e2ee:'Chiffré de bout en bout',waitingKey:'◌ Échange de clés…',noCrypto:'⚠ Chiffrement indisponible',localTag:'Local',localHint:'Contact de bouclage — sans chiffrement ni vérification',
 onlineStatus:'En ligne',awayStatus:'Absent',dndStatus:'Ne pas déranger',offlineStatus:'Hors ligne',typing:'en train d\'écrire…',you:'Moi',other:'Pair',
-recalled:'a rappelé un message',pinnedCount:'épinglés',edited:'modifié',statusSent:'Envoyé',statusDelivered:'Distribué',statusRead:'Lu',statusFailed:'Échec, appuyez pour réessayer',
+recalled:'a rappelé un message',pinnedCount:'épinglés',edited:'modifié',statusSent:'Envoyé',statusDistributed:'Distribué',statusRead:'Lu',statusFailed:'Échec, appuyez pour réessayer',
 statsContacts:'Contacts',statsMsgs:'Messages',statsFiles:'Fichiers / images',statsUnread:'Non lus',statsTop:'Top contacts',statsItems:' msgs',
 tCopied:'Copié',tCopyFailed:'Échec de copie',tRecalled:'Rappelé',tPinned:'Épinglé',tUnpinned:'Désépinglé',tDeletedLocal:'Supprimé localement',tDeleted:'Supprimé « ',tCleared:'Historique effacé',
 tMsgQueued:'Pair hors ligne, message en file',tEncryptFail:'Échec du chiffrement',tFileSent:'Fichier envoyé (chiffré)',tFilesSent:'Envoyé ',tFileTooBigFull:'Fichier > 4 Mo ignoré',tFileReadFail:'Échec de lecture « ',tFileReadFail2:' »',tFileTooBig:'Données indisponibles',
@@ -951,6 +993,7 @@ function applyI18n(){
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.dataset.i18nPlaceholder)});
   document.querySelectorAll('[data-i18n-title]').forEach(el=>{el.title=t(el.dataset.i18nTitle)});
   document.documentElement.lang=lang==='zh'?'zh-CN':lang;
+  document.title=t('brand');
   if($('#myFp')&&identity)$('#myFp').textContent=t('fpPrefix')+identity.fingerprint;
   if($('#loopbackHint'))$('#loopbackHint').textContent=t('loopbackHint');
   renderContacts();renderChat();
@@ -1005,11 +1048,11 @@ const AVATAR_COLORS=[
 function avatarStyle(color){const f=AVATAR_COLORS.find(c=>c.v===color);const bg=f?f.bg:'rgba(79,140,255,.16)';const c=f?f.v:'#4f8cff';return`background:${bg};color:${c};border:1px solid ${c}44`}
 
 /* ============ 身份 & 加密 ============ */
-const ME_KEY='ipchat.device.id';
+const ME_KEY='seagull.device.id';
 let myId=sessionStorage.getItem(ME_KEY);if(!myId){myId='dev-'+uid();sessionStorage.setItem(ME_KEY,myId)}
 const me={id:myId,ip:null};
 const cryptoOk=typeof crypto!=='undefined'&&crypto.subtle&&crypto.getRandomValues;
-const IDENTITY_KEY='ipchat.identity.v1';
+const IDENTITY_KEY='seagull.identity.v1';
 let identity=null;const keyCache=new Map();
 async function makeFingerprint(pubKey){const raw=await crypto.subtle.exportKey('raw',pubKey);const hash=await crypto.subtle.digest('SHA-256',raw);const b=new Uint8Array(hash).slice(0,8);return[...b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase()}
 const identityReady=(async()=>{
@@ -1029,7 +1072,7 @@ async function encryptJSON(key,obj){const iv=crypto.getRandomValues(new Uint8Arr
 async function decryptJSON(key,ivB64,ctB64){const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(ivB64)},key,unb64(ctB64));return JSON.parse(new TextDecoder().decode(pt))}
 
 /* ============ 设置 ============ */
-const SET_KEY='ipchat.settings.v8';
+const SET_KEY='seagull.settings.v1';
 const defaultSettings={theme:'dark',sound:true,notifications:true,myStatus:'online',myName:'',myAvatarColor:'#4f8cff',bubbleStyle:'default',autoCleanDays:30,enterToSend:true,autoBackup:false,lastBackupAt:0,lang:'zh',starsBg:true};
 let settings=Object.assign({},defaultSettings);
 function loadSettings(){try{const raw=localStorage.getItem(SET_KEY);if(raw)settings=Object.assign({},defaultSettings,JSON.parse(raw))}catch(e){}}
@@ -1048,7 +1091,7 @@ function applyStarsBg(){
 }
 
 /* ============ 状态 ============ */
-const STORE_KEY='ipchat.state.v9';
+const STORE_KEY='seagull.state.v1';
 let contacts=[];let activeUid=null;
 let quotedMsg=null;let burnSeconds=0;
 let pendingMsgs=[];
@@ -1058,8 +1101,8 @@ let editingMsg=null;
 
 function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify({contacts,activeUid}));return true}catch(e){if(e&&(e.name==='QuotaExceededError'||e.code===22))toast('localStorage full');return false}}
 function load(){try{const raw=localStorage.getItem(STORE_KEY);if(!raw)return;const d=JSON.parse(raw);if(Array.isArray(d.contacts))contacts=d.contacts;activeUid=d.activeUid||null;contacts.forEach(c=>{c.msgs=c.msgs||[];c.online=false;c.lastSeen=c.lastSeen||null;c.pubJwk=c.pubJwk||null;c.pinned=!!c.pinned;c.group=c.group||'';c.blocked=!!c.blocked;c.avatarColor=c.avatarColor||'#4f8cff';c.remoteStatus=c.remoteStatus||null;c.msgs.forEach(m=>{if(!m.type)m.type='text';if(m.dir==='out'&&m.msgId&&!m.status)m.status='sent';if(m.pinned===undefined)m.pinned=false;if(m.edited===undefined)m.edited=false})});if(!contacts.some(c=>c.uid===activeUid))activeUid=contacts[0]?contacts[0].uid:null}catch(e){console.warn(e)}}
-function persistPending(){try{localStorage.setItem('ipchat.pending.v1',JSON.stringify(pendingMsgs))}catch(e){}}
-function loadPending(){try{const raw=localStorage.getItem('ipchat.pending.v1');if(raw)pendingMsgs=JSON.parse(raw)||[]}catch(e){}}
+function persistPending(){try{localStorage.setItem('seagull.pending.v1',JSON.stringify(pendingMsgs))}catch(e){}}
+function loadPending(){try{const raw=localStorage.getItem('seagull.pending.v1');if(raw)pendingMsgs=JSON.parse(raw)||[]}catch(e){}}
 
 /* ============ 网络层 ============ */
 let net=null;
@@ -1078,12 +1121,12 @@ function markSeen(mid){
 }
 
 function initBroadcastChannel(){
-  try{net=new BroadcastChannel('ipchat-net');net.onmessage=e=>onNet(e.data)}catch(err){net={postMessage(){}}}
+  try{net=new BroadcastChannel('seagull-net');net.onmessage=e=>onNet(e.data)}catch(err){net={postMessage(){}}}
 }
 
 function ipTopic(ip){
   if(!ip||isLoopback(ip))return null;
-  return 'ipchat/v3/ip/'+String(ip).replace(/[:.]/g,'_');
+  return 'seagull/v1/ip/'+String(ip).replace(/[:.]/g,'_');
 }
 
 function loadMqttLib(){
@@ -1113,7 +1156,7 @@ async function initMQTT(){
   if(!ok||!window.mqtt){toast(t('tMqttFail'));return}
   toast(t('tMqttConnecting'));
   try{
-    const clientId='ipchat-'+myId+'-'+uid().slice(0,6);
+    const clientId='seagull-'+myId+'-'+uid().slice(0,6);
     const client=window.mqtt.connect('wss://broker.emqx.io:8084/mqtt',{
       clientId,clean:true,reconnectPeriod:5000,connectTimeout:15000,keepalive:60,protocolVersion:4
     });
@@ -1193,11 +1236,9 @@ function findContact(from){let c=contacts.find(x=>x.remoteId&&x.remoteId===from.
 function rememberPub(c,pubJwk){if(!pubJwk)return false;const ch=!c.pubJwk||JSON.stringify(c.pubJwk)!==JSON.stringify(pubJwk);if(ch){c.pubJwk=pubJwk;forgetKey(c)}return ch}
 function updateRemoteMeta(c,from){if(from.status)c.remoteStatus=from.status;if(from.name)c.remoteName=from.name;if(from.avatarColor)c.remoteAvatarColor=from.avatarColor}
 
-/* 探测请求处理：直接向发送者定向回复 IP 更新（跨网络场景关键） */
 async function onProbe(msg){
   if(!msg.targetIp||msg.targetIp!==me.ip)return;
   if(isLoopback(me.ip))return;
-  // 直接向探测请求发送者的 IP 定向回复，无论是否在联系人列表中
   if(msg.from&&msg.from.ip){
     await post('ip-update',null,[msg.from.ip]);
   }
@@ -1277,10 +1318,10 @@ let titleTimer=null;
 function updateTitle(){
   const total=contacts.reduce((s,c)=>s+c.msgs.filter(m=>m.dir==='in'&&!m.read).length,0);
   clearInterval(titleTimer);
-  if(!total){document.title=t('brand')+' · '+t('e2ee');return}
+  if(!total){document.title=t('brand');return}
   let flip=false;
   document.title=`(${total}) ${t('brand')}`;
-  titleTimer=setInterval(()=>{flip=!flip;document.title=flip?`(${total}) 📬`:(t('brand')+' · '+t('e2ee'))},1500);
+  titleTimer=setInterval(()=>{flip=!flip;document.title=flip?`(${total}) 📬`:t('brand')},1500);
 }
 async function notifyMessage(c,m){
   if(!settings.notifications)return;
@@ -1408,7 +1449,18 @@ function renderPinnedBar(c){
 
 function renderChat(){
   const c=getActive();const head=$('#chatHead');const box=$('#messages');const input=$('#msgInput');const sendBtn=$('#sendBtn');const attachBtn=$('#attachBtn');const burnBtn=$('#burnBtn');
-  if(!c){head.innerHTML='<div class="empty-head">'+t('noSelection')+'</div>';box.innerHTML='<div class="empty-chat">'+t('emptySelect')+'</div>';$('#pinnedBar').innerHTML='';input.disabled=true;sendBtn.disabled=true;attachBtn.disabled=true;burnBtn.disabled=true;input.value='';input.placeholder=t('msgPhIdle');sendBtn.classList.remove('local');updateTitle();return}
+  if(!c){
+    head.innerHTML=`<div class="empty-head">
+      <div class="welcome-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13c1.5-1.5 3-2 4.5-2 2 0 3.5 1 5 2.5 1.5 1.5 3 2.5 5 2.5 1.5 0 3-.5 4.5-2"/><path d="M4 11c1.2-1.2 2.4-1.8 3.6-1.8 1.6 0 2.8.8 4 2 1.2 1.2 2.4 2 4 2 1.2 0 2.4-.6 3.6-1.8" opacity=".65"/></svg></div>
+      <div><div class="welcome-title">${t('welcomeTitle')}</div><div class="welcome-sub">${t('welcomeSub')}</div></div>
+    </div>`;
+    box.innerHTML=`<div class="empty-chat">
+      <div class="ec-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13c1.5-1.5 3-2 4.5-2 2 0 3.5 1 5 2.5 1.5 1.5 3 2.5 5 2.5 1.5 0 3-.5 4.5-2"/><path d="M4 11c1.2-1.2 2.4-1.8 3.6-1.8 1.6 0 2.8.8 4 2 1.2 1.2 2.4 2 4 2 1.2 0 2.4-.6 3.6-1.8" opacity=".65"/></svg></div>
+      <div class="ec-title">${t('emptyChatTitle')}</div>
+      <div class="ec-sub">${t('emptyChatSub')}</div>
+    </div>`;
+    $('#pinnedBar').innerHTML='';input.disabled=true;sendBtn.disabled=true;attachBtn.disabled=true;burnBtn.disabled=true;input.value='';input.placeholder=t('msgPhIdle');sendBtn.classList.remove('local');updateTitle();return;
+  }
   const isLocal=isLoopback(c.ip);
   let lockHtml;
   if(isLocal){lockHtml='<span class="lock local">🏠 '+t('localTag')+'</span>'}
@@ -1429,7 +1481,7 @@ function renderChat(){
   const all=c.msgs;
   const start=Math.max(0,all.length-visibleLimit);
   const shown=all.slice(start);
-  if(!all.length){box.innerHTML='<div class="empty-chat">'+t('emptyChat')+'</div>'}
+  if(!all.length){box.innerHTML='<div class="empty-chat"><div class="ec-title" style="font-size:14px">'+t('emptyChat')+'</div></div>'}
   else{
     let html='';
     if(start>0)html+=`<div class="sys-msg" style="cursor:pointer" id="loadMore">↑ +${start}</div>`;
@@ -1763,9 +1815,9 @@ $('#searchResults').addEventListener('click',e=>{const it=e.target.closest('.sr-
 /* ============ 数据管理 ============ */
 function download(filename,content,mime){const blob=new Blob([content],{type:mime||'application/octet-stream'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}
 function timestampName(){const d=new Date();const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`}
-function buildExportData(includeMsgs){return{app:'IPChat',version:9,exportedAt:now(),exportedAtStr:fmtFull(now()),device:{id:me.id,ip:me.ip,fingerprint:identity?identity.fingerprint:null},contacts:contacts.map(c=>({uid:c.uid,name:c.name,ip:c.ip,remoteId:c.remoteId||null,pubJwk:c.pubJwk||null,pinned:!!c.pinned,group:c.group||'',blocked:!!c.blocked,avatarColor:c.avatarColor||'#4f8cff',msgs:includeMsgs?(c.msgs||[]):[]}))}}
-function exportAll(){if(!contacts.length){toast(t('tExportEmpty'));return}const data=buildExportData(true);download(`ipchat-backup-${timestampName()}.json`,JSON.stringify(data,null,2),'application/json');settings.lastBackupAt=now();saveSettings();toast(t('tExportAll')+contacts.length+t('tExportAll2'));closeDataDialog()}
-function exportContactsOnly(){if(!contacts.length){toast(t('tExportContactsEmpty'));return}const data=buildExportData(false);download(`ipchat-contacts-${timestampName()}.json`,JSON.stringify(data,null,2),'application/json');toast(t('tExportContacts')+contacts.length+t('tExportContacts2'));closeDataDialog()}
+function buildExportData(includeMsgs){return{app:'SeagullChat',version:1,exportedAt:now(),exportedAtStr:fmtFull(now()),device:{id:me.id,ip:me.ip,fingerprint:identity?identity.fingerprint:null},contacts:contacts.map(c=>({uid:c.uid,name:c.name,ip:c.ip,remoteId:c.remoteId||null,pubJwk:c.pubJwk||null,pinned:!!c.pinned,group:c.group||'',blocked:!!c.blocked,avatarColor:c.avatarColor||'#4f8cff',msgs:includeMsgs?(c.msgs||[]):[]}))}}
+function exportAll(){if(!contacts.length){toast(t('tExportEmpty'));return}const data=buildExportData(true);download(`seagull-backup-${timestampName()}.json`,JSON.stringify(data,null,2),'application/json');settings.lastBackupAt=now();saveSettings();toast(t('tExportAll')+contacts.length+t('tExportAll2'));closeDataDialog()}
+function exportContactsOnly(){if(!contacts.length){toast(t('tExportContactsEmpty'));return}const data=buildExportData(false);download(`seagull-contacts-${timestampName()}.json`,JSON.stringify(data,null,2),'application/json');toast(t('tExportContacts')+contacts.length+t('tExportContacts2'));closeDataDialog()}
 function exportAsText(){
   if(!contacts.length){toast(t('tExportEmpty'));return}
   const lines=[];
@@ -1785,7 +1837,7 @@ function exportAsText(){
     else{c.msgs.forEach(m=>{const time=fmtFull(m.ts);if(m.dir==='sys'){lines.push(`  [${time}] * ${m.text}`)}else if(m.recalled){lines.push(`  [${time}] ${m.dir==='out'?t('you'):c.name}: [${t('recalled')}]`)}else{let content;if(m.type==='image')content='[IMG] '+(m.fileName||'');else if(m.type==='file')content=`[FILE] ${m.fileName||''} (${fmtSize(m.fileSize)})`;else content=m.text||'';const tags=[];if(m.pinned)tags.push('📌');if(m.edited)tags.push('['+t('edited')+']');lines.push(`  [${time}] ${m.dir==='out'?t('you'):c.name}: ${content} ${tags.join('')}`)}})}
     lines.push('');
   });
-  download(`ipchat-chats-${timestampName()}.txt`,lines.join('\n'),'text/plain;charset=utf-8');
+  download(`seagull-chats-${timestampName()}.txt`,lines.join('\n'),'text/plain;charset=utf-8');
   toast(t('tExportTxt'));
   closeDataDialog();
 }
@@ -1964,7 +2016,7 @@ function setupPWA(){
   const svgIcon='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%234f8cff"/><stop offset="1" stop-color="%233ecf8e"/></linearGradient></defs><rect width="192" height="192" rx="42" fill="%230e1116"/><circle cx="96" cy="96" r="60" fill="url(%23g)" opacity="0.22"/><path d="M60 78h72M60 96h72M60 114h48" stroke="%234f8cff" stroke-width="9" stroke-linecap="round"/><circle cx="140" cy="140" r="12" fill="%233ecf8e"/></svg>';
   const iconUrl='data:image/svg+xml;charset=utf-8,'+svgIcon;
   document.getElementById('pwaIcon').href=iconUrl;
-  const manifest={name:'IP Chat',short_name:'IPChat',description:'Encrypted peer-to-peer chat over IP',start_url:location.pathname||'/',scope:'./',display:'standalone',orientation:'any',background_color:'#0e1116',theme_color:'#0e1116',icons:[{src:iconUrl,sizes:'192x192',type:'image/svg+xml',purpose:'any'},{src:iconUrl,sizes:'512x512',type:'image/svg+xml',purpose:'any'},{src:iconUrl,sizes:'any',type:'image/svg+xml',purpose:'maskable'}]};
+  const manifest={name:'海鸥通讯',short_name:'海鸥通讯',description:'端到端加密 · 跨网络通讯',start_url:location.pathname||'/',scope:'./',display:'standalone',orientation:'any',background_color:'#0e1116',theme_color:'#0e1116',icons:[{src:iconUrl,sizes:'192x192',type:'image/svg+xml',purpose:'any'},{src:iconUrl,sizes:'512x512',type:'image/svg+xml',purpose:'any'},{src:iconUrl,sizes:'any',type:'image/svg+xml',purpose:'maskable'}]};
   const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
   document.getElementById('pwaManifest').href=URL.createObjectURL(blob);
   if('serviceWorker' in navigator){
@@ -2005,7 +2057,7 @@ document.addEventListener('keydown',e=>{
 /* ============ 心跳 ============ */
 setInterval(()=>{if(me.ip&&!isLoopback(me.ip))post('heartbeat');let changed=false;const t2=now();contacts.forEach(c=>{if(isLoopback(c.ip))return;const on=!!(c.lastSeen&&(t2-c.lastSeen)<45000);if(on!==c.online){c.online=on;changed=true}});if(changed){renderContacts();renderChat()}},15000);
 
-/* ============ 密钥交换重试（跨网络链接关键） ============ */
+/* ============ 密钥交换重试 ============ */
 let retryProbeTimer=null;
 let retryProbeShown={};
 function scheduleKeyRetry(){
