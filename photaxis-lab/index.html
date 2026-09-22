@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>维护中 — SLC.Leo</title>
-<meta name="description" content="网站正在维护，请稍后再来。">
+<title>Maintenance — SLC.Leo</title>
+<meta name="description" content="Website is under maintenance. Please come back later.">
 <meta name="theme-color" content="#fbfbfd">
 <meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex">
@@ -20,6 +20,84 @@ body{
   transition:background 0.5s ease, color 0.5s ease;
 }
 
+/* ── 语言切换器 ── */
+.lang-switcher{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:100;
+}
+.lang-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  font-size:0.85rem;
+  font-family:inherit;
+  color:#424245;
+  background:rgba(255,255,255,0.7);
+  border:1px solid rgba(0,0,0,0.1);
+  border-radius:999px;
+  cursor:pointer;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:background 0.2s, border-color 0.2s, color 0.2s;
+}
+.lang-btn:hover{
+  background:rgba(255,255,255,0.95);
+  border-color:rgba(0,0,0,0.18);
+}
+.lang-btn svg{
+  width:12px;height:12px;
+  transition:transform 0.2s;
+}
+.lang-switcher.open .lang-btn svg{
+  transform:rotate(180deg);
+}
+.lang-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  min-width:150px;
+  padding:6px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.08);
+  border-radius:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.12);
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-8px);
+  transition:opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+.lang-switcher.open .lang-menu{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.lang-menu button{
+  display:block;
+  width:100%;
+  padding:10px 14px;
+  font-size:0.9rem;
+  font-family:inherit;
+  color:#424245;
+  background:transparent;
+  border:none;
+  border-radius:9px;
+  text-align:left;
+  cursor:pointer;
+  transition:background 0.15s, color 0.15s;
+}
+.lang-menu button:hover{
+  background:rgba(0,122,255,0.08);
+  color:#007aff;
+}
+.lang-menu button.active{
+  color:#007aff;
+  background:rgba(0,122,255,0.1);
+}
+
+/* ── 容器 ── */
 .container{
   max-width:760px;
   margin:0 auto;
@@ -79,7 +157,7 @@ h1{
   gap:16px;
   justify-content:center;
   flex-wrap:wrap;
-  margin-bottom:80px;
+  margin-bottom:72px;
 }
 .btn{
   font-size:1rem;
@@ -110,116 +188,64 @@ h1{
   background:rgba(0,122,255,0.08);
 }
 
-/* ── 游戏区 ── */
-.game-section{
+/* ── 跳转卡片 ── */
+.redirect-card{
+  display:block;
   text-align:left;
-  padding:36px;
+  padding:36px 40px;
   border-radius:20px;
   background:#fff;
   border:1px solid rgba(0,0,0,0.06);
-  transition:box-shadow 0.3s ease;
+  text-decoration:none;
+  transition:transform 0.3s ease, box-shadow 0.3s ease;
 }
-.game-section:hover{
-  box-shadow:0 12px 40px rgba(0,0,0,0.06);
+.redirect-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.08);
 }
-.game-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
-}
-.game-title{
-  font-size:1.3rem;
+.redirect-card .card-label{
+  font-size:0.8rem;
   font-weight:500;
-  color:#1d1d1f;
-  display:flex;
-  align-items:center;
-  gap:10px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:#86868b;
+  margin-bottom:14px;
 }
-.game-title i{
-  color:#007aff;
-  font-size:1.1rem;
-}
-.game-stats{
-  display:flex;
-  gap:20px;
-  font-size:0.9rem;
-  color:#6e6e73;
-}
-.game-stats strong{
-  color:#1d1d1f;
+.redirect-card h3{
+  font-size:1.5rem;
   font-weight:500;
-}
-.game-hint{
-  font-size:0.88rem;
-  color:#6e6e73;
-  line-height:1.65;
-  margin-bottom:20px;
-}
-
-/* ── 游戏画布 ── */
-.canvas-wrap{
-  position:relative;
-  border-radius:16px;
-  overflow:hidden;
-  background:#f5f5f7;
-  border:1px solid rgba(0,0,0,0.06);
-  touch-action:none;
-}
-#game-canvas{
-  display:block;
-  width:100%;
-  height:auto;
-  cursor:pointer;
-}
-
-/* ── 开始/结束遮罩 ── */
-.overlay{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-  background:rgba(251,251,253,0.92);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  text-align:center;
-  padding:24px;
-  transition:opacity 0.3s ease, visibility 0.3s ease;
-}
-.overlay.hidden{
-  opacity:0;
-  visibility:hidden;
-}
-.overlay-title{
-  font-size:1.2rem;
-  font-weight:500;
+  margin-bottom:12px;
   color:#1d1d1f;
 }
-.overlay-text{
-  font-size:0.95rem;
-  color:#6e6e73;
+.redirect-card p{
+  color:#424245;
   line-height:1.7;
-  max-width:340px;
+  margin-bottom:22px;
 }
-.overlay button{
-  margin-top:6px;
+.redirect-card .card-link{
+  color:#007aff;
+  font-size:1rem;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:gap 0.2s ease;
+}
+.redirect-card:hover .card-link{
+  gap:10px;
+  text-decoration:underline;
 }
 
 /* ── 移动端 ── */
 @media (max-width:640px){
   body{padding:32px 16px 56px;}
+  .lang-switcher{top:14px;right:14px;}
+  .lang-btn{padding:7px 12px;font-size:0.8rem;}
+  .lang-menu{min-width:130px;}
   .badge{margin-bottom:24px;}
   .desc-sub{margin-bottom:40px;}
-  .btn-group{flex-direction:column;gap:12px;margin-bottom:56px;}
+  .btn-group{flex-direction:column;gap:12px;margin-bottom:48px;}
   .btn{width:100%;text-align:center;}
-  .game-section{padding:22px;border-radius:16px;}
-  .game-header{flex-direction:column;align-items:flex-start;}
-  .game-stats{font-size:0.85rem;}
+  .redirect-card{padding:26px 24px;border-radius:16px;}
 }
 
 /* ── 深色模式 ── */
@@ -233,17 +259,18 @@ h1{
   .btn-primary:hover{background:#349cff;border-color:#349cff;}
   .btn-outline{border-color:#2997ff;color:#2997ff;}
   .btn-outline:hover{background:rgba(41,151,255,0.1);}
-  .game-section{background:#1e1e22;border-color:rgba(255,255,255,0.08);}
-  .game-section:hover{box-shadow:0 12px 40px rgba(0,0,0,0.3);}
-  .game-title{color:#f5f5f7;}
-  .game-title i{color:#2997ff;}
-  .game-stats{color:#a1a1a6;}
-  .game-stats strong{color:#f5f5f7;}
-  .game-hint{color:#a1a1a6;}
-  .canvas-wrap{background:#0a0a0c;border-color:rgba(255,255,255,0.08);}
-  .overlay{background:rgba(18,18,20,0.92);}
-  .overlay-title{color:#f5f5f7;}
-  .overlay-text{color:#a1a1a6;}
+  .redirect-card{background:#1e1e22;border-color:rgba(255,255,255,0.08);}
+  .redirect-card:hover{box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+  .redirect-card .card-label{color:#86868b;}
+  .redirect-card h3{color:#f5f5f7;}
+  .redirect-card p{color:#d1d1d6;}
+  .redirect-card .card-link{color:#2997ff;}
+  .lang-btn{color:#d1d1d6;background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);}
+  .lang-btn:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);}
+  .lang-menu{background:#1e1e22;border-color:rgba(255,255,255,0.08);box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+  .lang-menu button{color:#d1d1d6;}
+  .lang-menu button:hover{background:rgba(41,151,255,0.12);color:#2997ff;}
+  .lang-menu button.active{color:#2997ff;background:rgba(41,151,255,0.12);}
 }
 
 /* ── 减少动画 ── */
@@ -260,325 +287,158 @@ h1{
 </head>
 <body>
 
+<!-- 语言切换 -->
+<div class="lang-switcher" id="langSwitcher">
+  <button class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" aria-label="Language">
+    <span id="currentLang">English</span>
+    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 4.5 6 7.5 9 4.5"/>
+    </svg>
+  </button>
+  <div class="lang-menu" id="langMenu" role="menu">
+    <button type="button" data-lang="en"    role="menuitem">English</button>
+    <button type="button" data-lang="zh-CN" role="menuitem">中文</button>
+    <button type="button" data-lang="fr"    role="menuitem">Français</button>
+  </div>
+</div>
+
 <div class="container">
 
   <div class="badge">
     <span class="dot"></span>
-    <span>维护中</span>
+    <span data-i18n="badge"></span>
   </div>
 
-  <h1>网站正在抢修</h1>
-  <p class="desc">我们遇到了一个比较严重的问题，工程师正在紧急处理。</p>
-  <p class="desc-sub">服务预计很快恢复。在此期间，您可以先玩个小游戏打发时间。</p>
+  <h1 data-i18n="title"></h1>
+  <p class="desc" data-i18n="desc"></p>
+  <p class="desc-sub" data-i18n="descSub"></p>
 
   <div class="btn-group">
-    <button class="btn btn-primary" id="refresh-btn">刷新页面</button>
-    <a class="btn btn-outline" href="mailto:godsunwyyx123spx@163.com">联系我们</a>
+    <button class="btn btn-primary" id="refresh-btn" data-i18n="refreshBtn"></button>
+    <a class="btn btn-outline" href="mailto:godsunwyyx123spx@163.com" data-i18n="contactBtn"></a>
   </div>
 
-  <!-- 游戏 -->
-  <section class="game-section">
-    <div class="game-header">
-      <div class="game-title">
-        <i class="fa-solid fa-gamepad"></i>
-        <span>星尘收集者</span>
-      </div>
-      <div class="game-stats">
-        <span>得分 <strong id="score">0</strong></span>
-        <span>最高 <strong id="best">0</strong></span>
-      </div>
-    </div>
-
-    <p class="game-hint">用鼠标或手指控制飞船，接住下落的星星。接到星星得 1 分，漏掉 3 颗星星游戏结束。</p>
-
-    <div class="canvas-wrap">
-      <canvas id="game-canvas" width="720" height="420"></canvas>
-
-      <div class="overlay" id="start-overlay">
-        <div class="overlay-title">准备好了吗？</div>
-        <div class="overlay-text">点击开始，用飞船接住星星。</div>
-        <button class="btn btn-primary" id="start-btn">开始游戏</button>
-      </div>
-
-      <div class="overlay hidden" id="over-overlay">
-        <div class="overlay-title">游戏结束</div>
-        <div class="overlay-text">你的得分是 <strong id="final-score">0</strong>。</div>
-        <button class="btn btn-primary" id="restart-btn">再来一局</button>
-      </div>
-    </div>
-  </section>
+  <!-- 跳转卡片 -->
+  <a class="redirect-card" href="https://photaxis-lab.github.io/">
+    <div class="card-label" data-i18n="cardLabel"></div>
+    <h3 data-i18n="cardTitle"></h3>
+    <p data-i18n="cardDesc"></p>
+    <span class="card-link" data-i18n="cardLink"></span>
+  </a>
 
 </div>
 
 <script>
 /* ══════════════════════════════════════════
-   星尘收集者
+   多语言文案
+   ══════════════════════════════════════════ */
+const I18N = {
+
+  "en": {
+    langName: "English",
+    badge: "Under Maintenance",
+    title: "We're fixing a major issue",
+    desc: "The site is currently under emergency maintenance.",
+    descSub: "Service should be back shortly. In the meantime, you can visit our other site.",
+    refreshBtn: "Refresh",
+    contactBtn: "Contact Us",
+    cardLabel: "Meanwhile",
+    cardTitle: "Photaxis Lab",
+    cardDesc: "While we fix things here, feel free to explore our other site. You will find projects, notes and experiments there.",
+    cardLink: "Visit Photaxis Lab →"
+  },
+
+  "zh-CN": {
+    langName: "中文",
+    badge: "维护中",
+    title: "网站正在抢修",
+    desc: "我们遇到了一个比较严重的问题，工程师正在紧急处理。",
+    descSub: "服务预计很快恢复。在此期间，您可以先访问我们的另一个站点。",
+    refreshBtn: "刷新页面",
+    contactBtn: "联系我们",
+    cardLabel: "在此期间",
+    cardTitle: "Photaxis Lab",
+    cardDesc: "在我们修复期间，欢迎先逛逛我们的另一个站点。那里有项目、笔记和实验。",
+    cardLink: "访问 Photaxis Lab →"
+  },
+
+  "fr": {
+    langName: "Français",
+    badge: "Maintenance en cours",
+    title: "Nous réparons un problème majeur",
+    desc: "Le site est actuellement en maintenance d'urgence.",
+    descSub: "Le service devrait revenir rapidement. En attendant, vous pouvez visiter notre autre site.",
+    refreshBtn: "Actualiser",
+    contactBtn: "Nous contacter",
+    cardLabel: "En attendant",
+    cardTitle: "Photaxis Lab",
+    cardDesc: "Pendant que nous réparons, n'hésitez pas à explorer notre autre site. Vous y trouverez des projets, des notes et des expérimentations.",
+    cardLink: "Visiter Photaxis Lab →"
+  }
+};
+
+
+/* ══════════════════════════════════════════
+   语言切换逻辑
    ══════════════════════════════════════════ */
 (() => {
   "use strict";
 
-  const canvas = document.getElementById('game-canvas');
-  const ctx = canvas.getContext('2d');
+  const STORAGE_KEY = "slcleo-lang";
 
-  const scoreEl       = document.getElementById('score');
-  const bestEl        = document.getElementById('best');
-  const finalScoreEl  = document.getElementById('final-score');
-  const startOverlay  = document.getElementById('start-overlay');
-  const overOverlay   = document.getElementById('over-overlay');
-  const startBtn      = document.getElementById('start-btn');
-  const restartBtn    = document.getElementById('restart-btn');
+  const switcher = document.getElementById("langSwitcher");
+  const langBtn  = document.getElementById("langBtn");
+  const langMenu = document.getElementById("langMenu");
+  const currentLangEl = document.getElementById("currentLang");
 
-  const W = canvas.width;
-  const H = canvas.height;
-
-  let running = false;
-  let score = 0;
-  let missed = 0;
-  let best = parseInt(localStorage.getItem('slcleo-game-best') || '0', 10);
-  bestEl.textContent = best;
-
-  let ship, stars, particles, lastTime, spawnTimer, animationId;
-
-  /* ── 主题色（跟随深浅色） ── */
-  function isDark() {
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-  function theme() {
-    return isDark()
-      ? { bg:'#0a0a0c', ship:'#2997ff', shipGlow:'rgba(41,151,255,0.35)', star:'#ffd60a', starGlow:'rgba(255,214,10,0.3)', text:'#f5f5f7', sub:'#a1a1a6' }
-      : { bg:'#f5f5f7', ship:'#007aff', shipGlow:'rgba(0,122,255,0.25)', star:'#ff9f0a', starGlow:'rgba(255,159,10,0.25)', text:'#1d1d1f', sub:'#6e6e73' };
+  function detectLang() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && I18N[saved]) return saved;
+    return "en";
   }
 
-  /* ── 初始化 ── */
-  function reset() {
-    ship = {
-      x: W / 2,
-      y: H - 50,
-      w: 72,
-      h: 20,
-      speed: 0,
-      targetX: W / 2
-    };
-    stars = [];
-    particles = [];
-    score = 0;
-    missed = 0;
-    spawnTimer = 0;
-    scoreEl.textContent = '0';
-    draw();
-  }
+  function applyLang(lang) {
+    const t = I18N[lang] || I18N.en;
 
-  /* ── 输入 ── */
-  function moveTo(x) {
-    const rect = canvas.getBoundingClientRect();
-    const scale = W / rect.width;
-    ship.targetX = (x - rect.left) * scale;
-  }
+    document.documentElement.lang = lang;
+    document.title = (lang === "zh-CN" ? "维护中" : "Maintenance") + " — SLC.Leo";
 
-  canvas.addEventListener('mousemove', (e) => moveTo(e.clientX));
-  canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    moveTo(e.touches[0].clientX);
-  }, { passive: false });
-  canvas.addEventListener('touchstart', (e) => {
-    moveTo(e.touches[0].clientX);
-  }, { passive: true });
-
-  /* ── 游戏循环 ── */
-  function spawnStar() {
-    stars.push({
-      x: 40 + Math.random() * (W - 80),
-      y: -20,
-      r: 10 + Math.random() * 4,
-      vy: 1.6 + Math.random() * 1.4,
-      rot: Math.random() * Math.PI * 2,
-      rotSpeed: (Math.random() - 0.5) * 0.08
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.dataset.i18n;
+      if (t[key] !== undefined) el.textContent = t[key];
     });
-  }
 
-  function addParticles(x, y, color) {
-    for (let i = 0; i < 10; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const s = 1 + Math.random() * 3;
-      particles.push({
-        x, y,
-        vx: Math.cos(a) * s,
-        vy: Math.sin(a) * s,
-        life: 1,
-        color
-      });
-    }
-  }
+    currentLangEl.textContent = t.langName;
 
-  function update(dt) {
-    /* 飞船平滑移动 */
-    ship.x += (ship.targetX - ship.x) * 0.18;
-    ship.x = Math.max(ship.w / 2, Math.min(W - ship.w / 2, ship.x));
-
-    /* 生成星星 */
-    spawnTimer += dt;
-    if (spawnTimer > 40) {
-      spawnTimer = 0;
-      spawnStar();
-    }
-
-    /* 星星下落 */
-    for (let i = stars.length - 1; i >= 0; i--) {
-      const s = stars[i];
-      s.y += s.vy * dt;
-      s.rot += s.rotSpeed * dt;
-
-      /* 碰撞检测 */
-      const dx = Math.abs(s.x - ship.x);
-      const dy = Math.abs(s.y - ship.y);
-      if (dx < ship.w / 2 && dy < ship.h / 2 + s.r) {
-        score++;
-        scoreEl.textContent = score;
-        addParticles(s.x, s.y, theme().star);
-        stars.splice(i, 1);
-        continue;
-      }
-
-      /* 漏掉 */
-      if (s.y > H + 30) {
-        stars.splice(i, 1);
-        missed++;
-        if (missed >= 3) {
-          gameOver();
-          return;
-        }
-      }
-    }
-
-    /* 粒子 */
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.vy += 0.08 * dt;
-      p.life -= 0.03 * dt;
-      if (p.life <= 0) particles.splice(i, 1);
-    }
-  }
-
-  function drawStar(s, color) {
-    ctx.save();
-    ctx.translate(s.x, s.y);
-    ctx.rotate(s.rot);
-    ctx.beginPath();
-    for (let i = 0; i < 5; i++) {
-      const outer = s.r;
-      const inner = s.r * 0.45;
-      const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
-      const x1 = Math.cos(angle) * outer;
-      const y1 = Math.sin(angle) * outer;
-      const x2 = Math.cos(angle + Math.PI / 5) * inner;
-      const y2 = Math.sin(angle + Math.PI / 5) * inner;
-      if (i === 0) ctx.moveTo(x1, y1);
-      else ctx.lineTo(x1, y1);
-      ctx.lineTo(x2, y2);
-    }
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function draw() {
-    const t = theme();
-
-    /* 背景 */
-    ctx.fillStyle = t.bg;
-    ctx.fillRect(0, 0, W, H);
-
-    /* 顶部漏掉计数 */
-    ctx.font = '500 16px -apple-system, "PingFang SC", sans-serif';
-    ctx.fillStyle = t.sub;
-    ctx.textAlign = 'right';
-    ctx.fillText('漏掉 ' + missed + ' / 3', W - 24, 34);
-
-    /* 粒子 */
-    for (const p of particles) {
-      ctx.globalAlpha = Math.max(0, p.life);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-
-    /* 星星 */
-    for (const s of stars) {
-      ctx.shadowColor = t.starGlow;
-      ctx.shadowBlur = 12;
-      drawStar(s, t.star);
-      ctx.shadowBlur = 0;
-    }
-
-    /* 飞船 */
-    ctx.shadowColor = t.shipGlow;
-    ctx.shadowBlur = 16;
-    ctx.beginPath();
-    const sx = ship.x;
-    const sy = ship.y;
-    const sw = ship.w / 2;
-    const sh = ship.h / 2;
-    ctx.moveTo(sx, sy - sh - 6);
-    ctx.lineTo(sx + sw, sy + sh);
-    ctx.lineTo(sx - sw, sy + sh);
-    ctx.closePath();
-    ctx.fillStyle = t.ship;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  }
-
-  function loop(now) {
-    if (!running) return;
-    const dt = Math.min((now - lastTime) / 16.667, 3);
-    lastTime = now;
-
-    update(dt);
-    draw();
-
-    animationId = requestAnimationFrame(loop);
-  }
-
-  function start() {
-    reset();
-    running = true;
-    startOverlay.classList.add('hidden');
-    overOverlay.classList.add('hidden');
-    lastTime = performance.now();
-    animationId = requestAnimationFrame(loop);
-  }
-
-  function gameOver() {
-    running = false;
-    cancelAnimationFrame(animationId);
-
-    if (score > best) {
-      best = score;
-      localStorage.setItem('slcleo-game-best', String(best));
-      bestEl.textContent = best;
-    }
-
-    finalScoreEl.textContent = score;
-    overOverlay.classList.remove('hidden');
-  }
-
-  /* ── 按钮 ── */
-  startBtn.addEventListener('click', start);
-  restartBtn.addEventListener('click', start);
-
-  /* ── 监听系统主题变化 ── */
-  if (window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (!running) draw();
+    langMenu.querySelectorAll("button").forEach(b => {
+      b.classList.toggle("active", b.dataset.lang === lang);
     });
+
+    localStorage.setItem(STORAGE_KEY, lang);
   }
 
-  /* ── 初始绘制 ── */
-  reset();
+  langBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = switcher.classList.toggle("open");
+    langBtn.setAttribute("aria-expanded", String(open));
+  });
+
+  langMenu.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-lang]");
+    if (btn) {
+      applyLang(btn.dataset.lang);
+      switcher.classList.remove("open");
+      langBtn.setAttribute("aria-expanded", "false");
+    }
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", () => {
+    switcher.classList.remove("open");
+    langBtn.setAttribute("aria-expanded", "false");
+  });
+
+  applyLang(detectLang());
 })();
 
 /* ── 刷新按钮 ── */
@@ -586,8 +446,5 @@ document.getElementById('refresh-btn').addEventListener('click', () => {
   location.reload();
 });
 </script>
-
-<!-- Font Awesome（图标） -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 </body>
 </html>
