@@ -1,343 +1,249 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photaxis Lab</title>
-<meta name="description" content="Photaxis Lab — a student studio exploring aviation, railways, programming and operating system development.">
-<meta name="theme-color" content="#0a0e1f">
-<meta name="color-scheme" content="dark">
-<link rel="canonical" href="https://slcleo-usa.github.io/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Photaxis Lab">
-<meta property="og:description" content="Explore. Create. Iterate.">
-<meta property="og:url" content="https://slcleo-usa.github.io/">
+<title>维护中 — SLC.Leo</title>
+<meta name="description" content="网站正在维护，请稍后再来。">
+<meta name="theme-color" content="#fbfbfd">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 
-html,body{height:100%;}
-
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif;
-  background:radial-gradient(circle at 50% 40%, #141c3a 0%, #0a0e1f 55%, #04050c 100%);
-  color:#f5f5f7;
+  font-family:-apple-system,BlinkMacSystemFont,"San Francisco","Segoe UI","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
+  background:#fbfbfd;
+  color:#1d1d1f;
   min-height:100vh;
-  -webkit-tap-highlight-color:transparent;
-  overflow-x:hidden;
+  padding:64px 24px 80px;
+  transition:background 0.5s ease, color 0.5s ease;
 }
 
-/* ── 语言切换器 ── */
-.lang-switcher{
-  position:fixed;
-  top:20px;
-  right:20px;
-  z-index:100;
-}
-.lang-btn{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:8px 14px;
-  font-size:0.85rem;
-  font-family:inherit;
-  color:#d1d1d6;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:999px;
-  cursor:pointer;
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  transition:background 0.2s, border-color 0.2s, color 0.2s;
-}
-.lang-btn:hover{
-  background:rgba(255,255,255,0.1);
-  border-color:rgba(255,255,255,0.2);
-  color:#fff;
-}
-.lang-btn svg{
-  width:12px;height:12px;
-  transition:transform 0.2s;
-}
-.lang-switcher.open .lang-btn svg{
-  transform:rotate(180deg);
-}
-.lang-menu{
-  position:absolute;
-  top:calc(100% + 10px);
-  right:0;
-  min-width:170px;
-  padding:6px;
-  background:rgba(20,24,40,0.96);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:14px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.6);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  opacity:0;
-  visibility:hidden;
-  transform:translateY(-8px);
-  transition:opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-}
-.lang-switcher.open .lang-menu{
-  opacity:1;
-  visibility:visible;
-  transform:translateY(0);
-}
-.lang-menu button{
-  display:block;
-  width:100%;
-  padding:10px 14px;
-  font-size:0.9rem;
-  font-family:inherit;
-  color:#d1d1d6;
-  background:transparent;
-  border:none;
-  border-radius:9px;
-  text-align:left;
-  cursor:pointer;
-  transition:background 0.15s, color 0.15s;
-}
-.lang-menu button:hover{
-  background:rgba(255,255,255,0.08);
-  color:#fff;
-}
-.lang-menu button.active{
-  color:#5ac8fa;
-  background:rgba(90,200,250,0.1);
-}
-
-/* ── 容器 ── */
 .container{
-  position:relative;
-  z-index:1;
-  max-width:980px;
+  max-width:760px;
   margin:0 auto;
-  padding:100px 24px 80px;
   text-align:center;
+  position:relative;
 }
 
-/* ── Hero ── */
-.hero{margin-bottom:110px;}
+/* ── 状态徽章 ── */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 16px;
+  border-radius:999px;
+  background:rgba(255,159,10,0.12);
+  color:#c93400;
+  font-size:0.88rem;
+  font-weight:500;
+  margin-bottom:32px;
+}
+.badge .dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ff9f0a;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.4;transform:scale(0.8);}
+}
 
+/* ── 标题与说明 ── */
 h1{
-  font-size:clamp(2.5rem,6vw,4rem);
+  font-size:clamp(2rem,5vw,3rem);
   font-weight:500;
   letter-spacing:-0.02em;
-  margin-bottom:16px;
-  background:linear-gradient(135deg,#f5f5f7 0%,#9fc9ff 60%,#6ee7ff 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-.subtitle{
-  font-size:clamp(1rem,2vw,1.2rem);
-  color:#8e8e93;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  letter-spacing:0.02em;
-  margin-bottom:44px;
+  margin-bottom:18px;
+  color:#1d1d1f;
 }
 .desc{
   font-size:1.1rem;
-  color:#c7c7cc;
-  line-height:1.75;
+  color:#424245;
+  line-height:1.8;
+  margin-bottom:16px;
+}
+.desc-sub{
+  font-size:0.95rem;
+  color:#6e6e73;
+  line-height:1.7;
   margin-bottom:52px;
 }
+
+/* ── 按钮 ── */
 .btn-group{
   display:flex;
   gap:16px;
   justify-content:center;
   flex-wrap:wrap;
-  align-items:center;
+  margin-bottom:80px;
 }
 .btn{
   font-size:1rem;
   font-family:inherit;
-  padding:13px 28px;
+  padding:13px 26px;
   border-radius:999px;
   text-decoration:none;
   cursor:pointer;
-  transition:background 0.25s, color 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  border:1px solid transparent;
+  transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   white-space:nowrap;
 }
 .btn-primary{
-  background:#5ac8fa;
-  color:#04121f;
-  border:1px solid #5ac8fa;
-  font-weight:500;
+  background:#007aff;
+  color:#fff;
+  border-color:#007aff;
 }
 .btn-primary:hover{
-  background:#7dd3fc;
-  border-color:#7dd3fc;
-  transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(90,200,250,0.3);
+  background:#0077ed;
+  border-color:#0077ed;
 }
 .btn-outline{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.18);
-  color:#e5e5ea;
+  background:transparent;
+  border-color:#007aff;
+  color:#007aff;
 }
 .btn-outline:hover{
-  background:rgba(255,255,255,0.09);
-  border-color:rgba(255,255,255,0.3);
-  transform:translateY(-2px);
+  background:rgba(0,122,255,0.08);
 }
 
-/* ── 邮箱下拉 ── */
-.email-wrap{position:relative;display:inline-block;}
-.email-menu{
-  position:absolute;
-  top:calc(100% + 12px);
-  left:50%;
-  transform:translateX(-50%) translateY(-8px);
-  min-width:290px;
-  padding:8px;
-  background:rgba(20,24,40,0.96);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:16px;
-  box-shadow:0 24px 64px rgba(0,0,0,0.6);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  opacity:0;
-  visibility:hidden;
-  transition:opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-  z-index:100;
-}
-.email-menu.open{
-  opacity:1;
-  visibility:visible;
-  transform:translateX(-50%) translateY(0);
-}
-.email-option{
-  display:block;
-  padding:12px 16px;
-  text-decoration:none;
-  border-radius:11px;
-  text-align:left;
-  transition:background 0.15s;
-}
-.email-option:hover{
-  background:rgba(90,200,250,0.1);
-}
-.email-role{
-  display:block;
-  font-size:0.95rem;
-  color:#f5f5f7;
-  font-weight:500;
-  margin-bottom:3px;
-}
-.email-addr{
-  display:block;
-  font-size:0.78rem;
-  color:#8e8e93;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  word-break:break-all;
-}
-
-/* ── 区块标题 ── */
-.section-title{
-  font-size:clamp(1.7rem,4vw,2.1rem);
-  font-weight:500;
-  margin-bottom:48px;
-  letter-spacing:-0.01em;
-  color:#f5f5f7;
-}
-
-/* ── 卡片 ── */
-.project-list{display:grid;gap:28px;}
-.project-card{
+/* ── 游戏区 ── */
+.game-section{
   text-align:left;
   padding:36px;
   border-radius:20px;
-  background:rgba(255,255,255,0.035);
-  border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  transition:transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.06);
+  transition:box-shadow 0.3s ease;
 }
-.project-card:hover{
-  transform:translateY(-6px);
-  background:rgba(255,255,255,0.055);
-  border-color:rgba(90,200,250,0.25);
-  box-shadow:0 16px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(90,200,250,0.1);
+.game-section:hover{
+  box-shadow:0 12px 40px rgba(0,0,0,0.06);
 }
-.project-card h3{
-  font-size:1.4rem;
-  font-weight:500;
-  margin-bottom:12px;
-  color:#f5f5f7;
-}
-.project-card p{
-  color:#a1a1a6;
-  line-height:1.75;
-  margin-bottom:22px;
-}
-.project-link{
-  color:#5ac8fa;
-  text-decoration:none;
-  font-size:0.95rem;
-  display:inline-flex;
+.game-header{
+  display:flex;
   align-items:center;
-  gap:6px;
-  transition:gap 0.2s;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
 }
-.project-link:hover{
+.game-title{
+  font-size:1.3rem;
+  font-weight:500;
+  color:#1d1d1f;
+  display:flex;
+  align-items:center;
   gap:10px;
 }
-
-/* ── 关于 ── */
-.about-section{
-  margin-top:100px;
-  text-align:left;
-  padding:40px;
-  border-radius:20px;
-  background:rgba(255,255,255,0.035);
-  border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+.game-title i{
+  color:#007aff;
+  font-size:1.1rem;
 }
-.about-section h2{
-  font-size:clamp(1.7rem,4vw,2.1rem);
-  font-weight:500;
-  margin-bottom:22px;
-  letter-spacing:-0.01em;
-  color:#f5f5f7;
-}
-.about-section p{
-  color:#a1a1a6;
-  line-height:1.85;
-  margin-bottom:14px;
-}
-.about-section p:last-child{margin-bottom:0;}
-.about-section a{
-  color:#5ac8fa;
-  text-decoration:none;
-}
-.about-section a:hover{text-decoration:underline;}
-
-footer{
-  margin-top:100px;
-  font-size:0.85rem;
+.game-stats{
+  display:flex;
+  gap:20px;
+  font-size:0.9rem;
   color:#6e6e73;
 }
-
-/* ── 动画 ── */
-@keyframes softFade{
-  from{opacity:0;transform:translateY(18px);}
-  to{opacity:1;transform:translateY(0);}
+.game-stats strong{
+  color:#1d1d1f;
+  font-weight:500;
 }
-.hero,
-.section-title,
-.project-card,
-.about-section{
-  animation:softFade 0.9s ease-out both;
+.game-hint{
+  font-size:0.88rem;
+  color:#6e6e73;
+  line-height:1.65;
+  margin-bottom:20px;
 }
-.project-card:nth-of-type(2){animation-delay:0.1s;}
 
-/* ── 焦点可见 ── */
-:focus-visible{
-  outline:2px solid rgba(90,200,250,0.6);
-  outline-offset:3px;
-  border-radius:999px;
+/* ── 游戏画布 ── */
+.canvas-wrap{
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+  background:#f5f5f7;
+  border:1px solid rgba(0,0,0,0.06);
+  touch-action:none;
+}
+#game-canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  cursor:pointer;
+}
+
+/* ── 开始/结束遮罩 ── */
+.overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  background:rgba(251,251,253,0.92);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  text-align:center;
+  padding:24px;
+  transition:opacity 0.3s ease, visibility 0.3s ease;
+}
+.overlay.hidden{
+  opacity:0;
+  visibility:hidden;
+}
+.overlay-title{
+  font-size:1.2rem;
+  font-weight:500;
+  color:#1d1d1f;
+}
+.overlay-text{
+  font-size:0.95rem;
+  color:#6e6e73;
+  line-height:1.7;
+  max-width:340px;
+}
+.overlay button{
+  margin-top:6px;
+}
+
+/* ── 移动端 ── */
+@media (max-width:640px){
+  body{padding:32px 16px 56px;}
+  .badge{margin-bottom:24px;}
+  .desc-sub{margin-bottom:40px;}
+  .btn-group{flex-direction:column;gap:12px;margin-bottom:56px;}
+  .btn{width:100%;text-align:center;}
+  .game-section{padding:22px;border-radius:16px;}
+  .game-header{flex-direction:column;align-items:flex-start;}
+  .game-stats{font-size:0.85rem;}
+}
+
+/* ── 深色模式 ── */
+@media (prefers-color-scheme: dark){
+  body{background:#121214;color:#f5f5f7;}
+  h1{color:#f5f5f7;}
+  .desc{color:#d1d1d6;}
+  .desc-sub{color:#a1a1a6;}
+  .badge{background:rgba(255,159,10,0.16);color:#ffb340;}
+  .btn-primary{background:#2997ff;border-color:#2997ff;color:#04121f;}
+  .btn-primary:hover{background:#349cff;border-color:#349cff;}
+  .btn-outline{border-color:#2997ff;color:#2997ff;}
+  .btn-outline:hover{background:rgba(41,151,255,0.1);}
+  .game-section{background:#1e1e22;border-color:rgba(255,255,255,0.08);}
+  .game-section:hover{box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+  .game-title{color:#f5f5f7;}
+  .game-title i{color:#2997ff;}
+  .game-stats{color:#a1a1a6;}
+  .game-stats strong{color:#f5f5f7;}
+  .game-hint{color:#a1a1a6;}
+  .canvas-wrap{background:#0a0a0c;border-color:rgba(255,255,255,0.08);}
+  .overlay{background:rgba(18,18,20,0.92);}
+  .overlay-title{color:#f5f5f7;}
+  .overlay-text{color:#a1a1a6;}
 }
 
 /* ── 减少动画 ── */
@@ -350,330 +256,338 @@ footer{
     transition-duration:0.01ms !important;
   }
 }
-
-/* ── 移动端 ── */
-@media (max-width:640px){
-  .lang-switcher{top:14px;right:14px;}
-  .lang-btn{padding:7px 12px;font-size:0.8rem;}
-  .lang-menu{min-width:150px;}
-  .container{padding:80px 18px 60px;}
-  .hero{margin-bottom:80px;}
-  .section-title{margin-bottom:32px;}
-  .project-card,
-  .about-section{padding:26px;border-radius:16px;}
-  .btn-group{flex-direction:column;gap:12px;width:100%;}
-  .btn{width:100%;text-align:center;}
-  .email-wrap{width:100%;}
-  .email-menu{
-    left:50%;
-    min-width:min(290px,calc(100vw - 40px));
-  }
-}
 </style>
 </head>
 <body>
 
-<!-- 语言切换 -->
-<div class="lang-switcher" id="langSwitcher">
-  <button class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" aria-label="Language">
-    <span id="currentLang">English</span>
-    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 4.5 6 7.5 9 4.5"/>
-    </svg>
-  </button>
-  <div class="lang-menu" id="langMenu" role="menu">
-    <button type="button" data-lang="en"    role="menuitem">English</button>
-    <button type="button" data-lang="zh-CN" role="menuitem">中文</button>
-    <button type="button" data-lang="fr"    role="menuitem">Français</button>
-    <button type="button" data-lang="es"    role="menuitem">Español</button>
-    <button type="button" data-lang="de"    role="menuitem">Deutsch</button>
-    <button type="button" data-lang="wuu"   role="menuitem">上海话</button>
-  </div>
-</div>
-
 <div class="container">
 
-  <!-- Hero -->
-  <header class="hero">
-    <h1>Photaxis Lab</h1>
-    <p class="subtitle">photaxis-lab.github.io</p>
-    <p class="desc" data-i18n="heroDesc"></p>
-
-    <div class="btn-group">
-      <div class="email-wrap">
-        <button class="btn btn-primary" id="emailBtn"
-                aria-haspopup="true" aria-expanded="false"
-                data-i18n="emailBtn"></button>
-        <div class="email-menu" id="emailMenu" role="menu">
-          <a class="email-option" href="mailto:photaxislab@gmail.com" role="menuitem">
-            <span class="email-role" data-i18n="emailProjectLead"></span>
-            <span class="email-addr">photaxislab@gmail.com</span>
-          </a>
-          <a class="email-option" href="mailto:lens.photaxis@outlook.com" role="menuitem">
-            <span class="email-role" data-i18n="emailAdmin"></span>
-            <span class="email-addr">lens.photaxis@outlook.com</span>
-          </a>
-        </div>
-      </div>
-
-      <a class="btn btn-outline" href="https://github.com/SLCLeo-USA/SLC.Leo"
-         target="_blank" rel="noopener noreferrer">GitHub</a>
-    </div>
-  </header>
-
-  <!-- Projects -->
-  <h2 class="section-title" id="projects" data-i18n="projectsTitle"></h2>
-  <div class="project-list">
-
-    <!-- 第一个：Our Project，超链接进入 /list -->
-    <article class="project-card">
-      <h3 data-i18n="ourProjectTitle"></h3>
-      <p data-i18n="ourProjectDesc"></p>
-      <a class="project-link"
-         href="https://slcleo-usa.github.io/list/"
-         data-i18n="ourProjectLink"></a>
-    </article>
-
-    <article class="project-card">
-      <h3 data-i18n="project2Title"></h3>
-      <p data-i18n="project2Desc"></p>
-      <a class="project-link" href="#" data-i18n="project2Link"></a>
-    </article>
-
+  <div class="badge">
+    <span class="dot"></span>
+    <span>维护中</span>
   </div>
 
-  <!-- About -->
-  <section class="about-section" id="about">
-    <h2 data-i18n="aboutTitle"></h2>
-    <p data-i18n="aboutP1"></p>
-    <p data-i18n="aboutP2"></p>
+  <h1>网站正在抢修</h1>
+  <p class="desc">我们遇到了一个比较严重的问题，工程师正在紧急处理。</p>
+  <p class="desc-sub">服务预计很快恢复。在此期间，您可以先玩个小游戏打发时间。</p>
+
+  <div class="btn-group">
+    <button class="btn btn-primary" id="refresh-btn">刷新页面</button>
+    <a class="btn btn-outline" href="mailto:godsunwyyx123spx@163.com">联系我们</a>
+  </div>
+
+  <!-- 游戏 -->
+  <section class="game-section">
+    <div class="game-header">
+      <div class="game-title">
+        <i class="fa-solid fa-gamepad"></i>
+        <span>星尘收集者</span>
+      </div>
+      <div class="game-stats">
+        <span>得分 <strong id="score">0</strong></span>
+        <span>最高 <strong id="best">0</strong></span>
+      </div>
+    </div>
+
+    <p class="game-hint">用鼠标或手指控制飞船，接住下落的星星。接到星星得 1 分，漏掉 3 颗星星游戏结束。</p>
+
+    <div class="canvas-wrap">
+      <canvas id="game-canvas" width="720" height="420"></canvas>
+
+      <div class="overlay" id="start-overlay">
+        <div class="overlay-title">准备好了吗？</div>
+        <div class="overlay-text">点击开始，用飞船接住星星。</div>
+        <button class="btn btn-primary" id="start-btn">开始游戏</button>
+      </div>
+
+      <div class="overlay hidden" id="over-overlay">
+        <div class="overlay-title">游戏结束</div>
+        <div class="overlay-text">你的得分是 <strong id="final-score">0</strong>。</div>
+        <button class="btn btn-primary" id="restart-btn">再来一局</button>
+      </div>
+    </div>
   </section>
 
-  <footer data-i18n="footer"></footer>
 </div>
 
 <script>
 /* ══════════════════════════════════════════
-   多语言文案
-   ══════════════════════════════════════════ */
-const I18N = {
-
-  "en": {
-    langName: "English",
-    heroDesc: "Explore. Create. Iterate.<br>A minimalist static site hosted on GitHub Pages.",
-    emailBtn: "Email",
-    emailProjectLead: "Project Lead",
-    emailAdmin: "Administrator",
-    projectsTitle: "Projects",
-    ourProjectTitle: "Our Project",
-    ourProjectDesc: "Browse all our projects in one place. Inside you will find a directory of available pages and experiments.",
-    ourProjectLink: "Browse Projects →",
-    project2Title: "Another Project",
-    project2Desc: "Simple, clean, focused. This template keeps content lightweight and easy to maintain.",
-    project2Link: "View Project →",
-    aboutTitle: "About Us",
-    aboutP1: "Photaxis Lab is a student studio.",
-    aboutP2: "Passions: aviation, railways, programming, operating system development.",
-    footer: "© Photaxis Lab 2026. All rights reserved."
-  },
-
-  "zh-CN": {
-    langName: "中文",
-    heroDesc: "探索。创造。迭代。<br>一个托管在 GitHub Pages 上的极简静态站点。",
-    emailBtn: "邮件",
-    emailProjectLead: "项目负责人",
-    emailAdmin: "管理员",
-    projectsTitle: "项目",
-    ourProjectTitle: "我们的项目",
-    ourProjectDesc: "在这里浏览我们的所有项目。进去后你会看到一个目录，里面有可用的页面和实验。",
-    ourProjectLink: "浏览项目 →",
-    project2Title: "另一个项目",
-    project2Desc: "简单、干净、专注。这个模板让内容保持轻量，易于维护。",
-    project2Link: "查看项目 →",
-    aboutTitle: "关于我们",
-    aboutP1: "Photaxis Lab 是一个学生工作室。",
-    aboutP2: "兴趣方向：航空、铁路、编程、操作系统开发。",
-    footer: "© Photaxis Lab 2026 保留所有权利。"
-  },
-
-  "fr": {
-    langName: "Français",
-    heroDesc: "Explorer. Créer. Itérer.<br>Un site statique minimaliste hébergé sur GitHub Pages.",
-    emailBtn: "E-mail",
-    emailProjectLead: "Chef de projet",
-    emailAdmin: "Administrateur",
-    projectsTitle: "Projets",
-    ourProjectTitle: "Notre projet",
-    ourProjectDesc: "Parcourez tous nos projets en un seul endroit. Vous y trouverez un répertoire des pages et expérimentations disponibles.",
-    ourProjectLink: "Parcourir les projets →",
-    project2Title: "Un autre projet",
-    project2Desc: "Simple, propre, concentré. Ce modèle garde le contenu léger et facile à maintenir.",
-    project2Link: "Voir le projet →",
-    aboutTitle: "À propos",
-    aboutP1: "Photaxis Lab est un studio étudiant.",
-    aboutP2: "Passions : aviation, chemin de fer, programmation, développement de systèmes d'exploitation.",
-    footer: "© Photaxis Lab 2026. Tous droits réservés."
-  },
-
-  "es": {
-    langName: "Español",
-    heroDesc: "Explorar. Crear. Iterar.<br>Un sitio estático minimalista alojado en GitHub Pages.",
-    emailBtn: "Correo",
-    emailProjectLead: "Responsable del proyecto",
-    emailAdmin: "Administrador",
-    projectsTitle: "Proyectos",
-    ourProjectTitle: "Nuestro proyecto",
-    ourProjectDesc: "Explora todos nuestros proyectos en un solo lugar. Dentro encontrarás un directorio de páginas y experimentos disponibles.",
-    ourProjectLink: "Ver proyectos →",
-    project2Title: "Otro proyecto",
-    project2Desc: "Simple, limpio, enfocado. Esta plantilla mantiene el contenido ligero y fácil de mantener.",
-    project2Link: "Ver proyecto →",
-    aboutTitle: "Sobre nosotros",
-    aboutP1: "Photaxis Lab es un estudio estudiantil.",
-    aboutP2: "Pasiones: aviación, ferrocarriles, programación, desarrollo de sistemas operativos.",
-    footer: "© Photaxis Lab 2026. Todos los derechos reservados."
-  },
-
-  "de": {
-    langName: "Deutsch",
-    heroDesc: "Erkunden. Erschaffen. Iterieren.<br>Eine minimalistische statische Seite, gehostet auf GitHub Pages.",
-    emailBtn: "E-Mail",
-    emailProjectLead: "Projektleitung",
-    emailAdmin: "Administrator",
-    projectsTitle: "Projekte",
-    ourProjectTitle: "Unser Projekt",
-    ourProjectDesc: "Durchstöbere alle unsere Projekte an einem Ort. Drinnen findest du ein Verzeichnis der verfügbaren Seiten und Experimente.",
-    ourProjectLink: "Projekte ansehen →",
-    project2Title: "Ein weiteres Projekt",
-    project2Desc: "Einfach, klar, fokussiert. Diese Vorlage hält Inhalte leichtgewichtig und pflegeleicht.",
-    project2Link: "Projekt ansehen →",
-    aboutTitle: "Über uns",
-    aboutP1: "Photaxis Lab ist ein Schüler- und Studierendenstudio.",
-    aboutP2: "Leidenschaften: Luftfahrt, Eisenbahn, Programmierung, Betriebssystementwicklung.",
-    footer: "© Photaxis Lab 2026. Alle Rechte vorbehalten."
-  },
-
-  /* 上海话——文字表达，幽默口语 */
-  "wuu": {
-    langName: "上海话",
-    heroDesc: "白相相，造造物事，改改弄弄。<br>搿是一个摆勒 GitHub Pages 浪向个极简小网站。",
-    emailBtn: "发封信",
-    emailProjectLead: "项目负责人",
-    emailAdmin: "管理员",
-    projectsTitle: "阿拉做个物事",
-    ourProjectTitle: "阿拉个项目",
-    ourProjectDesc: "一塌刮子个项目侪摆了此地，随便看看。进去以后有一张目录，浪向有目前好白相个页面搭仔实验。",
-    ourProjectLink: "看看项目 →",
-    project2Title: "另外一只物事",
-    project2Desc: "简简单单，清清爽爽，认认真真。搿只模板轻飘飘，维护起来交关便当。",
-    project2Link: "去看看 →",
-    aboutTitle: "关于阿拉",
-    aboutP1: "Photaxis Lab 是一帮学生小囡自家组个工作室。",
-    aboutP2: "欢喜啥个？飞机、火车、写程序、搞操作系统——样样侪要白相相。",
-    footer: "© Photaxis Lab 2026 版权所有。"
-  }
-};
-
-
-/* ══════════════════════════════════════════
-   语言切换逻辑
+   星尘收集者
    ══════════════════════════════════════════ */
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "photaxis-lang";
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
 
-  const switcher = document.getElementById("langSwitcher");
-  const langBtn  = document.getElementById("langBtn");
-  const langMenu = document.getElementById("langMenu");
-  const currentLangEl = document.getElementById("currentLang");
+  const scoreEl       = document.getElementById('score');
+  const bestEl        = document.getElementById('best');
+  const finalScoreEl  = document.getElementById('final-score');
+  const startOverlay  = document.getElementById('start-overlay');
+  const overOverlay   = document.getElementById('over-overlay');
+  const startBtn      = document.getElementById('start-btn');
+  const restartBtn    = document.getElementById('restart-btn');
 
-  function detectLang() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && I18N[saved]) return saved;
-    return "en"; // 默认英语
+  const W = canvas.width;
+  const H = canvas.height;
+
+  let running = false;
+  let score = 0;
+  let missed = 0;
+  let best = parseInt(localStorage.getItem('slcleo-game-best') || '0', 10);
+  bestEl.textContent = best;
+
+  let ship, stars, particles, lastTime, spawnTimer, animationId;
+
+  /* ── 主题色（跟随深浅色） ── */
+  function isDark() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function theme() {
+    return isDark()
+      ? { bg:'#0a0a0c', ship:'#2997ff', shipGlow:'rgba(41,151,255,0.35)', star:'#ffd60a', starGlow:'rgba(255,214,10,0.3)', text:'#f5f5f7', sub:'#a1a1a6' }
+      : { bg:'#f5f5f7', ship:'#007aff', shipGlow:'rgba(0,122,255,0.25)', star:'#ff9f0a', starGlow:'rgba(255,159,10,0.25)', text:'#1d1d1f', sub:'#6e6e73' };
   }
 
-  function applyLang(lang) {
-    const t = I18N[lang] || I18N.en;
-
-    document.documentElement.lang = lang;
-
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.dataset.i18n;
-      if (t[key] !== undefined) el.innerHTML = t[key];
-    });
-
-    currentLangEl.textContent = t.langName;
-
-    langMenu.querySelectorAll("button").forEach(b => {
-      b.classList.toggle("active", b.dataset.lang === lang);
-    });
-
-    localStorage.setItem(STORAGE_KEY, lang);
+  /* ── 初始化 ── */
+  function reset() {
+    ship = {
+      x: W / 2,
+      y: H - 50,
+      w: 72,
+      h: 20,
+      speed: 0,
+      targetX: W / 2
+    };
+    stars = [];
+    particles = [];
+    score = 0;
+    missed = 0;
+    spawnTimer = 0;
+    scoreEl.textContent = '0';
+    draw();
   }
 
-  langBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const open = switcher.classList.toggle("open");
-    langBtn.setAttribute("aria-expanded", String(open));
-  });
+  /* ── 输入 ── */
+  function moveTo(x) {
+    const rect = canvas.getBoundingClientRect();
+    const scale = W / rect.width;
+    ship.targetX = (x - rect.left) * scale;
+  }
 
-  langMenu.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-lang]");
-    if (btn) {
-      applyLang(btn.dataset.lang);
-      switcher.classList.remove("open");
-      langBtn.setAttribute("aria-expanded", "false");
+  canvas.addEventListener('mousemove', (e) => moveTo(e.clientX));
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    moveTo(e.touches[0].clientX);
+  }, { passive: false });
+  canvas.addEventListener('touchstart', (e) => {
+    moveTo(e.touches[0].clientX);
+  }, { passive: true });
+
+  /* ── 游戏循环 ── */
+  function spawnStar() {
+    stars.push({
+      x: 40 + Math.random() * (W - 80),
+      y: -20,
+      r: 10 + Math.random() * 4,
+      vy: 1.6 + Math.random() * 1.4,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.08
+    });
+  }
+
+  function addParticles(x, y, color) {
+    for (let i = 0; i < 10; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = 1 + Math.random() * 3;
+      particles.push({
+        x, y,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s,
+        life: 1,
+        color
+      });
     }
-    e.stopPropagation();
-  });
+  }
 
-  document.addEventListener("click", () => {
-    switcher.classList.remove("open");
-    langBtn.setAttribute("aria-expanded", "false");
-  });
+  function update(dt) {
+    /* 飞船平滑移动 */
+    ship.x += (ship.targetX - ship.x) * 0.18;
+    ship.x = Math.max(ship.w / 2, Math.min(W - ship.w / 2, ship.x));
 
-  /* 初始化 */
-  applyLang(detectLang());
+    /* 生成星星 */
+    spawnTimer += dt;
+    if (spawnTimer > 40) {
+      spawnTimer = 0;
+      spawnStar();
+    }
+
+    /* 星星下落 */
+    for (let i = stars.length - 1; i >= 0; i--) {
+      const s = stars[i];
+      s.y += s.vy * dt;
+      s.rot += s.rotSpeed * dt;
+
+      /* 碰撞检测 */
+      const dx = Math.abs(s.x - ship.x);
+      const dy = Math.abs(s.y - ship.y);
+      if (dx < ship.w / 2 && dy < ship.h / 2 + s.r) {
+        score++;
+        scoreEl.textContent = score;
+        addParticles(s.x, s.y, theme().star);
+        stars.splice(i, 1);
+        continue;
+      }
+
+      /* 漏掉 */
+      if (s.y > H + 30) {
+        stars.splice(i, 1);
+        missed++;
+        if (missed >= 3) {
+          gameOver();
+          return;
+        }
+      }
+    }
+
+    /* 粒子 */
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 0.08 * dt;
+      p.life -= 0.03 * dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function drawStar(s, color) {
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(s.rot);
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const outer = s.r;
+      const inner = s.r * 0.45;
+      const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+      const x1 = Math.cos(angle) * outer;
+      const y1 = Math.sin(angle) * outer;
+      const x2 = Math.cos(angle + Math.PI / 5) * inner;
+      const y2 = Math.sin(angle + Math.PI / 5) * inner;
+      if (i === 0) ctx.moveTo(x1, y1);
+      else ctx.lineTo(x1, y1);
+      ctx.lineTo(x2, y2);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function draw() {
+    const t = theme();
+
+    /* 背景 */
+    ctx.fillStyle = t.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    /* 顶部漏掉计数 */
+    ctx.font = '500 16px -apple-system, "PingFang SC", sans-serif';
+    ctx.fillStyle = t.sub;
+    ctx.textAlign = 'right';
+    ctx.fillText('漏掉 ' + missed + ' / 3', W - 24, 34);
+
+    /* 粒子 */
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    /* 星星 */
+    for (const s of stars) {
+      ctx.shadowColor = t.starGlow;
+      ctx.shadowBlur = 12;
+      drawStar(s, t.star);
+      ctx.shadowBlur = 0;
+    }
+
+    /* 飞船 */
+    ctx.shadowColor = t.shipGlow;
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    const sx = ship.x;
+    const sy = ship.y;
+    const sw = ship.w / 2;
+    const sh = ship.h / 2;
+    ctx.moveTo(sx, sy - sh - 6);
+    ctx.lineTo(sx + sw, sy + sh);
+    ctx.lineTo(sx - sw, sy + sh);
+    ctx.closePath();
+    ctx.fillStyle = t.ship;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function loop(now) {
+    if (!running) return;
+    const dt = Math.min((now - lastTime) / 16.667, 3);
+    lastTime = now;
+
+    update(dt);
+    draw();
+
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function start() {
+    reset();
+    running = true;
+    startOverlay.classList.add('hidden');
+    overOverlay.classList.add('hidden');
+    lastTime = performance.now();
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function gameOver() {
+    running = false;
+    cancelAnimationFrame(animationId);
+
+    if (score > best) {
+      best = score;
+      localStorage.setItem('slcleo-game-best', String(best));
+      bestEl.textContent = best;
+    }
+
+    finalScoreEl.textContent = score;
+    overOverlay.classList.remove('hidden');
+  }
+
+  /* ── 按钮 ── */
+  startBtn.addEventListener('click', start);
+  restartBtn.addEventListener('click', start);
+
+  /* ── 监听系统主题变化 ── */
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (!running) draw();
+    });
+  }
+
+  /* ── 初始绘制 ── */
+  reset();
 })();
 
-
-/* ══════════════════════════════════════════
-   邮箱下拉
-   ══════════════════════════════════════════ */
-(() => {
-  "use strict";
-
-  const emailBtn  = document.getElementById("emailBtn");
-  const emailMenu = document.getElementById("emailMenu");
-
-  emailBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const open = emailMenu.classList.toggle("open");
-    emailBtn.setAttribute("aria-expanded", String(open));
-  });
-
-  emailMenu.addEventListener("click", (e) => {
-    if (e.target.closest("a")) {
-      emailMenu.classList.remove("open");
-      emailBtn.setAttribute("aria-expanded", "false");
-    }
-    e.stopPropagation();
-  });
-
-  document.addEventListener("click", () => {
-    emailMenu.classList.remove("open");
-    emailBtn.setAttribute("aria-expanded", "false");
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      emailMenu.classList.remove("open");
-      emailBtn.setAttribute("aria-expanded", "false");
-    }
-  });
-})();
+/* ── 刷新按钮 ── */
+document.getElementById('refresh-btn').addEventListener('click', () => {
+  location.reload();
+});
 </script>
+
+<!-- Font Awesome（图标） -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 </body>
 </html>
