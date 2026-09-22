@@ -1,2651 +1,593 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JOY CLOUD AIRLINES · Wanglan Member</title>
+<title>维护中 — SLC.Leo</title>
+<meta name="description" content="网站正在维护，请稍后再来。">
+<meta name="theme-color" content="#fbfbfd">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
 <style>
-:root{--blue-1:#2a7ff0;--blue-2:#0d47a1;--blue-soft:#eef4ff;--gold:#d4a24a;--gold-2:#a97a22;--green:#1f9d55;--red:#e2453c;--ink:#1b2437;--ink-2:#0d1f3c;--muted:#8795ab;--line:#e0e7f2;--bg:#eef2f8;--ease-out:cubic-bezier(.22,1,.36,1);--ease-back:cubic-bezier(.34,1.56,.64,1)}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-.hidden{display:none!important}
-button{font-family:inherit;cursor:pointer}
-input,textarea,select{font-family:inherit}
-::selection{background:rgba(42,127,240,.22)}
-.site-footer{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:150;display:flex;align-items:center;gap:9px;padding:6px 16px;border-radius:22px;font-size:10.5px;font-weight:700;letter-spacing:2.4px;white-space:nowrap;color:rgba(190,210,235,.72);background:rgba(10,22,42,.34);border:1px solid rgba(255,255,255,.08);pointer-events:none;user-select:none;backdrop-filter:blur(8px)}
-.site-footer .sep{opacity:.4}
-body.light .site-footer{color:rgba(105,128,160,.92);background:rgba(255,255,255,.82);border-color:rgba(180,202,228,.7)}
-.lang-switch{display:flex;gap:6px}
-.lang-btn{padding:6px 12px;border-radius:9px;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#a7bad6;font-size:11.5px;font-weight:800;cursor:pointer;transition:all .22s;letter-spacing:.6px}
-.lang-btn:hover{color:#fff;border-color:rgba(255,255,255,.42);transform:translateY(-1px)}
-.lang-btn.active{background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(42,127,240,.4)}
-.login-lang{position:absolute;top:20px;right:20px;z-index:5}
-.login-lang .lang-btn{border-color:#dde6f2;background:#f6f9ff;color:#5b6a83}
-.login-lang .lang-btn:hover{color:var(--blue-1);border-color:#9dc2f5}
-.login-lang .lang-btn.active{color:#fff;border-color:transparent}
-.login-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px 20px 76px;overflow:auto;background:radial-gradient(1100px 620px at 15% 5%,#1c4a92 0%,#0a1730 55%,#060d1c 100%)}
-.login-screen::before{content:"";position:absolute;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(64,150,255,.3),transparent 65%);top:-240px;right:-150px;pointer-events:none;animation:floatGlow 16s ease-in-out infinite}
-.login-screen::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(212,162,74,.18),transparent 65%);bottom:-230px;left:-130px;pointer-events:none;animation:floatGlow 20s ease-in-out infinite reverse}
-@keyframes floatGlow{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-42px,42px) scale(1.1)}}
-.login-card{position:relative;width:100%;max-width:452px;background:#fff;border-radius:24px;padding:40px 34px 32px;box-shadow:0 40px 90px rgba(0,0,0,.52),0 0 0 1px rgba(255,255,255,.06);animation:cardIn .65s var(--ease-out) both;margin:auto}
-@keyframes cardIn{0%{opacity:0;transform:translateY(34px) scale(.955)}100%{opacity:1;transform:translateY(0) scale(1)}}
-.brand{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-right:130px}
-.brand-logo{width:46px;height:46px;flex:0 0 46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;font-weight:800;font-size:15px;box-shadow:0 10px 24px rgba(31,111,224,.4);animation:logoPulse 4.5s ease-in-out infinite}
-@keyframes logoPulse{0%,100%{box-shadow:0 10px 24px rgba(31,111,224,.4)}50%{box-shadow:0 10px 32px rgba(31,111,224,.62)}}
-.brand-text{font-size:11px;color:#7b8aa3;letter-spacing:.6px;font-weight:700;line-height:1.5}
-.login-card h1{font-size:23px;font-weight:800;margin-bottom:8px;color:var(--ink-2);line-height:1.35}
-.login-card .sub{font-size:13px;color:var(--muted);margin-bottom:26px;line-height:1.7}
-.field{margin-bottom:18px}
-.field label{display:block;font-size:12.5px;color:#7b8aa3;margin-bottom:7px;font-weight:700}
-.field input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;outline:none;transition:all .22s;background:#fafcff;color:#12203a}
-.field input:focus{border-color:var(--blue-1);background:#fff;box-shadow:0 0 0 4px rgba(42,127,240,.13)}
-.field input::placeholder{color:#b6c1d3}
-.gender-row{display:flex;gap:12px}
-.gender-btn{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:#fafcff;color:#5b6a83;font-size:15px;font-weight:700;transition:all .22s}
-.gender-btn:hover{border-color:#b9cdea;color:var(--blue-1);transform:translateY(-1px)}
-.gender-btn.active{background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(42,127,240,.34);transform:translateY(-1px)}
-.primary-btn{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;border:none;padding:13px 26px;border-radius:12px;font-size:15px;font-weight:700;transition:all .25s;box-shadow:0 10px 24px rgba(31,111,224,.3)}
-.primary-btn:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 16px 32px rgba(31,111,224,.42)}
-.primary-btn:active{transform:translateY(0) scale(.98)}
-#enterBtn{width:100%;margin-top:8px;padding:14px}
-.err{color:#e2453c;font-size:13px;margin-top:12px;min-height:18px;text-align:center}
-.ripple{position:absolute;border-radius:50%;pointer-events:none;background:rgba(255,255,255,.45);transform:scale(0);opacity:.85;animation:rippleOut .62s ease-out forwards}
-@keyframes rippleOut{to{transform:scale(1);opacity:0}}
-.app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:246px;flex:0 0 246px;background:linear-gradient(180deg,#0c1c38 0%,#081226 100%);color:#c8d6ea;display:flex;flex-direction:column;padding:24px 16px 18px;box-shadow:4px 0 24px rgba(6,16,34,.18);z-index:20}
-.side-brand{display:flex;align-items:center;gap:11px;padding:0 8px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
-.side-logo{width:40px;height:40px;flex:0 0 40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3a8bff,var(--blue-2));color:#fff;font-weight:800;font-size:13px;box-shadow:0 8px 20px rgba(42,127,240,.42)}
-.side-title{font-size:12.5px;font-weight:800;color:#fff;letter-spacing:1.4px;white-space:nowrap}
-.side-sub{font-size:10px;color:#6f83a3;margin-top:3px}
-nav{display:flex;flex-direction:column;gap:6px;margin-top:22px;flex:1}
-.nav-item{position:relative;display:block;width:100%;text-align:left;padding:12px 16px;border-radius:11px;border:none;background:transparent;color:#a7bad6;font-size:14.5px;font-weight:600;transition:all .24s;letter-spacing:.3px}
-.nav-item:hover{background:rgba(255,255,255,.07);color:#fff;transform:translateX(4px)}
-.nav-item.active{background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;box-shadow:0 10px 24px rgba(42,127,240,.38);transform:none}
-.side-bottom{display:flex;flex-direction:column;gap:12px}
-.side-user{display:flex;align-items:center;gap:11px;padding:13px 12px;border-radius:14px;background:rgba(255,255,255,.06)}
-.avatar{width:38px;height:38px;flex:0 0 38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#fff;font-weight:800;font-size:16px}
-.uname{font-size:13px;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
-.umeta{font-size:10.5px;color:#7e93b3;margin-top:2px;white-space:nowrap}
-.side-lang{display:flex;justify-content:center}
-.main{flex:1;overflow-y:auto;padding:32px 36px 100px;scroll-behavior:smooth}
-.page{display:none}
-.page.active{display:block;animation:pageIn .42s var(--ease-out) both}
-@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.page-head{margin-bottom:22px}
-.page-head h2{font-size:23px;font-weight:800;color:var(--ink-2);display:inline-flex;align-items:center;gap:10px}
-.page-head h2::before{content:"";width:4px;height:20px;border-radius:3px;background:linear-gradient(180deg,var(--blue-1),var(--blue-2))}
-.page-head p{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.75;max-width:840px}
-.home-hero{position:relative;overflow:hidden;border-radius:26px;padding:56px 50px 48px;background:radial-gradient(900px 540px at 85% 0%,#1c4a92 0%,#0b1c38 55%,#071223 100%);color:#fff;box-shadow:0 26px 66px rgba(10,30,60,.3)}
-.home-hero::before{content:"";position:absolute;width:460px;height:460px;border-radius:50%;background:radial-gradient(circle,rgba(64,150,255,.38),transparent 65%);top:-180px;right:-100px;pointer-events:none;animation:floatGlow 14s ease-in-out infinite}
-.home-hero::after{content:"";position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(212,162,74,.24),transparent 65%);bottom:-200px;left:-80px;pointer-events:none;animation:floatGlow 18s ease-in-out infinite reverse}
-.hero-eyebrow,.hero-title,.hero-sub,.hero-stat,.hero-cta-text,.hero-actions{position:relative;animation:heroIn .75s var(--ease-out) both}
-.hero-eyebrow{font-size:10.5px;letter-spacing:2.8px;color:#7fa5d8;margin-bottom:18px;font-weight:800;animation-delay:.06s}
-.hero-title{font-weight:800;letter-spacing:1.8px;margin-bottom:20px;line-height:1.3;font-size:clamp(25px,3.1vw,40px);background:linear-gradient(115deg,#ffffff 18%,#a8d0ff 52%,var(--gold) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:heroIn .75s var(--ease-out) .14s both,shimmer 7s ease-in-out infinite}
-html[lang="en"] .hero-title,html[lang="fr"] .hero-title{font-size:clamp(19px,2.3vw,31px);letter-spacing:.4px}
-@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-@keyframes heroIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-.hero-sub{font-size:16px;color:#c3d6ee;margin-bottom:12px;line-height:1.65;animation-delay:.22s}
-.hero-sub b{color:#fff;font-weight:800}
-.hero-stat{font-size:14.5px;color:#8fadd2;margin-bottom:34px;line-height:1.8;animation-delay:.3s}
-.hero-stat b{color:#e6b865;font-weight:800;font-size:19px;margin:0 4px;display:inline-block;min-width:14px;text-align:center}
-.hero-cta-text{font-size:18px;font-weight:800;color:#fff;letter-spacing:2.4px;margin-bottom:18px;animation-delay:.38s}
-.hero-actions{display:flex;gap:14px;flex-wrap:wrap;animation-delay:.46s}
-.ghost-hero-btn{position:relative;overflow:hidden;padding:13px 32px;border-radius:12px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:#fff;font-size:14.5px;font-weight:700;transition:all .25s}
-.ghost-hero-btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.7);transform:translateY(-2px);box-shadow:0 12px 26px rgba(0,0,0,.22)}
-.hero-deco{position:absolute;right:56px;bottom:38px;font-size:76px;opacity:.12;pointer-events:none;user-select:none;animation:planeFloat 6s ease-in-out infinite}
-@keyframes planeFloat{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(-14px,-14px) rotate(-3deg)}}
-.date-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:thin}
-.date-strip::-webkit-scrollbar{height:6px}
-.date-strip::-webkit-scrollbar-thumb{background:#c8d6ea;border-radius:6px}
-.date-chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 16px;border-radius:14px;border:1.5px solid var(--line);background:#fff;min-width:88px;color:#3a4a63;transition:all .26s;box-shadow:0 2px 8px rgba(15,40,80,.04)}
-.date-chip:hover{border-color:#9dc2f5;transform:translateY(-4px);box-shadow:0 8px 20px rgba(42,127,240,.15)}
-.date-chip.active{background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;border-color:transparent;box-shadow:0 12px 26px rgba(42,127,240,.38);transform:translateY(-3px) scale(1.03)}
-.dc-w{font-size:11.5px;opacity:.85;font-weight:600;white-space:nowrap}
-.dc-d{font-size:13.5px;font-weight:800;white-space:nowrap}
-.date-more-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:#fff;border-radius:14px;border:1px solid rgba(224,231,242,.9);box-shadow:0 4px 14px rgba(15,40,80,.05)}
-.date-more-row .dm-label{font-size:12px;color:#7b8aa3;font-weight:700;white-space:nowrap}
-.date-more-row .dm-hint{font-size:11.5px;color:var(--muted);font-weight:600}
-input.date-input{padding:10px 14px;border:1.5px solid var(--line);border-radius:11px;background:#fafcff;color:#12203a;font-size:14px;font-weight:700;font-family:inherit;outline:none;transition:all .22s;cursor:pointer;min-width:180px}
-input.date-input:hover{border-color:#9dc2f5;background:#f6faff}
-input.date-input:focus{border-color:var(--blue-1);background:#fff;box-shadow:0 0 0 4px rgba(42,127,240,.12)}
-.search-bar{display:flex;gap:14px;align-items:flex-end;background:#fff;padding:18px;border-radius:18px;box-shadow:0 8px 26px rgba(15,40,80,.08);flex-wrap:wrap;border:1px solid rgba(224,231,242,.9)}
-.search-bar:focus-within{box-shadow:0 12px 34px rgba(42,127,240,.14)}
-.sfield{display:flex;flex-direction:column;gap:7px;flex:1 1 152px;min-width:132px}
-.sfield label{font-size:12px;color:#7b8aa3;font-weight:700;padding-left:2px}
-.sfield input{padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;outline:none;transition:all .22s;background:#fafcff;color:#12203a}
-.sfield input:focus{border-color:var(--blue-1);background:#fff;box-shadow:0 0 0 4px rgba(42,127,240,.12)}
-.sfield input::placeholder{color:#b6c1d3}
-#searchBtn{flex:0 0 auto;padding:12px 34px}
-.conn-toggle-wrap{display:flex;align-items:center;gap:9px;padding:11px 15px;border-radius:11px;border:1.5px solid var(--line);background:#fafcff;cursor:pointer;transition:all .22s;user-select:none;flex:0 0 auto}
-.conn-toggle-wrap:hover{border-color:#9dc2f5;background:#f6faff}
-.conn-toggle-wrap input{display:none}
-.conn-toggle-switch{width:36px;height:20px;border-radius:12px;background:#cfd9e8;position:relative;transition:background .25s;flex:0 0 36px}
-.conn-toggle-switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .3s var(--ease-back);box-shadow:0 2px 6px rgba(0,0,0,.15)}
-.conn-toggle-wrap input:checked~.conn-toggle-switch{background:linear-gradient(135deg,var(--gold),var(--gold-2))}
-.conn-toggle-wrap input:checked~.conn-toggle-switch::after{transform:translateX(16px)}
-.conn-toggle-text{font-size:13px;font-weight:700;color:#5b6a83;white-space:nowrap}
-.conn-toggle-wrap input:checked~.conn-toggle-text{color:var(--gold-2);font-weight:800}
-.search-meta{font-size:13px;color:#7b8aa3;margin:20px 2px 0;line-height:1.75;min-height:20px}
-.search-meta b{color:var(--blue-2)}
-.search-meta .warn{color:#e2453c;font-weight:700;display:inline-flex;align-items:center;gap:6px}
-.search-meta .warn::before{content:"⚠";font-size:14px}
-.result-section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--ink-2);letter-spacing:.5px;margin:22px 2px 4px}
-.result-section-title:first-child{margin-top:14px}
-.result-section-title .rsc-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:800}
-.rsc-direct .rsc-badge{background:var(--blue-soft);color:var(--blue-1)}
-.rsc-conn .rsc-badge{background:linear-gradient(135deg,rgba(212,162,74,.16),rgba(169,122,34,.12));color:var(--gold-2)}
-.result-section-title .rsc-count{color:var(--muted);font-weight:600;font-size:12px}
-.result-list{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-.flight-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(15,40,80,.07);border:1.5px solid transparent;transition:box-shadow .3s,border-color .3s,transform .3s;animation:fadeUp .42s var(--ease-out) backwards}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.flight-card:hover{box-shadow:0 14px 34px rgba(15,40,80,.14);transform:translateY(-2px)}
-.flight-card.expanded{border-color:var(--blue-1);box-shadow:0 18px 44px rgba(42,127,240,.2);transform:translateY(-3px)}
-.fc-row{display:grid;grid-template-columns:80px 1fr 24px;align-items:center;gap:12px;padding:18px 20px;cursor:pointer;user-select:none;transition:background .2s}
-.fc-row:hover{background:#fbfdff}
-.fc-no{font-weight:800;color:var(--blue-2);font-size:14px;display:flex;align-items:center;gap:6px}
-.fc-no::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(212,162,74,.2);flex:0 0 5px}
-.fc-seg{display:flex;align-items:center;gap:14px;justify-content:space-between;min-width:0}
-.fc-col{flex:0 1 auto;min-width:0;max-width:38%}
-.fc-col.right{text-align:right}
-.fc-time{font-size:20px;font-weight:800;color:#12203a;line-height:1.15;white-space:nowrap}
-.fc-time sup{font-size:11px;color:#e2453c;font-weight:800;margin-left:2px;top:-8px;position:relative}
-.fc-date{font-size:10.5px;color:#93a1b6;font-weight:600;margin-top:3px;white-space:nowrap}
-.fc-ap{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fc-mid{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:80px}
-.fc-dur{font-size:11px;color:#93a1b6;white-space:nowrap}
-.fc-line{width:100%;height:2px;background:#d5e3f7;border-radius:2px;position:relative}
-.fc-line::before,.fc-line::after{content:"";position:absolute;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--blue-1);transition:transform .3s}
-.fc-line::before{left:0}
-.fc-line::after{right:0}
-.flight-card:hover .fc-line::before,.flight-card:hover .fc-line::after{transform:scale(1.25)}
-.fc-arrow{color:#a9b8cd;font-size:15px;text-align:center;transition:transform .32s,color .25s}
-.flight-card.expanded .fc-arrow{transform:rotate(180deg);color:var(--blue-1)}
-.fc-detail{max-height:0;opacity:0;overflow:hidden;background:linear-gradient(180deg,#f7faff,#f2f7ff);border-top:1px solid #e8eef8;transition:max-height .45s,opacity .3s}
-.flight-card.expanded .fc-detail{max-height:640px;opacity:1}
-.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px 18px;padding:20px}
-.detail-grid>div{display:flex;flex-direction:column;gap:5px}
-.detail-grid span{font-size:11.5px;color:#93a1b6;font-weight:600}
-.detail-grid b{font-size:13.5px;color:var(--ink);font-weight:700;line-height:1.5}
-.detail-foot{display:flex;justify-content:flex-end;align-items:center;gap:14px;padding:0 20px 20px}
-.detail-foot .hint{font-size:12.5px;color:#93a1b6;margin-right:auto}
-.book-btn{padding:11px 36px}
-.conn-card{position:relative;overflow:hidden;background:#fff;border-radius:16px;box-shadow:0 4px 18px rgba(15,40,80,.07);border:1.5px solid rgba(212,162,74,.24);transition:box-shadow .3s,border-color .3s,transform .3s;animation:fadeUp .42s var(--ease-out) backwards}
-.conn-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--gold),var(--gold-2));opacity:.9}
-.conn-card:hover{box-shadow:0 14px 34px rgba(212,162,74,.2);transform:translateY(-2px);border-color:rgba(212,162,74,.5)}
-.conn-card.expanded{border-color:var(--gold);box-shadow:0 18px 44px rgba(212,162,74,.28);transform:translateY(-3px)}
-.cc-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 20px 14px;cursor:pointer;user-select:none;transition:background .2s}
-.cc-head:hover{background:#fffdf7}
-.cc-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;background:linear-gradient(135deg,rgba(212,162,74,.18),rgba(169,122,34,.14));color:var(--gold-2);font-size:11.5px;font-weight:800}
-.cc-badge::before{content:"⇌";font-size:13px}
-.cc-via{font-size:13px;font-weight:700;color:#5b6a83}
-.cc-total{font-size:12.5px;color:var(--muted);font-weight:600;margin-left:auto}
-.cc-arrow{color:#c9b58a;font-size:15px;transition:transform .32s,color .25s;margin-left:6px}
-.conn-card.expanded .cc-arrow{transform:rotate(180deg);color:var(--gold-2)}
-.cc-legs{display:flex;flex-direction:column;gap:2px;padding:0 20px 16px}
-.cc-leg{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:#fafcff;border:1px solid rgba(224,231,242,.8)}
-.cc-leg-no{font-weight:800;color:var(--blue-2);font-size:13px;min-width:60px}
-.cc-leg-route{font-size:12.5px;color:#3a4a63;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cc-city{font-size:12.5px;color:#3a4a63;font-weight:600;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cc-time-stack{display:inline-flex;flex-direction:column;align-items:center;line-height:1.1;gap:1px;vertical-align:middle}
-.cc-time-stack .cc-time{font-size:13.5px;font-weight:800;color:#12203a;font-variant-numeric:tabular-nums}
-.cc-time-stack .cc-date-inline{font-size:9.5px;color:#93a1b6;font-weight:600;white-space:nowrap}
-.cc-arrow-sm{color:#9dc2f5;font-weight:800;font-size:13px}
-.cc-layover{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 22px;font-size:12px;color:var(--gold-2);font-weight:700}
-.cc-layover::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(212,162,74,.18);flex:0 0 8px}
-.cc-layover .cc-layover-line{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--gold) 0 4px,transparent 4px 8px);opacity:.5;border-radius:2px}
-.cc-nextday{display:inline-flex;align-items:center;padding:1px 6px;border-radius:5px;background:rgba(226,69,60,.1);color:#e2453c;font-size:10.5px;font-weight:800;margin-left:4px}
-.cc-detail{max-height:0;opacity:0;overflow:hidden;background:linear-gradient(180deg,#fffdf7,#fdf8ee);border-top:1px solid rgba(212,162,74,.2);transition:max-height .5s,opacity .3s}
-.conn-card.expanded .cc-detail{max-height:900px;opacity:1}
-.cc-detail-inner{padding:18px 20px}
-.cc-detail-leg{border-radius:12px;background:#fff;padding:14px 16px;margin-bottom:12px;border:1px solid rgba(224,231,242,.85)}
-.cc-detail-leg:last-child{margin-bottom:0}
-.cc-detail-leg-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.cc-detail-leg-tag{font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;background:var(--blue-soft);color:var(--blue-1)}
-.cc-detail-leg-tag.gold{background:linear-gradient(135deg,rgba(212,162,74,.18),rgba(169,122,34,.14));color:var(--gold-2)}
-.cc-detail-leg-no{font-size:14px;font-weight:800;color:var(--blue-2)}
-.cc-detail-leg-date{font-size:12px;color:var(--muted);font-weight:600}
-.cc-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px 16px}
-.cc-detail-grid>div{display:flex;flex-direction:column;gap:4px}
-.cc-detail-grid span{font-size:11px;color:#93a1b6;font-weight:600}
-.cc-detail-grid b{font-size:13px;color:var(--ink);font-weight:700;line-height:1.5}
-.cc-detail-foot{display:flex;justify-content:flex-end;align-items:center;gap:14px;margin-top:16px}
-.cc-detail-foot .hint{font-size:12.5px;color:#93a1b6;margin-right:auto}
-.conn-book-btn{background:linear-gradient(135deg,var(--gold),var(--gold-2));box-shadow:0 10px 24px rgba(212,162,74,.36)}
-.conn-book-btn:hover{filter:brightness(1.06);box-shadow:0 16px 32px rgba(212,162,74,.48)}
-.sched-toolbar{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 6px 22px rgba(15,40,80,.07);border:1px solid rgba(224,231,242,.9);margin-bottom:18px}
-.sched-search-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.sched-search{flex:1 1 260px;display:flex;flex-direction:column;gap:6px}
-.sched-search label{font-size:12px;color:#7b8aa3;font-weight:700;padding-left:2px}
-.sched-search input{padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;outline:none;transition:all .22s;background:#fafcff;color:#12203a}
-.sched-search input:focus{border-color:var(--blue-1);background:#fff;box-shadow:0 0 0 4px rgba(42,127,240,.12)}
-.sched-search input::placeholder{color:#b6c1d3}
-.sched-count{font-size:13px;color:var(--muted);font-weight:600;white-space:nowrap;padding-bottom:11px}
-.sched-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding-bottom:0}
-.sched-actions .tool-btn{padding:11px 20px;font-size:13px}
-.sched-table-wrap{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 6px 22px rgba(15,40,80,.07);border:1px solid rgba(224,231,242,.9);overflow-x:auto}
-.sched-table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
-.sched-table thead{background:linear-gradient(180deg,#f5f9ff,#eef4ff);position:sticky;top:0;z-index:2}
-.sched-table th{text-align:left;padding:13px 14px;font-weight:800;color:var(--ink-2);font-size:12px;white-space:nowrap;border-bottom:1.5px solid #e3ecf9}
-.sched-table td{padding:12px 14px;color:#3a4a63;font-weight:600;border-bottom:1px solid #eef2f8;white-space:nowrap}
-.sched-table tbody tr{transition:background .18s;animation:fadeUp .28s var(--ease-out) backwards}
-.sched-table tbody tr:hover{background:#f7faff}
-.sched-table tbody tr:last-child td{border-bottom:none}
-.sched-table tbody tr.row-warn{background:linear-gradient(90deg,#fff7f6,#fff)}
-.sched-no{font-weight:800;color:var(--blue-2);display:flex;align-items:center;gap:6px}
-.sched-no::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);flex:0 0 5px}
-.sched-airport{max-width:250px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:middle}
-.sched-time{font-weight:800;color:#12203a;font-variant-numeric:tabular-nums;font-size:13.5px}
-.sched-dur{font-weight:700;color:var(--blue-1);font-variant-numeric:tabular-nums}
-.sched-warn{display:inline-block;margin-left:6px;font-size:13px;color:#e2453c;font-weight:800;cursor:help}
-.sched-empty{text-align:center;padding:48px 20px;color:#9aa8bd;font-size:13.5px}
-.sched-empty .big{font-size:36px;display:block;margin-bottom:12px;opacity:.5}
-.sched-warn-bar{display:flex;align-items:flex-start;gap:10px;padding:14px 18px;background:linear-gradient(135deg,#fff5f4,#ffefee);border:1.5px solid #f0c0bb;border-radius:14px;margin-bottom:16px;font-size:13px;color:#a33;line-height:1.75}
-.sched-warn-bar .swb-icon{font-size:18px;flex:0 0 auto;color:#e2453c;animation:blink 1.6s ease-in-out infinite}
-.sched-warn-bar .swb-text{flex:1;word-break:break-word}
-.sched-warn-bar .swb-text b{color:#e2453c}
-.sched-warn-bar code{background:rgba(226,69,60,.1);color:#a33;padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:12px}
-.trip-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
-.tabs{display:flex;gap:10px;flex-wrap:wrap}
-.tab{padding:11px 22px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:#5b6a83;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:8px;transition:all .24s}
-.tab:hover{border-color:#9dc2f5;color:var(--blue-1);transform:translateY(-2px)}
-.tab.active{background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;border-color:transparent;box-shadow:0 12px 26px rgba(42,127,240,.32)}
-.cnt{background:rgba(0,0,0,.08);border-radius:20px;padding:1px 9px;font-size:12px;font-weight:800}
-.tab.active .cnt{background:rgba(255,255,255,.28)}
-.trip-actions{display:flex;gap:10px;flex-wrap:wrap}
-.tool-btn{position:relative;overflow:hidden;padding:11px 22px;border-radius:12px;border:1.5px solid #d8e3f3;background:#fff;color:#2a5fa8;font-size:13px;font-weight:700;transition:all .24s}
-.tool-btn:hover{border-color:#9dc2f5;background:#f4f9ff;color:var(--blue-2);transform:translateY(-2px);box-shadow:0 10px 22px rgba(42,127,240,.16)}
-.tool-btn:active{transform:translateY(0) scale(.98)}
-.trip-list{display:flex;flex-direction:column;gap:12px}
-.trip-card{background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 4px 18px rgba(15,40,80,.07);display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;animation:fadeUp .38s var(--ease-out) backwards;border-left:4px solid var(--blue-1);transition:box-shadow .28s,transform .28s}
-.trip-card:hover{box-shadow:0 14px 34px rgba(15,40,80,.13);transform:translateY(-2px)}
-.trip-card.past{border-left-color:#c3ccdb;opacity:.88}
-.trip-card.conn{border-left-color:var(--gold)}
-.tc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.tc-no{font-weight:800;color:var(--blue-2);font-size:14px}
-.tc-date{font-size:13px;color:#5b6a83;font-weight:600}
-.tc-tag{font-size:11px;font-weight:800;padding:3px 11px;border-radius:20px;background:var(--blue-soft);color:var(--blue-1)}
-.tc-tag.live{background:#e8f7ee;color:#1f9d55}
-.tc-tag.conn{background:linear-gradient(135deg,rgba(212,162,74,.18),rgba(169,122,34,.14));color:var(--gold-2)}
-.tc-route{display:flex;align-items:center;gap:18px}
-.tc-p{display:flex;flex-direction:column;gap:4px;min-width:0}
-.tc-p.right{text-align:right}
-.tc-p b{font-size:19px;color:#12203a;font-weight:800}
-.tc-p b sup{font-size:11px;color:#e2453c;top:-8px;position:relative}
-.tc-p span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
-.tc-line{color:#9dc2f5;font-size:15px;letter-spacing:1px}
-.ghost-btn{padding:10px 20px;border-radius:11px;border:1.5px solid #f0d0cd;background:#fff;color:#e2453c;font-size:13px;font-weight:700;white-space:nowrap;transition:all .22s}
-.ghost-btn:hover{background:#fdf2f1;border-color:#e8a8a3;transform:translateY(-2px)}
-.ghost-btn:active{transform:translateY(0) scale(.98)}
-.empty-state{background:#fff;border-radius:18px;padding:64px 24px;text-align:center;color:#9aa8bd;font-size:14px;line-height:1.95;box-shadow:0 4px 18px rgba(15,40,80,.05);border:1px dashed #dde6f2;animation:fadeUp .4s var(--ease-out) both}
-.empty-state .big{font-size:40px;display:block;margin-bottom:14px;opacity:.55;animation:bob 3.4s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.modal-mask{position:fixed;inset:0;background:rgba(8,18,36,.58);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px 20px 76px;animation:maskIn .24s ease both;overflow:auto;backdrop-filter:blur(3px)}
-@keyframes maskIn{from{opacity:0}to{opacity:1}}
-.modal-card{background:#fff;border-radius:22px;width:100%;max-width:640px;padding:30px;box-shadow:0 40px 90px rgba(0,0,0,.4);animation:modalIn .4s var(--ease-out) both;margin:auto}
-@keyframes modalIn{from{opacity:0;transform:translateY(24px) scale(.955)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal-card h3{font-size:19px;font-weight:800;color:var(--ink-2);margin-bottom:9px}
-.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.8}
-.modal-sub code{background:var(--blue-soft);color:#2a5fa8;padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:12px}
-.file-drop{display:flex;align-items:center;justify-content:center;gap:8px;padding:17px;border:1.5px dashed #b9cdea;border-radius:14px;background:#f7faff;color:var(--blue-1);font-size:13.5px;font-weight:700;transition:all .24s;margin-bottom:14px}
-.file-drop:hover{background:#eef5ff;border-color:var(--blue-1);transform:translateY(-2px);box-shadow:0 10px 24px rgba(42,127,240,.14)}
-#importText,#flightText{width:100%;height:162px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-size:12px;font-family:ui-monospace,monospace;resize:vertical;outline:none;background:#fafcff;color:#12203a;line-height:1.78;transition:all .22s}
-#flightText{height:200px}
-#importText:focus,#flightText:focus{border-color:var(--blue-1);background:#fff;box-shadow:0 0 0 4px rgba(42,127,240,.12)}
-#importText::placeholder,#flightText::placeholder{color:#b6c1d3}
-.modal-foot{display:flex;justify-content:flex-end;gap:12px;margin-top:20px;flex-wrap:wrap}
-.ghost-modal-btn{padding:12px 24px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:#5b6a83;font-size:14px;font-weight:700;transition:all .22s}
-.ghost-modal-btn:hover{border-color:#b9cdea;color:var(--blue-1);transform:translateY(-2px)}
-.ghost-modal-btn:active{transform:translateY(0) scale(.98)}
-.ghost-modal-btn.warn{border-color:#f0d0cd;color:#e2453c}
-.ghost-modal-btn.warn:hover{border-color:#e8a8a3;background:#fdf2f1}
-.modal-msg{font-size:13px;margin-top:14px;min-height:18px;text-align:center;line-height:1.75}
-.modal-msg.ok{color:#1f9d55;font-weight:600}
-.modal-msg.err{color:#e2453c;font-weight:600}
-.toast{position:fixed;left:50%;bottom:62px;transform:translate(-50%,30px) scale(.9);background:rgba(13,25,48,.96);color:#fff;padding:13px 26px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .4s var(--ease-back);z-index:999;box-shadow:0 20px 46px rgba(0,0,0,.34);max-width:88vw;text-align:center;border:1px solid rgba(255,255,255,.08)}
-.toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
-.live-bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:#fff;border-radius:16px;padding:14px 18px;box-shadow:0 8px 26px rgba(15,40,80,.08);border:1px solid rgba(224,231,242,.9);margin-bottom:16px}
-.dir-switch{display:flex;background:#eef4fc;border-radius:12px;padding:4px;gap:3px;flex:0 0 auto}
-.dir-btn{padding:9px 22px;border-radius:9px;border:none;background:transparent;color:#5b6a83;font-size:13.5px;font-weight:800;cursor:pointer;transition:all .22s;white-space:nowrap}
-.dir-btn:hover{color:var(--blue-1)}
-.dir-btn.active{background:linear-gradient(135deg,var(--blue-1),var(--blue-2));color:#fff;box-shadow:0 6px 16px rgba(42,127,240,.32)}
-.dir-btn.active.arr{background:linear-gradient(135deg,var(--green),#14703a)}
-.live-filter{flex:1 1 200px;min-width:180px;display:flex;flex-direction:column;gap:6px}
-.live-filter input{padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;outline:none;transition:all .22s;background:#fafcff;color:#12203a}
-.live-filter input:focus{border-color:var(--blue-1);background:#fff;box-shadow:0 0 0 4px rgba(42,127,240,.12)}
-.live-filter input::placeholder{color:#b6c1d3}
-.live-updated{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.live-updated .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(31,157,85,.22);animation:pulse 1.8s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(31,157,85,.22)}50%{box-shadow:0 0 0 6px rgba(31,157,85,.08)}}
-.live-meta{font-size:13px;color:#7b8aa3;margin:0 2px 14px;line-height:1.7;min-height:20px}
-.live-meta b{color:var(--blue-2)}
-.live-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
-.live-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 4px 18px rgba(15,40,80,.07);border-left:4px solid var(--blue-1);animation:fadeUp .38s var(--ease-out) backwards;transition:box-shadow .25s,transform .25s}
-.live-card:hover{box-shadow:0 12px 30px rgba(15,40,80,.14);transform:translateY(-2px)}
-.live-card.arr{border-left-color:var(--green)}
-.live-card.boarding{border-left-color:var(--gold);background:linear-gradient(180deg,#fffdf7,#fff)}
-.live-card.inair{border-left-color:#7ba3e0;opacity:.9}
-.live-card.arrived{border-left-color:#c3ccdb;opacity:.82}
-.live-card.delayed{border-left-color:#e2453c !important;background:linear-gradient(180deg,#fff8f7,#fff)}
-.lc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.lc-no{font-weight:800;color:var(--blue-2);font-size:13.5px}
-.lc-status{font-size:10.5px;font-weight:800;padding:3px 10px;border-radius:20px}
-.lc-status.scheduled{background:var(--blue-soft);color:var(--blue-1)}
-.lc-status.boarding{background:linear-gradient(135deg,rgba(212,162,74,.22),rgba(169,122,34,.16));color:var(--gold-2);animation:blink 1.6s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.55}}
-.lc-status.departed{background:#eef1f6;color:#8a97ad}
-.lc-status.inair{background:#e8f0ff;color:var(--blue-1)}
-.lc-status.arrived{background:#e8f7ee;color:var(--green)}
-.lc-delay{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:20px;background:linear-gradient(135deg,rgba(226,69,60,.15),rgba(200,50,40,.1));color:#e2453c;letter-spacing:.3px}
-.lc-countdown{margin-left:auto;font-size:12.5px;font-weight:800;color:var(--gold-2);font-variant-numeric:tabular-nums}
-.lc-countdown.soon{color:var(--red);animation:blink 1.4s ease-in-out infinite}
-.lc-route{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.lc-point{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 0}
-.lc-point.right{text-align:right}
-.lc-point b{font-size:17px;font-weight:800;color:#12203a;font-variant-numeric:tabular-nums;line-height:1.1}
-.lc-point span{font-size:11.5px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lc-mid{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:60px}
-.lc-mid .lc-mid-line{width:100%;height:2px;background:#d5e3f7;border-radius:2px;position:relative;min-width:50px}
-.lc-mid .lc-mid-line::before,.lc-mid .lc-mid-line::after{content:"";position:absolute;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--blue-1)}
-.lc-mid .lc-mid-line::before{left:0}
-.lc-mid .lc-mid-line::after{right:0}
-.lc-mid .lc-mid-dur{font-size:10.5px;color:#93a1b6;font-weight:600;white-space:nowrap}
-.lc-date{font-size:11px;color:#93a1b6;font-weight:600;display:flex;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px dashed #e8eef8}
-.lc-date span{white-space:nowrap}
-@media(max-width:1000px){.home-hero{padding:42px 30px 38px}.hero-deco{display:none}}
-@media(max-width:820px){
-.sidebar{width:98px;flex:0 0 98px;padding:18px 8px}
-.side-brand{flex-direction:column;gap:8px;padding:0 4px 16px}
-.side-brand>div:last-child{display:none}
-.nav-item{padding:12px 4px;text-align:center;font-size:10.5px}
-.nav-item:hover{transform:none}
-.side-user{flex-direction:column;gap:6px;padding:10px 6px}
-.side-user>div:last-child{display:none}
-.side-lang{flex-direction:column;gap:5px}
-.side-lang .lang-btn{padding:5px 6px;font-size:10px}
-.main{padding:22px 16px 104px}
-.fc-row{grid-template-columns:66px 1fr 20px;gap:8px;padding:15px 13px}
-.fc-time{font-size:17px}
-.fc-ap{font-size:11px}
-.fc-date{font-size:10px}
-.home-hero{border-radius:20px;padding:34px 22px 32px}
-.trip-toolbar{flex-direction:column;align-items:stretch}
-.trip-actions{justify-content:flex-start}
-.trip-actions .tool-btn{flex:1;text-align:center}
-.site-footer{font-size:9px;letter-spacing:1.6px;padding:5px 12px;bottom:8px}
-.login-card{padding:34px 24px 28px}
-.brand{padding-right:0;margin-top:26px}
-.login-lang{top:14px;right:14px}
-.detail-grid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
-.conn-toggle-wrap{width:100%;justify-content:center}
-.cc-head{gap:8px}
-.cc-total{margin-left:0;flex:1 1 100%;order:4}
-.cc-arrow{margin-left:auto}
-.cc-city{max-width:120px}
-.sched-actions{flex:1 1 100%;justify-content:flex-start}
-.live-grid{grid-template-columns:1fr}
-.live-bar{padding:12px 14px;gap:10px}
-.dir-switch{width:100%;justify-content:stretch}
-.dir-btn{flex:1}
-.live-updated{flex:1 1 100%;justify-content:flex-start}
-.date-more-row{padding:10px 12px}
-input.date-input{min-width:0;flex:1 1 100%}
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"San Francisco","Segoe UI","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
+  background:#fbfbfd;
+  color:#1d1d1f;
+  min-height:100vh;
+  padding:64px 24px 80px;
+  transition:background 0.5s ease, color 0.5s ease;
 }
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.container{
+  max-width:760px;
+  margin:0 auto;
+  text-align:center;
+  position:relative;
+}
+
+/* ── 状态徽章 ── */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 16px;
+  border-radius:999px;
+  background:rgba(255,159,10,0.12);
+  color:#c93400;
+  font-size:0.88rem;
+  font-weight:500;
+  margin-bottom:32px;
+}
+.badge .dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ff9f0a;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.4;transform:scale(0.8);}
+}
+
+/* ── 标题与说明 ── */
+h1{
+  font-size:clamp(2rem,5vw,3rem);
+  font-weight:500;
+  letter-spacing:-0.02em;
+  margin-bottom:18px;
+  color:#1d1d1f;
+}
+.desc{
+  font-size:1.1rem;
+  color:#424245;
+  line-height:1.8;
+  margin-bottom:16px;
+}
+.desc-sub{
+  font-size:0.95rem;
+  color:#6e6e73;
+  line-height:1.7;
+  margin-bottom:52px;
+}
+
+/* ── 按钮 ── */
+.btn-group{
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:80px;
+}
+.btn{
+  font-size:1rem;
+  font-family:inherit;
+  padding:13px 26px;
+  border-radius:999px;
+  text-decoration:none;
+  cursor:pointer;
+  border:1px solid transparent;
+  transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  white-space:nowrap;
+}
+.btn-primary{
+  background:#007aff;
+  color:#fff;
+  border-color:#007aff;
+}
+.btn-primary:hover{
+  background:#0077ed;
+  border-color:#0077ed;
+}
+.btn-outline{
+  background:transparent;
+  border-color:#007aff;
+  color:#007aff;
+}
+.btn-outline:hover{
+  background:rgba(0,122,255,0.08);
+}
+
+/* ── 游戏区 ── */
+.game-section{
+  text-align:left;
+  padding:36px;
+  border-radius:20px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.06);
+  transition:box-shadow 0.3s ease;
+}
+.game-section:hover{
+  box-shadow:0 12px 40px rgba(0,0,0,0.06);
+}
+.game-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+.game-title{
+  font-size:1.3rem;
+  font-weight:500;
+  color:#1d1d1f;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.game-title i{
+  color:#007aff;
+  font-size:1.1rem;
+}
+.game-stats{
+  display:flex;
+  gap:20px;
+  font-size:0.9rem;
+  color:#6e6e73;
+}
+.game-stats strong{
+  color:#1d1d1f;
+  font-weight:500;
+}
+.game-hint{
+  font-size:0.88rem;
+  color:#6e6e73;
+  line-height:1.65;
+  margin-bottom:20px;
+}
+
+/* ── 游戏画布 ── */
+.canvas-wrap{
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+  background:#f5f5f7;
+  border:1px solid rgba(0,0,0,0.06);
+  touch-action:none;
+}
+#game-canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  cursor:pointer;
+}
+
+/* ── 开始/结束遮罩 ── */
+.overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  background:rgba(251,251,253,0.92);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  text-align:center;
+  padding:24px;
+  transition:opacity 0.3s ease, visibility 0.3s ease;
+}
+.overlay.hidden{
+  opacity:0;
+  visibility:hidden;
+}
+.overlay-title{
+  font-size:1.2rem;
+  font-weight:500;
+  color:#1d1d1f;
+}
+.overlay-text{
+  font-size:0.95rem;
+  color:#6e6e73;
+  line-height:1.7;
+  max-width:340px;
+}
+.overlay button{
+  margin-top:6px;
+}
+
+/* ── 移动端 ── */
+@media (max-width:640px){
+  body{padding:32px 16px 56px;}
+  .badge{margin-bottom:24px;}
+  .desc-sub{margin-bottom:40px;}
+  .btn-group{flex-direction:column;gap:12px;margin-bottom:56px;}
+  .btn{width:100%;text-align:center;}
+  .game-section{padding:22px;border-radius:16px;}
+  .game-header{flex-direction:column;align-items:flex-start;}
+  .game-stats{font-size:0.85rem;}
+}
+
+/* ── 深色模式 ── */
+@media (prefers-color-scheme: dark){
+  body{background:#121214;color:#f5f5f7;}
+  h1{color:#f5f5f7;}
+  .desc{color:#d1d1d6;}
+  .desc-sub{color:#a1a1a6;}
+  .badge{background:rgba(255,159,10,0.16);color:#ffb340;}
+  .btn-primary{background:#2997ff;border-color:#2997ff;color:#04121f;}
+  .btn-primary:hover{background:#349cff;border-color:#349cff;}
+  .btn-outline{border-color:#2997ff;color:#2997ff;}
+  .btn-outline:hover{background:rgba(41,151,255,0.1);}
+  .game-section{background:#1e1e22;border-color:rgba(255,255,255,0.08);}
+  .game-section:hover{box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+  .game-title{color:#f5f5f7;}
+  .game-title i{color:#2997ff;}
+  .game-stats{color:#a1a1a6;}
+  .game-stats strong{color:#f5f5f7;}
+  .game-hint{color:#a1a1a6;}
+  .canvas-wrap{background:#0a0a0c;border-color:rgba(255,255,255,0.08);}
+  .overlay{background:rgba(18,18,20,0.92);}
+  .overlay-title{color:#f5f5f7;}
+  .overlay-text{color:#a1a1a6;}
+}
+
+/* ── 减少动画 ── */
+@media (prefers-reduced-motion: reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+}
 </style>
 </head>
 <body>
 
-<div id="loginScreen" class="login-screen">
-  <div class="login-card">
-    <div class="lang-switch login-lang">
-      <button class="lang-btn" data-lang="zh">中文</button>
-      <button class="lang-btn active" data-lang="en">EN</button>
-      <button class="lang-btn" data-lang="fr">FR</button>
-    </div>
-    <div class="brand"><div class="brand-logo">JC</div><div class="brand-text" data-i18n="login.brand">JOY CLOUD AIRLINES</div></div>
-    <h1 data-i18n="login.title">Welcome back, Wanglan Member</h1>
-    <p class="sub" data-i18n="login.sub">Please complete your membership details.</p>
-    <div class="field"><label data-i18n="login.last">Surname</label><input id="inpLast" type="text" maxlength="12" data-i18n-ph="login.lastPh"></div>
-    <div class="field"><label data-i18n="login.first">Given name</label><input id="inpFirst" type="text" maxlength="12" data-i18n-ph="login.firstPh"></div>
-    <div class="field"><label data-i18n="login.gender">Gender</label>
-      <div class="gender-row">
-        <button class="gender-btn" data-gender="M" data-i18n="login.male">Male</button>
-        <button class="gender-btn" data-gender="F" data-i18n="login.female">Female</button>
+<div class="container">
+
+  <div class="badge">
+    <span class="dot"></span>
+    <span>维护中</span>
+  </div>
+
+  <h1>网站正在抢修</h1>
+  <p class="desc">我们遇到了一个比较严重的问题，工程师正在紧急处理。</p>
+  <p class="desc-sub">服务预计很快恢复。在此期间，您可以先玩个小游戏打发时间。</p>
+
+  <div class="btn-group">
+    <button class="btn btn-primary" id="refresh-btn">刷新页面</button>
+    <a class="btn btn-outline" href="mailto:godsunwyyx123spx@163.com">联系我们</a>
+  </div>
+
+  <!-- 游戏 -->
+  <section class="game-section">
+    <div class="game-header">
+      <div class="game-title">
+        <i class="fa-solid fa-gamepad"></i>
+        <span>星尘收集者</span>
+      </div>
+      <div class="game-stats">
+        <span>得分 <strong id="score">0</strong></span>
+        <span>最高 <strong id="best">0</strong></span>
       </div>
     </div>
-    <button id="enterBtn" class="primary-btn" data-i18n="login.enter">Enter System</button>
-    <p id="loginErr" class="err"></p>
-  </div>
+
+    <p class="game-hint">用鼠标或手指控制飞船，接住下落的星星。接到星星得 1 分，漏掉 3 颗星星游戏结束。</p>
+
+    <div class="canvas-wrap">
+      <canvas id="game-canvas" width="720" height="420"></canvas>
+
+      <div class="overlay" id="start-overlay">
+        <div class="overlay-title">准备好了吗？</div>
+        <div class="overlay-text">点击开始，用飞船接住星星。</div>
+        <button class="btn btn-primary" id="start-btn">开始游戏</button>
+      </div>
+
+      <div class="overlay hidden" id="over-overlay">
+        <div class="overlay-title">游戏结束</div>
+        <div class="overlay-text">你的得分是 <strong id="final-score">0</strong>。</div>
+        <button class="btn btn-primary" id="restart-btn">再来一局</button>
+      </div>
+    </div>
+  </section>
+
 </div>
-
-<div id="app" class="app hidden">
-  <aside class="sidebar">
-    <div class="side-brand">
-      <div class="side-logo">JC</div>
-      <div><div class="side-title">JOY CLOUD</div><div class="side-sub" data-i18n="side.sub">Wanglan Member</div></div>
-    </div>
-    <nav>
-      <button class="nav-item active" data-page="home" data-i18n="nav.home">Home</button>
-      <button class="nav-item" data-page="live" data-i18n="nav.live">Live</button>
-      <button class="nav-item" data-page="book" data-i18n="nav.book">Booking</button>
-      <button class="nav-item" data-page="trip" data-i18n="nav.trip">Trips</button>
-      <button class="nav-item" data-page="schedule" data-i18n="nav.schedule">Schedule</button>
-    </nav>
-    <div class="side-bottom">
-      <div class="side-user"><div class="avatar" id="userAvatar">W</div><div><div class="uname" id="userName">Wanglan</div><div class="umeta" id="userMeta">—</div></div></div>
-      <div class="lang-switch side-lang">
-        <button class="lang-btn" data-lang="zh">中文</button>
-        <button class="lang-btn active" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="fr">FR</button>
-      </div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <section id="page-home" class="page active">
-      <div class="home-hero">
-        <div class="hero-eyebrow">JOY CLOUD AIRLINES · WANGLAN MEMBER</div>
-        <h1 class="hero-title" id="homeTitle">Gaze the Mountains and Seas</h1>
-        <p class="hero-sub" id="homeWelcome">—</p>
-        <p class="hero-stat" id="homeStat">—</p>
-        <p class="hero-cta-text" id="homeCta">Let's get started</p>
-        <div class="hero-actions">
-          <button class="primary-btn" id="goBook" data-i18n="home.book">Exclusive Booking</button>
-          <button class="ghost-hero-btn" id="goTrip" data-i18n="home.trip">My Trips</button>
-        </div>
-        <div class="hero-deco">✈</div>
-      </div>
-    </section>
-
-    <section id="page-live" class="page">
-      <div class="page-head"><h2 data-i18n="live.title">Live Flights</h2><p data-i18n="live.desc">Switch direction, pick a date (today to 365 days ahead), filter by airport/city.</p></div>
-      <div class="live-bar">
-        <div class="dir-switch">
-          <button class="dir-btn active" data-dir="dep" data-i18n="live.dep">Departures</button>
-          <button class="dir-btn" data-dir="arr" data-i18n="live.arr">Arrivals</button>
-        </div>
-        <input type="date" id="liveDateInput" class="date-input">
-        <div class="live-filter"><input id="liveFilter" type="text" data-i18n-ph="live.filterPh"></div>
-        <div class="live-updated"><span class="dot"></span><span id="liveUpdated">—</span></div>
-      </div>
-      <div class="live-meta" id="liveMeta"></div>
-      <div class="live-grid" id="liveList"></div>
-    </section>
-
-    <section id="page-book" class="page">
-      <div class="page-head"><h2 data-i18n="book.title">Booking</h2><p data-i18n="book.desc">Select a travel date (today to 365 days ahead), fill departure and arrival, or search by flight number.</p></div>
-      <div class="date-strip" id="dateStrip"></div>
-      <div class="date-more-row">
-        <span class="dm-label" data-i18n="book.moreDate">Pick any date</span>
-        <input type="date" id="bookingDateInput" class="date-input">
-        <span class="dm-hint" data-i18n="book.rangeHint">Range: today — +365 days</span>
-      </div>
-      <div class="search-bar">
-        <div class="sfield"><label data-i18n="book.from">Departure</label><input id="fromInput" type="text" data-i18n-ph="book.fromPh"></div>
-        <div class="sfield"><label data-i18n="book.to">Arrival</label><input id="toInput" type="text" data-i18n-ph="book.toPh"></div>
-        <div class="sfield"><label data-i18n="book.no">Flight No.</label><input id="noInput" type="text" data-i18n-ph="book.noPh"></div>
-        <label class="conn-toggle-wrap" for="connToggle">
-          <input type="checkbox" id="connToggle">
-          <span class="conn-toggle-switch"></span>
-          <span class="conn-toggle-text" data-i18n="book.connection">Easy Connection</span>
-        </label>
-        <button id="searchBtn" class="primary-btn" data-i18n="book.search">Search</button>
-      </div>
-      <div class="search-meta" id="searchMeta"></div>
-      <div class="result-list" id="resultList"></div>
-    </section>
-
-    <section id="page-trip" class="page">
-      <div class="page-head"><h2 data-i18n="trip.title">Trips</h2><p data-i18n="trip.desc">Your booked flights. Export/import TXT.</p></div>
-      <div class="trip-toolbar">
-        <div class="tabs">
-          <button class="tab active" data-tab="upcoming"><span data-i18n="trip.upcoming">Upcoming</span> <span class="cnt" id="cntUp">0</span></button>
-          <button class="tab" data-tab="past"><span data-i18n="trip.past">Past</span> <span class="cnt" id="cntPast">0</span></button>
-        </div>
-        <div class="trip-actions">
-          <button class="tool-btn" id="exportBtn" data-i18n="trip.export">Export TXT</button>
-          <button class="tool-btn" id="importBtn" data-i18n="trip.import">Import TXT</button>
-        </div>
-      </div>
-      <div class="trip-list" id="tripList"></div>
-    </section>
-
-    <section id="page-schedule" class="page">
-      <div class="page-head"><h2 data-i18n="schedule.title">Flight Schedule</h2><p data-i18n="schedule.desc">All flights. Search by flight number, departure or arrival. Red ⚠ marks timezone validation warnings.</p></div>
-      <div id="schedWarnBar" class="sched-warn-bar hidden">
-        <span class="swb-icon">⚠</span>
-        <span class="swb-text" id="schedWarnText"></span>
-      </div>
-      <div class="sched-toolbar">
-        <div class="sched-search-row">
-          <div class="sched-search"><label data-i18n="schedule.search">Search</label><input id="schedSearch" type="text" data-i18n-ph="schedule.searchPh"></div>
-          <div class="sched-count" id="schedCount"></div>
-          <div class="sched-actions">
-            <button class="tool-btn" id="exportFlightsBtn" data-i18n="schedule.export">Export Flight Data</button>
-            <button class="tool-btn" id="updateFlightsBtn" data-i18n="schedule.update">Update Flight Data</button>
-          </div>
-        </div>
-      </div>
-      <div class="sched-table-wrap">
-        <table class="sched-table">
-          <thead><tr>
-            <th data-i18n="book.flightNo">Flight No.</th>
-            <th data-i18n="book.depAirport">Departure</th>
-            <th data-i18n="book.duration">Duration</th>
-            <th data-i18n="book.depFreq">Frequency (dep.)</th>
-            <th data-i18n="book.arrAirport">Arrival</th>
-            <th data-i18n="book.arrFreq">Frequency (arr.)</th>
-          </tr></thead>
-          <tbody id="schedBody"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-</div>
-
-<div class="modal-mask hidden" id="importModal"><div class="modal-card">
-  <h3 data-i18n="import.title">Import Trips TXT</h3>
-  <p class="modal-sub" data-i18n="import.desc">Choose a .txt file or paste below.</p>
-  <label class="file-drop"><input type="file" id="importFile" accept=".txt,text/plain" hidden><span data-i18n="import.choose">Click to choose TXT</span></label>
-  <textarea id="importText" spellcheck="false" data-i18n-ph="import.placeholder"></textarea>
-  <div class="modal-foot">
-    <button class="ghost-modal-btn" id="importCancel" data-i18n="import.cancel">Cancel</button>
-    <button class="primary-btn" id="importConfirm" data-i18n="import.confirm">Confirm</button>
-  </div>
-  <p class="modal-msg" id="importMsg"></p>
-</div></div>
-
-<div class="modal-mask hidden" id="flightModal"><div class="modal-card">
-  <h3 data-i18n="flightData.title">Update Flight Schedule</h3>
-  <p class="modal-sub" data-i18n="flightData.desc">Paste or choose a flight data file. Lines starting with # and blank lines are ignored.</p>
-  <label class="file-drop"><input type="file" id="flightFile" accept=".txt,.csv,text/plain" hidden><span data-i18n="flightData.choose">Click to choose TXT/CSV</span></label>
-  <textarea id="flightText" spellcheck="false" data-i18n-ph="flightData.placeholder"></textarea>
-  <div class="modal-foot">
-    <button class="ghost-modal-btn warn" id="flightReset" data-i18n="flightData.reset">Reset</button>
-    <button class="ghost-modal-btn" id="flightCancel" data-i18n="import.cancel">Cancel</button>
-    <button class="primary-btn" id="flightConfirm" data-i18n="flightData.confirm">Apply</button>
-  </div>
-  <p class="modal-msg" id="flightMsg"></p>
-</div></div>
-
-<div class="toast" id="toast"></div>
-<div class="site-footer"><span>JOY CLOUD AIRLINES</span><span class="sep">·</span><span>PHOTAXIS-LAB</span></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   航班数据 · 带表头与注释的自解释格式
-   规则：
-   1. 字段顺序：航班号|出发机场|出发时刻|出发周期|到达机场|到达时刻|到达周期|飞行时长
-   2. 以 # 开头的行是注释，会被忽略
-   3. 空行会被忽略，表头行会被忽略
-   4. 跨天规则：到达时刻 ≤ 出发时刻 → 次日到达(+1)
-   5. 时差校验：出发 + 飞行 + 时差 = 到达（±2分钟容忍）
-   6. 周期格式：每天 / 周一 / 周一、周三、周五
-   ═══════════════════════════════════════════════════════════════ */
-const DEFAULT_RAW = `
-# 云悦航空 · 航班表 v2（带表头、自解释、支持时差校验）
-# ═══════════════════════════════════════════════════════════════
-# 字段（用 | 分隔，共 8 列，顺序不可变）：
-#   1 航班号   3位数字，不带 YU 前缀
-#   2 出发机场 中文全称，须与代码中 AP 表一致
-#   3 出发时刻 24小时制 HH:MM（出发地当地时间）
-#   4 出发周期 见下方"周期写法"
-#   5 到达机场 中文全称，须与代码中 AP 表一致
-#   6 到达时刻 24小时制 HH:MM（到达地当地时间）
-#   7 到达周期 见下方"周期写法"
-#   8 飞行时长 HH:MM（纯空中时间，不含时差）
-# ═══════════════════════════════════════════════════════════════
-航班号|出发机场|出发时刻|出发周期|到达机场|到达时刻|到达周期|飞行时长
-001|海口美兰国际机场|00:00|每天|上海浦东国际机场|02:45|每天|02:45
-002|上海浦东国际机场|04:00|每天|海口美兰国际机场|06:45|每天|02:45
-003|海口美兰国际机场|08:00|每天|上海浦东国际机场|10:45|每天|02:45
-004|上海浦东国际机场|12:00|每天|海口美兰国际机场|14:45|每天|02:45
-005|海口美兰国际机场|16:00|每天|上海浦东国际机场|18:45|每天|02:45
-006|上海浦东国际机场|20:00|每天|海口美兰国际机场|22:45|每天|02:45
-007|海口美兰国际机场|08:00|每天|新加坡樟宜机场|11:32|每天|03:32
-008|新加坡樟宜机场|13:00|每天|海口美兰国际机场|16:32|每天|03:32
-009|海口美兰国际机场|18:00|每天|新加坡樟宜机场|21:32|每天|03:32
-010|新加坡樟宜机场|23:00|每天|海口美兰国际机场|02:32|每天|03:32
-011|海口美兰国际机场|08:00|每天|广州白云国际机场|09:00|每天|01:00
-012|广州白云国际机场|10:30|每天|海口美兰国际机场|11:30|每天|01:00
-013|海口美兰国际机场|14:00|每天|广州白云国际机场|15:00|每天|01:00
-014|广州白云国际机场|16:30|每天|海口美兰国际机场|17:30|每天|01:00
-015|海口美兰国际机场|19:00|每天|广州白云国际机场|20:00|每天|01:00
-016|广州白云国际机场|21:15|每天|海口美兰国际机场|22:15|每天|01:00
-017|海口美兰国际机场|06:00|每天|北京大兴国际机场|09:45|每天|03:45
-018|北京大兴国际机场|11:00|每天|海口美兰国际机场|14:45|每天|03:45
-019|海口美兰国际机场|16:00|每天|北京大兴国际机场|19:45|每天|03:45
-020|北京大兴国际机场|21:00|每天|海口美兰国际机场|00:45|每天|03:45
-021|海口美兰国际机场|08:30|每天|乌鲁木齐天山国际机场|13:54|每天|05:24
-022|乌鲁木齐天山国际机场|17:30|每天|海口美兰国际机场|22:54|每天|05:24
-023|上海浦东国际机场|08:30|每天|乌鲁木齐天山国际机场|13:50|每天|05:20
-024|乌鲁木齐天山国际机场|17:30|每天|上海浦东国际机场|22:54|每天|05:20
-025|海口美兰国际机场|09:00|每天|林芝米林机场|12:23|每天|03:23
-026|林芝米林机场|16:37|每天|海口美兰国际机场|20:00|每天|03:23
-027|海口美兰国际机场|09:00|每天|拉萨贡嘎国际机场|12:46|每天|03:46
-028|拉萨贡嘎国际机场|16:14|每天|海口美兰国际机场|20:00|每天|03:46
-029|海口美兰国际机场|08:24|每天|西安咸阳国际机场|11:00|每天|02:36
-030|西安咸阳国际机场|12:24|每天|海口美兰国际机场|15:00|每天|02:36
-031|海口美兰国际机场|16:24|每天|西安咸阳国际机场|19:00|每天|02:36
-032|西安咸阳国际机场|20:24|每天|海口美兰国际机场|23:00|每天|02:36
-033|海口美兰国际机场|07:30|每天|青岛胶东国际机场|10:53|每天|03:25
-034|青岛胶东国际机场|12:30|每天|海口美兰国际机场|15:55|每天|03:25
-035|海口美兰国际机场|17:30|每天|青岛胶东国际机场|20:55|每天|03:25
-036|青岛胶东国际机场|22:30|每天|海口美兰国际机场|01:55|每天|03:25
-037|上海虹桥国际机场|07:30|每天|广州白云国际机场|08:50|每天|01:50
-038|广州白云国际机场|10:05|每天|上海虹桥国际机场|11:55|每天|01:50
-039|上海虹桥国际机场|13:10|每天|广州白云国际机场|15:00|每天|01:50
-040|广州白云国际机场|16:15|每天|上海虹桥国际机场|18:05|每天|01:50
-041|上海虹桥国际机场|19:20|每天|广州白云国际机场|21:10|每天|01:50
-042|广州白云国际机场|22:25|每天|上海虹桥国际机场|00:15|每天|01:50
-071|海口美兰国际机场|08:00|每天|南京禄口国际机场|10:40|每天|02:40
-072|南京禄口国际机场|12:00|每天|海口美兰国际机场|14:40|每天|02:40
-073|海口美兰国际机场|16:00|每天|南京禄口国际机场|18:40|每天|02:40
-074|南京禄口国际机场|20:00|每天|海口美兰国际机场|22:40|每天|02:40
-075|海口美兰国际机场|07:30|每天|呼和浩特白塔国际机场|11:21|每天|03:51
-076|呼和浩特白塔国际机场|12:36|每天|海口美兰国际机场|16:27|每天|03:51
-077|海口美兰国际机场|17:42|每天|丽江三义国际机场|19:52|每天|02:10
-078|丽江三义国际机场|21:07|每天|海口美兰国际机场|23:17|每天|02:10
-079|海口美兰国际机场|00:32|周二、周四、周六|悉尼金斯福德·史密斯机场|13:52|周二、周四、周六|11:20
-080|悉尼金斯福德·史密斯机场|15:07|周五|海口美兰国际机场|00:37|周五|11:20
-081|海口美兰国际机场|01:15|周三|图卢兹-布拉尼亚克机场|09:45|周三|15:30
-082|图卢兹-布拉尼亚克机场|01:15|周四|海口美兰国际机场|09:45|周四|15:30
-083|海口美兰国际机场|07:50|每天|昆明长水国际机场|09:30|每天|01:40
-084|昆明长水国际机场|10:45|每天|海口美兰国际机场|12:25|每天|01:40
-085|海口美兰国际机场|15:50|每天|昆明长水国际机场|17:30|每天|01:40
-086|昆明长水国际机场|18:45|每天|海口美兰国际机场|20:25|每天|01:40
-088|海口美兰国际机场|08:30|每天|杭州萧山国际机场|11:00|每天|02:30
-089|杭州萧山国际机场|08:20|每天|海口美兰国际机场|10:50|每天|02:30
-090|海口美兰国际机场|16:00|每天|杭州萧山国际机场|18:30|每天|02:30
-091|杭州萧山国际机场|19:50|每天|海口美兰国际机场|22:20|每天|02:30
-092|海口美兰国际机场|23:35|周三|丽江三义国际机场|01:25|周三|01:50
-093|丽江三义国际机场|02:40|周五|海口美兰国际机场|04:30|周五|01:50
-094|上海浦东国际机场|07:00|每天|新加坡樟宜机场|13:00|每天|06:00
-095|新加坡樟宜机场|15:30|每天|上海浦东国际机场|21:30|每天|06:00
-096|上海浦东国际机场|10:00|每天|新加坡樟宜机场|16:00|每天|06:00
-097|新加坡樟宜机场|17:30|每天|上海浦东国际机场|23:30|每天|06:00
-098|上海浦东国际机场|00:00|每天|悉尼金斯福德·史密斯机场|12:20|每天|10:20
-099|悉尼金斯福德·史密斯机场|13:40|每天|上海浦东国际机场|22:00|每天|10:20
-100|上海浦东国际机场|00:50|周二、周五、周日|图卢兹-布拉尼亚克机场|09:15|周二、周五、周日|15:45
-101|图卢兹-布拉尼亚克机场|00:30|周一、周三、周六|上海浦东国际机场|03:15|周一、周三、周六|15:45
-102|上海浦东国际机场|07:30|周三、周五、周日|西雅图-塔科马国际机场|07:22|周三、周五、周日|15:52
-103|西雅图-塔科马国际机场|09:30|周三、周五、周日|上海浦东国际机场|12:22|周二、周四、周六|15:52
-104|海口美兰国际机场|06:20|周日、周三|西雅图-塔科马国际机场|07:00|周日、周三|16:40
-105|西雅图-塔科马国际机场|06:20|周一、周四|海口美兰国际机场|15:00|周二、周五|16:40
-107|海口美兰国际机场|08:30|每天|东京羽田国际机场|14:40|每天|05:40
-108|东京羽田国际机场|15:55|每天|海口美兰国际机场|20:05|每天|05:40
-109|海口美兰国际机场|00:00|周三、周日|纽约肯尼迪国际机场|10:57|周三、周日|23:57
-110|纽约肯尼迪国际机场|00:00|周一、周四|海口美兰国际机场|12:57|周二、周五|23:57
-111|上海浦东国际机场|00:00|周二、周五、周日|纽约肯尼迪国际机场|08:33|周二、周五、周日|21:33
-112|纽约肯尼迪国际机场|11:00|周一、周三、周六|上海浦东国际机场|21:33|周一、周三、周六|21:33
-113|上海浦东国际机场|08:00|每天|深圳宝安国际机场|10:06|每天|02:06
-114|深圳宝安国际机场|11:21|每天|上海浦东国际机场|13:27|每天|02:06
-115|上海浦东国际机场|14:42|每天|深圳宝安国际机场|16:48|每天|02:06
-116|深圳宝安国际机场|18:03|每天|上海浦东国际机场|20:09|每天|02:06
-117|海口美兰国际机场|09:00|每天|兰州中川国际机场|12:27|每天|03:27
-118|兰州中川国际机场|13:42|每天|海口美兰国际机场|17:09|每天|03:27
-119|海口美兰国际机场|18:30|每天|成都天府国际机场|20:50|每天|02:20
-120|成都天府国际机场|22:05|每天|海口美兰国际机场|00:25|每天|02:20
-121|海口美兰国际机场|09:00|每天|成都天府国际机场|11:20|每天|02:20
-122|成都天府国际机场|12:35|每天|海口美兰国际机场|14:55|每天|02:20
-123|海口美兰国际机场|16:10|每天|兰州中川国际机场|19:37|每天|03:27
-124|兰州中川国际机场|20:52|每天|海口美兰国际机场|00:19|每天|03:27
-125|上海浦东国际机场|07:30|每天|成都天府国际机场|10:25|每天|02:55
-126|成都天府国际机场|11:40|每天|上海浦东国际机场|14:35|每天|02:55
-127|上海浦东国际机场|15:50|每天|成都天府国际机场|18:45|每天|02:55
-128|成都天府国际机场|20:00|每天|上海浦东国际机场|22:55|每天|02:55
-129|上海浦东国际机场|07:35|每天|重庆江北国际机场|10:00|每天|02:25
-130|重庆江北国际机场|11:15|每天|拉萨贡嘎国际机场|13:50|每天|02:35
-131|拉萨贡嘎国际机场|14:05|每天|重庆江北国际机场|16:40|每天|02:35
-132|重庆江北国际机场|17:55|每天|上海浦东国际机场|20:20|每天|02:25
-133|上海浦东国际机场|07:00|每天|北京大兴国际机场|08:50|每天|01:50
-134|北京大兴国际机场|10:05|每天|上海浦东国际机场|11:55|每天|01:50
-135|上海浦东国际机场|13:10|每天|北京大兴国际机场|15:00|每天|01:50
-136|北京大兴国际机场|16:15|每天|上海浦东国际机场|18:05|每天|01:50
-137|上海浦东国际机场|09:00|每天|海口美兰国际机场|11:45|每天|02:45
-138|海口美兰国际机场|15:15|每天|上海浦东国际机场|18:00|每天|02:45
-139|上海虹桥国际机场|09:00|每天|海口美兰国际机场|11:40|每天|02:40
-140|海口美兰国际机场|14:20|每天|上海虹桥国际机场|17:00|每天|02:40
-141|上海虹桥国际机场|18:15|每天|海口美兰国际机场|20:55|每天|02:40
-142|海口美兰国际机场|21:10|每天|上海虹桥国际机场|00:50|每天|02:40
-143|上海虹桥国际机场|08:30|每天|广州白云国际机场|10:20|每天|01:50
-144|广州白云国际机场|11:40|每天|上海虹桥国际机场|13:30|每天|01:50
-145|上海虹桥国际机场|14:50|每天|广州白云国际机场|16:40|每天|01:50
-146|广州白云国际机场|18:00|每天|上海虹桥国际机场|19:50|每天|01:50
-147|上海浦东国际机场|11:40|每天|上海虹桥国际机场|11:50|每天|00:10
-148|上海虹桥国际机场|12:50|每天|上海浦东国际机场|13:00|每天|00:10
-149|上海浦东国际机场|14:00|每天|南京禄口国际机场|14:35|每天|00:35
-150|南京禄口国际机场|15:35|每天|青岛胶东国际机场|17:28|每天|00:53
-151|青岛胶东国际机场|18:28|每天|南京禄口国际机场|19:11|每天|00:53
-152|南京禄口国际机场|20:11|每天|上海浦东国际机场|20:46|每天|00:35
-153|上海浦东国际机场|08:20|周二、周五、周日|盐湖城国际机场|11:30|周二、周五、周日|18:10
-154|盐湖城国际机场|15:00|周二、周五、周日|上海浦东国际机场|00:10|周二、周四、周日|18:10
-155|海口美兰国际机场|00:28|周日|新加坡樟宜机场|04:00|周日|03:32
-156|新加坡樟宜机场|06:00|周日|迈阿密国际机场|18:00|周日|25:00
-157|迈阿密国际机场|09:00|周一|新加坡樟宜机场|23:00|周二|25:00
-158|新加坡樟宜机场|10:28|周三|海口美兰国际机场|14:00|周三|03:32
-159|上海浦东国际机场|08:30|每天|昆明长水国际机场|10:45|每天|02:15
-160|昆明长水国际机场|12:00|每天|上海浦东国际机场|14:15|每天|02:15
-161|上海浦东国际机场|15:30|每天|厦门高崎国际机场|16:52|每天|01:22
-162|厦门高崎国际机场|18:07|每天|上海浦东国际机场|19:29|每天|01:22
-163|上海浦东国际机场|20:45|每天|丽江三义国际机场|00:35|每天|03:50
-164|丽江三义国际机场|01:50|每天|上海浦东国际机场|05:40|每天|03:50
-165|海口美兰国际机场|08:27|每天|丽江三义国际机场|10:37|每天|02:10
-166|丽江三义国际机场|11:50|每天|重庆江北国际机场|13:05|每天|01:15
-167|重庆江北国际机场|14:20|每天|丽江三义国际机场|15:35|每天|01:15
-168|丽江三义国际机场|16:50|每天|海口美兰国际机场|19:00|每天|02:10
-169|上海虹桥国际机场|07:00|每天|西安咸阳国际机场|09:02|每天|02:02
-170|西安咸阳国际机场|10:17|每天|兰州中川国际机场|11:12|每天|00:55
-171|兰州中川国际机场|12:27|每天|敦煌莫高国际机场|13:57|每天|01:30
-172|敦煌莫高国际机场|15:12|每天|乌鲁木齐天山国际机场|16:27|每天|01:15
-173|乌鲁木齐天山国际机场|17:42|每天|敦煌莫高国际机场|18:57|每天|01:15
-174|敦煌莫高国际机场|20:12|每天|兰州中川国际机场|21:42|每天|01:30
-175|兰州中川国际机场|22:57|每天|西安咸阳国际机场|23:52|每天|00:55
-176|西安咸阳国际机场|01:07|每天|上海虹桥国际机场|03:27|每天|02:20
-177|上海虹桥国际机场|07:05|每天|武汉天河国际机场|08:15|每天|01:10
-178|武汉天河国际机场|09:30|每天|重庆江北国际机场|10:40|每天|01:10
-179|重庆江北国际机场|11:55|每天|成都双流国际机场|12:35|每天|00:40
-180|成都双流国际机场|13:50|每天|重庆江北国际机场|14:30|每天|00:40
-181|重庆江北国际机场|15:45|每天|武汉天河国际机场|16:55|每天|01:10
-182|武汉天河国际机场|18:10|每天|上海虹桥国际机场|19:20|每天|01:10
-183|上海虹桥国际机场|08:10|每天|烟台蓬莱国际机场|09:30|每天|01:20
-184|烟台蓬莱国际机场|10:45|每天|北京首都国际机场|11:35|每天|00:50
-185|北京首都国际机场|12:50|每天|呼和浩特白塔国际机场|13:45|每天|00:55
-186|呼和浩特白塔国际机场|15:00|每天|北京首都国际机场|15:55|每天|00:55
-187|北京首都国际机场|17:10|每天|烟台蓬莱国际机场|18:00|每天|00:50
-188|烟台蓬莱国际机场|19:15|每天|上海虹桥国际机场|20:35|每天|01:20
-189|海口美兰国际机场|08:35|每天|烟台蓬莱国际机场|12:20|每天|03:45
-190|烟台蓬莱国际机场|15:15|每天|海口美兰国际机场|19:00|每天|03:45
-191|上海虹桥国际机场|05:00|每天|迪拜国际机场|10:25|每天|09:25
-192|迪拜国际机场|12:35|每天|上海虹桥国际机场|02:00|每天|09:25
-193|上海虹桥国际机场|09:44|每天|成都天府国际机场|12:30|每天|02:46
-194|成都天府国际机场|14:00|每天|上海虹桥国际机场|16:46|每天|02:46
-195|上海虹桥国际机场|18:00|每天|广州白云国际机场|19:50|每天|01:50
-196|广州白云国际机场|21:05|每天|上海虹桥国际机场|22:55|每天|01:50
-197|上海虹桥国际机场|09:05|每天|北京大兴国际机场|10:55|每天|01:50
-198|北京大兴国际机场|12:10|每天|上海虹桥国际机场|14:00|每天|01:50
-199|上海虹桥国际机场|15:15|每天|北京首都国际机场|17:10|每天|01:55
-200|北京首都国际机场|18:25|每天|上海虹桥国际机场|20:20|每天|01:55
-201|海口美兰国际机场|07:30|每天|北京大兴国际机场|11:05|每天|03:35
-202|北京大兴国际机场|12:30|每天|三亚凤凰国际机场|16:46|每天|04:16
-203|三亚凤凰国际机场|18:00|每天|北京大兴国际机场|22:16|每天|04:16
-204|北京大兴国际机场|23:30|每天|海口美兰国际机场|03:15|每天|03:45
-205|海口美兰国际机场|09:00|每天|昆明长水国际机场|10:45|每天|01:45
-206|昆明长水国际机场|12:00|每天|嘉峪关机场|14:55|每天|02:55
-207|嘉峪关机场|16:10|每天|兰州中川国际机场|17:10|每天|01:00
-208|兰州中川国际机场|18:25|每天|嘉峪关机场|19:25|每天|01:00
-209|嘉峪关机场|20:40|每天|昆明长水国际机场|23:35|每天|02:55
-210|昆明长水国际机场|06:00|每天|海口美兰国际机场|07:45|每天|01:45
-211|海口美兰国际机场|08:50|每天|武汉天河国际机场|10:00|每天|02:10
-212|武汉天河国际机场|11:50|每天|海口美兰国际机场|14:00|每天|02:10
-213|海口美兰国际机场|15:15|每天|台北桃园国际机场|17:25|每天|02:10
-214|台北桃园国际机场|18:50|每天|海口美兰国际机场|21:00|每天|02:10
-215|上海虹桥国际机场|08:15|每天|吉隆坡国际机场|10:00|每天|02:45
-216|吉隆坡国际机场|11:15|每天|上海虹桥国际机场|19:15|每天|03:00
-217|海口美兰国际机场|14:45|每天|上海虹桥国际机场|18:45|每天|03:00
-218|上海虹桥国际机场|20:00|每天|海口美兰国际机场|22:45|每天|02:45
-219|上海浦东国际机场|09:00|每天|台北桃园国际机场|10:10|每天|01:10
-220|台北桃园国际机场|11:30|每天|上海浦东国际机场|12:40|每天|01:10
-221|上海浦东国际机场|14:00|每天|三亚凤凰国际机场|17:09|每天|03:09
-222|三亚凤凰国际机场|18:30|每天|上海浦东国际机场|21:09|每天|03:09
-224|上海虹桥国际机场|09:15|每天|大阪关西国际机场|13:00|每天|02:45
-225|大阪关西国际机场|14:15|每天|上海虹桥国际机场|16:00|每天|02:45
-226|上海浦东国际机场|10:00|每天|香港国际机场|12:10|每天|02:10
-227|香港国际机场|13:30|每天|上海浦东国际机场|15:40|每天|02:10
-228|海口美兰国际机场|10:00|每天|香港国际机场|10:50|每天|00:50
-229|香港国际机场|15:10|每天|海口美兰国际机场|16:00|每天|00:50
-230|海口美兰国际机场|07:05|每天|南宁吴圩国际机场|07:45|每天|00:40
-231|南宁吴圩国际机场|09:00|每天|成都天府国际机场|10:45|每天|01:45
-232|成都天府国际机场|12:00|每天|兰州中川国际机场|13:10|每天|01:10
-233|兰州中川国际机场|14:25|每天|北京首都国际机场|16:30|每天|02:05
-234|北京首都国际机场|17:45|每天|兰州中川国际机场|19:50|每天|02:05
-235|兰州中川国际机场|21:05|每天|成都天府国际机场|22:15|每天|01:10
-236|成都天府国际机场|23:30|每天|南宁吴圩国际机场|01:15|每天|01:45
-237|南宁吴圩国际机场|02:30|每天|海口美兰国际机场|03:10|每天|00:40
-238|上海浦东国际机场|07:00|每天|广州白云国际机场|08:50|每天|01:50
-239|广州白云国际机场|10:05|每天|西安咸阳国际机场|12:20|每天|02:15
-240|西安咸阳国际机场|13:35|每天|北京大兴国际机场|15:05|每天|01:30
-241|北京大兴国际机场|16:20|每天|西安咸阳国际机场|17:50|每天|01:30
-242|西安咸阳国际机场|19:05|每天|广州白云国际机场|21:20|每天|02:15
-243|广州白云国际机场|22:35|每天|上海浦东国际机场|00:25|每天|01:50
-244|上海浦东国际机场|12:00|每天|深圳宝安国际机场|14:06|每天|02:10
-245|深圳宝安国际机场|15:30|每天|海口美兰国际机场|16:50|每天|01:20
-246|海口美兰国际机场|18:00|每天|上海浦东国际机场|20:45|每天|02:45
-247|上海浦东国际机场|08:00|每天|深圳宝安国际机场|09:00|每天|01:00
-248|深圳宝安国际机场|10:15|每天|海口美兰国际机场|11:15|每天|01:00
-249|海口美兰国际机场|12:30|每天|天津滨海国际机场|16:32|每天|04:02
-250|天津滨海国际机场|17:50|每天|海口美兰国际机场|21:52|每天|04:02
-251|海口美兰国际机场|09:55|每天|福州长乐国际机场|11:55|每天|02:00
-252|福州长乐国际机场|13:10|每天|海口美兰国际机场|15:10|每天|02:00
-253|海口美兰国际机场|16:25|每天|澳门国际机场|17:05|每天|00:40
-254|澳门国际机场|18:20|每天|海口美兰国际机场|19:00|每天|00:40
-255|上海虹桥国际机场|10:00|每天|福州长乐国际机场|11:01|每天|01:01
-256|福州长乐国际机场|12:16|每天|上海虹桥国际机场|13:07|每天|01:01
-257|上海虹桥国际机场|14:22|每天|澳门国际机场|15:32|每天|01:10
-258|澳门国际机场|16:47|每天|上海虹桥国际机场|17:57|每天|01:10
-259|海口美兰国际机场|10:30|每天|三亚凤凰国际机场|10:55|每天|00:25
-260|三亚凤凰国际机场|12:15|每天|昆明长水国际机场|14:00|每天|01:45
-261|昆明长水国际机场|15:15|每天|三亚凤凰国际机场|17:00|每天|01:45
-262|三亚凤凰国际机场|18:15|每天|海口美兰国际机场|18:40|每天|00:25
-263|海口美兰国际机场|08:40|每天|西双版纳嘎洒国际机场|12:00|每天|03:20
-264|西双版纳嘎洒国际机场|13:20|每天|海口美兰国际机场|16:40|每天|03:20
-265|上海浦东国际机场|07:45|每天|西宁曹家堡国际机场|11:00|每天|03:15
-266|西宁曹家堡国际机场|12:15|每天|上海浦东国际机场|15:30|每天|03:15
-267|上海浦东国际机场|16:45|每天|长春龙嘉国际机场|19:20|每天|02:35
-268|长春龙嘉国际机场|20:35|每天|上海浦东国际机场|23:10|每天|02:35
-269|上海浦东国际机场|03:35|每天|合肥新桥国际机场|04:25|每天|00:50
-270|合肥新桥国际机场|05:40|每天|上海浦东国际机场|06:30|每天|00:50
-271|海口美兰国际机场|08:55|每天|长春龙嘉国际机场|14:00|每天|05:05
-272|长春龙嘉国际机场|15:15|每天|海口美兰国际机场|20:20|每天|05:05
-273|海口美兰国际机场|08:26|每天|合肥新桥国际机场|11:00|每天|02:35
-274|合肥新桥国际机场|12:15|每天|海口美兰国际机场|14:50|每天|02:35
-275|海口美兰国际机场|16:05|每天|贵阳龙洞堡国际机场|17:29|每天|01:24
-276|贵阳龙洞堡国际机场|18:46|每天|海口美兰国际机场|20:10|每天|01:24
-277|上海虹桥国际机场|09:00|每天|贵阳龙洞堡国际机场|11:35|每天|02:35
-278|贵阳龙洞堡国际机场|12:50|每天|上海虹桥国际机场|15:25|每天|02:35
-279|上海虹桥国际机场|16:40|每天|沈阳桃仙国际机场|18:30|每天|01:50
-280|上海浦东国际机场|05:50|周二、周五、周日|阿姆斯特丹史基浦机场|13:00|周二、周五、周日|14:10
-281|阿姆斯特丹史基浦机场|17:20|周二、周五、周日|上海浦东国际机场|14:30|周一、周三、周六|14:10
-282|沈阳桃仙国际机场|19:45|每天|上海虹桥国际机场|21:35|每天|01:50
-283|海口美兰国际机场|08:00|每天|沈阳桃仙国际机场|12:35|每天|04:35
-284|沈阳桃仙国际机场|14:25|每天|海口美兰国际机场|19:00|每天|04:35
-285|上海浦东国际机场|08:55|每天|南昌昌北国际机场|10:00|每天|01:05
-286|南昌昌北国际机场|11:15|每天|上海浦东国际机场|12:20|每天|01:05
-287|上海浦东国际机场|13:35|每天|长沙黄花国际机场|15:10|每天|01:35
-288|长沙黄花国际机场|16:25|每天|上海浦东国际机场|18:00|每天|01:35
-289|海口美兰国际机场|08:20|每天|长沙黄花国际机场|10:00|每天|01:40
-290|长沙黄花国际机场|11:20|每天|海口美兰国际机场|13:00|每天|01:40
-291|海口美兰国际机场|14:15|每天|南昌昌北国际机场|16:10|每天|01:55
-292|南昌昌北国际机场|17:25|每天|海口美兰国际机场|19:20|每天|01:55
-293|上海浦东国际机场|06:50|每天|吉隆坡国际机场|11:50|每天|06:00
-294|吉隆坡机场|13:30|每天|上海浦东国际机场|20:30|每天|06:00
-295|上海浦东国际机场|05:55|周二、周五、周日|新加坡樟宜机场|11:45|周二、周五、周日|06:00
-296|新加坡樟宜机场|13:00|周二、周五、周日|迪拜国际机场|17:15|周二、周五、周日|08:15
-297|迪拜国际机场|18:30|周二、周五、周日|新加坡樟宜机场|05:35|周二、周五、周日|08:15
-298|新加坡樟宜机场|07:50|周二、周五、周日|上海浦东国际机场|14:00|周二、周五、周日|06:00
-299|上海浦东国际机场|03:50|周三、周六|新加坡樟宜机场|10:00|周三、周六|06:00
-300|新加坡樟宜机场|11:15|周三、周六|马累维拉纳国际机场|12:50|周三、周六|04:35
-301|马累维拉纳国际机场|14:05|周三、周六|新加坡樟宜机场|21:40|周三、周六|04:35
-302|新加坡樟宜机场|22:55|周三、周日|上海浦东国际机场|05:05|周三、周日|06:10
-303|上海浦东国际机场|07:10|每天|丽江三义国际机场|11:00|每天|03:50
-304|丽江三义国际机场|12:30|每天|迪庆香格里拉机场|13:00|每天|00:30
-305|迪庆香格里拉机场|14:25|每天|丽江三义国际机场|14:55|每天|00:30
-306|丽江三义国际机场|15:10|每天|上海浦东国际机场|19:00|每天|03:50
-307|上海浦东国际机场|09:35|每天|厦门高崎国际机场|11:00|每天|01:25
-308|厦门高崎国际机场|12:15|每天|上海浦东国际机场|13:40|每天|01:25
-309|上海浦东国际机场|15:00|每天|丽江三义国际机场|18:50|每天|03:50
-310|丽江三义国际机场|20:05|每天|上海浦东国际机场|23:55|每天|03:50
-311|上海虹桥国际机场|08:30|每天|新加坡樟宜机场|14:30|每天|06:00
-312|新加坡樟宜机场|15:45|每天|上海虹桥国际机场|21:45|每天|06:00
-313|上海浦东国际机场|11:00|每天|新加坡樟宜机场|17:00|每天|06:00
-314|新加坡樟宜机场|18:30|每天|上海浦东国际机场|00:30|每天|06:00
-315|上海浦东国际机场|10:08|每天|成都双流国际机场|13:00|每天|02:52
-316|成都双流国际机场|17:30|每天|上海浦东国际机场|20:22|每天|02:52
-317|上海浦东国际机场|08:08|每天|成都双流国际机场|11:00|每天|02:52
-318|成都双流国际机场|12:15|每天|昌都邦达机场|13:15|每天|01:00
-319|昌都邦达机场|14:30|每天|林芝米林机场|15:10|每天|00:40
-320|林芝米林机场|16:25|每天|昌都邦达机场|17:05|每天|00:40
-321|昌都邦达机场|18:20|每天|成都双流国际机场|19:20|每天|01:00
-322|成都双流国际机场|20:35|每天|上海浦东国际机场|23:27|每天|02:52
-323|上海虹桥国际机场|09:45|每天|济南遥墙国际机场|11:00|每天|01:15
-324|济南遥墙国际机场|12:15|每天|上海虹桥国际机场|13:30|每天|01:15
-325|上海虹桥国际机场|14:45|每天|温州龙湾国际机场|15:50|每天|01:05
-326|温州龙湾国际机场|17:05|每天|上海虹桥国际机场|18:10|每天|01:05
-327|上海浦东国际机场|06:15|周一、周三、周六|伦敦希思罗机场|13:00|周一、周三、周六|14:45
-328|伦敦希思罗机场|19:15|周一、周三、周六|上海浦东国际机场|10:00|周二、周四、周日|14:45
-330|上海浦东国际机场|03:00|周一、周三、周六|惠灵顿国际机场|22:00|周一、周三、周六|15:00
-330|惠灵顿国际机场|03:00|周二、周四、周日|上海浦东国际机场|14:00|周二、周四、周日|15:00
-331|上海浦东国际机场|03:45|周二、周五、周日|巴黎戴高乐机场|11:00|周日、周二、周五|14:15
-332|巴黎戴高乐机场|17:15|周二、周五、周日|上海浦东国际机场|14:30|周一、周三、周六|14:15
-333|上海浦东国际机场|09:40|周一、周三、周六|巴黎戴高乐机场|16:30|周一、周三、周六|14:20
-334|巴黎戴高乐机场|19:40|周一、周三、周六|上海浦东国际机场|16:30|周二、周四、周日|14:20
-335|上海浦东国际机场|08:55|周二、周五、周日|苏黎世机场|16:00|周二、周五、周日|14:05
-336|苏黎世机场|21:25|周二、周五、周日|上海浦东国际机场|19:30|周一、周三、周六|14:05
-337|上海浦东国际机场|01:30|周二、周五、周日|赫尔辛基万塔机场|07:20|周二、周五、周日|11:50
-338|赫尔辛基万塔机场|09:00|周二、周五、周日|上海浦东国际机场|02:50|周一、周三、周六|11:50
-339|上海浦东国际机场|02:40|周二、周五、周日|奥斯陆国际机场|09:00|周二、周五、周日|13:20
-340|奥斯陆国际机场|11:30|周二、周五、周日|上海浦东国际机场|07:50|周一、周三、周六|13:20
-341|上海浦东国际机场|06:45|周二、周五、周日|雷克雅未克凯夫拉维克国际机场|15:00|周二、周五、周日|16:15
-342|雷克雅未克凯夫拉维克国际机场|17:45|周二、周五、周日|上海浦东国际机场|10:00|周一、周三、周六|16:15
-343|上海浦东国际机场|00:00|周一、周三、周五|安克雷奇泰德·史蒂文斯安克雷奇国际机场|19:10|周二、周四、周日|12:10
-344|安克雷奇泰德·史蒂文斯安克雷奇国际机场|20:25|周二、周四、周日|盐湖城国际机场|05:55|周一、周三、周五|07:30
-345|盐湖城国际机场|07:10|周一、周三、周五|安克雷奇泰德·史蒂文斯安克雷奇国际机场|12:40|周一、周三、周五|07:30
-346|安克雷奇泰德·史蒂文斯安克雷奇国际机场|13:55|周一、周三、周五|上海浦东国际机场|02:05|周二、周四、周日|12:10
-347|上海浦东国际机场|02:40|周二、周五、周日|维也纳国际机场|09:00|周二、周五、周日|13:20
-348|维也纳国际机场|13:40|周二、周五、周日|上海浦东国际机场|10:00|周一、周三、周六|13:20
-349|上海浦东国际机场|01:00|周二、周五、周日|马赛国际机场|08:35|周二、周五、周日|14:35
-350|马赛国际机场|10:25|周二、周五、周日|上海浦东国际机场|08:00|周一、周三、周六|14:35
-351|上海浦东国际机场|06:20|周二、周五、周日|迈阿密国际机场|16:00|周二、周五、周日|22:40
-352|迈阿密国际机场|17:20|周二、周五、周日|上海浦东国际机场|05:00|周二、周四、周六|22:40
-353|上海浦东国际机场|00:00|周二、周五、周日|波士顿洛根国际机场|06:50|周二、周五、周日|19:50
-354|波士顿洛根国际机场|08:10|周二、周五、周日|上海浦东国际机场|17:00|周一、周三、周六|19:50
-355|上海浦东国际机场|10:10|每天|马累维拉纳国际机场|15:45|每天|08:35
-356|马累维拉纳国际机场|17:00|每天|上海浦东国际机场|04:35|每天|08:35
-357|上海浦东国际机场|06:30|周一、周三、周六|法兰克福机场|14:00|周一、周三、周六|14:10
-358|法兰克福机场|17:00|周一、周三、周六|上海浦东国际机场|14:10|周二、周四、周日|14:10
-359|上海虹桥国际机场|09:50|每天|香港国际机场|12:00|每天|02:10
-360|香港国际机场|17:50|每天|上海虹桥国际机场|20:00|每天|02:10
-361|海口美兰国际机场|08:15|每天|三沙永兴机场|10:00|每天|01:45
-362|三沙永兴机场|11:15|每天|海口美兰国际机场|13:00|每天|01:45
-363|海口美兰国际机场|14:15|每天|上海浦东国际机场|17:00|每天|02:45
-364|上海浦东国际机场|18:15|每天|海口美兰国际机场|21:00|每天|02:45
-365|海口美兰国际机场|22:15|每天|成都天府国际机场|00:35|每天|02:20
-366|成都天府国际机场|01:50|每天|海口美兰国际机场|04:10|每天|02:20
-367|海口美兰国际机场|09:00|每天|广州白云国际机场|10:00|每天|01:00
-368|广州白云国际机场|11:15|每天|北京首都国际机场|15:25|每天|03:10
-369|北京首都国际机场|16:40|每天|广州白云国际机场|19:50|每天|03:10
-370|广州白云国际机场|21:05|每天|海口美兰国际机场|22:05|每天|01:00
-371|上海浦东国际机场|09:21|每天|厦门高崎国际机场|10:44|每天|01:25
-372|厦门高崎国际机场|11:59|每天|台北桃园国际机场|12:44|每天|00:45
-373|台北桃园国际机场|13:59|每天|厦门高崎国际机场|14:44|每天|00:45
-374|厦门高崎国际机场|15:59|每天|上海浦东国际机场|17:24|每天|01:25
-375|上海浦东国际机场|18:39|每天|深圳宝安国际机场|20:44|每天|02:06
-376|深圳宝安国际机场|06:00|每天|上海浦东国际机场|08:06|每天|02:06
-377|上海浦东国际机场|10:10|每天|马累维拉纳国际机场|15:45|每天|08:35
-378|马累维拉纳国际机场|17:00|每天|上海浦东国际机场|04:35|每天|08:35
-379|上海浦东国际机场|03:00|每天|东京羽田国际机场|04:55|每天|01:55
-380|东京羽田国际机场|06:10|每天|新加坡樟宜机场|13:25|每天|07:15
-381|新加坡樟宜机场|14:40|每天|东京羽田国际机场|21:55|每天|07:15
-382|东京羽田国际机场|23:10|每天|上海浦东国际机场|01:05|每天|01:55
-383|上海浦东国际机场|06:30|周二、周四、周日|法兰克福机场|14:00|周二、周四、周日|14:10
-384|法兰克福机场|17:00|周二、周四、周日|上海浦东国际机场|14:10|周一、周三、周五|14:10
-385|上海虹桥国际机场|07:00|每天|广州白云国际机场|08:50|每天|01:50
-386|广州白云国际机场|10:05|每天|深圳宝安国际机场|10:30|每天|00:25
-387|深圳宝安国际机场|11:45|每天|广州白云国际机场|12:10|每天|00:25
-388|广州白云国际机场|13:25|每天|上海虹桥国际机场|15:15|每天|01:50
-389|上海虹桥国际机场|16:30|每天|拉萨贡嘎国际机场|21:20|每天|04:50
-390|拉萨贡嘎国际机场|22:35|每天|上海虹桥国际机场|03:25|每天|04:50
-391|上海虹桥国际机场|07:15|每天|喀什徕宁国际机场|10:00|每天|02:45
-392|喀什徕宁国际机场|11:15|每天|上海虹桥国际机场|14:00|每天|02:45
-393|上海虹桥国际机场|15:15|每天|郑州新郑国际机场|16:35|每天|01:20
-394|郑州新郑国际机场|17:50|每天|上海虹桥国际机场|19:10|每天|01:20
-395|上海虹桥国际机场|07:50|每天|威海大水泊国际机场|09:00|每天|01:10
-396|威海大水泊国际机场|10:15|每天|上海虹桥国际机场|11:25|每天|01:10
-397|上海虹桥国际机场|12:40|每天|石家庄正定国际机场|14:20|每天|01:40
-398|石家庄正定国际机场|15:35|每天|上海虹桥国际机场|17:15|每天|01:40
-399|上海虹桥国际机场|18:30|每天|太原武宿国际机场|20:20|每天|01:50
-400|太原武宿国际机场|21:35|每天|上海虹桥国际机场|23:25|每天|01:50
-401|上海虹桥国际机场|07:45|每天|珠海金湾机场|10:00|每天|02:15
-402|珠海金湾机场|11:15|每天|上海浦东国际机场|13:35|每天|02:20
-403|上海浦东国际机场|14:50|每天|银川河东国际机场|17:35|每天|02:45
-404|银川河东国际机场|18:50|每天|上海虹桥国际机场|21:30|每天|02:40
-405|上海浦东国际机场|07:00|每天|喀什徕宁国际机场|13:50|每天|06:50
-406|喀什徕宁国际机场|15:10|每天|上海浦东国际机场|22:00|每天|06:50
-407|上海浦东国际机场|07:00|每天|衡阳南岳机场|09:50|每天|01:50
-408|衡阳南岳机场|10:10|每天|上海浦东国际机场|12:00|每天|01:50
-409|上海浦东国际机场|13:15|每天|天津滨海国际机场|14:55|每天|01:40
-410|天津滨海国际机场|16:10|每天|上海浦东国际机场|17:50|每天|01:40
-411|上海浦东国际机场|19:05|每天|武汉天河国际机场|20:20|每天|01:15
-412|武汉天河国际机场|21:35|每天|上海浦东国际机场|22:50|每天|01:15
-413|上海浦东国际机场|07:05|每天|广州白云国际机场|09:00|每天|01:55
-414|广州白云国际机场|10:15|每天|新加坡樟宜机场|14:40|每天|04:25
-415|新加坡樟宜机场|15:55|每天|广州白云国际机场|20:20|每天|04:25
-416|广州白云国际机场|21:35|每天|上海浦东国际机场|23:30|每天|01:55
-417|上海浦东国际机场|07:50|每天|台北桃园国际机场|09:00|每天|01:10
-418|台北桃园国际机场|10:15|每天|新加坡樟宜机场|15:10|每天|04:55
-419|新加坡樟宜机场|16:25|每天|台北桃园国际机场|21:20|每天|04:55
-420|台北桃园国际机场|22:35|每天|上海浦东国际机场|23:45|每天|01:10
-421|上海浦东国际机场|07:00|每天|三亚凤凰国际机场|10:10|每天|03:10
-422|三亚凤凰国际机场|11:25|每天|上海浦东国际机场|14:35|每天|03:10
-423|上海浦东国际机场|15:50|每天|三亚凤凰国际机场|19:00|每天|03:10
-424|三亚凤凰国际机场|20:15|每天|上海浦东国际机场|23:25|每天|03:10
-425|上海浦东国际机场|09:50|每天|台北桃园国际机场|11:00|每天|01:10
-426|台北桃园国际机场|12:15|每天|成都双流国际机场|15:25|每天|03:10
-427|成都双流国际机场|16:40|每天|上海浦东国际机场|19:30|每天|02:50
-428|上海浦东国际机场|09:50|每天|成都双流国际机场|12:40|每天|02:50
-429|成都双流国际机场|13:55|每天|台北桃园国际机场|17:05|每天|03:10
-430|台北桃园国际机场|18:20|每天|上海浦东国际机场|19:30|每天|01:10
-431|上海浦东国际机场|07:05|每天|北京首都国际机场|09:00|每天|01:55
-432|北京首都国际机场|10:15|每天|上海浦东国际机场|12:10|每天|01:55
-433|上海浦东国际机场|13:25|每天|北京首都国际机场|15:20|每天|01:55
-434|北京首都国际机场|16:35|每天|上海浦东国际机场|18:30|每天|01:55
-435|上海浦东国际机场|19:45|每天|北京首都国际机场|21:40|每天|01:55
-436|北京首都国际机场|22:55|每天|上海浦东国际机场|00:50|每天|01:55
-437|上海浦东国际机场|00:15|周二、周五、周日|洛杉矶安大略国际机场|01:00|周二、周五、周日|16:45
-438|洛杉矶安大略国际机场|03:05|周二、周五、周日|上海浦东国际机场|12:00|周一、周三、周六|16:45
-439|上海浦东国际机场|00:30|周二、周五、周日|温哥华国际机场|00:00|周二、周五、周日|15:30
-440|温哥华国际机场|03:00|周二、周五、周日|上海浦东国际机场|06:00|周一、周三、周六|15:30
-441|上海浦东国际机场|07:30|每天|伊尔库茨克国际机场|13:55|每天|04:25
-442|伊尔库茨克国际机场|13:55|每天|上海浦东国际机场|18:00|每天|04:25
-443|上海浦东国际机场|22:00|每天|东京羽田国际机场|00:50|每天|02:50
-444|东京羽田国际机场|03:05|每天|上海浦东国际机场|04:55|每天|02:50
-445|上海浦东国际机场|07:30|周一、周四、周六|西雅图-塔科马国际机场|07:22|周一、周四、周六|15:52
-446|西雅图-塔科马国际机场|09:30|周一、周四、周六|上海浦东国际机场|17:22|周二、周五、周日|15:52
-447|上海浦东国际机场|06:00|周二、周四、周日|檀香山|00:00|周二、周四、周日|12:00
-448|檀香山|06:00|周二、周四、周日|上海浦东国际机场|10:00|周一、周三、周五|12:00
-449|上海浦东国际机场|06:15|周二、周四、周日|伦敦希思罗机场|13:00|周二、周四、周日|14:45
-450|伦敦希思罗机场|19:15|周二、周四、周日|上海浦东国际机场|18:00|周一、周三、周五|14:45
-451|上海浦东国际机场|05:30|每天|迪庆香格里拉机场|09:05|每天|03:35
-452|迪庆香格里拉机场|10:20|每天|上海虹桥国际机场|13:55|每天|03:35
-453|上海虹桥国际机场|15:10|每天|迪庆香格里拉机场|18:45|每天|03:35
-454|迪庆香格里拉机场|20:00|每天|上海浦东国际机场|23:35|每天|03:35
-455|三亚凤凰国际机场|07:55|每天|无锡硕放国际机场|11:00|每天|03:05
-456|无锡硕放国际机场|12:15|每天|三亚凤凰国际机场|15:20|每天|03:05
-457|三亚凤凰国际机场|16:35|每天|无锡硕放国际机场|19:40|每天|03:05
-458|无锡硕放国际机场|20:55|每天|三亚凤凰国际机场|00:00|每天|03:05
-459|三亚凤凰国际机场|01:15|每天|广州白云国际机场|02:40|每天|01:25
-460|广州白云国际机场|03:15|每天|三亚凤凰国际机场|04:40|每天|01:25
-461|上海浦东国际机场|08:40|每天|昆明长水国际机场|10:55|每天|02:15
-462|昆明长水国际机场|12:10|每天|上海浦东国际机场|14:25|每天|02:15
-463|上海浦东国际机场|15:40|每天|昆明长水国际机场|17:55|每天|02:15
-464|昆明长水国际机场|19:10|每天|上海浦东国际机场|21:25|每天|02:15
-465|上海浦东国际机场|05:00|周一、周三、周六|盐湖城国际机场|09:00|周一、周三、周六|18:10
-466|盐湖城国际机场|11:50|周一、周三、周六|上海浦东国际机场|21:00|周二、周四、周日|18:10
-467|上海浦东国际机场|05:00|周二、周五、周日|丹佛国际机场|09:00|周二、周五、周日|19:00
-468|丹佛国际机场|12:00|周二、周五、周日|上海浦东国际机场|22:00|周一、周三、周六|19:00
-469|上海浦东国际机场|00:15|周二、周五、周日|新奥尔良国际机场|06:45|周二、周五、周日|20:30
-470|新奥尔良国际机场|09:00|周二、周五、周日|上海浦东国际机场|19:30|周一、周三、周六|20:30
-471|上海浦东国际机场|04:45|周二、周五、周日|芝加哥奥黑尔国际机场|06:45|周二、周五、周日|20:00
-472|芝加哥奥黑尔国际机场|09:00|周二、周五、周日|上海浦东国际机场|19:00|周一、周三、周六|20:00
-473|上海浦东国际机场|05:00|周二、周五、周日|旧金山国际机场|05:00|周二、周五、周日|16:00
-474|旧金山国际机场|08:00|周二、周五、周日|上海浦东国际机场|16:00|周一、周三、周六|16:00
-475|上海浦东国际机场|09:00|周一、周三、周六|洛杉矶安大略国际机场|09:45|周一、周三、周六|16:45
-476|洛杉矶安大略国际机场|11:15|周一、周三、周六|上海浦东国际机场|20:00|周二、周四、周日|16:45
-477|上海浦东国际机场|06:30|每天|雅加达国际机场|13:00|每天|07:30
-478|雅加达国际机场|14:15|每天|上海浦东国际机场|22:45|每天|07:30
-479|上海浦东国际机场|01:15|每天|首尔仁川国际机场|03:35|每天|01:25
-480|首尔仁川国际机场|04:50|每天|上海浦东国际机场|05:15|每天|01:25
-481|上海浦东国际机场|11:15|周二、周五、周日|拉斯维加斯哈里·瑞德国际机场|11:45|周二、周五、周日|16:30
-482|拉斯维加斯哈里·瑞德国际机场|15:00|周二、周五、周日|上海浦东国际机场|23:30|周一、周三、周六|16:30
-483|上海浦东国际机场|00:45|周二、周五、周日|马德里巴拉哈斯机场|07:40|周二、周五、周日|13:55
-484|马德里巴拉哈斯机场|11:00|周二、周五、周日|上海浦东国际机场|07:55|周一、周三、周六|13:55
-485|上海浦东国际机场|10:05|周三、周日|布宜诺斯艾利斯埃塞萨国际机场|22:45|周三、周日|23:40
-486|布宜诺斯艾利斯埃塞萨国际机场|01:20|周一、周四|上海浦东国际机场|12:00|周二、周五|23:40
-487|上海浦东国际机场|08:05|周二、周五、周日|米兰马尔彭萨机场|13:20|周二、周五、周日|12:15
-488|米兰马尔彭萨机场|16:30|周二、周五、周日|上海浦东国际机场|11:45|周一、周三、周六|12:15
-489|上海浦东国际机场|01:05|每天|墨尔本机场|13:20|每天|10:15
-490|墨尔本机场|14:50|每天|上海浦东国际机场|23:05|每天|10:15
-491|上海浦东国际机场|09:30|每天|奥克兰国际机场|17:00|每天|11:30
-492|奥克兰国际机场|19:30|每天|上海浦东国际机场|03:00|每天|11:30
-493|上海浦东国际机场|09:10|每天|东京羽田国际机场|13:00|每天|02:50
-494|东京羽田国际机场|15:00|每天|上海虹桥国际机场|16:50|每天|02:50
-495|上海虹桥国际机场|18:45|每天|东京羽田国际机场|22:35|每天|02:50
-496|东京羽田国际机场|23:50|每天|上海浦东国际机场|01:40|每天|02:50
-497|上海浦东国际机场|08:15|周一、周三、周六|阿姆斯特丹史基浦机场|15:25|周一、周三、周六|14:10
-498|阿姆斯特丹史基浦机场|16:40|周一、周三、周六|上海浦东国际机场|13:50|周二、周四、周日|14:10
-499|上海浦东国际机场|11:00|每天|伊斯坦布尔机场|15:45|每天|10:45
-500|伊斯坦布尔机场|17:00|每天|上海浦东国际机场|09:45|每天|10:45
-501|上海浦东国际机场|08:00|每天|吉隆坡国际机场|13:50|每天|05:50
-502|吉隆坡国际机场|16:40|每天|上海浦东国际机场|22:00|每天|05:50
-503|上海虹桥国际机场|09:05|每天|新加坡樟宜机场|15:15|每天|06:10
-504|新加坡樟宜机场|17:10|每天|上海虹桥国际机场|23:20|每天|06:10
-`;
+/* ══════════════════════════════════════════
+   星尘收集者
+   ══════════════════════════════════════════ */
+(() => {
+  "use strict";
 
-/* ═══════════════════════════════════════════════════════════════
-   机场三语名称表
-   ═══════════════════════════════════════════════════════════════ */
-const AP = {
-'海口美兰国际机场':{en:['Haikou Meilan Intl','Haikou'],fr:['Aéroport int. de Haikou Meilan','Haikou']},
-'上海浦东国际机场':{en:['Shanghai Pudong Intl','Shanghai'],fr:['Aéroport int. de Shanghai Pudong','Shanghai']},
-'上海虹桥国际机场':{en:['Shanghai Hongqiao Intl','Shanghai'],fr:['Aéroport int. de Shanghai Hongqiao','Shanghai']},
-'新加坡樟宜机场':{en:['Singapore Changi','Singapore'],fr:['Aéroport de Singapour Changi','Singapour']},
-'广州白云国际机场':{en:['Guangzhou Baiyun Intl','Guangzhou'],fr:['Aéroport int. de Canton Baiyun','Canton']},
-'北京大兴国际机场':{en:['Beijing Daxing Intl','Beijing'],fr:['Aéroport int. de Pékin Daxing','Pékin']},
-'北京首都国际机场':{en:['Beijing Capital Intl','Beijing'],fr:['Aéroport int. de Pékin-Capitale','Pékin']},
-'乌鲁木齐天山国际机场':{en:['Urumqi Tianshan Intl','Urumqi'],fr:['Aéroport int. d\'Urumqi Tianshan','Ürümqi']},
-'林芝米林机场':{en:['Nyingchi Mainling','Nyingchi'],fr:['Aéroport de Nyingchi Mainling','Nyingchi']},
-'拉萨贡嘎国际机场':{en:['Lhasa Gonggar Intl','Lhasa'],fr:['Aéroport int. de Lhassa Gonggar','Lhassa']},
-'西安咸阳国际机场':{en:['Xi\'an Xianyang Intl','Xi\'an'],fr:['Aéroport int. de Xi\'an Xianyang','Xi\'an']},
-'青岛胶东国际机场':{en:['Qingdao Jiaodong Intl','Qingdao'],fr:['Aéroport int. de Qingdao Jiaodong','Qingdao']},
-'南京禄口国际机场':{en:['Nanjing Lukou Intl','Nanjing'],fr:['Aéroport int. de Nankin Lukou','Nankin']},
-'呼和浩特白塔国际机场':{en:['Hohhot Baita Intl','Hohhot'],fr:['Aéroport int. de Hohhot Baita','Hohhot']},
-'南宁吴圩国际机场':{en:['Nanning Wuxu Intl','Nanning'],fr:['Aéroport int. de Nanning Wuxu','Nanning']},
-'悉尼金斯福德·史密斯机场':{en:['Sydney Kingsford Smith','Sydney'],fr:['Aéroport Kingsford Smith de Sydney','Sydney']},
-'图卢兹-布拉尼亚克机场':{en:['Toulouse-Blagnac','Toulouse'],fr:['Aéroport de Toulouse-Blagnac','Toulouse']},
-'昆明长水国际机场':{en:['Kunming Changshui Intl','Kunming'],fr:['Aéroport int. de Kunming Changshui','Kunming']},
-'杭州萧山国际机场':{en:['Hangzhou Xiaoshan Intl','Hangzhou'],fr:['Aéroport int. de Hangzhou Xiaoshan','Hangzhou']},
-'丽江三义国际机场':{en:['Lijiang Sanyi Intl','Lijiang'],fr:['Aéroport int. de Lijiang Sanyi','Lijiang']},
-'西雅图-塔科马国际机场':{en:['Seattle-Tacoma Intl','Seattle'],fr:['Aéroport int. de Seattle-Tacoma','Seattle']},
-'东京羽田国际机场':{en:['Tokyo Haneda','Tokyo'],fr:['Aéroport de Tokyo Haneda','Tokyo']},
-'纽约肯尼迪国际机场':{en:['New York JFK','New York'],fr:['Aéroport JFK de New York','New York']},
-'深圳宝安国际机场':{en:['Shenzhen Bao\'an Intl','Shenzhen'],fr:['Aéroport int. de Shenzhen Bao\'an','Shenzhen']},
-'兰州中川国际机场':{en:['Lanzhou Zhongchuan Intl','Lanzhou'],fr:['Aéroport int. de Lanzhou Zhongchuan','Lanzhou']},
-'成都天府国际机场':{en:['Chengdu Tianfu Intl','Chengdu'],fr:['Aéroport int. de Chengdu Tianfu','Chengdu']},
-'成都双流国际机场':{en:['Chengdu Shuangliu Intl','Chengdu'],fr:['Aéroport int. de Chengdu Shuangliu','Chengdu']},
-'重庆江北国际机场':{en:['Chongqing Jiangbei Intl','Chongqing'],fr:['Aéroport int. de Chongqing Jiangbei','Chongqing']},
-'嘉峪关机场':{en:['Jiayuguan Airport','Jiayuguan'],fr:['Aéroport de Jiayuguan','Jiayuguan']},
-'台北桃园国际机场':{en:['Taipei Taoyuan Intl','Taipei'],fr:['Aéroport int. de Taipei Taoyuan','Taipei']},
-'吉隆坡国际机场':{en:['Kuala Lumpur Intl','Kuala Lumpur'],fr:['Aéroport int. de Kuala Lumpur','Kuala Lumpur']},
-'吉隆坡机场':{en:['Kuala Lumpur Intl','Kuala Lumpur'],fr:['Aéroport int. de Kuala Lumpur','Kuala Lumpur']},
-'大阪关西国际机场':{en:['Osaka Kansai Intl','Osaka'],fr:['Aéroport int. du Kansai d\'Osaka','Osaka']},
-'香港国际机场':{en:['Hong Kong Intl','Hong Kong'],fr:['Aéroport int. de Hong Kong','Hong Kong']},
-'天津滨海国际机场':{en:['Tianjin Binhai Intl','Tianjin'],fr:['Aéroport int. de Tianjin Binhai','Tianjin']},
-'福州长乐国际机场':{en:['Fuzhou Changle Intl','Fuzhou'],fr:['Aéroport int. de Fuzhou Changle','Fuzhou']},
-'澳门国际机场':{en:['Macau Intl','Macau'],fr:['Aéroport int. de Macao','Macao']},
-'西双版纳嘎洒国际机场':{en:['Xishuangbanna Gasa Intl','Xishuangbanna'],fr:['Aéroport int. de Xishuangbanna Gasa','Xishuangbanna']},
-'西宁曹家堡国际机场':{en:['Xining Caojiabao Intl','Xining'],fr:['Aéroport int. de Xining Caojiabao','Xining']},
-'长春龙嘉国际机场':{en:['Changchun Longjia Intl','Changchun'],fr:['Aéroport int. de Changchun Longjia','Changchun']},
-'合肥新桥国际机场':{en:['Hefei Xinqiao Intl','Hefei'],fr:['Aéroport int. de Hefei Xinqiao','Hefei']},
-'贵阳龙洞堡国际机场':{en:['Guiyang Longdongbao Intl','Guiyang'],fr:['Aéroport int. de Guiyang Longdongbao','Guiyang']},
-'沈阳桃仙国际机场':{en:['Shenyang Taoxian Intl','Shenyang'],fr:['Aéroport int. de Shenyang Taoxian','Shenyang']},
-'阿姆斯特丹史基浦机场':{en:['Amsterdam Schiphol','Amsterdam'],fr:['Aéroport d\'Amsterdam-Schiphol','Amsterdam']},
-'南昌昌北国际机场':{en:['Nanchang Changbei Intl','Nanchang'],fr:['Aéroport int. de Nanchang Changbei','Nanchang']},
-'长沙黄花国际机场':{en:['Changsha Huanghua Intl','Changsha'],fr:['Aéroport int. de Changsha Huanghua','Changsha']},
-'迪庆香格里拉机场':{en:['Diqing Shangri-La','Shangri-La'],fr:['Aéroport de Diqing Shangri-La','Shangri-La']},
-'昌都邦达机场':{en:['Qamdo Bamda','Qamdo'],fr:['Aéroport de Qamdo Bamda','Qamdo']},
-'济南遥墙国际机场':{en:['Jinan Yaoqiang Intl','Jinan'],fr:['Aéroport int. de Jinan Yaoqiang','Jinan']},
-'温州龙湾国际机场':{en:['Wenzhou Longwan Intl','Wenzhou'],fr:['Aéroport int. de Wenzhou Longwan','Wenzhou']},
-'伦敦希思罗机场':{en:['London Heathrow','London'],fr:['Aéroport de Londres-Heathrow','Londres']},
-'惠灵顿国际机场':{en:['Wellington Intl','Wellington'],fr:['Aéroport int. de Wellington','Wellington']},
-'巴黎戴高乐机场':{en:['Paris Charles de Gaulle','Paris'],fr:['Aéroport Paris-Charles-de-Gaulle','Paris']},
-'苏黎世机场':{en:['Zurich Airport','Zurich'],fr:['Aéroport de Zurich','Zurich']},
-'赫尔辛基万塔机场':{en:['Helsinki-Vantaa','Helsinki'],fr:['Aéroport d\'Helsinki-Vantaa','Helsinki']},
-'奥斯陆国际机场':{en:['Oslo Intl','Oslo'],fr:['Aéroport int. d\'Oslo','Oslo']},
-'雷克雅未克凯夫拉维克国际机场':{en:['Reykjavík Keflavík Intl','Reykjavík'],fr:['Aéroport int. de Reykjavík-Keflavík','Reykjavík']},
-'安克雷奇泰德·史蒂文斯安克雷奇国际机场':{en:['Ted Stevens Anchorage Intl','Anchorage'],fr:['Aéroport int. Ted Stevens d\'Anchorage','Anchorage']},
-'盐湖城国际机场':{en:['Salt Lake City Intl','Salt Lake City'],fr:['Aéroport int. de Salt Lake City','Salt Lake City']},
-'维也纳国际机场':{en:['Vienna Intl','Vienna'],fr:['Aéroport int. de Vienne','Vienne']},
-'马赛国际机场':{en:['Marseille Intl','Marseille'],fr:['Aéroport int. de Marseille','Marseille']},
-'波士顿洛根国际机场':{en:['Boston Logan Intl','Boston'],fr:['Aéroport int. Logan de Boston','Boston']},
-'法兰克福机场':{en:['Frankfurt Airport','Frankfurt'],fr:['Aéroport de Francfort','Francfort']},
-'三沙永兴机场':{en:['Sansha Yongxing','Sansha'],fr:['Aéroport de Sansha Yongxing','Sansha']},
-'檀香山':{en:['Honolulu','Honolulu'],fr:['Honolulu','Honolulu']},
-'伊斯坦布尔机场':{en:['Istanbul Airport','Istanbul'],fr:['Aéroport d\'Istanbul','Istanbul']},
-'洛杉矶国际机场':{en:['Los Angeles Intl','Los Angeles'],fr:['Aéroport int. de Los Angeles','Los Angeles']},
-'洛杉矶安大略国际机场':{en:['LA/Ontario Intl','Ontario'],fr:['Aéroport int. d\'Ontario','Ontario']},
-'温哥华国际机场':{en:['Vancouver Intl','Vancouver'],fr:['Aéroport int. de Vancouver','Vancouver']},
-'伊尔库茨克国际机场':{en:['Irkutsk Intl','Irkutsk'],fr:['Aéroport int. d\'Irkoutsk','Irkoutsk']},
-'丹佛国际机场':{en:['Denver Intl','Denver'],fr:['Aéroport int. de Denver','Denver']},
-'新奥尔良国际机场':{en:['New Orleans Intl','New Orleans'],fr:['Aéroport int. de La Nouvelle-Orléans','La Nouvelle-Orléans']},
-'芝加哥奥黑尔国际机场':{en:['Chicago O\'Hare Intl','Chicago'],fr:['Aéroport int. O\'Hare de Chicago','Chicago']},
-'旧金山国际机场':{en:['San Francisco Intl','San Francisco'],fr:['Aéroport int. de San Francisco','San Francisco']},
-'雅加达国际机场':{en:['Jakarta Intl','Jakarta'],fr:['Aéroport int. de Jakarta','Jakarta']},
-'莫斯科谢列梅捷沃国际机场':{en:['Moscow Sheremetyevo Intl','Moscow'],fr:['Aéroport int. de Moscou-Cheremetievo','Moscou']},
-'马德里巴拉哈斯机场':{en:['Madrid Barajas','Madrid'],fr:['Aéroport de Madrid-Barajas','Madrid']},
-'首尔仁川国际机场':{en:['Seoul Incheon Intl','Seoul'],fr:['Aéroport int. d\'Incheon','Séoul']},
-'拉斯维加斯哈里·瑞德国际机场':{en:['Las Vegas Harry Reid Intl','Las Vegas'],fr:['Aéroport int. Harry Reid de Las Vegas','Las Vegas']},
-'布宜诺斯艾利斯埃塞萨国际机场':{en:['Buenos Aires Ezeiza Intl','Buenos Aires'],fr:['Aéroport int. d\'Ezeiza','Buenos Aires']},
-'米兰马尔彭萨机场':{en:['Milan Malpensa','Milan'],fr:['Aéroport de Milan-Malpensa','Milan']},
-'墨尔本机场':{en:['Melbourne Airport','Melbourne'],fr:['Aéroport de Melbourne','Melbourne']},
-'无锡硕放国际机场':{en:['Wuxi Shuofang Intl','Wuxi'],fr:['Aéroport int. de Wuxi Shuofang','Wuxi']},
-'烟台蓬莱国际机场':{en:['Yantai Penglai Intl','Yantai'],fr:['Aéroport int. de Yantai Penglai','Yantai']},
-'武汉天河国际机场':{en:['Wuhan Tianhe Intl','Wuhan'],fr:['Aéroport int. de Wuhan Tianhe','Wuhan']},
-'三亚凤凰国际机场':{en:['Sanya Phoenix Intl','Sanya'],fr:['Aéroport int. de Sanya Phoenix','Sanya']},
-'喀什徕宁国际机场':{en:['Kashgar Laining Intl','Kashgar'],fr:['Aéroport int. de Kashgar Laining','Kachgar']},
-'郑州新郑国际机场':{en:['Zhengzhou Xinzheng Intl','Zhengzhou'],fr:['Aéroport int. de Zhengzhou Xinzheng','Zhengzhou']},
-'威海大水泊国际机场':{en:['Weihai Dashuipo Intl','Weihai'],fr:['Aéroport int. de Weihai Dashuipo','Weihai']},
-'石家庄正定国际机场':{en:['Shijiazhuang Zhengding Intl','Shijiazhuang'],fr:['Aéroport int. de Shijiazhuang Zhengding','Shijiazhuang']},
-'太原武宿国际机场':{en:['Taiyuan Wusu Intl','Taiyuan'],fr:['Aéroport int. de Taiyuan Wusu','Taiyuan']},
-'珠海金湾机场':{en:['Zhuhai Jinwan Airport','Zhuhai'],fr:['Aéroport de Zhuhai Jinwan','Zhuhai']},
-'银川河东国际机场':{en:['Yinchuan Hedong Intl','Yinchuan'],fr:['Aéroport int. de Yinchuan Hedong','Yinchuan']},
-'衡阳南岳机场':{en:['Hengyang Nanyue','Hengyang'],fr:['Aéroport de Hengyang Nanyue','Hengyang']},
-'鄂尔多斯伊金霍洛国际机场':{en:['Ordos Ejin Horo Intl','Ordos'],fr:['Aéroport int. d\'Ordos Ejin Horo','Ordos']},
-'厦门高崎国际机场':{en:['Xiamen Gaoqi Intl','Xiamen'],fr:['Aéroport int. de Xiamen Gaoqi','Xiamen']},
-'迪拜国际机场':{en:['Dubai Intl','Dubai'],fr:['Aéroport int. de Dubaï','Dubaï']},
-'迈阿密国际机场':{en:['Miami Intl','Miami'],fr:['Aéroport int. de Miami','Miami']},
-'敦煌莫高国际机场':{en:['Dunhuang Mogao Intl','Dunhuang'],fr:['Aéroport int. de Dunhuang Mogao','Dunhuang']}
-};
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
 
-/* ═══════════════════════════════════════════════════════════════
-   机场搜索别名（拼音 / 三字码 / 简称）
-   ═══════════════════════════════════════════════════════════════ */
-const AIRPORT_ALIAS = {
-'海口美兰国际机场':['海口','美兰','haikou','ml','hk'],
-'上海浦东国际机场':['浦东','上海','pudong','shanghai','pvg','sh'],
-'上海虹桥国际机场':['虹桥','上海','hongqiao','sha','sh'],
-'广州白云国际机场':['广州','白云','guangzhou','can','gz'],
-'北京大兴国际机场':['北京','大兴','daxing','pkx','bj'],
-'北京首都国际机场':['北京','首都','capital','pek','bj'],
-'深圳宝安国际机场':['深圳','宝安','shenzhen','szx','sz'],
-'成都天府国际机场':['成都','天府','chengdu','tfu','cd'],
-'成都双流国际机场':['成都','双流','chengdu','ctu','cd'],
-'重庆江北国际机场':['重庆','江北','chongqing','ckg','cq'],
-'西安咸阳国际机场':['西安','咸阳','xian','xiy','xa'],
-'杭州萧山国际机场':['杭州','萧山','hangzhou','hgh','hz'],
-'南京禄口国际机场':['南京','禄口','nanjing','nkg','nj'],
-'厦门高崎国际机场':['厦门','高崎','xiamen','xmn','xm'],
-'青岛胶东国际机场':['青岛','胶东','qingdao','tao','qd'],
-'武汉天河国际机场':['武汉','天河','wuhan','wuh','wh'],
-'长沙黄花国际机场':['长沙','黄花','changsha','csx','cs'],
-'昆明长水国际机场':['昆明','长水','kunming','kmg','km'],
-'三亚凤凰国际机场':['三亚','凤凰','sanya','syx','sy'],
-'乌鲁木齐天山国际机场':['乌鲁木齐','天山','urumqi','urc','wlmq'],
-'拉萨贡嘎国际机场':['拉萨','贡嘎','lhasa','lxa','ls'],
-'新加坡樟宜机场':['新加坡','樟宜','singapore','sin','sg'],
-'东京羽田国际机场':['东京','羽田','tokyo','hnd','dj'],
-'香港国际机场':['香港','hongkong','hkg','xg'],
-'首尔仁川国际机场':['首尔','仁川','seoul','icn','se'],
-'迪拜国际机场':['迪拜','dubai','dxb','db'],
-'伦敦希思罗机场':['伦敦','希思罗','london','lhr','ld'],
-'巴黎戴高乐机场':['巴黎','戴高乐','paris','cdg','bl'],
-'纽约肯尼迪国际机场':['纽约','肯尼迪','newyork','jfk','ny'],
-'洛杉矶国际机场':['洛杉矶','losangeles','lax','lsj'],
-'旧金山国际机场':['旧金山','sanfrancisco','sfo','jsj'],
-'西雅图-塔科马国际机场':['西雅图','塔科马','seattle','sea','xyt'],
-'温哥华国际机场':['温哥华','vancouver','yvr','wgh'],
-'悉尼金斯福德·史密斯机场':['悉尼','sydney','syd','xn'],
-'墨尔本机场':['墨尔本','melbourne','mel','meb'],
-'奥克兰国际机场':['奥克兰','auckland','akl'],
-'法兰克福机场':['法兰克福','frankfurt','fra','flkf'],
-'阿姆斯特丹史基浦机场':['阿姆斯特丹','史基浦','amsterdam','ams'],
-'苏黎世机场':['苏黎世','zurich','zrh','szs'],
-'赫尔辛基万塔机场':['赫尔辛基','helsinki','hel','hexj'],
-'马德里巴拉哈斯机场':['马德里','madrid','mad','mdl'],
-'维也纳国际机场':['维也纳','vienna','vie','wyn'],
-'米兰马尔彭萨机场':['米兰','milan','mxp','ml'],
-'伊斯坦布尔机场':['伊斯坦布尔','istanbul','ist'],
-'莫斯科谢列梅捷沃国际机场':['莫斯科','sheremetyevo','svo','msk'],
-'雅加达国际机场':['雅加达','jakarta','cgk','yjd'],
-'吉隆坡国际机场':['吉隆坡','kualalumpur','klia','jlp'],
-'大阪关西国际机场':['大阪','关西','osaka','kix','db'],
-'檀香山':['檀香山','honolulu','hnl','hono','夏威夷','hawaii'],
-'上海虹桥国际机场':['虹桥','上海','hongqiao','sha']
-};
+  const scoreEl       = document.getElementById('score');
+  const bestEl        = document.getElementById('best');
+  const finalScoreEl  = document.getElementById('final-score');
+  const startOverlay  = document.getElementById('start-overlay');
+  const overOverlay   = document.getElementById('over-overlay');
+  const startBtn      = document.getElementById('start-btn');
+  const restartBtn    = document.getElementById('restart-btn');
 
-/* ═══════════════════════════════════════════════════════════════
-   机场时区表（UTC 偏移，单位：小时）
-   ═══════════════════════════════════════════════════════════════ */
-const TZ = {
-'海口美兰国际机场':8,'上海浦东国际机场':8,'上海虹桥国际机场':8,'广州白云国际机场':8,
-'北京大兴国际机场':8,'北京首都国际机场':8,'深圳宝安国际机场':8,'成都天府国际机场':8,
-'成都双流国际机场':8,'重庆江北国际机场':8,'昆明长水国际机场':8,'西安咸阳国际机场':8,
-'青岛胶东国际机场':8,'南京禄口国际机场':8,'杭州萧山国际机场':8,'厦门高崎国际机场':8,
-'拉萨贡嘎国际机场':8,'乌鲁木齐天山国际机场':8,'三亚凤凰国际机场':8,'兰州中川国际机场':8,
-'南宁吴圩国际机场':8,'呼和浩特白塔国际机场':8,'丽江三义国际机场':8,'林芝米林机场':8,
-'西双版纳嘎洒国际机场':8,'西宁曹家堡国际机场':8,'长春龙嘉国际机场':8,'合肥新桥国际机场':8,
-'贵阳龙洞堡国际机场':8,'沈阳桃仙国际机场':8,'南昌昌北国际机场':8,'长沙黄花国际机场':8,
-'迪庆香格里拉机场':8,'昌都邦达机场':8,'济南遥墙国际机场':8,'温州龙湾国际机场':8,
-'三沙永兴机场':8,'烟台蓬莱国际机场':8,'武汉天河国际机场':8,'喀什徕宁国际机场':8,
-'郑州新郑国际机场':8,'威海大水泊国际机场':8,'石家庄正定国际机场':8,'太原武宿国际机场':8,
-'珠海金湾机场':8,'银川河东国际机场':8,'衡阳南岳机场':8,'鄂尔多斯伊金霍洛国际机场':8,
-'嘉峪关机场':8,'无锡硕放国际机场':8,'敦煌莫高国际机场':8,'伊尔库茨克国际机场':8,
-'香港国际机场':8,'澳门国际机场':8,'台北桃园国际机场':8,
-'新加坡樟宜机场':8,'吉隆坡国际机场':8,'吉隆坡机场':8,'雅加达国际机场':7,
-'东京羽田国际机场':9,'首尔仁川国际机场':9,'大阪关西国际机场':9,
-'悉尼金斯福德·史密斯机场':10,'墨尔本机场':10,
-'奥克兰国际机场':12,'惠灵顿国际机场':12,
-'伦敦希思罗机场':0,'都柏林机场':0,'雷克雅未克凯夫拉维克国际机场':0,
-'巴黎戴高乐机场':1,'图卢兹-布拉尼亚克机场':1,'法兰克福机场':1,
-'阿姆斯特丹史基浦机场':1,'苏黎世机场':1,'维也纳国际机场':1,
-'米兰马尔彭萨机场':1,'马德里巴拉哈斯机场':1,'马赛国际机场':1,
-'奥斯陆国际机场':1,'赫尔辛基万塔机场':2,
-'莫斯科谢列梅捷沃国际机场':3,'伊斯坦布尔机场':3,
-'迪拜国际机场':4,'马累维拉纳国际机场':5,
-'纽约肯尼迪国际机场':-5,'迈阿密国际机场':-5,'波士顿洛根国际机场':-5,
-'芝加哥奥黑尔国际机场':-6,'新奥尔良国际机场':-6,
-'丹佛国际机场':-7,'盐湖城国际机场':-7,
-'洛杉矶国际机场':-8,'洛杉矶安大略国际机场':-8,'旧金山国际机场':-8,
-'西雅图-塔科马国际机场':-8,'温哥华国际机场':-8,
-'拉斯维加斯哈里·瑞德国际机场':-8,
-'安克雷奇泰德·史蒂文斯安克雷奇国际机场':-9,
-'檀香山':-10,'布宜诺斯艾利斯埃塞萨国际机场':-3
-};
-function getTZ(airport){ return (TZ[airport] !== undefined) ? TZ[airport] : 8; }
+  const W = canvas.width;
+  const H = canvas.height;
 
-/* ═══════════════════════════════════════════════════════════════
-   时间工具
-   ═══════════════════════════════════════════════════════════════ */
-function toMin(t){
-  const parts = String(t).split(':');
-  const h = parseInt(parts[0], 10) || 0;
-  const m = parseInt(parts[1], 10) || 0;
-  return h * 60 + m;
-}
-function minToHHMM(min){
-  if(min < 0) min = ((min % 1440) + 1440) % 1440;
-  const h = Math.floor(min / 60) % 24;
-  const m = min % 60;
-  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-}
-function fmtDurMin(min){
-  if(min < 0) min = 0;
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-}
-function fmtLayover(min){
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  if(LANG === 'zh') return (h ? h + '小时' : '') + (m ? m + '分' : '') || '0分';
-  if(LANG === 'fr') return (h ? h + 'h' : '') + (m ? String(m).padStart(2,'0') : '00');
-  return (h ? h + 'h ' : '') + (m ? m + 'm' : (h ? '' : '0m'));
-}
+  let running = false;
+  let score = 0;
+  let missed = 0;
+  let best = parseInt(localStorage.getItem('slcleo-game-best') || '0', 10);
+  bestEl.textContent = best;
 
-/* ═══════════════════════════════════════════════════════════════
-   时差校验函数
-   ═══════════════════════════════════════════════════════════════ */
-function validateFlight(f){
-  const depMin = toMin(f.dep);
-  const durMin = toMin(f.dur);
-  const tzDiffMin = (getTZ(f.to) - getTZ(f.from)) * 60;
-  let expected = depMin + durMin + tzDiffMin;
-  expected = ((expected % 1440) + 1440) % 1440;
-  const actual = toMin(f.arr);
-  let diff = Math.abs(expected - actual);
-  if(diff > 720) diff = 1440 - diff;
-  return {valid: diff <= 2, expected: minToHHMM(expected), actual: f.arr, diff: diff};
-}
+  let ship, stars, particles, lastTime, spawnTimer, animationId;
 
-/* ═══════════════════════════════════════════════════════════════
-   机场名称显示
-   ═══════════════════════════════════════════════════════════════ */
-function airportLabel(zh){
-  if(LANG === 'zh') return zh;
-  const a = AP[zh];
-  if(!a) return zh;
-  return LANG === 'fr' ? a.fr[0] : a.en[0];
-}
-function cityLabel(zh){
-  if(LANG === 'zh') return cityOfZh(zh);
-  const a = AP[zh];
-  if(!a) return cityOfZh(zh);
-  return LANG === 'fr' ? a.fr[1] : a.en[1];
-}
-const CITY_SUFFIXES = [
-'泰德·史蒂文斯安克雷奇','金斯福德·史密斯','哈里·瑞德','谢列梅捷沃','凯夫拉维克','布拉尼亚克',
-'巴拉哈斯','马尔彭萨','伊金霍洛','史基浦','希思罗','戴高乐','维拉纳','龙洞堡','香格里拉',
-'大水泊','奥黑尔','塔科马','龙嘉','桃仙','昌北','黄花','遥墙','龙湾','新桥','嘎洒','三义',
-'贡嘎','米林','天山','咸阳','中川','美兰','白塔','吴圩','长水','萧山','禄口','胶东','永兴',
-'桃园','硕放','滨海','长乐','关西','仁川','羽田','肯尼迪','樟宜','白云','宝安','高崎','天府',
-'双流','江北','浦东','虹桥','大兴','首都','蓬莱','天河','莫高','凤凰','邦达','正定','武宿',
-'金湾','河东','徕宁','新郑','洛根','埃塞萨','万塔','曹家堡','南岳','安大略','奥尔良','伊尔库茨克'
-];
-function cityOfZh(airport){
-  let s = String(airport).replace(/(国际机场|机场)$/,'');
-  for(let i = 0; i < CITY_SUFFIXES.length; i++){
-    const x = CITY_SUFFIXES[i];
-    if(s.length > x.length && s.slice(-x.length) === x){
-      s = s.slice(0, s.length - x.length);
-      break;
-    }
+  /* ── 主题色（跟随深浅色） ── */
+  function isDark() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
-  return s.replace(/[-·]$/,'');
-}
-function airportMatches(zhName, query){
-  if(!query) return true;
-  const q = String(query).trim().toLowerCase();
-  if(!q) return true;
-  if(zhName.toLowerCase().indexOf(q) >= 0) return true;
-  const a = AP[zhName];
-  if(a){
-    if(a.en[0].toLowerCase().indexOf(q) >= 0) return true;
-    if(a.fr[0].toLowerCase().indexOf(q) >= 0) return true;
-    if(a.en[1].toLowerCase().indexOf(q) >= 0) return true;
-    if(a.fr[1].toLowerCase().indexOf(q) >= 0) return true;
+  function theme() {
+    return isDark()
+      ? { bg:'#0a0a0c', ship:'#2997ff', shipGlow:'rgba(41,151,255,0.35)', star:'#ffd60a', starGlow:'rgba(255,214,10,0.3)', text:'#f5f5f7', sub:'#a1a1a6' }
+      : { bg:'#f5f5f7', ship:'#007aff', shipGlow:'rgba(0,122,255,0.25)', star:'#ff9f0a', starGlow:'rgba(255,159,10,0.25)', text:'#1d1d1f', sub:'#6e6e73' };
   }
-  const alias = AIRPORT_ALIAS[zhName];
-  if(alias){
-    for(let i = 0; i < alias.length; i++){
-      if(alias[i].toLowerCase().indexOf(q) >= 0) return true;
-    }
+
+  /* ── 初始化 ── */
+  function reset() {
+    ship = {
+      x: W / 2,
+      y: H - 50,
+      w: 72,
+      h: 20,
+      speed: 0,
+      targetX: W / 2
+    };
+    stars = [];
+    particles = [];
+    score = 0;
+    missed = 0;
+    spawnTimer = 0;
+    scoreEl.textContent = '0';
+    draw();
   }
-  return false;
-}
 
-/* ═══════════════════════════════════════════════════════════════
-   航班解析
-   ═══════════════════════════════════════════════════════════════ */
-const FLIGHT_STORAGE_KEY = 'joycloud_flights_v5';
-function parseFlights(raw){
-  if(!raw) return [];
-  return raw.split(/\r?\n/)
-    .map(l => l.trim())
-    .filter(l => l && !l.startsWith('#'))
-    .map(l => {
-      const p = l.split('|').map(x => x.trim());
-      if(p.length < 8) return null;
-      if(p[0] === '航班号') return null;
-      return {no:p[0], from:p[1], dep:p[2], depDays:p[3], to:p[4], arr:p[5], arrDays:p[6], dur:p[7]};
-    })
-    .filter(x => x && x.no);
-}
-let FLIGHTS = [];
-let flightSourceCustom = false;
-function loadFlights(){
-  try {
-    const saved = localStorage.getItem(FLIGHT_STORAGE_KEY);
-    if(saved){
-      const arr = parseFlights(saved);
-      if(arr.length > 0){ FLIGHTS = arr; flightSourceCustom = true; return; }
-    }
-  } catch(e){}
-  FLIGHTS = parseFlights(DEFAULT_RAW);
-  flightSourceCustom = false;
-}
-loadFlights();
-
-const WD_ZH = ['周日','周一','周二','周三','周四','周五','周六'];
-function parseDays(s){
-  if(!s || s.indexOf('每天') >= 0) return [0,1,2,3,4,5,6];
-  const r = [];
-  WD_ZH.forEach((w,i) => { if(s.indexOf(w) >= 0) r.push(i); });
-  return r;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   三语字典
-   ═══════════════════════════════════════════════════════════════ */
-const I18N = {
-zh:{
-'login.brand':'云悦航空 · 望澜会员','login.title':'望澜会员，欢迎回来','login.sub':'请完善您的会员信息，以便进入内部购票系统。',
-'login.last':'姓氏','login.first':'名字','login.gender':'性别','login.male':'男','login.female':'女','login.enter':'进入系统',
-'login.lastPh':'请输入您的姓氏','login.firstPh':'请输入您的名字','login.errFill':'请填写完整的姓氏和名字','login.errGender':'请选择性别',
-'side.sub':'望澜会员购票系统','nav.home':'首页','nav.live':'实时','nav.book':'订票','nav.trip':'行程','nav.schedule':'航班表',
-'home.title':'云观山海，悦享旅程','home.welcome':'望澜会员，{name}，欢迎选择云悦航空','home.stat':'您已飞行 {n} 次，抵达过 {a} 个机场 {c} 个城市','home.cta':'让我们开始吧','home.book':'专享订票','home.trip':'我的行程',
-'live.title':'实时航班','live.desc':'切换进港/出港，选择日期（今日至未来 365 天），可按机场或城市筛选。每天最多 3 个航班轻微延误。','live.dep':'出港','live.arr':'进港','live.today':'今天',
-'live.filterPh':'机场 / 城市 / 航班号','live.updated':'更新于 {t}',
-'live.empty':'暂无符合条件的航班','live.emptyHint':'请调整日期或筛选条件。','live.count':'共 {n} 个航班',
-'live.statusScheduled':'计划中','live.statusBoarding':'即将登机','live.statusFinal':'最后召集','live.statusDeparted':'已起飞','live.statusInAir':'飞行中','live.statusArrived':'已抵达',
-'live.countdownMin':'{n} 分钟后','live.countdownHour':'{h} 小时 {m} 分后','live.countdownSoon':'即将',
-'live.delayNote':'今日 {n} 个航班延误','live.delayBadge':'延误 {n} 分钟',
-'book.title':'订票','book.desc':'请先选择出行日期（今日至未来 365 天，选择今日仅显示尚未出港的航班），填写出发地与到达地，或直接按航班号查询；开启「便捷联乘」可搜索经停一站的方案。',
-'book.from':'出发地','book.to':'到达地','book.no':'航班号','book.search':'查询','book.fromPh':'如：上海浦东 / Shanghai','book.toPh':'如：盐湖城 / Salt Lake City','book.noPh':'如：001 / YU001',
-'book.connection':'便捷联乘','book.needBoth':'请同时填写出发地和到达地，或直接输入航班号查询','book.allFlights':'全部航班','book.depCond':'出发：{v}','book.arrCond':'到达：{v}','book.noCond':'航班号：{v}','book.count':'共 {n} 个航班',
-'book.empty':'没有找到符合条件的航班','book.emptyHint':'请调整日期或查询条件后重试。','book.nonstop':'直飞','book.direct':'直飞航班','book.connections':'便捷联乘方案',
-'book.viaHub':'经 {v} 中转','book.layover':'中转停留','book.totalDur':'总时长','book.leg1':'第一程','book.leg2':'第二程','book.nextDayTag':'次日出发','book.dayOffsetTag':'+{n}天',
-'book.flightNo':'航班号','book.depDate':'出发日期','book.arrDate':'到达日期','book.depAirport':'出发机场','book.arrAirport':'到达机场','book.depFreq':'出发周期','book.arrFreq':'到达周期',
-'book.duration':'飞行时长','book.class':'舱位','book.classVal':'头等 / 商务','book.collapseHint':'点击卡片可收起详情','book.book':'预订','book.bookConn':'预订联乘',
-'book.added':'已添加至行程 · YU{n}','book.connAdded':'已添加便捷联乘 · YU{n1} + YU{n2}','book.dup':'该航班已在您的行程中','book.connDup':'该联乘方案已在您的行程中',
-'book.moreDate':'选择其他日期','book.rangeHint':'范围：今日 — 未来 365 天','book.todayNotDeparted':'今日仅显示尚未出港的航班',
-'trip.title':'行程','trip.desc':'您已预订的航班记录，可导出为 TXT 文件备份，也可从 TXT 导入恢复行程。','trip.upcoming':'待出行','trip.past':'已出行','trip.export':'导出 TXT','trip.import':'导入 TXT',
-'trip.emptyUp':'暂无待出行行程，前往「订票」页面预订航班吧','trip.emptyPast':'暂无已出行记录','trip.cancel':'取消预订','trip.cancelled':'已取消 YU{n} 的预订','trip.tagUp':'待出行','trip.tagPast':'已出行','trip.tagConn':'便捷联乘',
-'import.title':'导入行程 TXT','import.desc':'请选择由本系统导出的 .txt 文件，或将文本内容粘贴到下方输入框。','import.choose':'点击选择 TXT 文件','import.cancel':'取消','import.confirm':'确认导入',
-'import.placeholder':'云悦航空 · 望澜会员行程单\n会员：张伟（男）\n导出时间：2026-09-19 14:30\n航班总数：2\n----------------------------------------\n\nYU153 | 2026-09-20 周日 | 上海浦东国际机场 08:20 → 盐湖城国际机场 11:30 | 03:10',
-'import.needText':'请先选择 TXT 文件，或将行程内容粘贴到输入框。','import.fileLoaded':'已读取文件：{name}，可点击「确认导入」。','import.fileErr':'文件读取失败，请重试或改用粘贴方式。','import.none':'未识别到有效行程，请检查文本是否包含航班号与日期。',
-'import.result':'成功导入 {a} 条，跳过重复 {d} 条，无法识别 {b} 条。','import.toast':'已导入 {n} 条行程',
-'export.h1':'云悦航空 · 望澜会员行程单','export.member':'会员：{v}','export.time':'导出时间：{v}','export.total':'航班总数：{v}','export.empty':'暂无行程可导出','export.done':'已导出 {n} 条行程',
-'schedule.title':'航班表','schedule.desc':'全部航班一览，可按航班号、出发地或到达地搜索。⚠ 标记表示时差或飞行时长异常。','schedule.search':'搜索航班','schedule.searchPh':'输入航班号 / 出发地 / 到达地','schedule.count':'共 {n} 个航班','schedule.empty':'没有匹配的航班',
-'schedule.export':'导出航班数据','schedule.exportDone':'已导出 {n} 条航班数据','schedule.exportEmpty':'暂无航班数据可导出','schedule.update':'更新航班数据',
-'flightData.title':'更新航班数据','flightData.desc':'粘贴或选择航班数据文件。格式：每行一个航班，字段用「|」分隔：航班号 | 出发地 | 出发时间 | 出发周期 | 到达地 | 到达时间 | 到达周期 | 飞行时长。',
-'flightData.choose':'点击选择 TXT / CSV 文件','flightData.placeholder':'粘贴航班数据，每行一个航班，字段用 | 分隔……','flightData.confirm':'应用数据','flightData.reset':'恢复默认数据',
-'flightData.needText':'请先选择文件或粘贴航班数据。','flightData.invalid':'无法解析航班数据，请检查格式。','flightData.success':'航班数据已更新，共 {n} 条。','flightData.resetDone':'已恢复默认航班数据。','flightData.customTip':'当前使用自定义航班数据',
-'flightData.tzWarn':'以下航班时差校验未通过（{n} 条）：','flightData.tzWarnLine':'YU{n}: 期望 {e}，实际 {a}（差 {d} 分钟）',
-'schedWarn.title':'航班表检测到 {n} 条时差或飞行时长异常','schedWarn.hint':'以下航班「出发 + 飞行 + 时差」与「到达」不符，可能影响行程规划，请核实。数据仍可正常使用。','schedWarn.item':'{dep} + {dur} + 时差 ≠ {arr}（应为 {exp}，差 {diff} 分钟）','schedWarn.more':'还有 {n} 条未显示',
-'freq.daily':'每天','date.tomorrow':'明天','date.today':'今天','misc.genderM':'男','misc.genderF':'女'
-},
-en:{
-'login.brand':'JOY CLOUD AIRLINES','login.title':'Welcome back, Wanglan Member','login.sub':'Please complete your membership details.',
-'login.last':'Surname','login.first':'Given name','login.gender':'Gender','login.male':'Male','login.female':'Female','login.enter':'Enter System',
-'login.lastPh':'Enter your surname','login.firstPh':'Enter your given name','login.errFill':'Please fill in both surname and given name','login.errGender':'Please select your gender',
-'side.sub':'Wanglan Member','nav.home':'Home','nav.live':'Live','nav.book':'Booking','nav.trip':'Trips','nav.schedule':'Schedule',
-'home.title':'Gaze the Mountains and Seas','home.welcome':'Wanglan Member, {name}, welcome aboard Joy Cloud Airlines','home.stat':'You have flown {n} times, reaching {a} airports in {c} cities','home.cta':"Let's get started",'home.book':'Exclusive Booking','home.trip':'My Trips',
-'live.title':'Live Flights','live.desc':'Switch direction, pick a date (today to 365 days ahead), filter by airport/city. Up to 3 flights may be slightly delayed per day.','live.dep':'Departures','live.arr':'Arrivals','live.today':'Today',
-'live.filterPh':'Airport / city / flight no.','live.updated':'Updated at {t}',
-'live.empty':'No matching flights','live.emptyHint':'Please adjust date or filter.','live.count':'{n} flight(s)',
-'live.statusScheduled':'Scheduled','live.statusBoarding':'Boarding','live.statusFinal':'Final Call','live.statusDeparted':'Departed','live.statusInAir':'In the air','live.statusArrived':'Arrived',
-'live.countdownMin':'in {n} min','live.countdownHour':'in {h}h {m}m','live.countdownSoon':'soon',
-'live.delayNote':'{n} delayed flight(s) today','live.delayBadge':'Delayed {n} min',
-'book.title':'Booking','book.desc':'Select a travel date (today to 365 days ahead; today only shows flights not yet departed), then fill in both departure and arrival, or search directly by flight number.',
-'book.from':'Departure','book.to':'Arrival','book.no':'Flight No.','book.search':'Search','book.fromPh':'e.g. Shanghai Pudong','book.toPh':'e.g. Salt Lake City','book.noPh':'e.g. 001 / YU001',
-'book.connection':'Easy Connection','book.needBoth':'Please fill in both departure and arrival, or enter a flight number.','book.allFlights':'All flights','book.depCond':'Departure: {v}','book.arrCond':'Arrival: {v}','book.noCond':'Flight No.: {v}','book.count':'{n} flight(s)',
-'book.empty':'No flights found','book.emptyHint':'Please adjust date or criteria.','book.nonstop':'Non-stop','book.direct':'Direct flights','book.connections':'Easy Connections',
-'book.viaHub':'via {v}','book.layover':'Layover','book.totalDur':'Total duration','book.leg1':'Leg 1','book.leg2':'Leg 2','book.nextDayTag':'next day','book.dayOffsetTag':'+{n}d',
-'book.flightNo':'Flight No.','book.depDate':'Departure date','book.arrDate':'Arrival date','book.depAirport':'Departure airport','book.arrAirport':'Arrival airport','book.depFreq':'Frequency (dep.)','book.arrFreq':'Frequency (arr.)',
-'book.duration':'Duration','book.class':'Class','book.classVal':'First / Business','book.collapseHint':'Click the card to collapse details','book.book':'Book','book.bookConn':'Book Connection',
-'book.added':'Added to trips · YU{n}','book.connAdded':'Connection added · YU{n1} + YU{n2}','book.dup':'This flight is already in your trips','book.connDup':'This connection is already in your trips',
-'book.moreDate':'Pick any date','book.rangeHint':'Range: today — +365 days','book.todayNotDeparted':'Today only shows flights not yet departed',
-'trip.title':'Trips','trip.desc':'Your booked flights. Export/import TXT.','trip.upcoming':'Upcoming','trip.past':'Past','trip.export':'Export TXT','trip.import':'Import TXT',
-'trip.emptyUp':'No upcoming trips. Go to Booking to book a flight.','trip.emptyPast':'No past trips yet.','trip.cancel':'Cancel','trip.cancelled':'Cancelled YU{n}','trip.tagUp':'Upcoming','trip.tagPast':'Past','trip.tagConn':'Connection',
-'import.title':'Import Trips TXT','import.desc':'Choose a .txt file or paste below.','import.choose':'Click to choose TXT','import.cancel':'Cancel','import.confirm':'Confirm',
-'import.placeholder':'JOY CLOUD AIRLINES · WANGLAN MEMBER TRIPS\nMember: Zhang Wei (Male)\nExported at: 2026-09-19 14:30\nTotal flights: 2\n----------------------------------------\n\nYU153 | 2026-09-20 Sun | 上海浦东国际机场 08:20 → 盐湖城国际机场 11:30 | 03:10',
-'import.needText':'Please choose a TXT file or paste the trip content first.','import.fileLoaded':'File loaded: {name}. Click "Confirm" to continue.','import.fileErr':'Failed to read the file.','import.none':'No valid trips recognised.',
-'import.result':'Imported {a}, skipped {d} duplicate(s), {b} unrecognised.','import.toast':'{n} trip(s) imported',
-'export.h1':'JOY CLOUD AIRLINES · WANGLAN MEMBER TRIPS','export.member':'Member: {v}','export.time':'Exported at: {v}','export.total':'Total flights: {v}','export.empty':'No trips to export','export.done':'{n} trip(s) exported',
-'schedule.title':'Flight Schedule','schedule.desc':'All flights. Search by flight number, departure or arrival. Red ⚠ marks timezone/duration anomalies.','schedule.search':'Search','schedule.searchPh':'Flight no. / from / to','schedule.count':'{n} flight(s)','schedule.empty':'No matching flights',
-'schedule.export':'Export Flight Data','schedule.exportDone':'Exported {n} flight records','schedule.exportEmpty':'No flight data to export','schedule.update':'Update Flight Data',
-'flightData.title':'Update Flight Data','flightData.desc':'Paste or choose a flight data file. Lines starting with # and blank lines are ignored. Timezone validation: departure + duration + timezone difference should equal arrival (tolerance ±2 min).',
-'flightData.choose':'Click to choose TXT/CSV','flightData.placeholder':'Paste flight data, one flight per line, fields separated by |…','flightData.confirm':'Apply','flightData.reset':'Reset',
-'flightData.needText':'Please choose a file or paste flight data first.','flightData.invalid':'Unable to parse flight data.','flightData.success':'Flight data updated: {n} flights.','flightData.resetDone':'Default flight data restored.','flightData.customTip':'Using custom flight data',
-'flightData.tzWarn':'Timezone validation failed for {n} flights:','flightData.tzWarnLine':'YU{n}: expected {e}, actual {a} (diff {d} min)',
-'schedWarn.title':'{n} flight(s) with time/duration anomalies','schedWarn.hint':'For the following flights, "departure + duration + timezone" does not match "arrival". Please verify. Data remains usable.','schedWarn.item':'{dep} + {dur} + TZ ≠ {arr} (expected {exp}, diff {diff} min)','schedWarn.more':'{n} more not shown',
-'freq.daily':'Daily','date.tomorrow':'Tomorrow','date.today':'Today','misc.genderM':'Male','misc.genderF':'Female'
-},
-fr:{
-'login.brand':'JOY CLOUD AIRLINES','login.title':'Bon retour, membre Wanglan','login.sub':"Veuillez compléter vos informations de membre.",
-'login.last':'Nom','login.first':'Prénom','login.gender':'Sexe','login.male':'Homme','login.female':'Femme','login.enter':'Entrer',
-'login.lastPh':'Entrez votre nom','login.firstPh':'Entrez votre prénom','login.errFill':'Veuillez remplir le nom et le prénom','login.errGender':'Veuillez sélectionner votre sexe',
-'side.sub':'Membre Wanglan','nav.home':'Accueil','nav.live':'Temps réel','nav.book':'Réserver','nav.trip':'Voyages','nav.schedule':'Horaires',
-'home.title':'Contemplez les monts et les mers','home.welcome':'Membre Wanglan, {name}, bienvenue à bord de Joy Cloud Airlines','home.stat':'Vous avez volé {n} fois, atteint {a} aéroports dans {c} villes','home.cta':'Commençons','home.book':'Réservation exclusive','home.trip':'Mes voyages',
-'live.title':'Vols en temps réel','live.desc':"Basculez entre départs et arrivées, choisissez une date (aujourd'hui à 365 jours) et filtrez par aéroport ou ville. Jusqu'à 3 vols peuvent être légèrement retardés par jour.",'live.dep':'Départs','live.arr':'Arrivées','live.today':"Aujourd'hui",
-'live.filterPh':'Aéroport / ville / n° de vol','live.updated':'Mis à jour à {t}',
-'live.empty':'Aucun vol correspondant','live.emptyHint':'Veuillez ajuster la date ou le filtre.','live.count':'{n} vol(s)',
-'live.statusScheduled':'Programmé','live.statusBoarding':'Embarquement','live.statusFinal':'Dernier appel','live.statusDeparted':'Parti','live.statusInAir':'En vol','live.statusArrived':'Arrivé',
-'live.countdownMin':'dans {n} min','live.countdownHour':'dans {h}h {m}','live.countdownSoon':'bientôt',
-'live.delayNote':'{n} vol(s) retardé(s) aujourd\'hui','live.delayBadge':'Retard {n} min',
-'book.title':'Réservation','book.desc':"Sélectionnez une date (aujourd'hui à 365 jours ; aujourd'hui n'affiche que les vols non partis), indiquez le départ et l'arrivée, ou recherchez par numéro de vol.",
-'book.from':'Départ','book.to':'Arrivée','book.no':'N° de vol','book.search':'Rechercher','book.fromPh':'ex. Shanghai Pudong','book.toPh':'ex. Salt Lake City','book.noPh':'ex. 001 / YU001',
-'book.connection':'Correspondance','book.needBoth':"Veuillez remplir le départ et l'arrivée, ou saisir un numéro de vol.",'book.allFlights':'Tous les vols','book.depCond':'Départ : {v}','book.arrCond':'Arrivée : {v}','book.noCond':'N° de vol : {v}','book.count':'{n} vol(s)',
-'book.empty':'Aucun vol trouvé','book.emptyHint':'Veuillez ajuster la date ou les critères.','book.nonstop':'Sans escale','book.direct':'Vols directs','book.connections':'Correspondances',
-'book.viaHub':'via {v}','book.layover':'Escale','book.totalDur':'Durée totale','book.leg1':'Vol 1','book.leg2':'Vol 2','book.nextDayTag':'lendemain','book.dayOffsetTag':'+{n}j',
-'book.flightNo':'N° de vol','book.depDate':'Date de départ','book.arrDate':"Date d'arrivée",'book.depAirport':'Aéroport de départ','book.arrAirport':"Aéroport d'arrivée",'book.depFreq':'Fréquence (départ)','book.arrFreq':'Fréquence (arrivée)',
-'book.duration':'Durée','book.class':'Classe','book.classVal':'Première / Affaires','book.collapseHint':'Cliquez sur la carte pour réduire les détails','book.book':'Réserver','book.bookConn':'Réserver la correspondance',
-'book.added':'Ajouté aux voyages · YU{n}','book.connAdded':'Correspondance ajoutée · YU{n1} + YU{n2}','book.dup':'Ce vol est déjà dans vos voyages','book.connDup':'Cette correspondance est déjà dans vos voyages',
-'book.moreDate':'Choisir une autre date','book.rangeHint':"Plage : aujourd'hui — +365 jours",'book.todayNotDeparted':"Aujourd'hui : seuls les vols non partis",
-'trip.title':'Voyages','trip.desc':'Vos vols réservés. Exportez ou importez TXT.','trip.upcoming':'À venir','trip.past':'Passés','trip.export':'Exporter TXT','trip.import':'Importer TXT',
-'trip.emptyUp':'Aucun voyage à venir.','trip.emptyPast':'Aucun voyage passé.','trip.cancel':'Annuler','trip.cancelled':'Annulé YU{n}','trip.tagUp':'À venir','trip.tagPast':'Passé','trip.tagConn':'Correspondance',
-'import.title':'Importer les voyages TXT','import.desc':"Choisissez un fichier .txt ou collez ci-dessous.",'import.choose':'Cliquez pour choisir un fichier TXT','import.cancel':'Annuler','import.confirm':"Confirmer l'import",
-'import.placeholder':'JOY CLOUD AIRLINES · VOYAGES MEMBRE WANGLAN\nMembre : Zhang Wei (Homme)\nExporté le : 2026-09-19 14:30\nTotal des vols : 2\n----------------------------------------\n\nYU153 | 2026-09-20 dim. | 上海浦东国际机场 08:20 → 盐湖城国际机场 11:30 | 03:10',
-'import.needText':"Veuillez d'abord choisir un fichier TXT ou coller le contenu.",'import.fileLoaded':'Fichier chargé : {name}. Cliquez sur « Confirmer » pour continuer.','import.fileErr':'Échec de lecture du fichier.','import.none':'Aucun voyage valide reconnu.',
-'import.result':'{a} importé(s), {d} doublon(s) ignoré(s), {b} non reconnu(s).','import.toast':'{n} voyage(s) importé(s)',
-'export.h1':'JOY CLOUD AIRLINES · VOYAGES MEMBRE WANGLAN','export.member':'Membre : {v}','export.time':'Exporté le : {v}','export.total':'Total des vols : {v}','export.empty':'Aucun voyage à exporter','export.done':'{n} voyage(s) exporté(s)',
-'schedule.title':'Horaires des vols','schedule.desc':"Tous les vols. Recherchez par numéro de vol, départ ou arrivée. ⚠ signale des anomalies de durée/décalage.",'schedule.search':'Rechercher','schedule.searchPh':'N° de vol / départ / arrivée','schedule.count':'{n} vol(s)','schedule.empty':'Aucun vol correspondant',
-'schedule.export':'Exporter les vols','schedule.exportDone':'{n} vols exportés','schedule.exportEmpty':'Aucune donnée de vol à exporter','schedule.update':'Mettre à jour les vols',
-'flightData.title':'Mettre à jour les vols','flightData.desc':"Collez ou choisissez un fichier de vols. Les lignes commençant par # et les lignes vides sont ignorées. Validation du décalage horaire : départ + durée + décalage = arrivée (tolérance ±2 min).",
-'flightData.choose':'Cliquez pour choisir un fichier TXT / CSV','flightData.placeholder':'Collez les données de vols, un vol par ligne, champs séparés par |…','flightData.confirm':'Appliquer','flightData.reset':'Réinitialiser',
-'flightData.needText':"Veuillez d'abord choisir un fichier ou coller les données.",'flightData.invalid':'Impossible de parser les données de vols.','flightData.success':'Données de vols mises à jour : {n} vols.','flightData.resetDone':'Données par défaut restaurées.','flightData.customTip':'Données de vols personnalisées',
-'flightData.tzWarn':'Échec de validation du décalage horaire pour {n} vols :','flightData.tzWarnLine':'YU{n}: attendu {e}, réel {a} (écart {d} min)',
-'schedWarn.title':'{n} vol(s) avec anomalie de durée/décalage','schedWarn.hint':'Pour les vols suivants, « départ + durée + décalage » ne correspond pas à « arrivée ». À vérifier. Les données restent utilisables.','schedWarn.item':'{dep} + {dur} + TZ ≠ {arr} (attendu {exp}, écart {diff} min)','schedWarn.more':'{n} non affiché(s)',
-'freq.daily':'Tous les jours','date.tomorrow':'Demain','date.today':"Aujourd'hui",'misc.genderM':'Homme','misc.genderF':'Femme'
-}
-};
-
-let LANG = 'en';
-function t(key){
-  const pack = I18N[LANG] || I18N.en;
-  if(pack[key] !== undefined) return pack[key];
-  if(I18N.en[key] !== undefined) return I18N.en[key];
-  return key;
-}
-function tf(key, vars){
-  let s = t(key);
-  Object.keys(vars || {}).forEach(k => { s = s.split('{' + k + '}').join(String(vars[k])); });
-  return s;
-}
-
-const MONTHS = {
-zh: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
-en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-fr: ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.']
-};
-const WD_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const WD_FR = ['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-function wdLabel(d){
-  if(LANG === 'zh') return WD_ZH[d.getDay()];
-  return (LANG === 'fr' ? WD_FR : WD_EN)[d.getDay()];
-}
-function mdLabel(d){
-  if(LANG === 'zh') return (d.getMonth() + 1) + '月' + d.getDate() + '日';
-  return d.getDate() + ' ' + MONTHS[LANG][d.getMonth()];
-}
-function freqLabel(s){
-  if(!s) return '';
-  if(s.indexOf('每天') >= 0) return t('freq.daily');
-  if(LANG === 'zh') return s;
-  const arr = LANG === 'fr' ? WD_FR : WD_EN;
-  const out = [];
-  WD_ZH.forEach((z, i) => { if(s.indexOf(z) >= 0) out.push(arr[i]); });
-  return out.length ? out.join(', ') : s;
-}
-
-const TODAY = new Date(); TODAY.setHours(0,0,0,0);
-function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate() + n); return x; }
-function ymd(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
-function pad2(n){ return String(n).padStart(2, '0'); }
-function sameDay(a, b){
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
-function parseYmd(str){
-  const [y, m, d] = String(str).split('-').map(Number);
-  const dt = new Date(y, m - 1, d);
-  dt.setHours(0,0,0,0);
-  return dt;
-}
-
-const RANGE_MAX_DAYS = 365;
-const RANGE_MAX_DATE = addDays(TODAY, RANGE_MAX_DAYS);
-const QUICK_DAYS = 30;
-const QUICK_DATES = [];
-for(let i = 0; i < QUICK_DAYS; i++) QUICK_DATES.push(addDays(TODAY, i));
-let selectedDate = new Date(TODAY);
-
-const LIVE_MAX_DAYS = 365;
-const LIVE_MAX_DATE = addDays(TODAY, LIVE_MAX_DAYS);
-let selectedLiveDate = new Date(TODAY);
-let currentLiveDir = 'dep';
-let currentLiveFilter = '';
-let liveTimer = null;
-
-function calcArrDayOffset(depTime, arrTime){
-  return toMin(arrTime) <= toMin(depTime) ? 1 : 0;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   延误逻辑（基于日期种子，同一天延误固定）
-   ═══════════════════════════════════════════════════════════════ */
-function dateSeed(date){
-  return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
-}
-function hashRand(seed){
-  const x = Math.sin(seed * 12.9898) * 43758.5453;
-  return x - Math.floor(x);
-}
-const delayCache = {};
-function getDayDelays(date){
-  const key = ymd(date);
-  if(delayCache[key]) return delayCache[key];
-  const seed = dateSeed(date);
-  const dayFlights = FLIGHTS.filter(f => parseDays(f.depDays).indexOf(date.getDay()) >= 0);
-  if(!dayFlights.length){ delayCache[key] = {}; return {}; }
-  const count = 1 + Math.floor(hashRand(seed) * 3);
-  const delays = {};
-  const picked = new Set();
-  const maxTry = count * 10;
-  for(let i = 0; i < maxTry && Object.keys(delays).length < count; i++){
-    const idx = Math.floor(hashRand(seed + i * 137.5) * dayFlights.length);
-    const f = dayFlights[idx];
-    if(picked.has(f.no)) continue;
-    picked.add(f.no);
-    const noNum = parseInt(f.no, 10) || 0;
-    const delayMin = 5 + Math.floor(hashRand(seed + noNum * 1.7 + i) * 21);
-    delays[f.no] = delayMin;
+  /* ── 输入 ── */
+  function moveTo(x) {
+    const rect = canvas.getBoundingClientRect();
+    const scale = W / rect.width;
+    ship.targetX = (x - rect.left) * scale;
   }
-  delayCache[key] = delays;
-  return delays;
-}
 
-const user = { last:'', first:'', gender:'' };
-let trips = [];
-let currentResults = [];
-let currentConnections = [];
-let currentTab = 'upcoming';
-let uid = 1;
-let entered = false;
-let homeFirstRender = true;
-let currentScheduleFilter = '';
+  canvas.addEventListener('mousemove', (e) => moveTo(e.clientX));
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    moveTo(e.touches[0].clientX);
+  }, { passive: false });
+  canvas.addEventListener('touchstart', (e) => {
+    moveTo(e.touches[0].clientX);
+  }, { passive: true });
 
-function $(id){ return document.getElementById(id); }
-let toastTimer = null;
-function toast(msg){
-  const el = $('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
-}
-function depTsOf(dateObj, timeStr){
-  const parts = timeStr.split(':');
-  const d = new Date(dateObj);
-  d.setHours(Number(parts[0]), Number(parts[1]), 0, 0);
-  return d.getTime();
-}
-function animateNumber(el, target, duration){
-  duration = duration || 900;
-  const t0 = performance.now();
-  (function step(now){
-    const p = Math.min((now - t0) / duration, 1);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(target * eased);
-    if(p < 1) requestAnimationFrame(step);
-    else el.textContent = target;
-  })(t0);
-}
-function displayName(){
-  if(LANG === 'zh') return user.last + (user.gender === 'F' ? '女士' : '先生');
-  const full = user.first + ' ' + user.last;
-  return (user.gender === 'F' ? (LANG === 'fr' ? 'Mme ' : 'Ms. ') : (LANG === 'fr' ? 'M. ' : 'Mr. ')) + full;
-}
-function genderText(){ return user.gender === 'F' ? t('misc.genderF') : t('misc.genderM'); }
-function fullName(){ return LANG === 'zh' ? (user.last + user.first) : (user.first + ' ' + user.last); }
-
-document.addEventListener('click', e => {
-  const btn = e.target.closest('.primary-btn, .ghost-hero-btn, .ghost-btn, .ghost-modal-btn, .tool-btn, .nav-item, .tab');
-  if(!btn) return;
-  const rect = btn.getBoundingClientRect();
-  const size = Math.max(rect.width, rect.height) * 1.8;
-  const r = document.createElement('span');
-  r.className = 'ripple';
-  r.style.width = size + 'px';
-  r.style.height = size + 'px';
-  r.style.left = (e.clientX - rect.left - size / 2) + 'px';
-  r.style.top = (e.clientY - rect.top - size / 2) + 'px';
-  btn.appendChild(r);
-  setTimeout(() => r.remove(), 660);
-}, true);
-
-function applyI18n(){
-  document.documentElement.lang = LANG;
-  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
-  updateFlightSourceTip();
-}
-
-function setLang(l){
-  if(l !== 'zh' && l !== 'en' && l !== 'fr') return;
-  if(l === LANG){ document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l)); return; }
-  LANG = l;
-  document.querySelectorAll('.lang-btn').forEach(b => { b.classList.toggle('active', b.dataset.lang === l); });
-  applyI18n();
-  if(entered){
-    $('userMeta').textContent = genderText() + ' · Wanglan';
-    renderHome();
-    renderDates();
-    renderTrips();
-    const hasMeta = $('searchMeta').textContent.trim() && !$('searchMeta').querySelector('.warn');
-    if(hasMeta) doSearch();
-    if(document.querySelector('.nav-item.active[data-page="schedule"]')) renderSchedule();
-    if(document.querySelector('.nav-item.active[data-page="live"]')) renderLive();
-  }
-}
-document.querySelectorAll('.lang-btn').forEach(b => { b.addEventListener('click', () => setLang(b.dataset.lang)); });
-
-document.querySelectorAll('.gender-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    user.gender = btn.dataset.gender;
-    $('loginErr').textContent = '';
-  });
-});
-$('enterBtn').addEventListener('click', () => {
-  const last = $('inpLast').value.trim();
-  const first = $('inpFirst').value.trim();
-  const shake = () => {
-    $('loginErr').animate(
-      [{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],
-      {duration:280, easing:'ease-in-out'}
-    );
-  };
-  if(!last || !first){ $('loginErr').textContent = t('login.errFill'); shake(); return; }
-  if(!user.gender){ $('loginErr').textContent = t('login.errGender'); shake(); return; }
-  user.last = last;
-  user.first = first;
-  enterSystem();
-});
-[$('inpLast'), $('inpFirst')].forEach(inp => {
-  inp.addEventListener('keydown', e => { if(e.key === 'Enter') $('enterBtn').click(); });
-});
-
-function enterSystem(){
-  entered = true;
-  homeFirstRender = true;
-  $('loginScreen').classList.add('hidden');
-  $('app').classList.remove('hidden');
-  document.body.classList.add('light');
-  $('userName').textContent = fullName();
-  $('userMeta').textContent = genderText() + ' · Wanglan';
-  $('userAvatar').textContent = (user.last.charAt(0) || 'W').toUpperCase();
-
-  const bInput = $('bookingDateInput');
-  bInput.min = ymd(TODAY);
-  bInput.max = ymd(RANGE_MAX_DATE);
-  bInput.value = ymd(selectedDate);
-
-  const lInput = $('liveDateInput');
-  lInput.min = ymd(TODAY);
-  lInput.max = ymd(LIVE_MAX_DATE);
-  lInput.value = ymd(selectedLiveDate);
-
-  renderDates();
-  renderHome();
-  renderTrips();
-  renderSchedule();
-  renderLive();
-  startLiveTimer();
-}
-
-function renderHome(){
-  $('homeTitle').textContent = t('home.title');
-  $('homeWelcome').innerHTML = tf('home.welcome', { name: '<b>' + displayName() + '</b>' });
-  $('homeCta').textContent = t('home.cta');
-  const now = Date.now();
-  const flown = trips.filter(tt => tt.depTs <= now);
-  const airports = new Set(flown.map(tt => tt.flight.to));
-  const cities = new Set(flown.map(tt => tt.flight.to));
-  const nums = [flown.length, airports.size, cities.size];
-  $('homeStat').innerHTML = tf('home.stat', {
-    n: '<b>' + nums[0] + '</b>',
-    a: '<b>' + nums[1] + '</b>',
-    c: '<b>' + nums[2] + '</b>'
-  });
-  if(homeFirstRender){
-    homeFirstRender = false;
-    const els = $('homeStat').querySelectorAll('b');
-    els.forEach((el, i) => {
-      const target = nums[i];
-      el.textContent = '0';
-      setTimeout(() => animateNumber(el, target, 950), 260 + i * 130);
+  /* ── 游戏循环 ── */
+  function spawnStar() {
+    stars.push({
+      x: 40 + Math.random() * (W - 80),
+      y: -20,
+      r: 10 + Math.random() * 4,
+      vy: 1.6 + Math.random() * 1.4,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.08
     });
   }
-}
 
-function goPage(name){
-  document.querySelectorAll('.nav-item').forEach(b => { b.classList.toggle('active', b.dataset.page === name); });
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  $('page-' + name).classList.add('active');
-  if(name === 'home') renderHome();
-  if(name === 'trip') renderTrips();
-  if(name === 'schedule') renderSchedule();
-  if(name === 'live') renderLive();
-  const main = document.querySelector('.main');
-  if(main) main.scrollTop = 0;
-}
-$('goBook').addEventListener('click', () => goPage('book'));
-$('goTrip').addEventListener('click', () => goPage('trip'));
-document.querySelectorAll('.nav-item').forEach(btn => { btn.addEventListener('click', () => goPage(btn.dataset.page)); });
-
-function renderDates(){
-  const strip = $('dateStrip');
-  strip.innerHTML = '';
-  QUICK_DATES.forEach((d, i) => {
-    const b = document.createElement('button');
-    const isSel = sameDay(d, selectedDate);
-    b.className = 'date-chip' + (isSel ? ' active' : '');
-    const w = i === 0 ? t('date.today') : (i === 1 ? t('date.tomorrow') : wdLabel(d));
-    b.innerHTML = '<span class="dc-w">' + w + '</span><span class="dc-d">' + mdLabel(d) + '</span>';
-    b.addEventListener('click', () => {
-      selectedDate = new Date(d);
-      $('bookingDateInput').value = ymd(selectedDate);
-      renderDates();
-      const hasMeta = $('searchMeta').textContent.trim() && !$('searchMeta').querySelector('.warn');
-      if(hasMeta) doSearch();
-    });
-    strip.appendChild(b);
-  });
-}
-
-$('bookingDateInput').addEventListener('change', e => {
-  if(!e.target.value) return;
-  const d = parseYmd(e.target.value);
-  if(d < TODAY){ d.setTime(TODAY.getTime()); e.target.value = ymd(TODAY); }
-  if(d > RANGE_MAX_DATE){ d.setTime(RANGE_MAX_DATE.getTime()); e.target.value = ymd(RANGE_MAX_DATE); }
-  selectedDate = d;
-  renderDates();
-  const hasMeta = $('searchMeta').textContent.trim() && !$('searchMeta').querySelector('.warn');
-  if(hasMeta) doSearch();
-});
-
-const liveDateInput = $('liveDateInput');
-liveDateInput.addEventListener('change', e => {
-  if(!e.target.value) return;
-  const d = parseYmd(e.target.value);
-  if(d < TODAY){ d.setTime(TODAY.getTime()); e.target.value = ymd(TODAY); }
-  if(d > LIVE_MAX_DATE){ d.setTime(LIVE_MAX_DATE.getTime()); e.target.value = ymd(LIVE_MAX_DATE); }
-  selectedLiveDate = d;
-  renderLive();
-});
-
-document.querySelectorAll('.dir-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if(currentLiveDir === btn.dataset.dir) return;
-    currentLiveDir = btn.dataset.dir;
-    document.querySelectorAll('.dir-btn').forEach(b => {
-      const isActive = b.dataset.dir === currentLiveDir;
-      b.classList.toggle('active', isActive);
-      b.classList.toggle('arr', b.dataset.dir === 'arr' && isActive);
-    });
-    renderLive();
-  });
-});
-
-$('liveFilter').addEventListener('input', e => {
-  currentLiveFilter = e.target.value;
-  renderLive();
-});
-
-function flightStatus(depTs, arrTs, now){
-  if(now >= arrTs) return {key: 'live.statusArrived', cls: 'arrived'};
-  if(now >= depTs) return {key: 'live.statusInAir', cls: 'inair'};
-  const minToDep = Math.floor((depTs - now) / 60000);
-  if(minToDep <= 20) return {key: 'live.statusFinal', cls: 'boarding'};
-  if(minToDep <= 60) return {key: 'live.statusBoarding', cls: 'boarding'};
-  return {key: 'live.statusScheduled', cls: 'scheduled'};
-}
-function countdownText(ts){
-  const diff = ts - Date.now();
-  if(diff <= 0) return '';
-  const totalMin = Math.floor(diff / 60000);
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  if(h > 0) return tf('live.countdownHour', { h: h, m: pad2(m) });
-  if(m <= 0) return t('live.countdownSoon');
-  return tf('live.countdownMin', { n: m });
-}
-function startLiveTimer(){
-  if(liveTimer) clearInterval(liveTimer);
-  liveTimer = setInterval(() => {
-    if(document.querySelector('.nav-item.active[data-page="live"]')) renderLive();
-  }, 30000);
-}
-
-function renderLive(){
-  liveDateInput.value = ymd(selectedLiveDate);
-  const date = selectedLiveDate;
-  const day = date.getDay();
-  const isToday = sameDay(date, TODAY);
-  const now = Date.now();
-  const delays = getDayDelays(date);
-
-  const nowD = new Date();
-  $('liveUpdated').textContent = tf('live.updated', { t: pad2(nowD.getHours()) + ':' + pad2(nowD.getMinutes()) });
-
-  const list = FLIGHTS.filter(f => parseDays(f.depDays).indexOf(day) >= 0);
-  const filter = currentLiveFilter.trim();
-  const noQ = filter.replace(/^YU/i, '').trim();
-  const items = [];
-
-  list.forEach(f => {
-    const depTs = depTsOf(date, f.dep);
-    const arrOffset = calcArrDayOffset(f.dep, f.arr);
-    const arrTs = depTsOf(addDays(date, arrOffset), f.arr);
-    const delayMin = delays[f.no] || 0;
-
-    if(currentLiveDir === 'dep'){
-      if(isToday && depTs <= now) return;
-      if(filter){
-        const ok = airportMatches(f.from, filter) || (noQ && f.no.indexOf(noQ) >= 0);
-        if(!ok) return;
-      }
-      items.push({flight: f, depTs, arrTs, arrOffset, delayMin});
-    } else {
-      if(isToday && arrTs <= now) return;
-      if(filter){
-        const ok = airportMatches(f.to, filter) || (noQ && f.no.indexOf(noQ) >= 0);
-        if(!ok) return;
-      }
-      items.push({flight: f, depTs, arrTs, arrOffset, delayMin});
-    }
-  });
-
-  items.sort((a, b) => {
-    const at = currentLiveDir === 'dep' ? a.depTs : a.arrTs;
-    const bt = currentLiveDir === 'dep' ? b.depTs : b.arrTs;
-    return at - bt;
-  });
-  if(!isToday) items.splice(80);
-
-  const metaBox = $('liveMeta');
-  const dateStr = mdLabel(date) + ' ' + wdLabel(date);
-  const dirLabel = currentLiveDir === 'dep' ? t('live.dep') : t('live.arr');
-  const filterTxt = filter ? ' · ' + filter : '';
-  const delayCount = Object.keys(delays).length;
-  const delayTxt = delayCount ? ' · <span style="color:#e2453c;font-weight:700">' + tf('live.delayNote', {n: delayCount}) + '</span>' : '';
-  metaBox.innerHTML = '<b>' + dateStr + '</b> · ' + dirLabel + filterTxt +
-    ' · ' + tf('live.count', { n: items.length }) + delayTxt;
-
-  const box = $('liveList');
-  if(!items.length){
-    box.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><span class="big">✈</span>'
-      + t('live.empty') + '<br>' + t('live.emptyHint') + '</div>';
-    return;
-  }
-  box.innerHTML = items.map((x, i) => renderLiveCard(x, i, isToday, now)).join('');
-}
-
-function renderLiveCard(item, i, isToday, now){
-  const f = item.flight;
-  const date = selectedLiveDate;
-  const depDate = date;
-  const arrDate = addDays(date, item.arrOffset);
-  const st = flightStatus(item.depTs, item.arrTs, now);
-  const delay = Math.min(i * 0.02, 0.45);
-  const targetTs = currentLiveDir === 'dep' ? item.depTs : item.arrTs;
-  const cd = isToday ? countdownText(targetTs) : '';
-  const cdCls = (isToday && targetTs - now <= 30 * 60 * 1000) ? ' soon' : '';
-  const fromCity = cityLabel(f.from);
-  const toCity = cityLabel(f.to);
-  const isDelayed = item.delayMin > 0;
-  const cardCls = (currentLiveDir === 'arr' ? 'arr ' : '') +
-    (st.cls === 'boarding' ? 'boarding ' : '') +
-    (st.cls === 'inair' ? 'inair ' : '') +
-    (st.cls === 'arrived' ? 'arrived ' : '') +
-    (isDelayed ? 'delayed' : '');
-  const delayBadge = isDelayed ? '<span class="lc-delay">' + tf('live.delayBadge', {n: item.delayMin}) + '</span>' : '';
-  return `
-  <div class="live-card ${cardCls}" style="animation-delay:${delay}s">
-    <div class="lc-head">
-      <span class="lc-no">YU${f.no}</span>
-      <span class="lc-status ${st.cls}">${t(st.key)}</span>
-      ${delayBadge}
-      ${cd ? '<span class="lc-countdown' + cdCls + '">' + cd + '</span>' : ''}
-    </div>
-    <div class="lc-route">
-      <div class="lc-point"><b>${f.dep}</b><span>${fromCity}</span></div>
-      <div class="lc-mid"><div class="lc-mid-line"></div><div class="lc-mid-dur">${f.dur}</div></div>
-      <div class="lc-point right"><b>${f.arr}${item.arrOffset ? '<sup style="color:#e2453c;font-size:10px">+' + item.arrOffset + '</sup>' : ''}</b><span>${toCity}</span></div>
-    </div>
-    <div class="lc-date">
-      <span>${mdLabel(depDate)} ${wdLabel(depDate)}</span>
-      <span>${mdLabel(arrDate)} ${wdLabel(arrDate)}</span>
-    </div>
-  </div>`;
-}
-
-/* 便捷联乘 */
-const MAX_LAYOVER_MIN = 39 * 60;
-const MIN_LAYOVER_MIN = 60;
-const MAX_DAY_OFFSET = 3;
-function findConnections(fromCity, toCity, date, day){
-  const results = [];
-  const isToday = sameDay(date, TODAY);
-  const nowTs = Date.now();
-  const firstLegs = FLIGHTS.filter(f => {
-    if(parseDays(f.depDays).indexOf(day) < 0) return false;
-    if(!airportMatches(f.from, fromCity)) return false;
-    if(isToday && depTsOf(date, f.dep) <= nowTs) return false;
-    return true;
-  });
-  firstLegs.forEach(leg1 => {
-    const hub = leg1.to;
-    if(airportMatches(hub, toCity)) return;
-    if(airportMatches(hub, fromCity)) return;
-    const dep1 = toMin(leg1.dep);
-    const arr1raw = toMin(leg1.arr);
-    const arr1 = arr1raw <= dep1 ? arr1raw + 1440 : arr1raw;
-    for(let dOff = 0; dOff <= MAX_DAY_OFFSET; dOff++){
-      const checkDay = (day + dOff) % 7;
-      const leg2Candidates = FLIGHTS.filter(f =>
-        parseDays(f.depDays).indexOf(checkDay) >= 0 &&
-        f.from === hub &&
-        airportMatches(f.to, toCity) &&
-        !airportMatches(f.to, fromCity)
-      );
-      leg2Candidates.forEach(leg2 => {
-        const dep2 = toMin(leg2.dep) + dOff * 1440;
-        const layover = dep2 - arr1;
-        if(layover < MIN_LAYOVER_MIN || layover > MAX_LAYOVER_MIN) return;
-        results.push({leg1, leg2, dep1, arr1, dep2, layover, nextDayOffset: dOff, hub});
+  function addParticles(x, y, color) {
+    for (let i = 0; i < 10; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = 1 + Math.random() * 3;
+      particles.push({
+        x, y,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s,
+        life: 1,
+        color
       });
     }
-  });
-  const seen = new Set();
-  const uniq = [];
-  results.forEach(r => {
-    const key = r.leg1.no + '-' + r.leg2.no + '-' + r.nextDayOffset;
-    if(seen.has(key)) return;
-    seen.add(key);
-    uniq.push(r);
-  });
-  uniq.sort((a, b) => a.dep1 - b.dep1 || a.layover - b.layover);
-  return uniq.slice(0, 30);
-}
-function connTotalDur(conn){ return toMin(conn.leg1.dur) + conn.layover + toMin(conn.leg2.dur); }
-
-$('searchBtn').addEventListener('click', doSearch);
-['fromInput','toInput','noInput'].forEach(id => {
-  $(id).addEventListener('keydown', e => { if(e.key === 'Enter') doSearch(); });
-});
-$('connToggle').addEventListener('change', () => {
-  const hasMeta = $('searchMeta').textContent.trim() && !$('searchMeta').querySelector('.warn');
-  if(hasMeta) doSearch();
-});
-
-function doSearch(){
-  const date = selectedDate;
-  const day = date.getDay();
-  const isToday = sameDay(date, TODAY);
-  const nowTs = Date.now();
-  const from = $('fromInput').value.trim();
-  const to = $('toInput').value.trim();
-  const noRaw = $('noInput').value.trim().replace(/^YU/i, '').trim();
-  const useConn = $('connToggle').checked;
-
-  if(!noRaw && (!from || !to)){
-    $('searchMeta').innerHTML = '<span class="warn">' + t('book.needBoth') + '</span>';
-    $('resultList').innerHTML = '';
-    currentResults = [];
-    currentConnections = [];
-    return;
   }
 
-  let list = FLIGHTS.filter(f => parseDays(f.depDays).indexOf(day) >= 0);
-  if(isToday) list = list.filter(f => depTsOf(date, f.dep) > nowTs);
-  if(from) list = list.filter(f => airportMatches(f.from, from));
-  if(to) list = list.filter(f => airportMatches(f.to, to));
-  if(noRaw){
-    const n = noRaw.replace(/^0+/, '') || '0';
-    list = list.filter(f => {
-      const fn = f.no.replace(/^0+/, '') || '0';
-      return fn === n || f.no.indexOf(noRaw) >= 0;
+  function update(dt) {
+    /* 飞船平滑移动 */
+    ship.x += (ship.targetX - ship.x) * 0.18;
+    ship.x = Math.max(ship.w / 2, Math.min(W - ship.w / 2, ship.x));
+
+    /* 生成星星 */
+    spawnTimer += dt;
+    if (spawnTimer > 40) {
+      spawnTimer = 0;
+      spawnStar();
+    }
+
+    /* 星星下落 */
+    for (let i = stars.length - 1; i >= 0; i--) {
+      const s = stars[i];
+      s.y += s.vy * dt;
+      s.rot += s.rotSpeed * dt;
+
+      /* 碰撞检测 */
+      const dx = Math.abs(s.x - ship.x);
+      const dy = Math.abs(s.y - ship.y);
+      if (dx < ship.w / 2 && dy < ship.h / 2 + s.r) {
+        score++;
+        scoreEl.textContent = score;
+        addParticles(s.x, s.y, theme().star);
+        stars.splice(i, 1);
+        continue;
+      }
+
+      /* 漏掉 */
+      if (s.y > H + 30) {
+        stars.splice(i, 1);
+        missed++;
+        if (missed >= 3) {
+          gameOver();
+          return;
+        }
+      }
+    }
+
+    /* 粒子 */
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 0.08 * dt;
+      p.life -= 0.03 * dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function drawStar(s, color) {
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(s.rot);
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const outer = s.r;
+      const inner = s.r * 0.45;
+      const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+      const x1 = Math.cos(angle) * outer;
+      const y1 = Math.sin(angle) * outer;
+      const x2 = Math.cos(angle + Math.PI / 5) * inner;
+      const y2 = Math.sin(angle + Math.PI / 5) * inner;
+      if (i === 0) ctx.moveTo(x1, y1);
+      else ctx.lineTo(x1, y1);
+      ctx.lineTo(x2, y2);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function draw() {
+    const t = theme();
+
+    /* 背景 */
+    ctx.fillStyle = t.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    /* 顶部漏掉计数 */
+    ctx.font = '500 16px -apple-system, "PingFang SC", sans-serif';
+    ctx.fillStyle = t.sub;
+    ctx.textAlign = 'right';
+    ctx.fillText('漏掉 ' + missed + ' / 3', W - 24, 34);
+
+    /* 粒子 */
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    /* 星星 */
+    for (const s of stars) {
+      ctx.shadowColor = t.starGlow;
+      ctx.shadowBlur = 12;
+      drawStar(s, t.star);
+      ctx.shadowBlur = 0;
+    }
+
+    /* 飞船 */
+    ctx.shadowColor = t.shipGlow;
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    const sx = ship.x;
+    const sy = ship.y;
+    const sw = ship.w / 2;
+    const sh = ship.h / 2;
+    ctx.moveTo(sx, sy - sh - 6);
+    ctx.lineTo(sx + sw, sy + sh);
+    ctx.lineTo(sx - sw, sy + sh);
+    ctx.closePath();
+    ctx.fillStyle = t.ship;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function loop(now) {
+    if (!running) return;
+    const dt = Math.min((now - lastTime) / 16.667, 3);
+    lastTime = now;
+
+    update(dt);
+    draw();
+
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function start() {
+    reset();
+    running = true;
+    startOverlay.classList.add('hidden');
+    overOverlay.classList.add('hidden');
+    lastTime = performance.now();
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function gameOver() {
+    running = false;
+    cancelAnimationFrame(animationId);
+
+    if (score > best) {
+      best = score;
+      localStorage.setItem('slcleo-game-best', String(best));
+      bestEl.textContent = best;
+    }
+
+    finalScoreEl.textContent = score;
+    overOverlay.classList.remove('hidden');
+  }
+
+  /* ── 按钮 ── */
+  startBtn.addEventListener('click', start);
+  restartBtn.addEventListener('click', start);
+
+  /* ── 监听系统主题变化 ── */
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (!running) draw();
     });
   }
-  list.sort((a, b) => a.dep.localeCompare(b.dep));
 
-  let connections = [];
-  if(useConn && !noRaw && from && to){
-    connections = findConnections(from, to, date, day);
-  }
-  currentResults = list;
-  currentConnections = connections;
-  renderResults(list, connections, date);
+  /* ── 初始绘制 ── */
+  reset();
+})();
 
-  const cond = [];
-  if(from) cond.push(tf('book.depCond', { v: from }));
-  if(to) cond.push(tf('book.arrCond', { v: to }));
-  if(noRaw) cond.push(tf('book.noCond', { v: 'YU' + noRaw }));
-  if(useConn && !noRaw) cond.push(t('book.connection'));
-
-  const totalCount = list.length + connections.length;
-  let metaHtml = mdLabel(date) + ' ' + wdLabel(date) + ' · ' +
-    (cond.length ? cond.join(' · ') : t('book.allFlights')) +
-    ' · <b>' + tf('book.count', { n: totalCount }) + '</b>';
-  if(isToday) metaHtml += ' · <span style="color:#a97a22;font-weight:700">' + t('book.todayNotDeparted') + '</span>';
-  $('searchMeta').innerHTML = metaHtml;
-}
-
-function renderResults(list, connections, date){
-  const box = $('resultList');
-  if(!list.length && !connections.length){
-    box.innerHTML = '<div class="empty-state"><span class="big">✈</span>'
-      + t('book.empty') + '<br>' + t('book.emptyHint') + '</div>';
-    return;
-  }
-  let html = '';
-  if(list.length){
-    html += `<div class="result-section-title rsc-direct"><span class="rsc-badge">✈ ${t('book.direct')}</span><span class="rsc-count">${tf('book.count', { n: list.length })}</span></div>`;
-    html += list.map((f, i) => renderFlightCard(f, i, date)).join('');
-  }
-  if(connections.length){
-    html += `<div class="result-section-title rsc-conn"><span class="rsc-badge">⇌ ${t('book.connections')}</span><span class="rsc-count">${tf('book.count', { n: connections.length })}</span></div>`;
-    html += connections.map((c, i) => renderConnCard(c, i, date)).join('');
-  }
-  box.innerHTML = html;
-}
-
-function renderFlightCard(f, i, date){
-  const arrOffset = calcArrDayOffset(f.dep, f.arr);
-  const arrDate = addDays(date, arrOffset);
-  const delay = Math.min(i * 0.035, 0.55);
-  return `
-  <div class="flight-card" data-no="${f.no}" style="animation-delay:${delay}s">
-    <div class="fc-row">
-      <div class="fc-no">YU${f.no}</div>
-      <div class="fc-seg">
-        <div class="fc-col"><div class="fc-time">${f.dep}</div><div class="fc-date">${mdLabel(date)} ${wdLabel(date)}</div><div class="fc-ap">${airportLabel(f.from)}</div></div>
-        <div class="fc-mid"><div class="fc-dur">${f.dur}</div><div class="fc-line"></div><div class="fc-dur">${t('book.nonstop')}</div></div>
-        <div class="fc-col right"><div class="fc-time">${f.arr}${arrOffset ? '<sup>+' + arrOffset + '</sup>' : ''}</div><div class="fc-date">${mdLabel(arrDate)} ${wdLabel(arrDate)}</div><div class="fc-ap">${airportLabel(f.to)}</div></div>
-      </div>
-      <div class="fc-arrow">▾</div>
-    </div>
-    <div class="fc-detail">
-      <div class="detail-grid">
-        <div><span>${t('book.flightNo')}</span><b>YU${f.no}</b></div>
-        <div><span>${t('book.depDate')}</span><b>${ymd(date)} ${wdLabel(date)} ${f.dep}</b></div>
-        <div><span>${t('book.arrDate')}</span><b>${ymd(arrDate)} ${wdLabel(arrDate)} ${f.arr}</b></div>
-        <div><span>${t('book.depAirport')}</span><b>${airportLabel(f.from)}</b></div>
-        <div><span>${t('book.arrAirport')}</span><b>${airportLabel(f.to)}</b></div>
-        <div><span>${t('book.depFreq')}</span><b>${freqLabel(f.depDays)}</b></div>
-        <div><span>${t('book.arrFreq')}</span><b>${freqLabel(f.arrDays)}</b></div>
-        <div><span>${t('book.duration')}</span><b>${f.dur}</b></div>
-        <div><span>${t('book.class')}</span><b>${t('book.classVal')}</b></div>
-      </div>
-      <div class="detail-foot">
-        <span class="hint">${t('book.collapseHint')}</span>
-        <button class="primary-btn book-btn" data-no="${f.no}">${t('book.book')}</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-function renderConnCard(conn, idx, date){
-  const { leg1, leg2, layover, nextDayOffset, hub } = conn;
-  const totalDur = connTotalDur(conn);
-  const delay = Math.min(idx * 0.035, 0.55);
-  const arrOffset1 = calcArrDayOffset(leg1.dep, leg1.arr);
-  const arrDate1 = addDays(date, arrOffset1);
-  const depDate2 = addDays(date, nextDayOffset);
-  const arrOffset2 = calcArrDayOffset(leg2.dep, leg2.arr);
-  const arrDate2 = addDays(depDate2, arrOffset2);
-  const hubShort = cityLabel(hub);
-  const offsetTag = nextDayOffset > 0 ? '<span class="cc-nextday">' + tf('book.dayOffsetTag', { n: nextDayOffset }) + '</span>' : '';
-  return `
-  <div class="conn-card" data-conn-idx="${idx}" style="animation-delay:${delay}s">
-    <div class="cc-head">
-      <span class="cc-badge">${t('book.connections')}</span>
-      <span class="cc-via">${tf('book.viaHub', { v: hubShort })}</span>
-      <span class="cc-total">${t('book.totalDur')} · ${fmtDurMin(totalDur)}</span>
-      <span class="cc-arrow">▾</span>
-    </div>
-    <div class="cc-legs">
-      <div class="cc-leg"><span class="cc-leg-no">YU${leg1.no}</span><span class="cc-leg-route"><span class="cc-city">${cityLabel(leg1.from)}</span><span class="cc-time-stack"><span class="cc-time">${leg1.dep}</span><span class="cc-date-inline">${mdLabel(date)}</span></span><span class="cc-arrow-sm">→</span><span class="cc-city">${cityLabel(leg1.to)}</span><span class="cc-time-stack"><span class="cc-time">${leg1.arr}${arrOffset1 ? '<sup style="color:#e2453c;font-size:10px">+' + arrOffset1 + '</sup>' : ''}</span><span class="cc-date-inline">${mdLabel(arrDate1)}</span></span></span></div>
-      <div class="cc-layover"><span>${t('book.layover')} ${fmtLayover(layover)}</span><span class="cc-layover-line"></span><span style="color:#9aa8bd;font-weight:600">${hubShort}${offsetTag}</span></div>
-      <div class="cc-leg"><span class="cc-leg-no">YU${leg2.no}</span><span class="cc-leg-route"><span class="cc-city">${cityLabel(leg2.from)}</span><span class="cc-time-stack"><span class="cc-time">${leg2.dep}</span><span class="cc-date-inline">${mdLabel(depDate2)}</span></span><span class="cc-arrow-sm">→</span><span class="cc-city">${cityLabel(leg2.to)}</span><span class="cc-time-stack"><span class="cc-time">${leg2.arr}${arrOffset2 ? '<sup style="color:#e2453c;font-size:10px">+' + arrOffset2 + '</sup>' : ''}</span><span class="cc-date-inline">${mdLabel(arrDate2)}</span></span></span></div>
-    </div>
-    <div class="cc-detail"><div class="cc-detail-inner">
-      <div class="cc-detail-leg">
-        <div class="cc-detail-leg-head"><span class="cc-detail-leg-tag">${t('book.leg1')}</span><span class="cc-detail-leg-no">YU${leg1.no}</span><span class="cc-detail-leg-date">${ymd(date)} ${wdLabel(date)}</span></div>
-        <div class="cc-detail-grid">
-          <div><span>${t('book.depAirport')}</span><b>${airportLabel(leg1.from)}</b></div>
-          <div><span>${t('book.arrAirport')}</span><b>${airportLabel(leg1.to)}</b></div>
-          <div><span>${t('book.depDate')}</span><b>${ymd(date)} ${wdLabel(date)} ${leg1.dep}</b></div>
-          <div><span>${t('book.arrDate')}</span><b>${ymd(arrDate1)} ${wdLabel(arrDate1)} ${leg1.arr}</b></div>
-          <div><span>${t('book.depFreq')}</span><b>${freqLabel(leg1.depDays)}</b></div>
-          <div><span>${t('book.arrFreq')}</span><b>${freqLabel(leg1.arrDays)}</b></div>
-          <div><span>${t('book.duration')}</span><b>${leg1.dur}</b></div>
-          <div><span>${t('book.class')}</span><b>${t('book.classVal')}</b></div>
-        </div>
-      </div>
-      <div class="cc-detail-leg">
-        <div class="cc-detail-leg-head"><span class="cc-detail-leg-tag gold">${t('book.leg2')}</span><span class="cc-detail-leg-no">YU${leg2.no}</span><span class="cc-detail-leg-date">${ymd(depDate2)} ${wdLabel(depDate2)}</span></div>
-        <div class="cc-detail-grid">
-          <div><span>${t('book.depAirport')}</span><b>${airportLabel(leg2.from)}</b></div>
-          <div><span>${t('book.arrAirport')}</span><b>${airportLabel(leg2.to)}</b></div>
-          <div><span>${t('book.depDate')}</span><b>${ymd(depDate2)} ${wdLabel(depDate2)} ${leg2.dep}</b></div>
-          <div><span>${t('book.arrDate')}</span><b>${ymd(arrDate2)} ${wdLabel(arrDate2)} ${leg2.arr}</b></div>
-          <div><span>${t('book.depFreq')}</span><b>${freqLabel(leg2.depDays)}</b></div>
-          <div><span>${t('book.arrFreq')}</span><b>${freqLabel(leg2.arrDays)}</b></div>
-          <div><span>${t('book.duration')}</span><b>${leg2.dur}</b></div>
-          <div><span>${t('book.class')}</span><b>${t('book.classVal')}</b></div>
-        </div>
-      </div>
-      <div class="cc-detail-foot">
-        <span class="hint">${t('book.layover')} ${fmtLayover(layover)} · ${t('book.totalDur')} ${fmtDurMin(totalDur)}</span>
-        <button class="primary-btn conn-book-btn" data-idx="${idx}">${t('book.bookConn')}</button>
-      </div>
-    </div></div>
-  </div>`;
-}
-
-$('resultList').addEventListener('click', e => {
-  const connBookBtn = e.target.closest('.conn-book-btn');
-  if(connBookBtn){
-    e.stopPropagation();
-    const idx = Number(connBookBtn.dataset.idx);
-    if(currentConnections[idx]) bookConnection(currentConnections[idx], selectedDate);
-    return;
-  }
-  const bookBtn = e.target.closest('.book-btn');
-  if(bookBtn){
-    e.stopPropagation();
-    const f = FLIGHTS.find(x => x.no === bookBtn.dataset.no);
-    if(f) bookFlight(f, selectedDate);
-    return;
-  }
-  const ccHead = e.target.closest('.cc-head');
-  if(ccHead){ ccHead.parentElement.classList.toggle('expanded'); return; }
-  const row = e.target.closest('.fc-row');
-  if(row){ row.parentElement.classList.toggle('expanded'); }
+/* ── 刷新按钮 ── */
+document.getElementById('refresh-btn').addEventListener('click', () => {
+  location.reload();
 });
-
-function bookFlight(f, date){
-  const id = f.no + '_' + ymd(date);
-  if(trips.some(tt => tt.id === id)){ toast(t('book.dup')); return; }
-  trips.push({
-    id: id, uid: uid++,
-    flight: f, dateStr: ymd(date),
-    depTs: depTsOf(date, f.dep),
-    nextDay: calcArrDayOffset(f.dep, f.arr),
-    conn: false, groupId: null
-  });
-  renderTrips();
-  renderHome();
-  toast(tf('book.added', { n: f.no }));
-}
-
-function bookConnection(conn, date){
-  const { leg1, leg2, nextDayOffset } = conn;
-  const date1 = date;
-  const date2 = addDays(date, nextDayOffset);
-  const groupId = leg1.no + '+' + leg2.no + '_' + ymd(date1);
-  if(trips.some(tt => tt.groupId === groupId && tt.conn)){ toast(t('book.connDup')); return; }
-  const id1 = leg1.no + '_' + ymd(date1);
-  const id2 = leg2.no + '_' + ymd(date2);
-  if(trips.some(tt => tt.id === id1) && trips.some(tt => tt.id === id2)){ toast(t('book.connDup')); return; }
-  if(!trips.some(tt => tt.id === id1)){
-    trips.push({ id: id1, uid: uid++, flight: leg1, dateStr: ymd(date1), depTs: depTsOf(date1, leg1.dep), nextDay: calcArrDayOffset(leg1.dep, leg1.arr), conn: true, groupId: groupId, connLeg: 1 });
-  }
-  if(!trips.some(tt => tt.id === id2)){
-    trips.push({ id: id2, uid: uid++, flight: leg2, dateStr: ymd(date2), depTs: depTsOf(date2, leg2.dep), nextDay: calcArrDayOffset(leg2.dep, leg2.arr), conn: true, groupId: groupId, connLeg: 2 });
-  }
-  renderTrips();
-  renderHome();
-  toast(tf('book.connAdded', { n1: leg1.no, n2: leg2.no }));
-}
-
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    tab.classList.add('active');
-    currentTab = tab.dataset.tab;
-    renderTrips();
-  });
-});
-
-$('tripList').addEventListener('click', e => {
-  const btn = e.target.closest('[data-cancel]');
-  if(!btn) return;
-  const id = btn.dataset.cancel;
-  const tt = trips.find(x => x.id === id);
-  trips = trips.filter(x => x.id !== id);
-  renderTrips();
-  renderHome();
-  toast(tf('trip.cancelled', { n: tt ? tt.flight.no : '' }));
-});
-
-function renderTrips(){
-  const now = Date.now();
-  const up = [], past = [];
-  trips.forEach(tt => { (tt.depTs > now ? up : past).push(tt); });
-  up.sort((a, b) => a.depTs - b.depTs);
-  past.sort((a, b) => b.depTs - a.depTs);
-  $('cntUp').textContent = up.length;
-  $('cntPast').textContent = past.length;
-  const list = currentTab === 'upcoming' ? up : past;
-  const box = $('tripList');
-  if(!list.length){
-    box.innerHTML = '<div class="empty-state"><span class="big">🧳</span>' +
-      (currentTab === 'upcoming' ? t('trip.emptyUp') : t('trip.emptyPast')) + '</div>';
-    return;
-  }
-  box.innerHTML = list.map((tt, i) => {
-    const f = tt.flight;
-    const isPast = tt.depTs <= now;
-    const d = new Date(tt.depTs);
-    const label = mdLabel(d) + ' ' + wdLabel(d);
-    const connTag = tt.conn ? '<span class="tc-tag conn">' + t('trip.tagConn') + '</span>' : '';
-    return `
-    <div class="trip-card ${isPast ? 'past' : ''} ${tt.conn ? 'conn' : ''}" style="animation-delay:${Math.min(i * 0.045, 0.42)}s">
-      <div class="tc-left">
-        <div class="tc-top">
-          <span class="tc-no">YU${f.no}</span>
-          <span class="tc-date">${label}</span>
-          <span class="tc-tag ${isPast ? '' : 'live'}">${isPast ? t('trip.tagPast') : t('trip.tagUp')}</span>
-          ${connTag}
-        </div>
-        <div class="tc-route">
-          <div class="tc-p"><b>${f.dep}</b><span>${airportLabel(f.from)}</span></div>
-          <div class="tc-line">✈ ——</div>
-          <div class="tc-p right"><b>${f.arr}${tt.nextDay ? '<sup>+1</sup>' : ''}</b><span>${airportLabel(f.to)}</span></div>
-        </div>
-      </div>
-      <button class="ghost-btn" data-cancel="${tt.id}">${t('trip.cancel')}</button>
-    </div>`;
-  }).join('');
-}
-
-function updateFlightSourceTip(){
-  const btn = $('updateFlightsBtn');
-  if(!btn) return;
-  const base = t('schedule.update');
-  if(flightSourceCustom){
-    btn.textContent = base + ' · ' + t('flightData.customTip');
-    btn.style.borderColor = '#e2c78a';
-    btn.style.background = '#fffdf7';
-    btn.style.color = '#a97a22';
-  } else {
-    btn.textContent = base;
-    btn.style.borderColor = '';
-    btn.style.background = '';
-    btn.style.color = '';
-  }
-}
-
-function renderSchedule(){
-  const q = currentScheduleFilter.trim().toLowerCase();
-  let list = FLIGHTS.slice();
-  if(q){
-    const qq = q.replace(/^yu/i, '');
-    list = list.filter(f => {
-      if(f.no.toLowerCase().indexOf(q) >= 0) return true;
-      if(qq && f.no.replace(/^0+/, '').indexOf(qq) >= 0) return true;
-      if(airportMatches(f.from, currentScheduleFilter)) return true;
-      if(airportMatches(f.to, currentScheduleFilter)) return true;
-      return false;
-    });
-  }
-  list.sort((a, b) => Number(a.no) - Number(b.no));
-  $('schedCount').textContent = tf('schedule.count', { n: list.length });
-  updateFlightSourceTip();
-  const body = $('schedBody');
-  if(!list.length){
-    body.innerHTML = '<tr><td colspan="6" class="sched-empty"><span class="big">✈</span>'
-      + t('schedule.empty') + '</td></tr>';
-  } else {
-    body.innerHTML = list.map((f, i) => {
-      const delay = Math.min(i * 0.008, 0.4);
-      const arrOffset = calcArrDayOffset(f.dep, f.arr);
-      const v = validateFlight(f);
-      const warn = v.valid ? '' : '<span class="sched-warn" title="' + tf('flightData.tzWarnLine', {n:f.no, e:v.expected, a:v.actual, d:v.diff}) + '">⚠</span>';
-      const rowCls = v.valid ? '' : 'row-warn';
-      return `
-      <tr class="${rowCls}" style="animation-delay:${delay}s">
-        <td><span class="sched-no">YU${f.no}</span>${warn}</td>
-        <td><span class="sched-airport" title="${airportLabel(f.from)}">${airportLabel(f.from)}</span></td>
-        <td><span class="sched-time">${f.dep}</span> <span class="sched-dur">· ${f.dur}</span></td>
-        <td>${freqLabel(f.depDays)}</td>
-        <td><span class="sched-airport" title="${airportLabel(f.to)}">${airportLabel(f.to)}</span></td>
-        <td><span class="sched-time">${f.arr}${arrOffset ? ' <sup style="color:#e2453c;font-size:10px">+' + arrOffset + '</sup>' : ''}</span></td>
-      </tr>`;
-    }).join('');
-  }
-
-  // 时差校验汇总警告条
-  const allWarns = [];
-  FLIGHTS.forEach(f => {
-    const v = validateFlight(f);
-    if(!v.valid) allWarns.push({no:f.no, expected:v.expected, actual:v.actual, diff:v.diff, flight:f});
-  });
-  const warnBar = $('schedWarnBar');
-  const warnText = $('schedWarnText');
-  if(allWarns.length){
-    warnBar.classList.remove('hidden');
-    let html = '<b>' + tf('schedWarn.title', {n: allWarns.length}) + '</b>　' + t('schedWarn.hint') + '<br>';
-    allWarns.slice(0, 8).forEach(w => {
-      html += '<code>YU' + w.no + '</code> ' + w.flight.from + ' → ' + w.flight.to + '：' +
-        tf('schedWarn.item', {dep:w.flight.dep, dur:w.flight.dur, arr:w.flight.arr, exp:w.expected, diff:w.diff}) + '<br>';
-    });
-    if(allWarns.length > 8) html += '<i>…' + tf('schedWarn.more', {n: allWarns.length - 8}) + '</i>';
-    warnText.innerHTML = html;
-  } else {
-    warnBar.classList.add('hidden');
-  }
-}
-
-$('schedSearch').addEventListener('input', e => {
-  currentScheduleFilter = e.target.value;
-  renderSchedule();
-});
-
-function exportFlights(){
-  if(!FLIGHTS.length){ toast(t('schedule.exportEmpty')); return; }
-  const header =
-`# 云悦航空 · 航班表 v2（导出文件）
-# ═══════════════════════════════════════════════════════════════
-# 字段（用 | 分隔，共 8 列）：
-#   1 航班号   2 出发机场   3 出发时刻   4 出发周期
-#   5 到达机场 6 到达时刻   7 到达周期   8 飞行时长
-# ═══════════════════════════════════════════════════════════════
-# 跨天规则：到达时刻 ≤ 出发时刻 → 次日到达(+1)
-# 时差规则：出发 + 飞行 + 时差 = 到达（±2分钟容忍）
-# 周期写法：每天 / 周一 / 周一、周三、周五
-# 注释行（以 # 开头）与空行会被忽略
-# ═══════════════════════════════════════════════════════════════
-航班号|出发机场|出发时刻|出发周期|到达机场|到达时刻|到达周期|飞行时长`;
-  const lines = FLIGHTS.map(f =>
-    [f.no, f.from, f.dep, f.depDays, f.to, f.arr, f.arrDays, f.dur].join('|')
-  );
-  const text = header + '\n' + lines.join('\n') + '\n';
-  const blob = new Blob(['\ufeff' + text], { type:'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const now = new Date();
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'JOY_CLOUD_Flight_Data_' + ymd(now) + '.txt';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1600);
-  toast(tf('schedule.exportDone', { n: FLIGHTS.length }));
-}
-$('exportFlightsBtn').addEventListener('click', exportFlights);
-
-function closeFlightModal(){ $('flightModal').classList.add('hidden'); }
-$('updateFlightsBtn').addEventListener('click', () => {
-  $('flightModal').classList.remove('hidden');
-  $('flightText').value = '';
-  $('flightMsg').textContent = '';
-  $('flightMsg').className = 'modal-msg';
-});
-$('flightCancel').addEventListener('click', closeFlightModal);
-$('flightModal').addEventListener('click', e => { if(e.target === $('flightModal')) closeFlightModal(); });
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape' && !$('flightModal').classList.contains('hidden')) closeFlightModal();
-});
-$('flightFile').addEventListener('change', e => {
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    $('flightText').value = ev.target.result || '';
-    $('flightMsg').textContent = tf('import.fileLoaded', { name: file.name });
-    $('flightMsg').className = 'modal-msg ok';
-  };
-  reader.onerror = () => {
-    $('flightMsg').textContent = t('import.fileErr');
-    $('flightMsg').className = 'modal-msg err';
-  };
-  reader.readAsText(file, 'UTF-8');
-  e.target.value = '';
-});
-$('flightConfirm').addEventListener('click', () => {
-  const text = $('flightText').value.trim();
-  if(!text){ $('flightMsg').textContent = t('flightData.needText'); $('flightMsg').className = 'modal-msg err'; return; }
-  const arr = parseFlights(text);
-  if(!arr.length){ $('flightMsg').textContent = t('flightData.invalid'); $('flightMsg').className = 'modal-msg err'; return; }
-
-  const warns = [];
-  arr.forEach(f => {
-    const v = validateFlight(f);
-    if(!v.valid) warns.push({no:f.no, e:v.expected, a:v.actual, d:v.diff});
-  });
-
-  FLIGHTS = arr;
-  flightSourceCustom = true;
-  try { localStorage.setItem(FLIGHT_STORAGE_KEY, text); } catch(e){}
-  renderSchedule();
-  renderLive();
-  const hasMeta = $('searchMeta').textContent.trim() && !$('searchMeta').querySelector('.warn');
-  if(hasMeta) doSearch();
-
-  let msg = tf('flightData.success', { n: arr.length });
-  if(warns.length){
-    msg += '\n' + tf('flightData.tzWarn', { n: warns.length });
-    warns.slice(0,5).forEach(w => {
-      msg += '\n' + tf('flightData.tzWarnLine', {n:w.no, e:w.e, a:w.a, d:w.d});
-    });
-    if(warns.length > 5) msg += '\n...';
-  }
-  $('flightMsg').textContent = msg;
-  $('flightMsg').className = 'modal-msg ' + (warns.length ? 'err' : 'ok');
-  $('flightMsg').style.whiteSpace = 'pre-wrap';
-  $('flightMsg').style.textAlign = 'left';
-  toast(tf('flightData.success', { n: arr.length }));
-});
-$('flightReset').addEventListener('click', () => {
-  try { localStorage.removeItem(FLIGHT_STORAGE_KEY); } catch(e){}
-  FLIGHTS = parseFlights(DEFAULT_RAW);
-  flightSourceCustom = false;
-  renderSchedule();
-  renderLive();
-  const hasMeta = $('searchMeta').textContent.trim() && !$('searchMeta').querySelector('.warn');
-  if(hasMeta) doSearch();
-  $('flightText').value = '';
-  $('flightMsg').textContent = t('flightData.resetDone');
-  $('flightMsg').className = 'modal-msg ok';
-  toast(t('flightData.resetDone'));
-});
-
-function exportTrips(){
-  if(!trips.length){ toast(t('export.empty')); return; }
-  const now = new Date();
-  const exportTime = ymd(now) + ' ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes());
-  const sorted = trips.slice().sort((a, b) => a.depTs - b.depTs);
-  const lines = [];
-  lines.push(t('export.h1'));
-  lines.push('========================================');
-  lines.push(tf('export.member', { v: fullName() + ' (' + genderText() + ')' }));
-  lines.push(tf('export.time', { v: exportTime }));
-  lines.push(tf('export.total', { v: sorted.length }));
-  lines.push('----------------------------------------');
-  lines.push('');
-  sorted.forEach(tt => {
-    const f = tt.flight;
-    const d = new Date(tt.depTs);
-    const nextDay = tt.nextDay ? ' (+1)' : '';
-    lines.push('YU' + f.no + ' | ' + tt.dateStr + ' ' + wdLabel(d)
-      + ' | ' + airportLabel(f.from) + ' ' + f.dep + ' → ' + airportLabel(f.to) + ' ' + f.arr + nextDay
-      + ' | ' + f.dur);
-  });
-  lines.push('');
-  const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type:'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'JOY_CLOUD_Wanglan_Trips_' + ymd(now) + '.txt';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1600);
-  toast(tf('export.done', { n: sorted.length }));
-}
-
-function parseAndImport(text){
-  const lines = text.split(/\r?\n/);
-  let added = 0, dup = 0, bad = 0;
-  lines.forEach(line => {
-    const noMatch = line.match(/YU\s*(\d{1,4})/i);
-    if(!noMatch) return;
-    const dateMatch = line.match(/(\d{4})\s*[-\/.]\s*(\d{1,2})\s*[-\/.]\s*(\d{1,2})/);
-    if(!dateMatch) return;
-    const f = FLIGHTS.find(x => Number(x.no) === Number(noMatch[1]));
-    if(!f){ bad++; return; }
-    const y = Number(dateMatch[1]);
-    const m = Number(dateMatch[2]);
-    const d = Number(dateMatch[3]);
-    const date = new Date(y, m - 1, d);
-    date.setHours(0, 0, 0, 0);
-    if(date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d){ bad++; return; }
-    const dateStr = ymd(date);
-    const id = f.no + '_' + dateStr;
-    if(trips.some(tt => tt.id === id)){ dup++; return; }
-    trips.push({
-      id: id, uid: uid++,
-      flight: f, dateStr: dateStr,
-      depTs: depTsOf(date, f.dep),
-      nextDay: calcArrDayOffset(f.dep, f.arr),
-      conn: false, groupId: null
-    });
-    added++;
-  });
-  return { added, dup, bad };
-}
-
-function closeImport(){ $('importModal').classList.add('hidden'); }
-$('exportBtn').addEventListener('click', exportTrips);
-$('importBtn').addEventListener('click', () => {
-  $('importModal').classList.remove('hidden');
-  $('importText').value = '';
-  $('importMsg').textContent = '';
-  $('importMsg').className = 'modal-msg';
-});
-$('importCancel').addEventListener('click', closeImport);
-$('importModal').addEventListener('click', e => { if(e.target === $('importModal')) closeImport(); });
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape' && !$('importModal').classList.contains('hidden')) closeImport();
-});
-$('importFile').addEventListener('change', e => {
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    $('importText').value = ev.target.result || '';
-    $('importMsg').textContent = tf('import.fileLoaded', { name: file.name });
-    $('importMsg').className = 'modal-msg ok';
-  };
-  reader.onerror = () => {
-    $('importMsg').textContent = t('import.fileErr');
-    $('importMsg').className = 'modal-msg err';
-  };
-  reader.readAsText(file, 'UTF-8');
-  e.target.value = '';
-});
-$('importConfirm').addEventListener('click', () => {
-  const text = $('importText').value.trim();
-  if(!text){ $('importMsg').textContent = t('import.needText'); $('importMsg').className = 'modal-msg err'; return; }
-  const r = parseAndImport(text);
-  renderTrips();
-  renderHome();
-  if(r.added === 0 && r.dup === 0 && r.bad === 0){
-    $('importMsg').textContent = t('import.none');
-    $('importMsg').className = 'modal-msg err';
-    return;
-  }
-  $('importMsg').textContent = tf('import.result', { a: r.added, d: r.dup, b: r.bad });
-  $('importMsg').className = 'modal-msg ' + (r.added > 0 ? 'ok' : 'err');
-  if(r.added > 0) toast(tf('import.toast', { n: r.added }));
-});
-
-applyI18n();
 </script>
+
+<!-- Font Awesome（图标） -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 </body>
 </html>
