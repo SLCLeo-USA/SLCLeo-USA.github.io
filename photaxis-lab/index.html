@@ -157,7 +157,7 @@ h1{
   gap:16px;
   justify-content:center;
   flex-wrap:wrap;
-  margin-bottom:72px;
+  margin-bottom:32px;
 }
 .btn{
   font-size:1rem;
@@ -187,6 +187,33 @@ h1{
 .btn-outline:hover{
   background:rgba(0,122,255,0.08);
 }
+
+/* ── 玩游戏 CTA ── */
+.game-cta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+  padding:16px 26px;
+  margin-bottom:40px;
+  font-size:1rem;
+  font-family:inherit;
+  font-weight:500;
+  color:#c93400;
+  background:linear-gradient(135deg, rgba(255,159,10,0.14), rgba(255,90,80,0.10));
+  border:1px dashed rgba(255,120,60,0.45);
+  border-radius:18px;
+  cursor:pointer;
+  transition:background 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.game-cta:hover{
+  background:linear-gradient(135deg, rgba(255,159,10,0.22), rgba(255,90,80,0.16));
+  border-color:rgba(255,120,60,0.75);
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(255,120,60,0.16);
+}
+.game-cta .ico{font-size:1.15rem;line-height:1;}
 
 /* ── 跳转卡片 ── */
 .redirect-card{
@@ -235,6 +262,55 @@ h1{
   text-decoration:underline;
 }
 
+/* ══════════════════════════════════════════
+   游戏全屏覆盖层
+   ══════════════════════════════════════════ */
+.game-overlay{
+  position:fixed;
+  inset:0;
+  z-index:999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:#0a0c12;
+  overflow:hidden;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.game-overlay.show{display:flex;}
+.game-overlay canvas{
+  display:block;
+  border-radius:12px;
+  box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06);
+}
+.game-close{
+  position:fixed;
+  top:16px;
+  right:16px;
+  z-index:1001;
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:17px;
+  font-family:inherit;
+  color:#f5f5f7;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:50%;
+  cursor:pointer;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.game-close:hover{
+  background:rgba(255,255,255,0.18);
+  border-color:rgba(255,255,255,0.35);
+  transform:scale(1.06);
+}
+
 /* ── 移动端 ── */
 @media (max-width:640px){
   body{padding:32px 16px 56px;}
@@ -243,9 +319,11 @@ h1{
   .lang-menu{min-width:130px;}
   .badge{margin-bottom:24px;}
   .desc-sub{margin-bottom:40px;}
-  .btn-group{flex-direction:column;gap:12px;margin-bottom:48px;}
+  .btn-group{flex-direction:column;gap:12px;margin-bottom:24px;}
   .btn{width:100%;text-align:center;}
+  .game-cta{margin-bottom:32px;padding:15px 20px;font-size:0.95rem;}
   .redirect-card{padding:26px 24px;border-radius:16px;}
+  .game-close{top:10px;right:10px;width:38px;height:38px;}
 }
 
 /* ── 深色模式 ── */
@@ -259,6 +337,15 @@ h1{
   .btn-primary:hover{background:#349cff;border-color:#349cff;}
   .btn-outline{border-color:#2997ff;color:#2997ff;}
   .btn-outline:hover{background:rgba(41,151,255,0.1);}
+  .game-cta{
+    color:#ffb340;
+    background:linear-gradient(135deg, rgba(255,159,10,0.16), rgba(255,90,80,0.12));
+    border-color:rgba(255,150,80,0.4);
+  }
+  .game-cta:hover{
+    background:linear-gradient(135deg, rgba(255,159,10,0.26), rgba(255,90,80,0.2));
+    border-color:rgba(255,150,80,0.7);
+  }
   .redirect-card{background:#1e1e22;border-color:rgba(255,255,255,0.08);}
   .redirect-card:hover{box-shadow:0 12px 40px rgba(0,0,0,0.3);}
   .redirect-card .card-label{color:#86868b;}
@@ -318,6 +405,12 @@ h1{
     <a class="btn btn-outline" href="mailto:godsunwyyx123spx@163.com" data-i18n="contactBtn"></a>
   </div>
 
+  <!-- 玩游戏入口 -->
+  <button class="game-cta" id="playGame">
+    <span class="ico">🎮</span>
+    <span data-i18n="playBtn"></span>
+  </button>
+
   <!-- 跳转卡片 -->
   <a class="redirect-card" href="https://photaxis-lab.github.io/">
     <div class="card-label" data-i18n="cardLabel"></div>
@@ -326,6 +419,14 @@ h1{
     <span class="card-link" data-i18n="cardLink"></span>
   </a>
 
+</div>
+
+<!-- ══════════════════════════════════════════
+     游戏覆盖层
+     ══════════════════════════════════════════ -->
+<div class="game-overlay" id="gameOverlay">
+  <canvas id="game"></canvas>
+  <button class="game-close" id="gameClose" aria-label="Close game">✕</button>
 </div>
 
 <script>
@@ -339,9 +440,10 @@ const I18N = {
     badge: "Under Maintenance",
     title: "We're fixing a major issue",
     desc: "The site is currently under emergency maintenance.",
-    descSub: "Service should be back shortly. In the meantime, you can visit our other site.",
+    descSub: "Service should be back shortly. In the meantime, you can visit our other site — or kill some time with a little road trip.",
     refreshBtn: "Refresh",
     contactBtn: "Contact Us",
+    playBtn: "Bored? Play a game while you wait",
     cardLabel: "Meanwhile",
     cardTitle: "Photaxis Lab",
     cardDesc: "While we fix things here, feel free to explore our other site. You will find projects, notes and experiments there.",
@@ -353,9 +455,10 @@ const I18N = {
     badge: "维护中",
     title: "网站正在抢修",
     desc: "我们遇到了一个比较严重的问题，工程师正在紧急处理。",
-    descSub: "服务预计很快恢复。在此期间，您可以先访问我们的另一个站点。",
+    descSub: "服务预计很快恢复。在此期间，您可以先逛逛我们的另一个站点，或者玩个小游戏消磨时间。",
     refreshBtn: "刷新页面",
     contactBtn: "联系我们",
+    playBtn: "等得无聊？玩个小游戏吧",
     cardLabel: "在此期间",
     cardTitle: "Photaxis Lab",
     cardDesc: "在我们修复期间，欢迎先逛逛我们的另一个站点。那里有项目、笔记和实验。",
@@ -367,9 +470,10 @@ const I18N = {
     badge: "Maintenance en cours",
     title: "Nous réparons un problème majeur",
     desc: "Le site est actuellement en maintenance d'urgence.",
-    descSub: "Le service devrait revenir rapidement. En attendant, vous pouvez visiter notre autre site.",
+    descSub: "Le service devrait revenir rapidement. En attendant, vous pouvez visiter notre autre site — ou vous détendre avec un petit jeu.",
     refreshBtn: "Actualiser",
     contactBtn: "Nous contacter",
+    playBtn: "Ennuyé ? Jouez en attendant",
     cardLabel: "En attendant",
     cardTitle: "Photaxis Lab",
     cardDesc: "Pendant que nous réparons, n'hésitez pas à explorer notre autre site. Vous y trouverez des projets, des notes et des expérimentations.",
@@ -445,6 +549,1285 @@ const I18N = {
 document.getElementById('refresh-btn').addEventListener('click', () => {
   location.reload();
 });
+
+/* ── 游戏开关 ── */
+window.__gameActive = false;
+
+(() => {
+  "use strict";
+
+  const overlay  = document.getElementById("gameOverlay");
+  const playBtn  = document.getElementById("playGame");
+  const closeBtn = document.getElementById("gameClose");
+
+  function openGame(){
+    overlay.classList.add("show");
+    document.body.style.overflow = "hidden";
+    window.__gameActive = true;
+    // 让游戏重新计算画布尺寸
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  function closeGame(){
+    overlay.classList.remove("show");
+    document.body.style.overflow = "";
+    window.__gameActive = false;
+  }
+
+  playBtn.addEventListener("click", openGame);
+  closeBtn.addEventListener("click", closeGame);
+
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape" && overlay.classList.contains("show")){
+      closeGame();
+    }
+  });
+})();
+
+
+/* ══════════════════════════════════════════════════════════════
+   ══════════════════ 小游戏：横跨美国 · 公路之旅 ══════════════════
+   ══════════════════════════════════════════════════════════════ */
+(() => {
+'use strict';
+
+// ══════════════════════════════════════════════
+//  基础设置
+// ══════════════════════════════════════════════
+const W = 960, H = 600;
+const cv = document.getElementById('game');
+const ctx = cv.getContext('2d');
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+cv.width = W * DPR; cv.height = H * DPR;
+ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+function fitCanvas(){
+  const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+  cv.style.width  = (W * s) + 'px';
+  cv.style.height = (H * s) + 'px';
+}
+window.addEventListener('resize', fitCanvas);
+fitCanvas();
+
+// ── 3D 投影常量 ──
+const FOCAL      = 300;
+const CAM_H      = 6;
+const HORIZON_Y  = 250;
+const PLAYER_Z   = 6.5;
+const ROAD_HW    = 8;
+const CURVE_AMP  = 15;
+const CURVE_K    = 0.007;
+const LANES      = [-6, -3, 0, 3, 6];
+
+const clamp = (v,a,b) => v < a ? a : v > b ? b : v;
+const rand  = (a,b) => a + Math.random()*(b-a);
+const randi = n => Math.floor(Math.random()*n);
+
+// ══════════════════════════════════════════════
+//  颜色系统：随旅程进度渐变
+// ══════════════════════════════════════════════
+// LA → NY (西到东)
+const SKY_A_LA_NY = [
+  {t:0.00, c:[186, 98,128]},   // 洛杉矶黄昏
+  {t:0.18, c:[236,142, 96]},   // 沙漠落日
+  {t:0.40, c:[124,186,228]},   // 大平原
+  {t:0.65, c:[ 96,172,230]},   // 中西部
+  {t:1.00, c:[ 86,160,220]},   // 东海岸 晴空
+];
+const SKY_B_LA_NY = [
+  {t:0.00, c:[255,172,122]},
+  {t:0.18, c:[255,208,152]},
+  {t:0.40, c:[246,226,188]},
+  {t:0.65, c:[212,234,246]},
+  {t:1.00, c:[190,225,242]},
+];
+const GND_A_LA_NY = [
+  {t:0.00, c:[152,102, 90]},
+  {t:0.18, c:[196,142, 92]},
+  {t:0.40, c:[182,160,100]},
+  {t:0.65, c:[122,168, 78]},
+  {t:1.00, c:[ 88,152, 72]},
+];
+const GND_B_LA_NY = [
+  {t:0.00, c:[118, 78, 72]},
+  {t:0.18, c:[158,112, 70]},
+  {t:0.40, c:[148,130, 78]},
+  {t:0.65, c:[ 94,140, 58]},
+  {t:1.00, c:[ 62,120, 56]},
+];
+
+// NY → LA (东到西) — 反向渐变
+const SKY_A_NY_LA = [
+  {t:0.00, c:[ 86,160,220]},   // 纽约晴空
+  {t:0.35, c:[ 96,172,230]},   // 中西部
+  {t:0.60, c:[124,186,228]},   // 大平原
+  {t:0.82, c:[236,142, 96]},   // 沙漠落日
+  {t:1.00, c:[186, 98,128]},   // 洛杉矶黄昏
+];
+const SKY_B_NY_LA = [
+  {t:0.00, c:[190,225,242]},
+  {t:0.35, c:[212,234,246]},
+  {t:0.60, c:[246,226,188]},
+  {t:0.82, c:[255,208,152]},
+  {t:1.00, c:[255,172,122]},
+];
+const GND_A_NY_LA = [
+  {t:0.00, c:[ 88,152, 72]},
+  {t:0.35, c:[122,168, 78]},
+  {t:0.60, c:[182,160,100]},
+  {t:0.82, c:[196,142, 92]},
+  {t:1.00, c:[152,102, 90]},
+];
+const GND_B_NY_LA = [
+  {t:0.00, c:[ 62,120, 56]},
+  {t:0.35, c:[ 94,140, 58]},
+  {t:0.60, c:[148,130, 78]},
+  {t:0.82, c:[158,112, 70]},
+  {t:1.00, c:[118, 78, 72]},
+];
+
+function lerpC(a,b,t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
+function rgbStr(c){ return `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; }
+function sample(stops, p){
+  p = clamp(p,0,1);
+  for(let i=0;i<stops.length-1;i++){
+    if(p <= stops[i+1].t){
+      const t = (p - stops[i].t) / (stops[i+1].t - stops[i].t || 1);
+      return lerpC(stops[i].c, stops[i+1].c, t);
+    }
+  }
+  return stops[stops.length-1].c.slice();
+}
+
+// ══════════════════════════════════════════════
+//  城市里程表（两个方向）
+// ══════════════════════════════════════════════
+const TOTAL_MILES = 2790;
+
+const ROUTE_LA_NY = [
+  { m:    0, n:'洛杉矶'     },
+  { m:  270, n:'拉斯维加斯' },
+  { m:  570, n:'大峡谷'     },
+  { m:  830, n:'阿尔伯克基' },
+  { m: 1080, n:'阿马里洛'   },
+  { m: 1330, n:'俄克拉荷马城'},
+  { m: 1630, n:'圣路易斯'   },
+  { m: 1900, n:'芝加哥'     },
+  { m: 2790, n:'纽约'       },
+];
+
+const ROUTE_NY_LA = [
+  { m:    0, n:'纽约'       },
+  { m:  790, n:'芝加哥'     },
+  { m: 1050, n:'圣路易斯'   },
+  { m: 1350, n:'俄克拉荷马城'},
+  { m: 1600, n:'阿马里洛'   },
+  { m: 1850, n:'阿尔伯克基' },
+  { m: 2100, n:'大峡谷'     },
+  { m: 2350, n:'拉斯维加斯' },
+  { m: 2790, n:'洛杉矶'     },
+];
+
+// ══════════════════════════════════════════════
+//  游戏状态
+// ══════════════════════════════════════════════
+let G = null;
+let DIRECTION = 'LA_NY'; // 'LA_NY' 或 'NY_LA'
+
+function newGame(){
+  return {
+    mode: 'title',
+    camZ: 0,
+    playerLat: 0,
+    camLat: 0,
+    pointerLat: null,
+    shake: 0,
+    hitFlash: 0,
+    slowT: 0,
+    time: 0,
+    objects: [],
+    particles: [],
+    nextObs: 150,
+    nextScen: 20,
+    notif: null,
+    passed: new Set(),
+    best: 0,
+    flash: 0,
+    endT: 0,
+    deathCause: '',
+  };
+}
+G = newGame();
+
+const BASE_SPEED = 40;
+const NPC_SPEED_FACTOR = 0.83;
+
+// 根据方向获取当前使用的城市表和颜色表
+function getCities(){
+  return DIRECTION === 'LA_NY' ? ROUTE_LA_NY : ROUTE_NY_LA;
+}
+function getColors(){
+  if(DIRECTION === 'LA_NY'){
+    return { skyA: SKY_A_LA_NY, skyB: SKY_B_LA_NY, gndA: GND_A_LA_NY, gndB: GND_B_LA_NY };
+  } else {
+    return { skyA: SKY_A_NY_LA, skyB: SKY_B_NY_LA, gndA: GND_A_NY_LA, gndB: GND_B_NY_LA };
+  }
+}
+
+// ══════════════════════════════════════════════
+//  投影
+// ══════════════════════════════════════════════
+function roadOffset(rz){
+  return CURVE_AMP * (Math.sin((G.camZ + rz) * CURVE_K) - Math.sin(G.camZ * CURVE_K));
+}
+function project(rz, lat){
+  const s = FOCAL / rz;
+  return {
+    x: W/2 + (roadOffset(rz) + lat - G.camLat) * s,
+    y: HORIZON_Y + CAM_H * s,
+    s
+  };
+}
+
+// ══════════════════════════════════════════════
+//  生成 —— 只有障碍物(NPC车辆) 和 风景
+// ══════════════════════════════════════════════
+function difficulty(){ return clamp(G.camZ / TOTAL_MILES, 0, 1); }
+
+function spawnObstacles(){
+  const ahead = G.camZ + 260;
+  const d = difficulty();
+  while(G.nextObs < ahead){
+    const z = G.nextObs;
+    const gap = rand(42, 72) - d * 16;
+    const n = Math.random() < 0.28 + d*0.35 ? (Math.random()<0.5?3:2) : 1;
+    const lanes = [0,1,2,3,4];
+    for(let i=lanes.length-1;i>0;i--){ const j=randi(i+1); [lanes[i],lanes[j]]=[lanes[j],lanes[i]]; }
+    const chosen = lanes.slice(0, Math.min(n,3));
+    for(const li of chosen){
+      const lat = LANES[li] + rand(-0.5,0.5);
+      G.objects.push({
+        type:'obstacle', z, lat, size:1,
+        kind: 'car',
+        speedFactor: NPC_SPEED_FACTOR + rand(-0.06, 0.06),
+        passed:false, dead:false
+      });
+    }
+    G.nextObs = z + gap;
+  }
+}
+
+function spawnScenery(){
+  const ahead = G.camZ + 300;
+  while(G.nextScen < ahead){
+    const z = G.nextScen;
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const lat = side * rand(12, 30);
+    G.objects.push({
+      type:'scenery', z, lat, size: rand(0.8,1.8),
+      kind: 'auto', dead:false
+    });
+    G.nextScen = z + rand(14, 34);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  更新
+// ══════════════════════════════════════════════
+const keys = {};
+
+function update(dt){
+  G.time += dt;
+  G.shake = Math.max(0, G.shake - dt * 3.2);
+  G.hitFlash = Math.max(0, G.hitFlash - dt * 2.5);
+  G.flash = Math.max(0, G.flash - dt * 2);
+
+  if(G.mode === 'title'){
+    G.camZ += 18 * dt;
+    if(G.camZ > TOTAL_MILES * 0.6) G.camZ = 0;
+    G.camLat += (0 - G.camLat) * dt * 3;
+    spawnScenery();
+    G.objects = G.objects.filter(o => o.z - G.camZ > -10);
+    return;
+  }
+
+  if(G.mode === 'over' || G.mode === 'win'){
+    G.endT += dt;
+    G.camZ += (G.mode==='win' ? 22 : 0) * dt;
+    updateParticles(dt);
+    return;
+  }
+
+  // ── 驾驶 ──
+  const slowMul = G.slowT > 0 ? 0.35 : 1;
+  G.slowT = Math.max(0, G.slowT - dt);
+  const speed = BASE_SPEED * slowMul;
+  G.camZ += speed * dt;
+
+  let dir = 0;
+  if(keys['ArrowLeft']  || keys['a'] || keys['A']) dir -= 1;
+  if(keys['ArrowRight'] || keys['d'] || keys['D']) dir += 1;
+
+  if(dir !== 0){
+    G.playerLat += dir * 17 * dt;
+    G.pointerLat = null;
+  } else if(G.pointerLat !== null){
+    G.playerLat += (G.pointerLat - G.playerLat) * Math.min(1, 15*dt);
+  }
+  G.playerLat = clamp(G.playerLat, -6.6, 6.6);
+  G.camLat += (G.playerLat - G.camLat) * Math.min(1, 10*dt);
+
+  spawnObstacles();
+  spawnScenery();
+
+  // NPC车辆移动
+  const playerSpeed = speed;
+  for(const o of G.objects){
+    if(o.type === 'obstacle'){
+      const npcSpeed = playerSpeed * (o.speedFactor || NPC_SPEED_FACTOR);
+      o.z += npcSpeed * dt;
+    }
+  }
+
+  // 碰撞判定 —— 撞车直接结束游戏
+  const pz = G.camZ + PLAYER_Z;
+  for(const o of G.objects){
+    if(o.dead) continue;
+    if(o.type === 'scenery') continue;
+    if(!o.passed && o.z < pz){
+      o.passed = true;
+      const dx = Math.abs(o.lat - G.playerLat);
+      if(o.type === 'obstacle'){
+        if(dx < 1.55){
+          o.dead = true;
+          G.shake = 1;
+          G.hitFlash = 0.8;
+          const p = project(o.z - G.camZ, o.lat);
+          burst(p.x, p.y - 25, '#ff7b5a', 40);
+          burst(p.x, p.y - 25, '#ffd166', 25);
+          endGame('crash');
+          return;
+        }
+      }
+    }
+  }
+
+  G.objects = G.objects.filter(o => (o.z - G.camZ) > -20 && !o.dead);
+  updateParticles(dt);
+
+  // 城市播报
+  const cities = getCities();
+  for(const c of cities){
+    if(!G.passed.has(c.n) && G.camZ >= c.m){
+      G.passed.add(c.n);
+      if(c.m > 0) G.notif = { text: '到达 ' + c.n, t: 2.6 };
+    }
+  }
+  if(G.notif){ G.notif.t -= dt; if(G.notif.t <= 0) G.notif = null; }
+
+  if(G.camZ >= TOTAL_MILES) endGame('win');
+}
+
+function burst(x, y, color, n){
+  for(let i=0;i<n;i++){
+    G.particles.push({
+      x, y,
+      vx: rand(-260,260), vy: rand(-380,-60),
+      life: rand(0.5,1.2), max: 1.2,
+      color, size: rand(2.5,7)
+    });
+  }
+}
+
+function updateParticles(dt){
+  for(let i=G.particles.length-1;i>=0;i--){
+    const p = G.particles[i];
+    p.x += p.vx*dt;
+    p.y += p.vy*dt;
+    p.vy += 620*dt;
+    p.life -= dt;
+    if(p.life <= 0) G.particles.splice(i,1);
+  }
+}
+
+function endGame(reason){
+  if(G.mode !== 'playing') return;
+  if(reason === 'win'){
+    G.mode = 'win';
+    G.deathCause = '';
+  } else {
+    G.mode = 'over';
+    G.deathCause = 'crash';
+  }
+  G.endT = 0;
+  G.shake = 1;
+}
+
+// ══════════════════════════════════════════════
+//  绘制工具
+// ══════════════════════════════════════════════
+function roundRect(x,y,w,h,r){
+  r = Math.min(r, Math.abs(w)/2, Math.abs(h)/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y,   x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x,   y+h, r);
+  ctx.arcTo(x,   y+h, x,   y,   r);
+  ctx.arcTo(x,   y,   x+w, y,   r);
+  ctx.closePath();
+}
+
+// ══════════════════════════════════════════════
+//  场景绘制
+// ══════════════════════════════════════════════
+function drawSky(skyA, skyB, prog){
+  const g = ctx.createLinearGradient(0, -30, 0, HORIZON_Y + 40);
+  g.addColorStop(0, rgbStr(skyA));
+  g.addColorStop(1, rgbStr(skyB));
+  ctx.fillStyle = g;
+  ctx.fillRect(-50, -50, W+100, H+100);
+
+  const sunX = W*0.72 - G.camLat * 4;
+  const sunY = HORIZON_Y - 55 + Math.sin(prog*Math.PI) * -20;
+  const sunR = 34;
+  const glow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR*4.2);
+  glow.addColorStop(0, 'rgba(255,238,190,0.85)');
+  glow.addColorStop(0.25,'rgba(255,215,150,0.35)');
+  glow.addColorStop(1, 'rgba(255,200,140,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(sunX, sunY, sunR*4.2, 0, 7); ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,248,225,0.95)';
+  ctx.beginPath(); ctx.arc(sunX, sunY, sunR, 0, 7); ctx.fill();
+}
+
+function drawMountains(prog, skyB){
+  const baseY = HORIZON_Y + 3;
+  const dark = [
+    skyB[0]*0.42 + 24,
+    skyB[1]*0.42 + 22,
+    skyB[2]*0.45 + 26
+  ];
+  const far = [
+    dark[0]*1.25 + 14,
+    dark[1]*1.25 + 14,
+    dark[2]*1.25 + 16
+  ];
+
+  const amp2 = 44 + prog*26;
+  ctx.fillStyle = rgbStr(far);
+  ctx.beginPath();
+  ctx.moveTo(-20, baseY);
+  for(let x=-20; x<=W+20; x+=10){
+    const wx = (x + G.camLat*26) * 0.0055;
+    const y = baseY - (Math.sin(wx*0.9 + 2.1)*0.5+0.5) * amp2
+                    - Math.sin(wx*2.3 + 0.4)*8;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W+20, baseY);
+  ctx.lineTo(W+20, baseY+80);
+  ctx.lineTo(-20, baseY+80);
+  ctx.closePath();
+  ctx.fill();
+
+  const amp1 = 30 + prog*16;
+  ctx.fillStyle = rgbStr(dark);
+  ctx.beginPath();
+  ctx.moveTo(-20, baseY);
+  for(let x=-20; x<=W+20; x+=9){
+    const wx = (x + G.camLat*40) * 0.008;
+    const y = baseY - (Math.sin(wx*1.5 + 0.7)*0.5+0.5) * amp1
+                    - Math.sin(wx*3.7 + 1.9)*5;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W+20, baseY);
+  ctx.lineTo(W+20, baseY+80);
+  ctx.lineTo(-20, baseY+80);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawGround(gndA, gndB){
+  const g = ctx.createLinearGradient(0, HORIZON_Y, 0, H);
+  g.addColorStop(0, rgbStr(gndB));
+  g.addColorStop(1, rgbStr(gndA));
+  ctx.fillStyle = g;
+  ctx.fillRect(-50, HORIZON_Y, W+100, H - HORIZON_Y + 80);
+}
+
+function drawRoad(skyB){
+  const SEG = 46;
+  const zNear = 5.2, zFar = 260;
+  const pts = [];
+  for(let i=0;i<=SEG;i++){
+    const rz = zNear * Math.pow(zFar/zNear, i/SEG);
+    const s = FOCAL/rz;
+    pts.push({
+      rz,
+      y: HORIZON_Y + CAM_H*s,
+      x: W/2 + (roadOffset(rz) - G.camLat) * s,
+      hw: ROAD_HW * s
+    });
+  }
+
+  for(let i=SEG-1;i>=0;i--){
+    const a = pts[i+1];
+    const b = pts[i];
+    const fog = Math.min(1, a.rz / 150);
+    const col = lerpC([56,56,66], skyB, fog*0.88);
+    ctx.fillStyle = rgbStr(col);
+    ctx.beginPath();
+    ctx.moveTo(a.x - a.hw, a.y);
+    ctx.lineTo(a.x + a.hw, a.y);
+    ctx.lineTo(b.x + b.hw, b.y);
+    ctx.lineTo(b.x - b.hw, b.y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.32)';
+  for(let i=SEG-1;i>=0;i--){
+    const a = pts[i+1], b = pts[i];
+    if(a.rz > 130) continue;
+    const wa = 0.42 * (FOCAL/a.rz);
+    const wb = 0.42 * (FOCAL/b.rz);
+    ctx.beginPath();
+    ctx.moveTo(a.x - a.hw, a.y);
+    ctx.lineTo(a.x - a.hw + wa, a.y);
+    ctx.lineTo(b.x - b.hw + wb, b.y);
+    ctx.lineTo(b.x - b.hw, b.y);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(a.x + a.hw, a.y);
+    ctx.lineTo(a.x + a.hw - wa, a.y);
+    ctx.lineTo(b.x + b.hw - wb, b.y);
+    ctx.lineTo(b.x + b.hw, b.y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  const dashGap = 14, dashLen = 6.5;
+  const startWZ = Math.ceil((G.camZ + zNear) / dashGap) * dashGap;
+  ctx.fillStyle = 'rgba(255,228,140,0.8)';
+  for(let wz = startWZ; wz < G.camZ + 160; wz += dashGap){
+    const rz1 = wz - G.camZ;
+    if(rz1 < zNear + 1.2) continue;
+    const rz2 = rz1 + dashLen;
+    const s1 = FOCAL/rz1, s2 = FOCAL/rz2;
+    const y1 = HORIZON_Y + CAM_H*s1;
+    const y2 = HORIZON_Y + CAM_H*s2;
+    const x1 = W/2 + (roadOffset(rz1) - G.camLat) * s1;
+    const x2 = W/2 + (roadOffset(rz2) - G.camLat) * s2;
+    const w1 = 0.17 * s1, w2 = 0.17 * s2;
+    if(w1 < 0.35) continue;
+    ctx.beginPath();
+    ctx.moveTo(x1 - w1, y1);
+    ctx.lineTo(x1 + w1, y1);
+    ctx.lineTo(x2 + w2, y2);
+    ctx.lineTo(x2 - w2, y2);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawObject(o, x, y, s, rz){
+  const alpha = Math.min(1, (rz - 3) / 8);
+  ctx.globalAlpha = alpha;
+
+  if(o.type === 'scenery'){
+    drawScenery(o, x, y, s);
+  } else if(o.type === 'obstacle'){
+    drawObstacle(o, x, y, s);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawScenery(o, x, y, s){
+  const prog = clamp(G.camZ / TOTAL_MILES, 0, 1);
+  let kind = o.kind;
+  if(kind === 'auto'){
+    // 根据方向调整植被分布
+    if(DIRECTION === 'LA_NY'){
+      if(prog < 0.22)      kind = Math.random() < 0.55 ? 'cactus' : 'rock';
+      else if(prog < 0.45) kind = Math.random() < 0.4 ? 'windmill' : 'hay';
+      else if(prog < 0.70) kind = Math.random() < 0.5 ? 'tree' : (Math.random()<0.5?'silo':'fence');
+      else                 kind = Math.random() < 0.6 ? 'tree' : 'bush';
+    } else {
+      if(prog < 0.30)      kind = Math.random() < 0.6 ? 'tree' : 'bush';
+      else if(prog < 0.55) kind = Math.random() < 0.5 ? 'tree' : (Math.random()<0.5?'silo':'fence');
+      else if(prog < 0.78) kind = Math.random() < 0.4 ? 'windmill' : 'hay';
+      else                 kind = Math.random() < 0.55 ? 'cactus' : 'rock';
+    }
+    o.kind = kind;
+  }
+
+  const h = s * 3.4 * o.size;
+  const w = s * 1.6 * o.size;
+
+  switch(kind){
+    case 'tree': {
+      ctx.fillStyle = '#5b3d26';
+      ctx.fillRect(x - s*0.16, y - h*0.42, s*0.32, h*0.42);
+      ctx.fillStyle = '#4e8f42';
+      ctx.beginPath();
+      ctx.arc(x, y - h*0.62, w*0.62, 0, 7);
+      ctx.arc(x - w*0.42, y - h*0.46, w*0.46, 0, 7);
+      ctx.arc(x + w*0.42, y - h*0.46, w*0.46, 0, 7);
+      ctx.fill();
+      break;
+    }
+    case 'bush': {
+      ctx.fillStyle = '#4d8b45';
+      ctx.beginPath();
+      ctx.arc(x, y - s*0.5, s*0.62, 0, 7);
+      ctx.arc(x - s*0.5, y - s*0.32, s*0.48, 0, 7);
+      ctx.arc(x + s*0.5, y - s*0.32, s*0.48, 0, 7);
+      ctx.fill();
+      break;
+    }
+    case 'silo': {
+      ctx.fillStyle = '#b8b2a6';
+      ctx.fillRect(x - s*0.55, y - h*0.9, s*1.1, h*0.9);
+      ctx.fillStyle = '#8f8a80';
+      ctx.beginPath();
+      ctx.moveTo(x - s*0.62, y - h*0.9);
+      ctx.lineTo(x, y - h*1.18);
+      ctx.lineTo(x + s*0.62, y - h*0.9);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'fence': {
+      ctx.fillStyle = '#8a6b4a';
+      for(let i=0;i<3;i++){
+        ctx.fillRect(x - w*0.7 + i*w*0.7, y - h*0.42, s*0.18, h*0.42);
+      }
+      ctx.fillRect(x - w*0.78, y - h*0.32, w*1.56, s*0.14);
+      ctx.fillRect(x - w*0.78, y - h*0.16, w*1.56, s*0.14);
+      break;
+    }
+    case 'windmill': {
+      ctx.fillStyle = '#9a9488';
+      ctx.fillRect(x - s*0.13, y - h*0.9, s*0.26, h*0.9);
+      ctx.beginPath();
+      ctx.arc(x, y - h*0.95, s*0.42, 0, 7);
+      ctx.fillStyle = '#c8c2b4';
+      ctx.fill();
+      ctx.fillStyle = '#7d7870';
+      const rot = (G.time*2.4 + o.z*0.5);
+      for(let i=0;i<4;i++){
+        const a = rot + i*Math.PI/2;
+        ctx.save();
+        ctx.translate(x, y - h*0.95);
+        ctx.rotate(a);
+        ctx.fillRect(0, -s*0.06, s*0.42, s*0.12);
+        ctx.restore();
+      }
+      break;
+    }
+    case 'hay': {
+      ctx.fillStyle = '#d9b96a';
+      ctx.beginPath();
+      ctx.ellipse(x, y - s*0.55, s*0.85, s*0.62, 0, 0, 7);
+      ctx.fill();
+      ctx.strokeStyle = '#b89a4e';
+      ctx.lineWidth = Math.max(1, s*0.06);
+      ctx.beginPath();
+      ctx.ellipse(x, y - s*0.55, s*0.5, s*0.62, 0, 0, 7);
+      ctx.stroke();
+      break;
+    }
+    case 'cactus': {
+      ctx.fillStyle = '#4e7d47';
+      const cw = s*0.34;
+      ctx.fillRect(x - cw/2, y - h*0.95, cw, h*0.95);
+      ctx.fillRect(x - cw*1.9, y - h*0.72, cw*1.6, cw*0.85);
+      ctx.fillRect(x - cw*1.9, y - h*0.72, cw, h*0.32);
+      ctx.fillRect(x + cw*0.3, y - h*0.6, cw*1.6, cw*0.85);
+      ctx.fillRect(x + cw*0.9, y - h*0.6, cw, h*0.28);
+      break;
+    }
+    case 'rock': {
+      ctx.fillStyle = '#a8785a';
+      ctx.beginPath();
+      ctx.moveTo(x - s*0.9, y);
+      ctx.lineTo(x - s*0.4, y - s*0.72);
+      ctx.lineTo(x + s*0.25, y - s*0.9);
+      ctx.lineTo(x + s*0.9, y - s*0.2);
+      ctx.lineTo(x + s*0.7, y);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#c08e6c';
+      ctx.beginPath();
+      ctx.moveTo(x - s*0.4, y - s*0.72);
+      ctx.lineTo(x + s*0.25, y - s*0.9);
+      ctx.lineTo(x + s*0.1, y - s*0.5);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+  }
+}
+
+function drawObstacle(o, x, y, s){
+  const sz = s * o.size;
+  if(o.kind === 'car'){
+    const cw = sz*2.3, ch = sz*1.45;
+    ctx.fillStyle = 'rgba(0,0,0,0.24)';
+    ctx.beginPath();
+    ctx.ellipse(x, y, cw*0.55, sz*0.28, 0, 0, 7);
+    ctx.fill();
+
+    ctx.fillStyle = '#2f6fb0';
+    roundRect(x - cw*0.34, y - ch*1.42, cw*0.68, ch*0.72, sz*0.16);
+    ctx.fill();
+    ctx.fillStyle = '#3d86d1';
+    roundRect(x - cw/2, y - ch, cw, ch, sz*0.22);
+    ctx.fill();
+    ctx.fillStyle = '#a9d6f5';
+    roundRect(x - cw*0.29, y - ch*1.34, cw*0.58, ch*0.5, sz*0.1);
+    ctx.fill();
+    ctx.fillStyle = '#ff4d4d';
+    ctx.fillRect(x - cw*0.44, y - ch*0.72, cw*0.16, ch*0.24);
+    ctx.fillRect(x + cw*0.28, y - ch*0.72, cw*0.16, ch*0.24);
+  }
+}
+
+function drawPlayer(){
+  const s = FOCAL / PLAYER_Z;
+  const x = W/2 + (roadOffset(PLAYER_Z) + G.playerLat - G.camLat) * s;
+  const y = HORIZON_Y + CAM_H * s;
+
+  const cw = 2.5 * s;
+  const ch = 1.55 * s;
+
+  ctx.fillStyle = 'rgba(0,0,0,0.32)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + 4, cw*0.6, s*0.34, 0, 0, 7);
+  ctx.fill();
+
+  const lg = ctx.createRadialGradient(x, y - ch*0.5, 0, x, y - ch*0.5, cw*1.5);
+  lg.addColorStop(0, 'rgba(255,60,60,0.22)');
+  lg.addColorStop(1, 'rgba(255,60,60,0)');
+  ctx.fillStyle = lg;
+  ctx.beginPath(); ctx.arc(x, y - ch*0.5, cw*1.5, 0, 7); ctx.fill();
+
+  ctx.fillStyle = '#8e2f2f';
+  roundRect(x - cw*0.35, y - ch*1.5, cw*0.7, ch*0.75, s*0.18);
+  ctx.fill();
+  ctx.fillStyle = '#3a4a5c';
+  roundRect(x - cw*0.3, y - ch*1.42, cw*0.6, ch*0.52, s*0.12);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(150,200,235,0.35)';
+  roundRect(x - cw*0.26, y - ch*1.38, cw*0.5, ch*0.24, s*0.1);
+  ctx.fill();
+
+  const bodyGrad = ctx.createLinearGradient(0, y - ch, 0, y);
+  bodyGrad.addColorStop(0, '#d64545');
+  bodyGrad.addColorStop(1, '#a82f2f');
+  ctx.fillStyle = bodyGrad;
+  roundRect(x - cw/2, y - ch, cw, ch, s*0.26);
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.14)';
+  roundRect(x - cw*0.44, y - ch*0.94, cw*0.88, ch*0.2, s*0.1);
+  ctx.fill();
+
+  const blink = G.slowT > 0 ? 1 : 0.75;
+  ctx.fillStyle = `rgba(255,70,70,${blink})`;
+  roundRect(x - cw*0.47, y - ch*0.68, cw*0.19, ch*0.3, s*0.08);
+  ctx.fill();
+  roundRect(x + cw*0.28, y - ch*0.68, cw*0.19, ch*0.3, s*0.08);
+  ctx.fill();
+
+  ctx.fillStyle = '#f2ead6';
+  roundRect(x - cw*0.14, y - ch*0.5, cw*0.28, ch*0.2, s*0.05);
+  ctx.fill();
+
+  ctx.fillStyle = '#1a1a1f';
+  roundRect(x - cw*0.55, y - ch*0.42, cw*0.16, ch*0.45, s*0.07);
+  ctx.fill();
+  roundRect(x + cw*0.39, y - ch*0.42, cw*0.16, ch*0.45, s*0.07);
+  ctx.fill();
+}
+
+// ══════════════════════════════════════════════
+//  HUD
+// ══════════════════════════════════════════════
+function drawHUD(){
+  const prog = clamp(G.camZ / TOTAL_MILES, 0, 1);
+  const cities = getCities();
+
+  const barX = 60, barY = 40, barW = W - 120, barH = 8;
+
+  ctx.fillStyle = 'rgba(0,0,0,0.28)';
+  roundRect(barX, barY, barW, barH, 4); ctx.fill();
+
+  const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+  if(DIRECTION === 'LA_NY'){
+    grad.addColorStop(0, '#ff7b5a');
+    grad.addColorStop(0.5, '#ffd166');
+    grad.addColorStop(1, '#4facfe');
+  } else {
+    grad.addColorStop(0, '#4facfe');
+    grad.addColorStop(0.5, '#ffd166');
+    grad.addColorStop(1, '#ff7b5a');
+  }
+  ctx.save();
+  ctx.beginPath();
+  roundRect(barX, barY, barW * prog, barH, 4);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.restore();
+
+  for(const c of cities){
+    const px = barX + barW * (c.m / TOTAL_MILES);
+    const reached = G.camZ >= c.m;
+    ctx.beginPath();
+    ctx.arc(px, barY + barH/2, reached ? 5 : 3.5, 0, 7);
+    ctx.fillStyle = reached ? '#ffffff' : 'rgba(255,255,255,0.35)';
+    ctx.fill();
+    if(reached){
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  ctx.font = 'bold 13px system-ui,-apple-system,sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.fillText(cities[0].n, barX, barY - 15);
+  ctx.textAlign = 'right';
+  ctx.fillText(cities[cities.length-1].n, barX + barW, barY - 15);
+
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 12px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText(Math.floor(G.camZ) + ' / ' + TOTAL_MILES + ' 英里', W/2, barY + 28);
+
+  let currentCity = cities[0].n;
+  for(const c of cities) if(G.camZ >= c.m) currentCity = c.n;
+  ctx.font = 'bold 15px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText('📍 ' + currentCity, W/2, barY + barH + 22);
+
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 12px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  const mph = Math.round((BASE_SPEED * (G.slowT>0?0.35:1)) * 1.6);
+  ctx.fillText(mph + ' mph', 40, H - 30);
+
+  if(G.notif){
+    const a = Math.min(1, G.notif.t / 0.5) * Math.min(1, (2.6 - G.notif.t) / 0.3);
+    ctx.globalAlpha = clamp(a, 0, 1);
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 26px system-ui,-apple-system,sans-serif';
+    const tw = ctx.measureText(G.notif.text).width;
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    roundRect(W/2 - tw/2 - 26, H*0.28 - 26, tw + 52, 52, 26);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText(G.notif.text, W/2, H*0.28);
+    ctx.globalAlpha = 1;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  覆盖界面
+// ══════════════════════════════════════════════
+
+// 方向选择按钮的布局
+function getDirButtons(){
+  const bw = 280, bh = 90, gap = 40;
+  const totalW = bw*2 + gap;
+  const bx = W/2 - totalW/2;
+  const by = H*0.60;
+  return {
+    la_ny: { x: bx, y: by, w: bw, h: bh, label: '洛杉矶 → 纽约', sub: '从西海岸出发' },
+    ny_la: { x: bx + bw + gap, y: by, w: bw, h: bh, label: '纽约 → 洛杉矶', sub: '从东海岸出发' }
+  };
+}
+
+function drawTitle(){
+  ctx.fillStyle = 'rgba(6,10,20,0.68)';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.textAlign = 'center';
+
+  // 标题
+  ctx.save();
+  ctx.font = 'bold 76px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillText('横跨美国', W/2 + 3, H*0.22 + 4);
+  const g = ctx.createLinearGradient(0, H*0.22 - 60, 0, H*0.22 + 10);
+  g.addColorStop(0, '#ffe9a8');
+  g.addColorStop(1, '#ff9f5a');
+  ctx.fillStyle = g;
+  ctx.fillText('横跨美国', W/2, H*0.22);
+  ctx.restore();
+
+  ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText('选择你的驾驶方向', W/2, H*0.22 + 52);
+
+  // 方向选择按钮
+  const btns = getDirButtons();
+  drawDirButton(btns.la_ny, DIRECTION === 'LA_NY', '#ff7b5a', '#ffd166');
+  drawDirButton(btns.ny_la, DIRECTION === 'NY_LA', '#4facfe', '#6ee7a0');
+
+  // 操作提示
+  ctx.font = '14px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('← →  /  A D  转向     ·     拖动屏幕也可以', W/2, H*0.60 + 130);
+  ctx.fillStyle = 'rgba(255,120,100,0.85)';
+  ctx.font = 'bold 15px system-ui,-apple-system,sans-serif';
+  ctx.fillText('撞车即结束 · 一路躲避车流', W/2, H*0.60 + 160);
+
+  // 开始按钮
+  const pulse = 0.5 + Math.sin(G.time*3)*0.5;
+  const bw = 280, bh = 62;
+  const bx = W/2 - bw/2, by = H*0.83;
+  ctx.save();
+  ctx.shadowColor = `rgba(255,190,90,${0.4 + pulse*0.4})`;
+  ctx.shadowBlur = 30 + pulse*22;
+  const bg = ctx.createLinearGradient(bx, by, bx, by+bh);
+  bg.addColorStop(0, '#ffd166');
+  bg.addColorStop(1, '#f79b3c');
+  ctx.fillStyle = bg;
+  roundRect(bx, by, bw, bh, 31);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = '#3a2208';
+  ctx.font = 'bold 24px system-ui,-apple-system,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('开始旅程', W/2, by + bh/2 + 1);
+
+  if(G.best > 0){
+    ctx.font = 'bold 14px system-ui,-apple-system,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('最远里程  ' + G.best + ' 英里', W/2, H - 20);
+  }
+}
+
+function drawDirButton(b, active, colorA, colorB){
+  ctx.save();
+  if(active){
+    ctx.shadowColor = colorA;
+    ctx.shadowBlur = 26;
+  }
+  const grad = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.h);
+  if(active){
+    grad.addColorStop(0, colorA);
+    grad.addColorStop(1, colorB);
+  } else {
+    grad.addColorStop(0, 'rgba(255,255,255,0.10)');
+    grad.addColorStop(1, 'rgba(255,255,255,0.04)');
+  }
+  ctx.fillStyle = grad;
+  roundRect(b.x, b.y, b.w, b.h, 18);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.strokeStyle = active ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = active ? 2.5 : 1.5;
+  roundRect(b.x, b.y, b.w, b.h, 18);
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 20px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = active ? '#1a1208' : 'rgba(255,255,255,0.8)';
+  ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2 - 12);
+
+  ctx.font = '13px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = active ? 'rgba(30,20,8,0.7)' : 'rgba(255,255,255,0.4)';
+  ctx.fillText(b.sub, b.x + b.w/2, b.y + b.h/2 + 16);
+
+  // 选中标记
+  if(active){
+    ctx.fillStyle = '#1a1208';
+    ctx.font = 'bold 14px system-ui,-apple-system,sans-serif';
+    ctx.fillText('✓ 已选择', b.x + b.w/2, b.y + b.h + 18);
+  }
+}
+
+function drawEndScreen(win){
+  const t = Math.min(1, G.endT / 0.6);
+  ctx.fillStyle = `rgba(6,10,20,${0.75 * t})`;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  const cy = H * 0.30;
+  const cities = getCities();
+  const dest = cities[cities.length-1].n;
+
+  if(win){
+    ctx.save();
+    ctx.font = 'bold 62px system-ui,-apple-system,sans-serif';
+    const g = ctx.createLinearGradient(0, cy-55, 0, cy+10);
+    g.addColorStop(0, '#ffe9a8');
+    g.addColorStop(1, '#ff9f5a');
+    ctx.fillStyle = g;
+    ctx.shadowColor = 'rgba(255,190,90,0.6)';
+    ctx.shadowBlur = 30;
+    ctx.fillText('抵达' + dest, W/2, cy);
+    ctx.restore();
+
+    ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    const sub = dest === '纽约' ? '自由女神在向你招手 🗽' : '太平洋就在眼前 🌊';
+    ctx.fillText(sub, W/2, cy + 46);
+  } else {
+    ctx.save();
+    ctx.font = 'bold 58px system-ui,-apple-system,sans-serif';
+    ctx.fillStyle = '#ff6b5a';
+    ctx.shadowColor = 'rgba(255,60,50,0.5)';
+    ctx.shadowBlur = 24;
+    ctx.fillText('撞 车 了', W/2, cy);
+    ctx.restore();
+
+    ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.72)';
+    ctx.fillText('旅途就此中断…', W/2, cy + 44);
+  }
+
+  // 数据面板
+  const pw = 400, ph = 100;
+  const px = W/2 - pw/2, py = H*0.46;
+  ctx.fillStyle = 'rgba(255,255,255,0.07)';
+  roundRect(px, py, pw, ph, 20); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  roundRect(px, py, pw, ph, 20); ctx.stroke();
+
+  ctx.font = 'bold 20px system-ui,-apple-system,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText('行驶里程', W/2, py + 42);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 32px system-ui,-apple-system,sans-serif';
+  ctx.fillText(Math.floor(G.camZ) + ' 英里', W/2, py + 82);
+
+  if(win && G.camZ > G.best){
+    ctx.font = 'bold 14px system-ui,-apple-system,sans-serif';
+    ctx.fillStyle = '#ffd166';
+    ctx.fillText('★ 新纪录！', W/2, py + ph + 28);
+  }
+
+  // 重开提示
+  const pulse = 0.45 + Math.sin(G.time*3)*0.35;
+  ctx.globalAlpha = pulse;
+  ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.fillText('点击屏幕重新出发', W/2, H - 52);
+  ctx.globalAlpha = 1;
+}
+
+// ══════════════════════════════════════════════
+//  主渲染
+// ══════════════════════════════════════════════
+function render(){
+  const prog = clamp(G.camZ / TOTAL_MILES, 0, 1);
+  const colors = getColors();
+
+  const skyA = sample(colors.skyA, prog);
+  const skyB = sample(colors.skyB, prog);
+  const gndA = sample(colors.gndA, prog);
+  const gndB = sample(colors.gndB, prog);
+
+  ctx.save();
+
+  if(G.shake > 0.01){
+    ctx.translate(
+      (Math.random()-0.5) * G.shake * 14,
+      (Math.random()-0.5) * G.shake * 14
+    );
+  }
+
+  drawSky(skyA, skyB, prog);
+  drawMountains(prog, skyB);
+  drawGround(gndA, gndB);
+  drawRoad(skyB);
+
+  const list = [];
+  for(const o of G.objects){
+    const rz = o.z - G.camZ;
+    if(rz > 3 && rz < 260) list.push({o, rz});
+  }
+  list.sort((a,b) => b.rz - a.rz);
+
+  for(const item of list){
+    const s = FOCAL / item.rz;
+    const x = W/2 + (roadOffset(item.rz) + item.o.lat - G.camLat) * s;
+    const y = HORIZON_Y + CAM_H * s;
+    drawObject(item.o, x, y, s, item.rz);
+  }
+
+  if(G.mode === 'playing' || G.mode === 'over' || G.mode === 'win'){
+    drawPlayer();
+  }
+
+  for(const p of G.particles){
+    const a = clamp(p.life / p.max, 0, 1);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * a, 0, 7);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+
+  if(G.hitFlash > 0){
+    ctx.fillStyle = `rgba(255,60,50,${G.hitFlash * 0.45})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  if(G.mode === 'playing'){
+    const d = difficulty();
+    ctx.globalAlpha = 0.06 + d * 0.06;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    for(let i=0;i<10;i++){
+      const sx = 60 + i * 95 + Math.sin(G.time*7 + i)*22;
+      const sy = H*0.75 + Math.sin(G.time*5 + i*2)*60;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + 8, sy + 90);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  if(G.mode === 'playing' || G.mode === 'over' || G.mode === 'win'){
+    drawHUD();
+  }
+
+  if(G.mode === 'title') drawTitle();
+  if(G.mode === 'over') drawEndScreen(false);
+  if(G.mode === 'win') drawEndScreen(true);
+}
+
+// ══════════════════════════════════════════════
+//  输入
+// ══════════════════════════════════════════════
+window.addEventListener('keydown', e => {
+  if(!window.__gameActive) return;
+
+  keys[e.key] = true;
+
+  if(G.mode === 'title' && (e.key === ' ' || e.key === 'Enter')){
+    startGame();
+    e.preventDefault();
+  }
+  if((G.mode === 'over' || G.mode === 'win') && (e.key === ' ' || e.key === 'Enter')){
+    if(G.endT > 0.7) backToTitle();
+    e.preventDefault();
+  }
+  if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)) e.preventDefault();
+});
+window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+function screenToLat(clientX){
+  const r = cv.getBoundingClientRect();
+  const gx = (clientX - r.left) / r.width * W;
+  const s = FOCAL / PLAYER_Z;
+  const lat = (gx - W/2) / s - roadOffset(PLAYER_Z) + G.camLat;
+  return clamp(lat, -6.6, 6.6);
+}
+
+function hitDirButton(clientX, clientY){
+  const r = cv.getBoundingClientRect();
+  const gx = (clientX - r.left) / r.width * W;
+  const gy = (clientY - r.top) / r.height * H;
+  const btns = getDirButtons();
+  for(const key of ['la_ny', 'ny_la']){
+    const b = btns[key];
+    if(gx >= b.x && gx <= b.x + b.w && gy >= b.y && gy <= b.y + b.h){
+      return key;
+    }
+  }
+  return null;
+}
+
+let dragging = false;
+cv.addEventListener('pointerdown', e => {
+  if(G.mode === 'title'){
+    // 先检查是否点击了方向按钮
+    const dirKey = hitDirButton(e.clientX, e.clientY);
+    if(dirKey){
+      DIRECTION = dirKey === 'la_ny' ? 'LA_NY' : 'NY_LA';
+      return;
+    }
+    // 检查是否点击了开始按钮
+    const r = cv.getBoundingClientRect();
+    const gy = (e.clientY - r.top) / r.height * H;
+    if(gy >= H*0.80) startGame();
+    return;
+  }
+  if(G.mode === 'over' || G.mode === 'win'){
+    if(G.endT > 0.7) backToTitle();
+    return;
+  }
+  dragging = true;
+  cv.setPointerCapture(e.pointerId);
+  G.pointerLat = screenToLat(e.clientX);
+});
+cv.addEventListener('pointermove', e => {
+  if(!dragging || G.mode !== 'playing') return;
+  G.pointerLat = screenToLat(e.clientX);
+});
+cv.addEventListener('pointerup', e => {
+  dragging = false;
+  if(e.pointerId !== undefined && cv.hasPointerCapture(e.pointerId)){
+    cv.releasePointerCapture(e.pointerId);
+  }
+});
+cv.addEventListener('pointercancel', () => { dragging = false; });
+
+function startGame(){
+  const best = G.best;
+  G = newGame();
+  G.best = best;
+  G.mode = 'playing';
+  G.nextObs = 170;
+  G.nextScen = 20;
+}
+
+function backToTitle(){
+  const best = G.best;
+  G = newGame();
+  G.best = best;
+  G.mode = 'title';
+}
+
+// ══════════════════════════════════════════════
+//  主循环
+// ══════════════════════════════════════════════
+let lastT = 0;
+function loop(t){
+  requestAnimationFrame(loop);
+  if(!lastT) lastT = t;
+  let dt = (t - lastT) / 1000;
+  lastT = t;
+  if(dt > 0.05) dt = 0.05;
+  if(dt <= 0) dt = 0.0001;
+
+  // 覆盖层未打开时不更新、不渲染，节省性能
+  if(!window.__gameActive) return;
+
+  update(dt);
+  render();
+}
+
+requestAnimationFrame(loop);
+
+})();
 </script>
 </body>
 </html>
