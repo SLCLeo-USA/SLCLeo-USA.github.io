@@ -564,7 +564,6 @@ window.__gameActive = false;
     overlay.classList.add("show");
     document.body.style.overflow = "hidden";
     window.__gameActive = true;
-    // 让游戏重新计算画布尺寸
     window.dispatchEvent(new Event("resize"));
   }
 
@@ -586,13 +585,13 @@ window.__gameActive = false;
 
 
 /* ══════════════════════════════════════════════════════════════
-   ══════════════════ 小游戏：横跨美国 · 公路之旅 ══════════════════
+   ══════════════ Across America · Road Trip (v2) ══════════════
    ══════════════════════════════════════════════════════════════ */
 (() => {
 'use strict';
 
 // ══════════════════════════════════════════════
-//  基础设置
+//  Base setup
 // ══════════════════════════════════════════════
 const W = 960, H = 600;
 const cv = document.getElementById('game');
@@ -609,7 +608,7 @@ function fitCanvas(){
 window.addEventListener('resize', fitCanvas);
 fitCanvas();
 
-// ── 3D 投影常量 ──
+// ── 3D projection constants ──
 const FOCAL      = 300;
 const CAM_H      = 6;
 const HORIZON_Y  = 250;
@@ -624,15 +623,14 @@ const rand  = (a,b) => a + Math.random()*(b-a);
 const randi = n => Math.floor(Math.random()*n);
 
 // ══════════════════════════════════════════════
-//  颜色系统：随旅程进度渐变
+//  Color system
 // ══════════════════════════════════════════════
-// LA → NY (西到东)
 const SKY_A_LA_NY = [
-  {t:0.00, c:[186, 98,128]},   // 洛杉矶黄昏
-  {t:0.18, c:[236,142, 96]},   // 沙漠落日
-  {t:0.40, c:[124,186,228]},   // 大平原
-  {t:0.65, c:[ 96,172,230]},   // 中西部
-  {t:1.00, c:[ 86,160,220]},   // 东海岸 晴空
+  {t:0.00, c:[186, 98,128]},
+  {t:0.18, c:[236,142, 96]},
+  {t:0.40, c:[124,186,228]},
+  {t:0.65, c:[ 96,172,230]},
+  {t:1.00, c:[ 86,160,220]},
 ];
 const SKY_B_LA_NY = [
   {t:0.00, c:[255,172,122]},
@@ -656,13 +654,12 @@ const GND_B_LA_NY = [
   {t:1.00, c:[ 62,120, 56]},
 ];
 
-// NY → LA (东到西) — 反向渐变
 const SKY_A_NY_LA = [
-  {t:0.00, c:[ 86,160,220]},   // 纽约晴空
-  {t:0.35, c:[ 96,172,230]},   // 中西部
-  {t:0.60, c:[124,186,228]},   // 大平原
-  {t:0.82, c:[236,142, 96]},   // 沙漠落日
-  {t:1.00, c:[186, 98,128]},   // 洛杉矶黄昏
+  {t:0.00, c:[ 86,160,220]},
+  {t:0.35, c:[ 96,172,230]},
+  {t:0.60, c:[124,186,228]},
+  {t:0.82, c:[236,142, 96]},
+  {t:1.00, c:[186, 98,128]},
 ];
 const SKY_B_NY_LA = [
   {t:0.00, c:[190,225,242]},
@@ -700,39 +697,38 @@ function sample(stops, p){
 }
 
 // ══════════════════════════════════════════════
-//  城市里程表（两个方向）
+//  City tables
+//  LA → Grand Canyon → Salt Lake City → Denver → Omaha → Chicago → Buffalo → NY
 // ══════════════════════════════════════════════
 const TOTAL_MILES = 2790;
 
 const ROUTE_LA_NY = [
-  { m:    0, n:'洛杉矶'     },
-  { m:  270, n:'拉斯维加斯' },
-  { m:  570, n:'大峡谷'     },
-  { m:  830, n:'阿尔伯克基' },
-  { m: 1080, n:'阿马里洛'   },
-  { m: 1330, n:'俄克拉荷马城'},
-  { m: 1630, n:'圣路易斯'   },
-  { m: 1900, n:'芝加哥'     },
-  { m: 2790, n:'纽约'       },
+  { m:    0, n:'Los Angeles'   },
+  { m:  410, n:'Grand Canyon'  },
+  { m:  730, n:'Salt Lake City'},
+  { m: 1160, n:'Denver'        },
+  { m: 1610, n:'Omaha'         },
+  { m: 2000, n:'Chicago'       },
+  { m: 2450, n:'Buffalo'       },
+  { m: 2790, n:'New York'      },
 ];
 
 const ROUTE_NY_LA = [
-  { m:    0, n:'纽约'       },
-  { m:  790, n:'芝加哥'     },
-  { m: 1050, n:'圣路易斯'   },
-  { m: 1350, n:'俄克拉荷马城'},
-  { m: 1600, n:'阿马里洛'   },
-  { m: 1850, n:'阿尔伯克基' },
-  { m: 2100, n:'大峡谷'     },
-  { m: 2350, n:'拉斯维加斯' },
-  { m: 2790, n:'洛杉矶'     },
+  { m:    0, n:'New York'      },
+  { m:  340, n:'Buffalo'       },
+  { m:  790, n:'Chicago'       },
+  { m: 1180, n:'Omaha'         },
+  { m: 1630, n:'Denver'        },
+  { m: 2060, n:'Salt Lake City'},
+  { m: 2380, n:'Grand Canyon'  },
+  { m: 2790, n:'Los Angeles'   },
 ];
 
 // ══════════════════════════════════════════════
-//  游戏状态
+//  Game state
 // ══════════════════════════════════════════════
 let G = null;
-let DIRECTION = 'LA_NY'; // 'LA_NY' 或 'NY_LA'
+let DIRECTION = 'LA_NY';
 
 function newGame(){
   return {
@@ -754,7 +750,6 @@ function newGame(){
     best: 0,
     flash: 0,
     endT: 0,
-    deathCause: '',
   };
 }
 G = newGame();
@@ -762,7 +757,6 @@ G = newGame();
 const BASE_SPEED = 40;
 const NPC_SPEED_FACTOR = 0.83;
 
-// 根据方向获取当前使用的城市表和颜色表
 function getCities(){
   return DIRECTION === 'LA_NY' ? ROUTE_LA_NY : ROUTE_NY_LA;
 }
@@ -775,7 +769,7 @@ function getColors(){
 }
 
 // ══════════════════════════════════════════════
-//  投影
+//  Projection
 // ══════════════════════════════════════════════
 function roadOffset(rz){
   return CURVE_AMP * (Math.sin((G.camZ + rz) * CURVE_K) - Math.sin(G.camZ * CURVE_K));
@@ -790,7 +784,7 @@ function project(rz, lat){
 }
 
 // ══════════════════════════════════════════════
-//  生成 —— 只有障碍物(NPC车辆) 和 风景
+//  Spawning
 // ══════════════════════════════════════════════
 function difficulty(){ return clamp(G.camZ / TOTAL_MILES, 0, 1); }
 
@@ -832,7 +826,7 @@ function spawnScenery(){
 }
 
 // ══════════════════════════════════════════════
-//  更新
+//  Update
 // ══════════════════════════════════════════════
 const keys = {};
 
@@ -858,7 +852,6 @@ function update(dt){
     return;
   }
 
-  // ── 驾驶 ──
   const slowMul = G.slowT > 0 ? 0.35 : 1;
   G.slowT = Math.max(0, G.slowT - dt);
   const speed = BASE_SPEED * slowMul;
@@ -880,7 +873,6 @@ function update(dt){
   spawnObstacles();
   spawnScenery();
 
-  // NPC车辆移动
   const playerSpeed = speed;
   for(const o of G.objects){
     if(o.type === 'obstacle'){
@@ -889,7 +881,6 @@ function update(dt){
     }
   }
 
-  // 碰撞判定 —— 撞车直接结束游戏
   const pz = G.camZ + PLAYER_Z;
   for(const o of G.objects){
     if(o.dead) continue;
@@ -915,12 +906,11 @@ function update(dt){
   G.objects = G.objects.filter(o => (o.z - G.camZ) > -20 && !o.dead);
   updateParticles(dt);
 
-  // 城市播报
   const cities = getCities();
   for(const c of cities){
     if(!G.passed.has(c.n) && G.camZ >= c.m){
       G.passed.add(c.n);
-      if(c.m > 0) G.notif = { text: '到达 ' + c.n, t: 2.6 };
+      if(c.m > 0) G.notif = { text: 'Arrived at ' + c.n, t: 2.6 };
     }
   }
   if(G.notif){ G.notif.t -= dt; if(G.notif.t <= 0) G.notif = null; }
@@ -954,17 +944,15 @@ function endGame(reason){
   if(G.mode !== 'playing') return;
   if(reason === 'win'){
     G.mode = 'win';
-    G.deathCause = '';
   } else {
     G.mode = 'over';
-    G.deathCause = 'crash';
   }
   G.endT = 0;
   G.shake = 1;
 }
 
 // ══════════════════════════════════════════════
-//  绘制工具
+//  Drawing helpers
 // ══════════════════════════════════════════════
 function roundRect(x,y,w,h,r){
   r = Math.min(r, Math.abs(w)/2, Math.abs(h)/2);
@@ -978,7 +966,7 @@ function roundRect(x,y,w,h,r){
 }
 
 // ══════════════════════════════════════════════
-//  场景绘制
+//  Scene drawing
 // ══════════════════════════════════════════════
 function drawSky(skyA, skyB, prog){
   const g = ctx.createLinearGradient(0, -30, 0, HORIZON_Y + 40);
@@ -1145,16 +1133,15 @@ function drawScenery(o, x, y, s){
   const prog = clamp(G.camZ / TOTAL_MILES, 0, 1);
   let kind = o.kind;
   if(kind === 'auto'){
-    // 根据方向调整植被分布
     if(DIRECTION === 'LA_NY'){
-      if(prog < 0.22)      kind = Math.random() < 0.55 ? 'cactus' : 'rock';
-      else if(prog < 0.45) kind = Math.random() < 0.4 ? 'windmill' : 'hay';
-      else if(prog < 0.70) kind = Math.random() < 0.5 ? 'tree' : (Math.random()<0.5?'silo':'fence');
+      if(prog < 0.28)      kind = Math.random() < 0.55 ? 'cactus' : 'rock';
+      else if(prog < 0.50) kind = Math.random() < 0.45 ? 'windmill' : 'hay';
+      else if(prog < 0.72) kind = Math.random() < 0.5 ? 'silo' : (Math.random()<0.5?'fence':'hay');
       else                 kind = Math.random() < 0.6 ? 'tree' : 'bush';
     } else {
-      if(prog < 0.30)      kind = Math.random() < 0.6 ? 'tree' : 'bush';
-      else if(prog < 0.55) kind = Math.random() < 0.5 ? 'tree' : (Math.random()<0.5?'silo':'fence');
-      else if(prog < 0.78) kind = Math.random() < 0.4 ? 'windmill' : 'hay';
+      if(prog < 0.28)      kind = Math.random() < 0.6 ? 'tree' : 'bush';
+      else if(prog < 0.50) kind = Math.random() < 0.5 ? 'silo' : (Math.random()<0.5?'fence':'tree');
+      else if(prog < 0.72) kind = Math.random() < 0.45 ? 'windmill' : 'hay';
       else                 kind = Math.random() < 0.55 ? 'cactus' : 'rock';
     }
     o.kind = kind;
@@ -1401,7 +1388,7 @@ function drawHUD(){
   ctx.textAlign = 'center';
   ctx.font = 'bold 12px system-ui,-apple-system,sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillText(Math.floor(G.camZ) + ' / ' + TOTAL_MILES + ' 英里', W/2, barY + 28);
+  ctx.fillText(Math.floor(G.camZ) + ' / ' + TOTAL_MILES + ' mi', W/2, barY + 28);
 
   let currentCity = cities[0].n;
   for(const c of cities) if(G.camZ >= c.m) currentCity = c.n;
@@ -1431,18 +1418,16 @@ function drawHUD(){
 }
 
 // ══════════════════════════════════════════════
-//  覆盖界面
+//  Overlay screens
 // ══════════════════════════════════════════════
-
-// 方向选择按钮的布局
 function getDirButtons(){
-  const bw = 280, bh = 90, gap = 40;
+  const bw = 300, bh = 96, gap = 40;
   const totalW = bw*2 + gap;
   const bx = W/2 - totalW/2;
-  const by = H*0.60;
+  const by = H*0.42;
   return {
-    la_ny: { x: bx, y: by, w: bw, h: bh, label: '洛杉矶 → 纽约', sub: '从西海岸出发' },
-    ny_la: { x: bx + bw + gap, y: by, w: bw, h: bh, label: '纽约 → 洛杉矶', sub: '从东海岸出发' }
+    la_ny: { x: bx, y: by, w: bw, h: bh, label: 'Los Angeles → New York', sub: 'From the West Coast' },
+    ny_la: { x: bx + bw + gap, y: by, w: bw, h: bh, label: 'New York → Los Angeles', sub: 'From the East Coast' }
   };
 }
 
@@ -1452,39 +1437,35 @@ function drawTitle(){
 
   ctx.textAlign = 'center';
 
-  // 标题
   ctx.save();
   ctx.font = 'bold 76px system-ui,-apple-system,sans-serif';
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.fillText('横跨美国', W/2 + 3, H*0.22 + 4);
-  const g = ctx.createLinearGradient(0, H*0.22 - 60, 0, H*0.22 + 10);
+  ctx.fillText('Across America', W/2 + 3, H*0.20 + 4);
+  const g = ctx.createLinearGradient(0, H*0.20 - 60, 0, H*0.20 + 10);
   g.addColorStop(0, '#ffe9a8');
   g.addColorStop(1, '#ff9f5a');
   ctx.fillStyle = g;
-  ctx.fillText('横跨美国', W/2, H*0.22);
+  ctx.fillText('Across America', W/2, H*0.20);
   ctx.restore();
 
   ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillText('选择你的驾驶方向', W/2, H*0.22 + 52);
+  ctx.fillText('Choose Your Route', W/2, H*0.20 + 50);
 
-  // 方向选择按钮
   const btns = getDirButtons();
   drawDirButton(btns.la_ny, DIRECTION === 'LA_NY', '#ff7b5a', '#ffd166');
   drawDirButton(btns.ny_la, DIRECTION === 'NY_LA', '#4facfe', '#6ee7a0');
 
-  // 操作提示
   ctx.font = '14px system-ui,-apple-system,sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.fillText('← →  /  A D  转向     ·     拖动屏幕也可以', W/2, H*0.60 + 130);
+  ctx.fillText('← →  /  A D  to steer     ·     or drag the screen', W/2, H*0.42 + 158);
   ctx.fillStyle = 'rgba(255,120,100,0.85)';
   ctx.font = 'bold 15px system-ui,-apple-system,sans-serif';
-  ctx.fillText('撞车即结束 · 一路躲避车流', W/2, H*0.60 + 160);
+  ctx.fillText('Crashing ends the game  ·  Dodge traffic all the way', W/2, H*0.42 + 188);
 
-  // 开始按钮
   const pulse = 0.5 + Math.sin(G.time*3)*0.5;
   const bw = 280, bh = 62;
-  const bx = W/2 - bw/2, by = H*0.83;
+  const bx = W/2 - bw/2, by = H*0.82;
   ctx.save();
   ctx.shadowColor = `rgba(255,190,90,${0.4 + pulse*0.4})`;
   ctx.shadowBlur = 30 + pulse*22;
@@ -1500,13 +1481,13 @@ function drawTitle(){
   ctx.font = 'bold 24px system-ui,-apple-system,sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('开始旅程', W/2, by + bh/2 + 1);
+  ctx.fillText('Start Journey', W/2, by + bh/2 + 1);
 
   if(G.best > 0){
     ctx.font = 'bold 14px system-ui,-apple-system,sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.textBaseline = 'alphabetic';
-    ctx.fillText('最远里程  ' + G.best + ' 英里', W/2, H - 20);
+    ctx.fillText('Best distance  ' + G.best + ' mi', W/2, H - 20);
   }
 }
 
@@ -1536,19 +1517,18 @@ function drawDirButton(b, active, colorA, colorB){
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = 'bold 20px system-ui,-apple-system,sans-serif';
+  ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
   ctx.fillStyle = active ? '#1a1208' : 'rgba(255,255,255,0.8)';
-  ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2 - 12);
+  ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2 - 14);
 
   ctx.font = '13px system-ui,-apple-system,sans-serif';
   ctx.fillStyle = active ? 'rgba(30,20,8,0.7)' : 'rgba(255,255,255,0.4)';
   ctx.fillText(b.sub, b.x + b.w/2, b.y + b.h/2 + 16);
 
-  // 选中标记
   if(active){
     ctx.fillStyle = '#1a1208';
     ctx.font = 'bold 14px system-ui,-apple-system,sans-serif';
-    ctx.fillText('✓ 已选择', b.x + b.w/2, b.y + b.h + 18);
+    ctx.fillText('✓ Selected', b.x + b.w/2, b.y + b.h + 20);
   }
 }
 
@@ -1573,12 +1553,12 @@ function drawEndScreen(win){
     ctx.fillStyle = g;
     ctx.shadowColor = 'rgba(255,190,90,0.6)';
     ctx.shadowBlur = 30;
-    ctx.fillText('抵达' + dest, W/2, cy);
+    ctx.fillText('Arrived in ' + dest, W/2, cy);
     ctx.restore();
 
     ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    const sub = dest === '纽约' ? '自由女神在向你招手 🗽' : '太平洋就在眼前 🌊';
+    const sub = dest === 'New York' ? 'The Statue of Liberty awaits 🗽' : 'The Pacific Ocean awaits 🌊';
     ctx.fillText(sub, W/2, cy + 46);
   } else {
     ctx.save();
@@ -1586,15 +1566,14 @@ function drawEndScreen(win){
     ctx.fillStyle = '#ff6b5a';
     ctx.shadowColor = 'rgba(255,60,50,0.5)';
     ctx.shadowBlur = 24;
-    ctx.fillText('撞 车 了', W/2, cy);
+    ctx.fillText('CRASHED', W/2, cy);
     ctx.restore();
 
     ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.72)';
-    ctx.fillText('旅途就此中断…', W/2, cy + 44);
+    ctx.fillText('Your journey ends here…', W/2, cy + 44);
   }
 
-  // 数据面板
   const pw = 400, ph = 100;
   const px = W/2 - pw/2, py = H*0.46;
   ctx.fillStyle = 'rgba(255,255,255,0.07)';
@@ -1606,29 +1585,28 @@ function drawEndScreen(win){
   ctx.font = 'bold 20px system-ui,-apple-system,sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillText('行驶里程', W/2, py + 42);
+  ctx.fillText('Distance Traveled', W/2, py + 42);
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 32px system-ui,-apple-system,sans-serif';
-  ctx.fillText(Math.floor(G.camZ) + ' 英里', W/2, py + 82);
+  ctx.fillText(Math.floor(G.camZ) + ' mi', W/2, py + 82);
 
   if(win && G.camZ > G.best){
     ctx.font = 'bold 14px system-ui,-apple-system,sans-serif';
     ctx.fillStyle = '#ffd166';
-    ctx.fillText('★ 新纪录！', W/2, py + ph + 28);
+    ctx.fillText('★ New Record!', W/2, py + ph + 28);
   }
 
-  // 重开提示
   const pulse = 0.45 + Math.sin(G.time*3)*0.35;
   ctx.globalAlpha = pulse;
   ctx.font = 'bold 18px system-ui,-apple-system,sans-serif';
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
-  ctx.fillText('点击屏幕重新出发', W/2, H - 52);
+  ctx.fillText('Tap to try again', W/2, H - 52);
   ctx.globalAlpha = 1;
 }
 
 // ══════════════════════════════════════════════
-//  主渲染
+//  Main render
 // ══════════════════════════════════════════════
 function render(){
   const prog = clamp(G.camZ / TOTAL_MILES, 0, 1);
@@ -1714,10 +1692,10 @@ function render(){
 }
 
 // ══════════════════════════════════════════════
-//  输入
+//  Input
 // ══════════════════════════════════════════════
 window.addEventListener('keydown', e => {
-  if(!window.__gameActive) return;
+  if(!window.__gameActive) return;   // 未打开游戏时不影响页面
 
   keys[e.key] = true;
 
@@ -1758,16 +1736,14 @@ function hitDirButton(clientX, clientY){
 let dragging = false;
 cv.addEventListener('pointerdown', e => {
   if(G.mode === 'title'){
-    // 先检查是否点击了方向按钮
     const dirKey = hitDirButton(e.clientX, e.clientY);
     if(dirKey){
       DIRECTION = dirKey === 'la_ny' ? 'LA_NY' : 'NY_LA';
       return;
     }
-    // 检查是否点击了开始按钮
     const r = cv.getBoundingClientRect();
     const gy = (e.clientY - r.top) / r.height * H;
-    if(gy >= H*0.80) startGame();
+    if(gy >= H*0.78) startGame();
     return;
   }
   if(G.mode === 'over' || G.mode === 'win'){
@@ -1800,14 +1776,14 @@ function startGame(){
 }
 
 function backToTitle(){
-  const best = G.best;
+  const best = Math.max(G.best, Math.floor(G.camZ));
   G = newGame();
   G.best = best;
   G.mode = 'title';
 }
 
 // ══════════════════════════════════════════════
-//  主循环
+//  Main loop
 // ══════════════════════════════════════════════
 let lastT = 0;
 function loop(t){
@@ -1818,7 +1794,7 @@ function loop(t){
   if(dt > 0.05) dt = 0.05;
   if(dt <= 0) dt = 0.0001;
 
-  // 覆盖层未打开时不更新、不渲染，节省性能
+  // 游戏未打开时暂停更新与渲染，节省性能
   if(!window.__gameActive) return;
 
   update(dt);
