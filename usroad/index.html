@@ -1,0 +1,3370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>横跨美国 · 公路之旅</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:#04060a;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    user-select:none;-webkit-user-select:none;touch-action:none;}
+  canvas{display:block;border-radius:16px;
+    box-shadow:0 40px 100px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06)}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script>
+(function(){
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+//  基础工具
+// ═══════════════════════════════════════════════════════════════
+var W = 960, H = 600;
+var cv = document.getElementById('game');
+var ctx = cv.getContext('2d');
+var DPR = Math.min(2, window.devicePixelRatio || 1);
+cv.width = W * DPR;
+cv.height = H * DPR;
+ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+function fitCanvas(){
+  var s = Math.min(window.innerWidth / W, window.innerHeight / H);
+  cv.style.width = (W * s) + 'px';
+  cv.style.height = (H * s) + 'px';
+}
+window.addEventListener('resize', fitCanvas);
+fitCanvas();
+
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+function lerp(a, b, t){ return a + (b - a) * t; }
+function rand(a, b){ return a + Math.random() * (b - a); }
+function randi(n){ return (Math.random() * n) | 0; }
+function safe(v, fallback){ return (v === undefined || v === null || isNaN(v)) ? fallback : v; }
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function hashStr(s){
+  var h = 2166136261;
+  for (var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function roundRect(x, y, w, h, r){
+  r = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function rgb(c){ return 'rgb(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ')'; }
+function rgba(c, a){ return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')'; }
+function lerpC3(a, b, t){ return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; }
+
+// ═══════════════════════════════════════════════════════════════
+//  投影常量
+// ═══════════════════════════════════════════════════════════════
+var FOCAL = 300;
+var HORIZON_Y = 245;
+var ROAD_HW = 10.8;
+var SHOULDER = 1.2;
+var MEDIAN_HW = 0.9;
+var LANE_CENTERS = [2.8, 6.1, 9.4];
+var LANE_L = [-2.8, -6.1, -9.4];
+var CURVE_AMP = 12;
+var CURVE_K = 0.0058;
+var WALL_LAT = 30.0;
+
+var VIEW_MODES = [
+  { id:'hood',   name:'行车记录', camH:1.75, playerZ:2.4,  hoodH:0.80 },
+  { id:'chase',  name:'追尾视角', camH:4.6,  playerZ:13,   hoodH:1.42 },
+  { id:'cockpit',name:'驾驶舱',   camH:1.38, playerZ:1.2,  hoodH:0.74 },
+  { id:'top',    name:'航拍视角', camH:16,   playerZ:32,   hoodH:1.0 }
+];
+
+function roadCenterAt(wz){
+  if (!isFinite(wz)) return 0;
+  return CURVE_AMP * Math.sin(wz * CURVE_K)
+       + CURVE_AMP * 0.38 * Math.sin(wz * CURVE_K * 2.6 + 1.2)
+       + CURVE_AMP * 0.16 * Math.sin(wz * CURVE_K * 5.1 + 0.6);
+}
+function roadOffset(rz){ return roadCenterAt(G.camZ + rz) - roadCenterAt(G.camZ); }
+// 计算当前弯道曲率（用于物理横向力）
+function roadCurvatureAt(rz){
+  var h = 0.5;
+  var a = roadCenterAt(G.camZ + rz - h);
+  var b = roadCenterAt(G.camZ + rz);
+  var c = roadCenterAt(G.camZ + rz + h);
+  return (a - 2 * b + c) / (h * h);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  城市数据
+// ═══════════════════════════════════════════════════════════════
+var CITIES = [
+  {id:'mia',name:'迈阿密',state:'FL',lat:25.76,lng:-80.19,theme:'tropical'},
+  {id:'tam',name:'坦帕',state:'FL',lat:27.95,lng:-82.46,theme:'tropical'},
+  {id:'orl',name:'奥兰多',state:'FL',lat:28.54,lng:-81.38,theme:'tropical'},
+  {id:'jax',name:'杰克逊维尔',state:'FL',lat:30.33,lng:-81.66,theme:'tropical'},
+  {id:'atl',name:'亚特兰大',state:'GA',lat:33.75,lng:-84.39,theme:'metro'},
+  {id:'sav',name:'萨凡纳',state:'GA',lat:32.08,lng:-81.09,theme:'tropical'},
+  {id:'clt',name:'夏洛特',state:'NC',lat:35.23,lng:-80.84,theme:'metro'},
+  {id:'rdu',name:'罗利',state:'NC',lat:35.78,lng:-78.64,theme:'metro'},
+  {id:'dc',name:'华盛顿',state:'DC',lat:38.91,lng:-77.04,theme:'monument'},
+  {id:'phi',name:'费城',state:'PA',lat:39.95,lng:-75.17,theme:'metro'},
+  {id:'nyc',name:'纽约',state:'NY',lat:40.71,lng:-74.01,theme:'nyc'},
+  {id:'bos',name:'波士顿',state:'MA',lat:42.36,lng:-71.06,theme:'metro'},
+  {id:'buf',name:'布法罗',state:'NY',lat:42.89,lng:-78.88,theme:'metro'},
+  {id:'cle',name:'克利夫兰',state:'OH',lat:41.50,lng:-81.69,theme:'metro'},
+  {id:'cin',name:'辛辛那提',state:'OH',lat:39.10,lng:-84.51,theme:'metro'},
+  {id:'det',name:'底特律',state:'MI',lat:42.33,lng:-83.05,theme:'metro'},
+  {id:'ind',name:'印第安纳波利斯',state:'IN',lat:39.77,lng:-86.16,theme:'metro'},
+  {id:'lou',name:'路易斯维尔',state:'KY',lat:38.25,lng:-85.76,theme:'metro'},
+  {id:'nsh',name:'纳什维尔',state:'TN',lat:36.16,lng:-86.78,theme:'metro'},
+  {id:'mem',name:'孟菲斯',state:'TN',lat:35.15,lng:-90.05,theme:'metro'},
+  {id:'knx',name:'诺克斯维尔',state:'TN',lat:35.96,lng:-83.92,theme:'metro'},
+  {id:'bir',name:'伯明翰',state:'AL',lat:33.52,lng:-86.80,theme:'metro'},
+  {id:'mob',name:'莫比尔',state:'AL',lat:30.69,lng:-88.04,theme:'tropical'},
+  {id:'nola',name:'新奥尔良',state:'LA',lat:29.95,lng:-90.07,theme:'tropical'},
+  {id:'jack',name:'杰克逊',state:'MS',lat:32.30,lng:-90.18,theme:'tropical'},
+  {id:'chi',name:'芝加哥',state:'IL',lat:41.88,lng:-87.63,theme:'chi'},
+  {id:'mil',name:'密尔沃基',state:'WI',lat:43.04,lng:-87.91,theme:'metro'},
+  {id:'msp',name:'明尼阿波利斯',state:'MN',lat:44.98,lng:-93.27,theme:'metro'},
+  {id:'omh',name:'奥马哈',state:'NE',lat:41.26,lng:-95.93,theme:'arch'},
+  {id:'stl',name:'圣路易斯',state:'MO',lat:38.63,lng:-90.20,theme:'arch'},
+  {id:'kc',name:'堪萨斯城',state:'MO',lat:39.10,lng:-94.58,theme:'arch'},
+  {id:'okc',name:'俄克拉荷马城',state:'OK',lat:35.47,lng:-97.52,theme:'arch'},
+  {id:'tls',name:'塔尔萨',state:'OK',lat:36.15,lng:-95.99,theme:'arch'},
+  {id:'dal',name:'达拉斯',state:'TX',lat:32.78,lng:-96.80,theme:'metro'},
+  {id:'hou',name:'休斯顿',state:'TX',lat:29.76,lng:-95.37,theme:'metro'},
+  {id:'sat',name:'圣安东尼奥',state:'TX',lat:29.42,lng:-98.49,theme:'metro'},
+  {id:'aus',name:'奥斯汀',state:'TX',lat:30.27,lng:-97.74,theme:'metro'},
+  {id:'elp',name:'埃尔帕索',state:'TX',lat:31.76,lng:-106.49,theme:'desert'},
+  {id:'amr',name:'阿马里洛',state:'TX',lat:35.22,lng:-101.83,theme:'desert'},
+  {id:'ltm',name:'小石城',state:'AR',lat:34.75,lng:-92.29,theme:'metro'},
+  {id:'den',name:'丹佛',state:'CO',lat:39.74,lng:-104.99,theme:'mountain'},
+  {id:'abq',name:'阿尔伯克基',state:'NM',lat:35.08,lng:-106.65,theme:'desert'},
+  {id:'slc',name:'盐湖城',state:'UT',lat:40.76,lng:-111.89,theme:'mountain'},
+  {id:'boi',name:'博伊西',state:'ID',lat:43.62,lng:-116.20,theme:'mountain'},
+  {id:'phx',name:'菲尼克斯',state:'AZ',lat:33.45,lng:-112.07,theme:'desert'},
+  {id:'tuc',name:'图森',state:'AZ',lat:32.22,lng:-110.97,theme:'desert'},
+  {id:'vegas',name:'拉斯维加斯',state:'NV',lat:36.17,lng:-115.14,theme:'vegas'},
+  {id:'ren',name:'里诺',state:'NV',lat:39.53,lng:-119.81,theme:'mountain'},
+  {id:'sac',name:'萨克拉门托',state:'CA',lat:38.58,lng:-121.49,theme:'hills'},
+  {id:'sfo',name:'旧金山',state:'CA',lat:37.77,lng:-122.42,theme:'sf'},
+  {id:'la',name:'洛杉矶',state:'CA',lat:34.05,lng:-118.24,theme:'la'},
+  {id:'sd',name:'圣迭戈',state:'CA',lat:32.72,lng:-117.16,theme:'tropical'},
+  {id:'pdx',name:'波特兰',state:'OR',lat:45.52,lng:-122.68,theme:'forest'},
+  {id:'sea',name:'西雅图',state:'WA',lat:47.61,lng:-122.33,theme:'sea'},
+  {id:'gcn',name:'大峡谷',state:'AZ',lat:36.10,lng:-112.11,theme:'canyon'}
+];
+var CITY_MAP = {};
+for (var ci = 0; ci < CITIES.length; ci++) CITY_MAP[CITIES[ci].id] = CITIES[ci];
+
+var HIGHWAYS = [
+  ['sea','pdx','I-5'],['pdx','sac','I-5'],['sac','sfo','I-80'],
+  ['sfo','la','I-5'],['la','sd','I-5'],
+  ['la','phx','I-10'],['phx','tuc','I-10'],['tuc','elp','I-10'],
+  ['elp','sat','I-10'],['sat','hou','I-10'],['hou','nola','I-10'],
+  ['nola','mob','I-10'],['mob','jax','I-10'],
+  ['sd','vegas','I-15'],['vegas','slc','I-15'],
+  ['elp','abq','I-25'],['abq','den','I-25'],
+  ['sat','aus','I-35'],['aus','dal','I-35'],['dal','okc','I-35'],
+  ['okc','kc','I-35'],['kc','msp','I-35'],
+  ['amr','okc','I-40'],['okc','ltm','I-40'],['ltm','mem','I-40'],
+  ['mem','nsh','I-40'],['nsh','knx','I-40'],['dal','amr','I-40'],
+  ['nola','jack','I-55'],['jack','mem','I-55'],['mem','stl','I-55'],['stl','chi','I-55'],
+  ['mob','bir','I-65'],['bir','nsh','I-65'],['nsh','lou','I-65'],
+  ['lou','ind','I-65'],['ind','chi','I-65'],
+  ['stl','kc','I-70'],['kc','den','I-70'],
+  ['mia','tam','I-75'],['tam','atl','I-75'],['atl','knx','I-75'],
+  ['knx','cin','I-75'],['cin','det','I-75'],
+  ['sac','ren','I-80'],['ren','slc','I-80'],['slc','den','I-80'],
+  ['den','omh','I-80'],['omh','chi','I-80'],['chi','cle','I-80'],
+  ['cle','buf','I-80'],['buf','nyc','I-80'],
+  ['atl','clt','I-85'],['clt','rdu','I-85'],['rdu','dc','I-85'],
+  ['sea','boi','I-90'],['boi','slc','I-90'],['slc','den','I-90'],
+  ['den','omh','I-90'],['omh','chi','I-90'],['chi','cle','I-90'],
+  ['cle','buf','I-90'],['buf','bos','I-90'],
+  ['msp','mil','I-94'],['mil','chi','I-94'],['chi','det','I-94'],
+  ['mia','jax','I-95'],['jax','sav','I-95'],['sav','clt','I-77'],
+  ['rdu','dc','I-95'],['dc','phi','I-95'],['phi','nyc','I-95'],
+  ['nyc','bos','I-95'],['dal','hou','I-45'],['phx','vegas','I-11'],
+  ['vegas','gcn','I-11'],['gcn','phx','I-17']
+];
+
+function haversine(a, b){
+  var R = 3958.8;
+  var dLat = (b.lat - a.lat) * Math.PI / 180;
+  var dLng = (b.lng - a.lng) * Math.PI / 180;
+  var la1 = a.lat * Math.PI / 180, la2 = b.lat * Math.PI / 180;
+  var h = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+var GRAPH = {};
+(function(){
+  for (var i = 0; i < CITIES.length; i++) GRAPH[CITIES[i].id] = [];
+  for (var j = 0; j < HIGHWAYS.length; j++){
+    var hw = HIGHWAYS[j];
+    var a = CITY_MAP[hw[0]], b = CITY_MAP[hw[1]];
+    if (!a || !b) continue;
+    var d = Math.round(haversine(a, b) * 1.16 / 5) * 5;
+    GRAPH[a.id].push({to: b.id, name: hw[2], miles: d});
+    GRAPH[b.id].push({to: a.id, name: hw[2], miles: d});
+  }
+})();
+
+function shortestPath(fromId, toId){
+  var dist = {}, prev = {}, visited = {};
+  for (var id in GRAPH) dist[id] = Infinity;
+  if (!(fromId in dist) || !(toId in dist)) return null;
+  dist[fromId] = 0;
+  for (;;){
+    var u = null, best = Infinity;
+    for (var k in dist){ if (!visited[k] && dist[k] < best){ best = dist[k]; u = k; } }
+    if (u === null || u === toId) break;
+    visited[u] = true;
+    var nbrs = GRAPH[u] || [];
+    for (var i = 0; i < nbrs.length; i++){
+      var e = nbrs[i], nd = dist[u] + e.miles;
+      if (nd < dist[e.to]){ dist[e.to] = nd; prev[e.to] = {from: u, edge: e}; }
+    }
+  }
+  if (dist[toId] === Infinity) return null;
+  var path = [], cur = toId;
+  while (cur !== fromId){
+    var p = prev[cur];
+    if (!p) return null;
+    path.unshift({from: p.from, to: cur, name: p.edge.name, miles: p.edge.miles});
+    cur = p.from;
+  }
+  return path;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  风景主题
+// ═══════════════════════════════════════════════════════════════
+var LANDSCAPE = {
+  forest:  {h:0.75,far:[46,66,54],   mid:[64,88,72],   near:[34,50,40],   snow:true, tree:'#3a5a3a', ground:[72,100,66]},
+  plains:  {h:0.28,far:[118,136,104],mid:[138,156,120],near:[96,112,84],  snow:false,tree:'#5a6b45', ground:[148,158,108]},
+  hills:   {h:0.80,far:[82,96,82],   mid:[102,116,98], near:[62,76,60],   snow:false,tree:'#4a6548', ground:[108,124,90]},
+  mountain:{h:1.55,far:[96,112,136], mid:[118,134,156],near:[68,84,106],  snow:true, tree:'#2e4a35', ground:[92,116,88]},
+  desert:  {h:0.52,far:[178,146,106],mid:[198,166,126],near:[150,120,84], snow:false,tree:'#6b7a5a', ground:[196,168,124]},
+  canyon:  {h:1.05,far:[176,116,86], mid:[198,138,106],near:[140,90,66],  snow:false,tree:'#7a6a4a', ground:[188,138,98]},
+  coast:   {h:0.68,far:[78,104,118], mid:[98,124,138], near:[58,84,98],   snow:false,tree:'#4a5a52', ground:[110,136,106]},
+  tropical:{h:0.25,far:[104,134,92], mid:[124,154,108],near:[84,114,78],  snow:false,tree:'#4a7a4a', ground:[126,156,108]},
+  neon:    {h:0.48,far:[104,92,104], mid:[124,108,124],near:[82,70,84],   snow:false,tree:'#5a5a4a', ground:[148,138,118]}
+};
+var THEME_TO_LAND = {
+  metro:'hills', tropical:'tropical', desert:'desert', neon:'neon',
+  mountain:'mountain', space:'forest', arch:'plains', la:'coast',
+  hills:'hills', forest:'forest', monument:'forest', canyon:'canyon',
+  nyc:'hills', chi:'plains', vegas:'desert', sf:'coast', sea:'forest'
+};
+
+function currentLandscape(){
+  if (!G.route) return LANDSCAPE.plains;
+  var seg = segAtWorld(G.route, G.camZ);
+  if (!seg) return LANDSCAPE.plains;
+  var t = clamp((G.camZ - seg.worldStart) / Math.max(1, seg.worldLen), 0, 1);
+  var fromCity = CITY_MAP[seg.from], toCity = CITY_MAP[seg.to];
+  if (!fromCity || !toCity) return LANDSCAPE.plains;
+  var fromL = LANDSCAPE[THEME_TO_LAND[fromCity.theme]] || LANDSCAPE.plains;
+  var toL = LANDSCAPE[THEME_TO_LAND[toCity.theme]] || LANDSCAPE.plains;
+  return {
+    h: lerp(fromL.h, toL.h, t),
+    far: lerpC3(fromL.far, toL.far, t),
+    mid: lerpC3(fromL.mid, toL.mid, t),
+    near: lerpC3(fromL.near, toL.near, t),
+    snow: fromL.snow || toL.snow,
+    tree: fromL.tree,
+    ground: lerpC3(fromL.ground, toL.ground, t),
+    canyon: fromCity.theme === 'canyon' || toCity.theme === 'canyon',
+    mountain: fromCity.theme === 'mountain' || toCity.theme === 'mountain'
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  天际线主题
+// ═══════════════════════════════════════════════════════════════
+var THEME_PARAMS = {
+  metro:{count:[24,36],spread:72,hMin:60,hMax:290,wMin:7,wMax:20,colors:['#3d4a5e','#4e5e76','#2e3a4b','#5a6a82','#42526a'],style:'glass',trees:0},
+  tropical:{count:[14,22],spread:58,hMin:18,hMax:78,wMin:10,wMax:24,colors:['#cdbcac','#e0d2c2','#bcac9c','#e6dac8'],style:'box',trees:1},
+  desert:{count:[12,20],spread:64,hMin:14,hMax:62,wMin:9,wMax:22,colors:['#b49878','#c8ae8e','#a28a6c','#cfb898'],style:'box',trees:0},
+  neon:{count:[16,26],spread:64,hMin:40,hMax:160,wMin:8,wMax:20,colors:['#2e2e44','#3c3c58','#262640','#464664'],style:'neon',trees:0},
+  mountain:{count:[14,22],spread:66,hMin:30,hMax:120,wMin:9,wMax:20,colors:['#4e5666','#5e6678','#404856','#6a7284'],style:'box',trees:1},
+  space:{count:[16,24],spread:66,hMin:42,hMax:180,wMin:8,wMax:20,colors:['#42505e','#525e6e','#36424e','#5e6a7a'],style:'glass',trees:1},
+  arch:{count:[14,22],spread:66,hMin:26,hMax:95,wMin:9,wMax:20,colors:['#525e6c','#626e7c','#444c58','#6e7a88'],style:'box',trees:1},
+  la:{count:[12,20],spread:72,hMin:20,hMax:90,wMin:9,wMax:22,colors:['#bcb4a4','#ccc4b4','#aca494','#d4ccbc'],style:'box',trees:1},
+  hills:{count:[16,26],spread:66,hMin:35,hMax:140,wMin:8,wMax:20,colors:['#5e626c','#6e727c','#50545e','#7a7e88'],style:'box',trees:1},
+  forest:{count:[12,18],spread:62,hMin:22,hMax:85,wMin:9,wMax:20,colors:['#4e5e56','#5e6e66','#404e48','#6a7a72'],style:'box',trees:1},
+  monument:{count:[14,22],spread:66,hMin:26,hMax:100,wMin:9,wMax:20,colors:['#5e5a4c','#6e6a5c','#4e4a3c','#7e7a6c'],style:'box',trees:1},
+  canyon:{count:[8,14],spread:80,hMin:14,hMax:44,wMin:10,wMax:22,colors:['#a87858','#c08868','#8c6048','#b89878'],style:'box',trees:0},
+  nyc:{count:[28,40],spread:76,hMin:80,hMax:320,wMin:6,wMax:18,colors:['#3a4658','#4a5a72','#2e3a4b','#5a6a82'],style:'glass',trees:0},
+  chi:{count:[24,34],spread:72,hMin:70,hMax:300,wMin:7,wMax:19,colors:['#3e4a5e','#4e5e76','#2e3a4b','#586a82'],style:'glass',trees:0},
+  vegas:{count:[16,24],spread:72,hMin:50,hMax:180,wMin:8,wMax:22,colors:['#2e2e44','#3c3c58','#262640','#464664'],style:'neon',trees:0},
+  sf:{count:[20,30],spread:68,hMin:50,hMax:180,wMin:8,wMax:20,colors:['#5a5e68','#6a6e78','#4c505a','#767a84'],style:'box',trees:1},
+  sea:{count:[20,28],spread:68,hMin:50,hMax:200,wMin:8,wMax:20,colors:['#42505e','#525e6e','#36424e','#5e6a7a'],style:'glass',trees:1}
+};
+
+var LANDMARKS = {
+  metro:function(){return{lat:40,relZ:30,h:340,w:16,col:'#36444f',style:'spire',seed:0.5};},
+  space:function(){return{lat:38,relZ:40,h:265,w:5,col:'#5e6c7a',style:'needle',seed:0.3};},
+  arch:function(){return{lat:-36,relZ:46,h:150,w:26,col:'#ccd4dc',style:'arch',seed:0.7};},
+  monument:function(){return{lat:34,relZ:50,h:220,w:5,col:'#e4e0d4',style:'obelisk',seed:0.2};},
+  la:function(){return{lat:-42,relZ:60,h:42,w:34,col:'#ccc4b4',style:'box',seed:0.1};},
+  neon:function(){return{lat:-34,relZ:34,h:125,w:44,col:'#3e3e5c',style:'neon',seed:0.9};},
+  hills:function(){return{lat:40,relZ:44,h:160,w:12,col:'#6e727c',style:'spire',seed:0.4};},
+  nyc:function(){return{lat:44,relZ:28,h:370,w:14,col:'#3a4658',style:'spire',seed:0.55};},
+  chi:function(){return{lat:42,relZ:30,h:355,w:13,col:'#3e4a5e',style:'spire',seed:0.5};},
+  sf:function(){return{lat:-40,relZ:38,h:92,w:120,col:'#a84028',style:'bridge',seed:0.3};},
+  sea:function(){return{lat:38,relZ:34,h:235,w:5,col:'#5a6878',style:'needle',seed:0.35};},
+  vegas:function(){return{lat:-32,relZ:28,h:135,w:44,col:'#3e3e5c',style:'neon',seed:0.95};}
+};
+
+function generateSkyline(city){
+  var rng = mulberry32(hashStr(city.id));
+  var P = THEME_PARAMS[city.theme] || THEME_PARAMS.metro;
+  var out = [];
+  var n = P.count[0] + Math.floor(rng() * (P.count[1] - P.count[0]));
+  for (var i = 0; i < n; i++){
+    var side = rng() < 0.5 ? -1 : 1;
+    out.push({
+      lat: side * (24 + rng() * P.spread),
+      relZ: -110 + rng() * 300,
+      h: P.hMin + rng() * (P.hMax - P.hMin),
+      w: P.wMin + rng() * (P.wMax - P.wMin),
+      col: P.colors[(rng() * P.colors.length) | 0],
+      style: P.style, seed: rng()
+    });
+  }
+  var lm = LANDMARKS[city.theme];
+  if (lm) out.push(lm());
+  if (P.trees){
+    for (var t = 0; t < 14; t++){
+      var s2 = rng() < 0.5 ? -1 : 1;
+      out.push({lat:s2*(20+rng()*32),relZ:-90+rng()*280,h:11+rng()*11,w:6+rng()*4,col:'#3d5a3a',style:'tree',seed:rng()});
+    }
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  游戏状态
+// ═══════════════════════════════════════════════════════════════
+var G = null;
+
+function freshState(){
+  var s = {
+    mode:'menu', driveMode:'casual', startTime:'noon',
+    time:0, camZ:0,
+    // 物理
+    speed:0,           // 世界单位/秒
+    throttle:0, brake:0,
+    engineForce:0,
+    lateralVel:0,
+    steerInput:0, steerSmooth:0,
+    bodyRoll:0,        // 车身侧倾
+    bodyPitch:0,       // 车身俯仰
+    playerLat:LANE_CENTERS[1], playerLane:1, targetLat:LANE_CENTERS[1],
+    camLat:LANE_CENTERS[1],
+    // 状态
+    autoDrive:false,
+    shake:0, hitFlash:0, collisionCooldown:0,
+    hazardTimer:0, stoppedTimer:0,
+    offRoadTime:0, offRoadWarned:false,
+    bumpY:0,
+    // 路线
+    route:null, signs:[],
+    traffic:[], nextTraffic:60,
+    sceneries:[], nextScen:0,
+    notif:null, clouds:[], birds:[],
+    // 菜单
+    menuFrom:null, menuTo:null,
+    timeHover:null, modeHover:null, menuHover:null,
+    // 进度
+    arrivedT:0, fuel:100, refueling:false,
+    freeOptions:null, freeCity:null, freeHoverIndex:-1,
+    totalMilesDriven:0,
+    exitZones:[], activeExit:null,
+    // 视角
+    viewIdx:0,
+    // 轨迹
+    trackPoints:[],
+    // UI
+    miniMapVisible:true, cityListScroll:0,
+    blinkers:0, blinkSide:0,
+    fadeAlpha:0,
+    // 自动驾驶状态
+    autoState:{ targetLane:1, targetSpeed:0, laneChangeCooldown:0, targetGap:0 }
+  };
+  for (var i = 0; i < 16; i++){
+    s.clouds.push({x:rand(0,W),y:rand(15,HORIZON_Y-70),w:rand(80,240),h:rand(14,36),spd:rand(2,9),a:rand(0.10,0.32)});
+  }
+  for (var j = 0; j < 6; j++){
+    s.birds.push({x:rand(0,W),y:rand(60,HORIZON_Y-40),spd:rand(14,30),ph:rand(0,6)});
+  }
+  return s;
+}
+G = freshState();
+
+// ═══════════════════════════════════════════════════════════════
+//  天空
+// ═══════════════════════════════════════════════════════════════
+var DAY_LEN = 480;
+var TIME_MAP = {dawn: 0.25, noon: 0.5, dusk: 0.75, night: 0.95};
+var SKY_KEYS = [
+  {h:-1.00, top:[7,9,24],     bot:[16,20,44],    sun:[46,56,104]},
+  {h:-0.20, top:[16,20,46],   bot:[42,40,76],    sun:[66,66,116]},
+  {h:-0.04, top:[54,48,94],   bot:[224,114,88],  sun:[255,152,92]},
+  {h:0.14,  top:[86,140,206], bot:[240,194,162], sun:[255,224,154]},
+  {h:0.42,  top:[70,142,216], bot:[186,220,244], sun:[255,250,234]},
+  {h:1.00,  top:[56,130,214], bot:[174,210,242], sun:[255,255,248]}
+];
+
+function skyState(){
+  var startT = TIME_MAP[G.startTime] || 0.5;
+  var dayT = (startT + G.time / DAY_LEN) % 1;
+  var ang = dayT * Math.PI * 2 - Math.PI * 0.5;
+  var h = Math.sin(ang);
+  var sunX = W / 2 + Math.cos(ang) * W * 0.60;
+  var sunY = HORIZON_Y - h * 200;
+  var top = SKY_KEYS[0].top, bot = SKY_KEYS[0].bot, sc = SKY_KEYS[0].sun;
+  for (var i = 0; i < SKY_KEYS.length - 1; i++){
+    var a = SKY_KEYS[i], b = SKY_KEYS[i+1];
+    if (h >= a.h && h <= b.h){
+      var t = (h - a.h) / (b.h - a.h || 1);
+      top = lerpC3(a.top, b.top, t);
+      bot = lerpC3(a.bot, b.bot, t);
+      sc = lerpC3(a.sun, b.sun, t);
+      break;
+    }
+  }
+  if (h > SKY_KEYS[SKY_KEYS.length-1].h){
+    var l = SKY_KEYS[SKY_KEYS.length-1];
+    top = l.top; bot = l.bot; sc = l.sun;
+  }
+  return {h:h, top:top, bot:bot, sunColor:sc, sunX:sunX, sunY:sunY, night:clamp(-h*1.8, 0, 1)};
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  路线构建
+// ═══════════════════════════════════════════════════════════════
+var WORLD_PER_MILE = {casual: 5.5, real: 22.0, free: 6.5};
+
+function buildRouteFromPath(path, fromCity, toCity){
+  if (!path || !path.length || !fromCity || !toCity) return null;
+  var wpm = WORLD_PER_MILE[G.driveMode] || 5.5;
+  var segs = [], wz = 0, totalMiles = 0;
+  for (var i = 0; i < path.length; i++){
+    var p = path[i];
+    var len = Math.max(600, p.miles * wpm);
+    segs.push({from:p.from, to:p.to, name:p.name, miles:p.miles, worldStart:wz, worldEnd:wz+len, worldLen:len});
+    wz += len;
+    totalMiles += p.miles;
+  }
+  return {segments:segs, totalMiles:totalMiles, totalWorld:wz, fromCity:fromCity, toCity:toCity};
+}
+function buildFreeRoute(fromCity, edge, toCity){
+  if (!fromCity || !edge || !toCity) return null;
+  var wpm = WORLD_PER_MILE[G.driveMode] || 5.5;
+  var len = Math.max(600, edge.miles * wpm);
+  var seg = {from:fromCity.id, to:toCity.id, name:edge.name, miles:edge.miles, worldStart:0, worldEnd:len, worldLen:len};
+  return {segments:[seg], totalMiles:edge.miles, totalWorld:len, fromCity:fromCity, toCity:toCity};
+}
+function segAtWorld(route, wz){
+  if (!route || !route.segments || !route.segments.length) return null;
+  var segs = route.segments;
+  for (var i = 0; i < segs.length; i++){
+    if (wz <= segs[i].worldEnd) return segs[i];
+  }
+  return segs[segs.length-1];
+}
+
+function generateExitZones(){
+  if (!G.route) return [];
+  var zones = [];
+  var segs = G.route.segments;
+  // 城市匝道
+  for (var i = 0; i < segs.length; i++){
+    var seg = segs[i];
+    var cityId = seg.to;
+    var nbrs = GRAPH[cityId] || [];
+    var opts = [];
+    for (var j = 0; j < nbrs.length; j++){
+      if (nbrs[j].to !== seg.from) opts.push(nbrs[j]);
+    }
+    zones.push({
+      type:'city',
+      zStart: seg.worldEnd - 280,
+      zEnd: seg.worldEnd,
+      city: CITY_MAP[cityId],
+      from: seg.from, to: seg.to, name: seg.name,
+      opts: opts, exited: false
+    });
+  }
+  // 服务区
+  for (var k = 0; k < segs.length; k++){
+    var s2 = segs[k];
+    var numSv = Math.max(1, Math.floor(s2.worldLen / 2400));
+    for (var m = 0; m < numSv; m++){
+      var zPos = s2.worldStart + s2.worldLen * (0.28 + m * 0.42 / numSv);
+      var kind = Math.random() < 0.62 ? 'gas' : 'rest';
+      zones.push({
+        type:'service', zStart: zPos, zEnd: zPos + 100,
+        lat: ROAD_HW + SHOULDER + 5, kind: kind,
+        name: ['Shell','Chevron','BP','Exxon','Texaco','76','Mobil','Sunoco'][randi(8)]
+      });
+    }
+  }
+  zones.sort(function(a, b){ return a.zStart - b.zStart; });
+  return zones;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  更新 - 主循环
+// ═══════════════════════════════════════════════════════════════
+var keys = {};
+var dragging = false;
+var SPEED_MAX_MAP = {casual: 58, real: 48, free: 58};
+
+function update(dt){
+  if (!G) return;
+  G.time += dt;
+
+  // 衰减
+  G.shake = Math.max(0, G.shake - dt * 4);
+  G.hitFlash = Math.max(0, G.hitFlash - dt * 2.6);
+  G.collisionCooldown = Math.max(0, G.collisionCooldown - dt);
+  G.hazardTimer = Math.max(0, G.hazardTimer - dt);
+  G.bumpY = Math.max(0, G.bumpY - dt * 4);
+  G.fadeAlpha = Math.max(0, G.fadeAlpha - dt * 1.5);
+  G.blinkers = Math.max(0, G.blinkers - dt);
+  if (G.blinkers <= 0) G.blinkSide = 0;
+  if (G.autoState) G.autoState.laneChangeCooldown = Math.max(0, G.autoState.laneChangeCooldown - dt);
+
+  // 云、鸟
+  for (var i = 0; i < G.clouds.length; i++){
+    var c = G.clouds[i];
+    c.x += c.spd * dt;
+    if (c.x > W + c.w){ c.x = -c.w; c.y = rand(15, HORIZON_Y - 70); }
+  }
+  for (var j = 0; j < G.birds.length; j++){
+    var b = G.birds[j];
+    b.x += b.spd * dt;
+    b.ph += dt * 6;
+    if (b.x > W + 40){ b.x = -40; b.y = rand(60, HORIZON_Y - 40); }
+  }
+
+  if (G.mode === 'arrived' || G.mode === 'free-choose'){ G.arrivedT += dt; return; }
+  if (G.mode !== 'playing') return;
+  if (!G.route) return;
+
+  updateDriving(dt);
+  checkCollisions(dt);
+  checkExitZones(dt);
+  spawnScenery();
+  spawnTraffic(dt);
+  checkStopped(dt);
+  recordTrack();
+
+  if (G.camZ >= G.route.totalWorld){
+    G.camZ = G.route.totalWorld;
+    if (G.driveMode === 'free') arriveFree();
+    else { G.mode = 'arrived'; G.arrivedT = 0; G.speed = 0; }
+  }
+  if (G.notif){
+    G.notif.t -= dt;
+    if (G.notif.t <= 0) G.notif = null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  车辆物理
+// ═══════════════════════════════════════════════════════════════
+function updateDriving(dt){
+  var SPEED_MAX = SPEED_MAX_MAP[G.driveMode] || 58;
+
+  // 输入
+  var throttle = 0, brake = 0, steer = 0;
+  if (keys['q'] || keys['Q'] || keys['ArrowUp']) throttle = 1;
+  if (keys['a'] || keys['A'] || keys['ArrowDown']) brake = 1;
+  if (keys['ArrowLeft']) steer -= 1;
+  if (keys['ArrowRight']) steer += 1;
+
+  G.throttle = throttle;
+  G.brake = brake;
+
+  // ── 纵向物理 ──
+  if (G.autoDrive){
+    autoDriveControl(dt, SPEED_MAX);
+  } else {
+    if (throttle > 0){
+      // 引擎力：随速度衰减
+      var engineAccel = SPEED_MAX * (1 - Math.pow(G.speed / SPEED_MAX, 1.6)) * 0.42;
+      G.speed += Math.max(0, engineAccel) * dt;
+      G.engineForce = throttle;
+    } else if (brake > 0){
+      // 刹车：随速度增强
+      var decel = 6 + G.speed * 0.20;
+      G.speed -= decel * dt;
+      if (G.speed < 0) G.speed = 0;
+      G.engineForce = -brake;
+    } else {
+      // 滑行：空气阻力 + 滚阻
+      var drag = 0.08 + G.speed * 0.012;
+      G.speed -= G.speed * drag * dt;
+      if (G.speed < 0.3) G.speed = 0;
+      G.engineForce = 0;
+    }
+  }
+
+  // ── 冲出公路 ──
+  var absLat = Math.abs(G.playerLat);
+  if (absLat > ROAD_HW + SHOULDER){
+    var off = absLat - ROAD_HW - SHOULDER;
+    var dragCoef = Math.min(2.4, off * 0.30);
+    G.speed -= G.speed * dragCoef * dt;
+    if (G.speed < 0) G.speed = 0;
+    G.offRoadTime += dt;
+    G.bumpY = Math.max(G.bumpY, Math.min(1, off * 0.12)) * Math.max(0.7, G.speed * 0.025);
+    if (!G.offRoadWarned && G.offRoadTime > 0.35){
+      G.offRoadWarned = true;
+      G.notif = {text:'⚠ 驶出公路', t: 1.6};
+    }
+  } else {
+    G.offRoadTime = 0;
+    G.offRoadWarned = false;
+  }
+  G.speed = clamp(G.speed, 0, SPEED_MAX);
+
+  // ── 横向物理（真实转向模型）──
+  if (!G.autoDrive){
+    G.steerInput = steer;
+    // 方向盘平滑
+    G.steerSmooth += (G.steerInput - G.steerSmooth) * Math.min(1, dt * 7);
+
+    // 转向灵敏度：随速度降低（真实）
+    var speedRatio = G.speed / SPEED_MAX;
+    var steerAuthority = 9.0 * (1 - speedRatio * 0.65);
+
+    // 离心力：弯道上被向外推
+    var curveForce = roadCurvatureAt(2.4) * G.speed * G.speed * 0.008;
+
+    // 横向加速度 = 转向输入 + 离心力
+    var latAccel = G.steerSmooth * steerAuthority + curveForce;
+    G.lateralVel += latAccel * dt;
+
+    // 阻尼（轮胎抓地力）—— 高速时阻尼更小（更滑）
+    var damping = Math.pow(0.04 + speedRatio * 0.04, dt);
+    G.lateralVel *= damping;
+
+    // 车身侧倾
+    var targetRoll = clamp(-G.lateralVel * 0.05 - G.steerSmooth * 0.04, -0.10, 0.10);
+    G.bodyRoll += (targetRoll - G.bodyRoll) * Math.min(1, dt * 6);
+
+    // 车身俯仰（加速后仰、刹车前倾）
+    var targetPitch = clamp(-G.engineForce * 0.02, -0.02, 0.03);
+    G.bodyPitch += (targetPitch - G.bodyPitch) * Math.min(1, dt * 5);
+
+    G.lateralVel = clamp(G.lateralVel, -10, 10);
+  } else {
+    // 自动驾驶：直接平滑移动到目标车道
+    var latErr = G.autoState ? (LANE_CENTERS[G.autoState.targetLane] - G.playerLat) : 0;
+    G.lateralVel += latErr * 1.6 * dt;
+    G.lateralVel *= Math.pow(0.08, dt);
+    G.lateralVel = clamp(G.lateralVel, -4, 4);
+    G.bodyRoll += (clamp(-G.lateralVel * 0.05, -0.08, 0.08) - G.bodyRoll) * Math.min(1, dt * 5);
+    G.bodyPitch += (0 - G.bodyPitch) * Math.min(1, dt * 3);
+  }
+
+  G.playerLat += G.lateralVel * dt;
+
+  // 车道检测
+  var laneGuess = 1;
+  if (G.playerLat < 4.3) laneGuess = 0;
+  else if (G.playerLat < 7.7) laneGuess = 1;
+  else laneGuess = 2;
+  G.playerLane = laneGuess;
+
+  G.playerLat = clamp(G.playerLat, -WALL_LAT, WALL_LAT);
+  G.camLat += (G.playerLat - G.camLat) * Math.min(1, dt * 4.2);
+
+  // 位置推进
+  G.camZ += G.speed * dt;
+  G.totalMilesDriven += G.speed * dt / (WORLD_PER_MILE[G.driveMode] || 5.5);
+
+  // 油耗
+  var cons = 0.5 + G.speed * 0.045 + throttle * 0.4;
+  G.fuel -= cons * dt * 0.22;
+  if (G.fuel < 0) G.fuel = 0;
+
+  // 转向灯
+  if (!G.autoDrive && Math.abs(G.steerSmooth) > 0.15 && G.speed > 4){
+    if (G.steerSmooth > 0){
+      if (G.blinkSide !== 1){ G.blinkSide = 1; G.blinkers = 2.5; }
+    } else {
+      if (G.blinkSide !== -1){ G.blinkSide = -1; G.blinkers = 2.5; }
+    }
+  }
+  // 自动驾驶变道时也打灯
+  if (G.autoDrive && G.blinkSide !== 0){
+    G.blinkers = Math.max(G.blinkers, 0.5);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  优化版自动驾驶
+// ═══════════════════════════════════════════════════════════════
+function autoDriveControl(dt, SPEED_MAX){
+  var pz = G.camZ + 2.4;
+  var state = G.autoState;
+  if (!state) return;
+
+  var myLane = state.targetLane;
+  var myLat = LANE_CENTERS[myLane];
+
+  // ── 1. 搜索前方所有车辆，评估各车道安全性 ──
+  var laneOccupancy = [
+    {leadD: 999, leadSpeed: SPEED_MAX * 0.9},  // 左车道
+    {leadD: 999, leadSpeed: SPEED_MAX * 0.9},  // 中车道
+    {leadD: 999, leadSpeed: SPEED_MAX * 0.9}   // 右车道
+  ];
+
+  for (var i = 0; i < G.traffic.length; i++){
+    var t = G.traffic[i];
+    if (t.oncoming) continue;
+    // 判断车辆所在车道
+    var tLane = 1;
+    if (t.lat < 4.3) tLane = 0;
+    else if (t.lat < 7.7) tLane = 1;
+    else tLane = 2;
+    if (tLane < 0 || tLane > 2) continue;
+    var d = t.z - pz;
+    if (d > 0 && d < laneOccupancy[tLane].leadD){
+      laneOccupancy[tLane].leadD = d;
+      laneOccupancy[tLane].leadSpeed = t.spd;
+    }
+  }
+
+  // ── 2. 决定目标车道 ──
+  // 使用时间间隔（秒）来评估
+  var myGapTime = laneOccupancy[myLane].leadD / Math.max(0.1, G.speed);
+  var safetyThreshold = 2.5; // 秒
+
+  if (myGapTime < safetyThreshold && state.laneChangeCooldown <= 0){
+    // 尝试变道
+    var candidates = [];
+    for (var ln = 0; ln < 3; ln++){
+      if (ln === myLane) continue;
+      // 检查目标车道的间隙
+      var aheadGap = laneOccupancy[ln].leadD;
+      var aheadGapTime = aheadGap / Math.max(0.1, G.speed);
+      // 检查后方车辆（在同一车道上，可能快速接近）
+      var behindClear = true;
+      for (var bi = 0; bi < G.traffic.length; bi++){
+        var bt = G.traffic[bi];
+        if (bt.oncoming) continue;
+        var btLane = 1;
+        if (bt.lat < 4.3) btLane = 0;
+        else if (bt.lat < 7.7) btLane = 1;
+        else btLane = 2;
+        if (btLane !== ln) continue;
+        var bd = pz - bt.z; // 后方距离
+        if (bd > 0 && bd < 40 && bt.spd > G.speed){
+          behindClear = false;
+          break;
+        }
+      }
+      if (behindClear && aheadGapTime > 3.0){
+        candidates.push({lane: ln, gapTime: aheadGapTime, distToCenter: Math.abs(LANE_CENTERS[ln] - G.playerLat)});
+      }
+    }
+    // 选最优：优先保持相近车道 + 大间隙
+    if (candidates.length > 0){
+      candidates.sort(function(a, b){
+        var scoreA = a.gapTime * 2 - a.distToCenter * 0.3;
+        var scoreB = b.gapTime * 2 - b.distToCenter * 0.3;
+        return scoreB - scoreA;
+      });
+      var chosen = candidates[0];
+      state.targetLane = chosen.lane;
+      state.laneChangeCooldown = 2.0;
+      // 转向灯
+      if (chosen.lane > myLane){ G.blinkSide = 1; G.blinkers = 1.5; }
+      else { G.blinkSide = -1; G.blinkers = 1.5; }
+    }
+  } else if (myGapTime > 5.0 && myLane !== 2 && state.laneChangeCooldown <= 0){
+    // 前方空旷，回到右侧（美式驾驶靠右）
+    var rightLane = myLane + 1;
+    var rightGap = laneOccupancy[rightLane].leadD / Math.max(0.1, G.speed);
+    if (rightGap > 4.0){
+      // 检查后方
+      var rightBehindClear = true;
+      for (var rbi = 0; rbi < G.traffic.length; rbi++){
+        var rt = G.traffic[rbi];
+        if (rt.oncoming) continue;
+        var rtLane = 1;
+        if (rt.lat < 4.3) rtLane = 0;
+        else if (rt.lat < 7.7) rtLane = 1;
+        else rtLane = 2;
+        if (rtLane !== rightLane) continue;
+        var rbd = pz - rt.z;
+        if (rbd > 0 && rbd < 30 && rt.spd > G.speed + 5){
+          rightBehindClear = false;
+          break;
+        }
+      }
+      if (rightBehindClear){
+        state.targetLane = rightLane;
+        state.laneChangeCooldown = 1.5;
+        G.blinkSide = 1; G.blinkers = 1.5;
+      }
+    }
+  }
+
+  // ── 3. 速度控制 ──
+  var desiredSpeed = SPEED_MAX * 0.85;
+
+  // 根据前方车辆调整
+  var lead = laneOccupancy[state.targetLane];
+  if (lead.leadD < 999){
+    // 时间间隔目标：2 秒
+    var targetGapTime = 2.0;
+    var targetGapDist = targetGapTime * Math.max(0.1, G.speed);
+    var minGapDist = 15;
+    var effectiveGap = Math.max(lead.leadD, minGapDist);
+
+    if (effectiveGap < targetGapDist){
+      // 需要减速
+      var targetSpeed = lead.leadSpeed * (effectiveGap / targetGapDist);
+      desiredSpeed = Math.min(desiredSpeed, Math.max(lead.leadSpeed * 0.85, targetSpeed));
+    }
+  }
+
+  // ── 4. 油门/刹车控制 ──
+  var diff = desiredSpeed - G.speed;
+  if (diff > 2){
+    G.throttle = clamp(diff / 20, 0.4, 1);
+    G.brake = 0;
+    G.speed += diff * Math.min(1, dt * 0.55);
+  } else if (diff < -2){
+    G.throttle = 0;
+    G.brake = clamp(-diff / 15, 0.3, 1);
+    G.speed += diff * Math.min(1, dt * 0.9);
+  } else {
+    G.throttle = 0.35;
+    G.brake = 0;
+    G.speed += diff * Math.min(1, dt * 0.3);
+  }
+  G.engineForce = G.throttle - G.brake;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  碰撞检测
+// ═══════════════════════════════════════════════════════════════
+function checkCollisions(dt){
+  if (G.collisionCooldown > 0) return;
+  var pz = G.camZ + 2.4, pl = G.playerLat;
+  for (var i = 0; i < G.traffic.length; i++){
+    var t = G.traffic[i];
+    var dz = t.z - pz;
+    var dl = t.lat - pl;
+    var carHalfLen = t.kind === 'truck' ? 2.6 : 1.7;
+    var carHalfWid = t.kind === 'truck' ? 1.15 : 0.95;
+    if (Math.abs(dz) < carHalfLen + 1.2 && Math.abs(dl) < carHalfWid + 0.85){
+      doCollision(t, dz, dl);
+      return;
+    }
+  }
+}
+function doCollision(t, dz, dl){
+  G.collisionCooldown = 0.7;
+  G.shake = 1.3;
+  G.hitFlash = 0.6;
+  G.hazardTimer = 4.5;
+  var impact = G.speed;
+  if (Math.abs(dz) < 1.0 && impact > 25){
+    G.speed = 0;
+    G.stoppedTimer = 0;
+    G.notif = {text:'⚠ 严重碰撞', t: 2.0};
+  } else if (impact > 15){
+    G.speed *= 0.25;
+    G.notif = {text:'⚠ 发生碰撞', t: 1.5};
+  } else {
+    G.speed *= 0.5;
+    G.notif = {text:'擦碰', t: 1.2};
+  }
+  var push = dl > 0 ? -1 : 1;
+  G.lateralVel = push * 3.0;
+  G.camLat += push * 0.5;
+  t.lat -= push * 1.6;
+  t.z += dz > 0 ? 3.5 : -3.5;
+}
+function checkStopped(dt){
+  if (G.speed < 1.5){ G.stoppedTimer += dt; } else G.stoppedTimer = 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  匝道 - 修复核心
+// ═══════════════════════════════════════════════════════════════
+function checkExitZones(dt){
+  G.activeExit = null;
+  G.refueling = false;
+  var pz = G.camZ + 2.4;
+  for (var i = 0; i < G.exitZones.length; i++){
+    var zone = G.exitZones[i];
+    if (zone.exited) continue;
+    var dist = zone.zStart - pz;
+    var endDist = zone.zEnd - pz;
+
+    // 进入匝道区
+    if (dist < 0 && endDist > -8){
+      if (zone.type === 'city'){
+        // 城市匝道：需在最右车道
+        if (G.playerLat > 8.2 && G.speed > 3){
+          zone.exited = true;
+          takeCityRamp(zone);
+          return;
+        }
+      } else if (zone.type === 'service'){
+        if (G.playerLat > ROAD_HW + SHOULDER - 1.5 && G.speed < 28){
+          if (zone.kind === 'gas' && G.fuel < 100){
+            G.fuel = Math.min(100, G.fuel + 22 * dt);
+            G.refueling = true;
+          }
+        }
+      }
+    }
+    // HUD 提示
+    if (dist > -200 && dist < 0){
+      if (zone.type === 'city' && !zone.exited){
+        G.activeExit = zone;
+      }
+    }
+  }
+}
+
+// ⚠ 修复核心：从当前城市（路段终点）出发
+function takeCityRamp(zone){
+  // zone.city 就是路段终点城市 = 玩家当前所在城市
+  var curCity = zone.city;
+  if (!curCity) return;
+
+  var opts = zone.opts || [];
+  if (!opts.length) return;
+
+  var pick = opts[0];
+  if (G.driveMode === 'free' && opts.length > 1){
+    pick = opts[randi(opts.length)];
+  }
+
+  var toCity = CITY_MAP[pick.to];
+  if (!toCity) return;
+
+  var edge = {to:pick.to, name:pick.name, miles:pick.miles};
+  var route = buildFreeRoute(curCity, edge, toCity);
+  if (!route) return;
+
+  var signs = [{
+    z: route.totalWorld * 0.42,
+    lat: 14,
+    city: toCity,
+    distMi: edge.miles
+  }];
+
+  G.fadeAlpha = 0.9;
+  G.route = route;
+  G.camZ = 0;
+  G.speed = Math.max(8, G.speed * 0.55);
+  G.playerLane = 1;
+  G.playerLat = LANE_CENTERS[1];
+  G.targetLat = LANE_CENTERS[1];
+  G.camLat = LANE_CENTERS[1];
+  G.lateralVel = 0;
+  G.signs = signs;
+  G.traffic = [];
+  G.sceneries = [];
+  G.nextTraffic = 90;
+  G.nextScen = 25;
+  G.notif = {text:'进入 ' + edge.name + ' · 前往 ' + toCity.name, t: 2.8};
+  G.exitZones = generateExitZones();
+  G.trackPoints = [];
+  G.activeExit = null;
+  // 重置自动驾驶状态
+  if (G.autoState){
+    G.autoState.targetLane = 1;
+    G.autoState.laneChangeCooldown = 1.5;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  生成
+// ═══════════════════════════════════════════════════════════════
+function spawnScenery(){
+  if (!G.route) return;
+  var ahead = G.camZ + 420;
+  while (G.nextScen < ahead){
+    var z = G.nextScen;
+    var side = Math.random() < 0.5 ? -1 : 1;
+    G.sceneries.push({
+      z: z, lat: side * rand(14, 100),
+      size: rand(0.65, 2.2), kind: 'auto', seed: Math.random()
+    });
+    G.nextScen = z + rand(10, 26);
+  }
+  if (G.sceneries.length > 340){
+    G.sceneries = G.sceneries.filter(function(o){ return o.z - G.camZ > -25; });
+  }
+}
+function spawnTraffic(dt){
+  if (!G.route) return;
+  var ahead = G.camZ + 360;
+  while (G.nextTraffic < ahead){
+    var z = G.nextTraffic;
+    var laneSet = Math.random() < 0.5 ? LANE_L : LANE_CENTERS;
+    var lane = laneSet[randi(3)];
+    var oncoming = lane < 0;
+    var isTruck = Math.random() < 0.28;
+    var spd;
+    if (oncoming) spd = isTruck ? rand(38, 48) : rand(46, 60);
+    else spd = isTruck ? rand(30, 38) : rand(36, 50);
+    G.traffic.push({
+      z: z, lat: lane + rand(-0.45, 0.45), spd: spd, oncoming: oncoming,
+      color: ['#c0392b','#2c6fa8','#dddddd','#3a3a3a','#b8860b','#4a7a5a','#8a4a8a','#d45a2a','#e8e8e8','#1f3a5c','#e8e0d0','#2a2a2a'][randi(12)],
+      kind: isTruck ? 'truck' : 'car',
+      blink: Math.random() * 6
+    });
+    G.nextTraffic = z + rand(45, 110);
+  }
+  for (var i = 0; i < G.traffic.length; i++){
+    var t = G.traffic[i];
+    t.z += (t.oncoming ? -t.spd : t.spd - 42) * dt;
+    t.blink += dt * 3;
+  }
+  G.traffic = G.traffic.filter(function(t){
+    var rz = t.z - G.camZ;
+    return rz > -30 && rz < 380;
+  });
+}
+function recordTrack(){
+  if (!G.route) return;
+  var lastT = G.trackPoints[G.trackPoints.length-1];
+  if (!lastT || Math.abs(G.camZ - lastT.z) > 15){
+    var seg = segAtWorld(G.route, G.camZ);
+    if (!seg) return;
+    G.trackPoints.push({z: G.camZ, lat: G.playerLat, x: G.camLat, seg: seg.name});
+    if (G.trackPoints.length > 800) G.trackPoints.shift();
+  }
+}
+function arriveFree(){
+  G.mode = 'free-choose';
+  G.arrivedT = 0;
+  G.speed = 0;
+  if (!G.route || !G.route.segments.length) return;
+  var curId = G.route.segments[0].to;
+  var curCity = CITY_MAP[curId];
+  G.freeCity = curCity;
+  var nbrs = GRAPH[curId] || [];
+  var opts = [];
+  for (var i = 0; i < nbrs.length; i++){
+    var n = nbrs[i];
+    var dest = CITY_MAP[n.to];
+    if (!dest) continue;
+    opts.push({id:n.to, name:dest.name, highway:n.name, miles:n.miles, state:dest.state});
+  }
+  G.freeOptions = opts;
+  G.freeHoverIndex = -1;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  渲染
+// ═══════════════════════════════════════════════════════════════
+function render(){
+  if (!G) return;
+  var sky = skyState();
+  var land = currentLandscape();
+  var view = VIEW_MODES[G.viewIdx] || VIEW_MODES[0];
+
+  ctx.save();
+
+  // 相机偏移
+  var sx = 0, sy = 0;
+  if (G.shake > 0.01){
+    sx += (Math.random()-0.5) * G.shake * 10;
+    sy += (Math.random()-0.5) * G.shake * 10;
+  }
+  if (G.bumpY > 0.05){
+    sy += Math.sin(G.time * 45) * G.bumpY * 4;
+    sx += Math.sin(G.time * 31) * G.bumpY * 2;
+  }
+  if (G.speed > 40){
+    var hiVib = Math.min(0.5, (G.speed - 40) / 40);
+    sy += Math.sin(G.time * 62) * hiVib * 0.7;
+  }
+  ctx.translate(sx, sy);
+
+  if (view.id === 'top'){
+    ctx.translate(W/2, H/2);
+    ctx.scale(0.85, 0.85);
+    ctx.translate(-W/2, -H/2);
+  }
+
+  drawSky(sky);
+  drawClouds(sky);
+  drawBirds(sky);
+  drawLandscape(sky, land);
+  if (G.route) drawCities(sky);
+  drawRoad(sky);
+  if (G.route) drawExitZonesVisual(sky);
+  drawScenery(sky);
+  drawTraffic(sky);
+  if (G.route) drawSigns(sky);
+  if (view.id === 'chase') drawPlayerCar();
+
+  ctx.restore();
+
+  // 屏幕效果
+  if (G.offRoadTime > 0.25 && G.mode === 'playing'){
+    var a = Math.min(0.20, G.offRoadTime * 0.35);
+    var vg = ctx.createRadialGradient(W/2, H/2, H*0.3, W/2, H/2, H*0.95);
+    vg.addColorStop(0, 'rgba(120,90,50,0)');
+    vg.addColorStop(1, 'rgba(120,90,50,' + a + ')');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, W, H);
+  }
+  if (G.hitFlash > 0){
+    ctx.fillStyle = 'rgba(255,60,50,' + (G.hitFlash * 0.28) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  if (view.hoodH > 0.05) drawHoodOrCockpit();
+
+  if (G.fadeAlpha > 0.01){
+    ctx.fillStyle = 'rgba(6,10,20,' + G.fadeAlpha + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  if (G.mode === 'playing' || G.mode === 'free-choose') drawHUD();
+  if (G.mode === 'menu') drawMenu();
+  if (G.mode === 'arrived') drawArrived();
+  if (G.mode === 'free-choose') drawFreeChoose();
+}
+
+function drawPlayerCar(){
+  var s = FOCAL / 5.2;
+  var x = W/2 + (roadOffset(5.2) + G.playerLat - G.camLat) * s;
+  var y = HORIZON_Y + 1.75 * s + 40;
+  var cw = 2.5 * s, ch = 1.5 * s;
+  if (cw < 10) return;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.42)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + 4, cw*0.62, s*0.34, 0, 0, 7);
+  ctx.fill();
+
+  ctx.fillStyle = '#7a2828';
+  roundRect(x-cw*0.36, y-ch*1.55, cw*0.72, ch*0.78, s*0.18); ctx.fill();
+  ctx.fillStyle = '#2e3b4c';
+  roundRect(x-cw*0.31, y-ch*1.47, cw*0.62, ch*0.54, s*0.12); ctx.fill();
+  ctx.fillStyle = 'rgba(150,205,240,0.30)';
+  roundRect(x-cw*0.27, y-ch*1.43, cw*0.52, ch*0.24, s*0.1); ctx.fill();
+
+  var bg = ctx.createLinearGradient(0, y-ch, 0, y);
+  bg.addColorStop(0, '#dc4d4d');
+  bg.addColorStop(0.5, '#c23b3b');
+  bg.addColorStop(1, '#8f2828');
+  ctx.fillStyle = bg;
+  roundRect(x-cw/2, y-ch, cw, ch, s*0.26); ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  roundRect(x-cw*0.44, y-ch*0.97, cw*0.88, ch*0.2, s*0.1); ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,70,70,0.85)';
+  roundRect(x-cw*0.47, y-ch*0.66, cw*0.19, ch*0.3, s*0.08); ctx.fill();
+  roundRect(x+cw*0.28, y-ch*0.66, cw*0.19, ch*0.3, s*0.08); ctx.fill();
+
+  ctx.fillStyle = '#e8dfc8';
+  roundRect(x-cw*0.15, y-ch*0.48, cw*0.3, ch*0.2, s*0.05); ctx.fill();
+
+  ctx.fillStyle = '#15151a';
+  roundRect(x-cw*0.56, y-ch*0.42, cw*0.17, ch*0.46, s*0.07); ctx.fill();
+  roundRect(x+cw*0.39, y-ch*0.42, cw*0.17, ch*0.46, s*0.07); ctx.fill();
+  ctx.restore();
+}
+
+function drawSky(sky){
+  var g = ctx.createLinearGradient(0, -40, 0, HORIZON_Y + 60);
+  g.addColorStop(0, rgb(sky.top));
+  g.addColorStop(1, rgb(sky.bot));
+  ctx.fillStyle = g;
+  ctx.fillRect(-60, -60, W + 120, H + 120);
+
+  if (sky.night > 0.05){
+    var rng = mulberry32(12345);
+    ctx.globalAlpha = sky.night * 0.85;
+    for (var i = 0; i < 100; i++){
+      var sx = rng() * W, sy = rng() * (HORIZON_Y - 30);
+      var tw = 0.55 + 0.45 * Math.sin(G.time * 2.2 + i);
+      ctx.fillStyle = 'rgba(255,255,255,' + tw + ')';
+      ctx.fillRect(sx, sy, 1.5, 1.5);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // 太阳 + 光晕
+  var sunR = 34;
+  var glow = ctx.createRadialGradient(sky.sunX, sky.sunY, 0, sky.sunX, sky.sunY, sunR*6);
+  glow.addColorStop(0, rgba(sky.sunColor, 0.55));
+  glow.addColorStop(0.20, rgba(sky.sunColor, 0.22));
+  glow.addColorStop(1, rgba(sky.sunColor, 0));
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(sky.sunX, sky.sunY, sunR*6, 0, 7); ctx.fill();
+
+  ctx.fillStyle = rgba(sky.sunColor, 0.95);
+  ctx.beginPath(); ctx.arc(sky.sunX, sky.sunY, sunR, 0, 7); ctx.fill();
+}
+
+function drawClouds(sky){
+  var tint = lerpC3(sky.bot, sky.top, 0.35);
+  for (var i = 0; i < G.clouds.length; i++){
+    var c = G.clouds[i];
+    ctx.globalAlpha = c.a * (0.5 + sky.night * 0.5);
+    ctx.fillStyle = rgb(tint);
+    ctx.beginPath();
+    ctx.ellipse(c.x, c.y, c.w*0.5, c.h*0.5, 0, 0, 7);
+    ctx.ellipse(c.x-c.w*0.26, c.y+c.h*0.12, c.w*0.34, c.h*0.42, 0, 0, 7);
+    ctx.ellipse(c.x+c.w*0.28, c.y+c.h*0.1, c.w*0.32, c.h*0.4, 0, 0, 7);
+    ctx.ellipse(c.x+c.w*0.05, c.y-c.h*0.22, c.w*0.3, c.h*0.4, 0, 0, 7);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawBirds(sky){
+  if (sky.night > 0.5) return;
+  ctx.strokeStyle = 'rgba(30,30,40,0.45)';
+  ctx.lineWidth = 1.6;
+  for (var i = 0; i < G.birds.length; i++){
+    var b = G.birds[i];
+    var f = Math.sin(b.ph) * 4;
+    ctx.beginPath();
+    ctx.moveTo(b.x-6, b.y+f);
+    ctx.lineTo(b.x, b.y-1);
+    ctx.lineTo(b.x+6, b.y+f);
+    ctx.stroke();
+  }
+}
+function drawLandscape(sky, land){
+  var baseY = HORIZON_Y + 3;
+  var p = G.route ? clamp(G.camZ / G.route.totalWorld, 0, 1) : 0;
+  var nightAmt = sky.night;
+
+  var tint = lerpC3(sky.bot, sky.top, 0.55);
+  var nearC = lerpC3(land.ground, tint, 0.25);
+  var gd = ctx.createLinearGradient(0, HORIZON_Y, 0, H);
+  gd.addColorStop(0, rgb(nearC));
+  gd.addColorStop(1, rgb([nearC[0]*0.72, nearC[1]*0.75, nearC[2]*0.68]));
+  ctx.fillStyle = gd;
+  ctx.fillRect(-60, HORIZON_Y, W+120, H-HORIZON_Y+100);
+
+  drawMountainLayer(land.far, land.h*0.85, p, 0.0042, 0.55, nightAmt, false);
+  drawMountainLayer(land.mid, land.h*1.10, p, 0.0072, 0.95, nightAmt, land.snow);
+  drawMountainLayer(land.near, land.h*0.72, p, 0.0118, 1.4, nightAmt, false);
+
+  if (land.canyon) drawCanyon(sky);
+}
+function drawMountainLayer(color, hMul, p, freq, ampMul, nightAmt, showSnow){
+  var baseY = HORIZON_Y + 3;
+  var col = [color[0], color[1], color[2]];
+  if (nightAmt > 0) col = [col[0]*(1-nightAmt*0.5), col[1]*(1-nightAmt*0.5), col[2]*(1-nightAmt*0.55)];
+  ctx.fillStyle = rgb(col);
+  ctx.beginPath();
+  ctx.moveTo(-30, baseY);
+  for (var x = -30; x <= W+30; x += 8){
+    var wx = (x + G.camLat * 25) * freq;
+    var y = baseY - ((Math.sin(wx*0.9+2.1)*0.5+0.5)*0.7 + Math.sin(wx*2.3+0.4)*0.2 + Math.sin(wx*0.4+1.1)*0.35) * (48+p*30) * hMul * ampMul;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W+30, baseY+100);
+  ctx.lineTo(-30, baseY+100);
+  ctx.closePath();
+  ctx.fill();
+
+  if (showSnow && hMul > 0.9){
+    var rng = mulberry32(777);
+    ctx.fillStyle = 'rgba(245,248,255,0.55)';
+    for (var i = 0; i < 40; i++){
+      var px = rng() * W;
+      var wx2 = (px + G.camLat * 25) * freq;
+      var peakY = baseY - ((Math.sin(wx2*0.9+2.1)*0.5+0.5)*0.7 + Math.sin(wx2*2.3+0.4)*0.2 + Math.sin(wx2*0.4+1.1)*0.35) * (48+p*30) * hMul * ampMul;
+      var snowH = 6 + rng() * 10;
+      ctx.beginPath();
+      ctx.moveTo(px-6, peakY+snowH);
+      ctx.lineTo(px, peakY);
+      ctx.lineTo(px+6, peakY+snowH);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+}
+function drawCanyon(sky){
+  var baseY = HORIZON_Y + 22;
+  var nightAmt = sky.night;
+  ctx.fillStyle = rgba([190,120,85], 0.55 - nightAmt*0.3);
+  ctx.beginPath();
+  ctx.moveTo(-30, baseY);
+  for (var x = -30; x <= W*0.35; x += 8){
+    var wx = (x + G.camLat * 22) * 0.008;
+    var y = baseY - (Math.sin(wx*1.7+0.4)*0.5+0.5) * 44;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W*0.35, baseY+80);
+  ctx.lineTo(-30, baseY+80);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = rgba([170,105,72], 0.55 - nightAmt*0.3);
+  ctx.beginPath();
+  ctx.moveTo(W+30, baseY);
+  for (var x2 = W+30; x2 >= W*0.65; x2 -= 8){
+    var wx2 = (x2 + G.camLat * 22) * 0.008;
+    var y2 = baseY - (Math.sin(wx2*1.7+1.9)*0.5+0.5) * 44;
+    ctx.lineTo(x2, y2);
+  }
+  ctx.lineTo(W*0.65, baseY+80);
+  ctx.lineTo(W+30, baseY+80);
+  ctx.closePath();
+  ctx.fill();
+
+  var grad = ctx.createLinearGradient(0, baseY, 0, baseY+70);
+  grad.addColorStop(0, 'rgba(40,25,18,0)');
+  grad.addColorStop(1, 'rgba(40,25,18,0.6)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(W*0.28, baseY, W*0.44, 70);
+}
+
+function drawCities(sky){
+  if (!G.route) return;
+  var wps = routeWaypoints();
+  for (var w = 0; w < wps.length; w++){
+    var wp = wps[w];
+    var cityRz = wp.worldZ - G.camZ;
+    if (cityRz > 1400 || cityRz < -240) continue;
+    var city = wp.city;
+    if (!city) continue;
+    if (!city._blds) city._blds = generateSkyline(city);
+    var blds = city._blds;
+    var fade = clamp((1400 - cityRz) / 380, 0, 1) * clamp((cityRz + 240) / 150, 0, 1);
+    if (fade <= 0.01) continue;
+    ctx.globalAlpha = fade;
+    var items = [];
+    for (var i = 0; i < blds.length; i++) items.push({b: blds[i], z: cityRz + blds[i].relZ});
+    items.sort(function(a, c){ return c.z - a.z; });
+    for (var j = 0; j < items.length; j++){
+      var it = items[j], z = it.z;
+      if (z < 3.5 || z > 1350) continue;
+      var s = FOCAL / z;
+      var x = W/2 + (roadOffset(z) + it.b.lat - G.camLat) * s;
+      var y = HORIZON_Y + 1.75 * s;
+      var bw = it.b.w * s, bh = it.b.h * s;
+      if (bh < 0.6 || bw < 0.4) continue;
+      if (x - bw/2 > W + 180 || x + bw/2 < -180) continue;
+      drawBuilding(it.b, x, y, bw, bh, s, z, sky);
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+function routeWaypoints(){
+  if (!G.route || !G.route.segments) return [];
+  var out = [], segs = G.route.segments;
+  for (var i = 0; i < segs.length; i++){
+    var seg = segs[i];
+    out.push({city: CITY_MAP[seg.from], worldZ: seg.worldStart});
+    if (i === segs.length - 1) out.push({city: CITY_MAP[seg.to], worldZ: seg.worldEnd});
+  }
+  return out;
+}
+function drawBuilding(b, x, y, bw, bh, s, z, sky){
+  var top = y - bh;
+  var fogAmt = clamp((z - 100) / 560, 0, 0.78);
+  var night = sky.night;
+
+  if (b.style === 'tree'){
+    ctx.fillStyle = b.col;
+    ctx.fillRect(x - bw*0.12, y - bh*0.4, bw*0.24, bh*0.4);
+    ctx.beginPath();
+    ctx.arc(x, top + bh*0.4, bw*0.62, 0, 7);
+    ctx.fill();
+    return;
+  }
+  if (b.style === 'arch'){
+    ctx.fillStyle = b.col;
+    ctx.beginPath();
+    ctx.moveTo(x-bw/2, y);
+    ctx.lineTo(x-bw/2, top+bh*0.28);
+    ctx.quadraticCurveTo(x, top-bh*0.06, x+bw/2, top+bh*0.28);
+    ctx.lineTo(x+bw/2, y);
+    ctx.lineTo(x+bw*0.32, y);
+    ctx.lineTo(x+bw*0.32, top+bh*0.44);
+    ctx.quadraticCurveTo(x, top+bh*0.22, x-bw*0.32, top+bh*0.44);
+    ctx.lineTo(x-bw*0.32, y);
+    ctx.closePath();
+    ctx.fill();
+    return;
+  }
+  if (b.style === 'needle'){
+    ctx.fillStyle = b.col;
+    ctx.fillRect(x-bw/2, y-bh*0.72, bw, bh*0.72);
+    ctx.beginPath();
+    ctx.ellipse(x, y-bh*0.78, bw*2.2, bh*0.1, 0, 0, 7);
+    ctx.fill();
+    ctx.fillRect(x-bw*0.3, top, bw*0.6, bh*0.3);
+    ctx.beginPath();
+    ctx.moveTo(x-bw*0.3, top+bh*0.02);
+    ctx.lineTo(x, top-bh*0.13);
+    ctx.lineTo(x+bw*0.3, top+bh*0.02);
+    ctx.closePath();
+    ctx.fill();
+    return;
+  }
+  if (b.style === 'obelisk'){
+    ctx.fillStyle = b.col;
+    ctx.beginPath();
+    ctx.moveTo(x-bw/2, y);
+    ctx.lineTo(x-bw*0.38, top);
+    ctx.lineTo(x+bw*0.38, top);
+    ctx.lineTo(x+bw/2, y);
+    ctx.closePath();
+    ctx.fill();
+    return;
+  }
+  if (b.style === 'bridge'){
+    ctx.strokeStyle = b.col;
+    ctx.lineWidth = Math.max(1.5, s*1.2);
+    ctx.beginPath();
+    ctx.moveTo(x-bw/2, y);
+    ctx.quadraticCurveTo(x, y-bh*1.6, x+bw/2, y);
+    ctx.stroke();
+    ctx.fillStyle = b.col;
+    ctx.fillRect(x-bw*0.35, y-bh*1.3, s*2, bh*1.3);
+    ctx.fillRect(x+bw*0.35-s*2, y-bh*1.3, s*2, bh*1.3);
+    ctx.strokeStyle = b.col;
+    ctx.lineWidth = Math.max(0.6, s*0.4);
+    for (var bi = 0; bi < 8; bi++){
+      var bt = bi/7;
+      var bx = x-bw/2 + bt*bw;
+      var by = y - (1 - Math.abs(bt-0.5)*2) * (bh*1.4) - s*1.2;
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx, y);
+      ctx.stroke();
+    }
+    return;
+  }
+
+  // 通用 box / glass / neon / spire
+  if (s > 0.6){
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    ctx.fillRect(x-bw*0.53, y-bh*0.05, bw*1.06, bh*0.05);
+  }
+  ctx.fillStyle = b.col;
+  ctx.fillRect(x-bw/2, top, bw, bh);
+
+  if (s > 0.85){
+    var sg = ctx.createLinearGradient(x-bw/2, 0, x+bw/2, 0);
+    sg.addColorStop(0, 'rgba(255,255,255,0.07)');
+    sg.addColorStop(0.55, 'rgba(0,0,0,0)');
+    sg.addColorStop(1, 'rgba(0,0,0,0.20)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(x-bw/2, top, bw, bh);
+  }
+  if (s > 0.7){
+    ctx.fillStyle = 'rgba(255,255,255,0.13)';
+    ctx.fillRect(x-bw/2-s*0.2, top-s*0.32, bw+s*0.4, s*0.36);
+  }
+  if (b.style === 'spire'){
+    ctx.beginPath();
+    ctx.moveTo(x-bw/2, top);
+    ctx.lineTo(x, top-bh*0.3);
+    ctx.lineTo(x+bw/2, top);
+    ctx.closePath();
+    ctx.fillStyle = b.col;
+    ctx.fill();
+  }
+  if (b.style === 'glass' && s > 1.0 && bw > 6){
+    ctx.fillStyle = 'rgba(170,210,240,0.10)';
+    var stripes = Math.max(2, Math.floor(bw / (s * 3.2)));
+    for (var si = 0; si < stripes; si++){
+      var sx = x-bw/2 + (si+0.5) * (bw/stripes);
+      ctx.fillRect(sx-Math.max(0.4,s*0.12), top, Math.max(0.8,s*0.24), bh);
+    }
+  }
+  if (s > 1.0 && bw > 5 && bh > 12){
+    ctx.fillStyle = night > 0.15 ? 'rgba(255,222,152,' + (0.30 + night*0.42) + ')' : 'rgba(255,255,255,0.085)';
+    var cols = Math.max(2, Math.floor(bw / (s * 2.0)));
+    var rows = Math.max(2, Math.floor(bh / (s * 2.8)));
+    var cw = bw / cols, rh = bh / rows;
+    var seedv = Math.floor(b.seed * 1000);
+    for (var r = 1; r < rows; r++){
+      for (var c = 0; c < cols; c++){
+        if ((r*7 + c*13 + seedv) % 3 === 0){
+          ctx.fillRect(x-bw/2 + c*cw + cw*0.2, top + r*rh + rh*0.2, cw*0.55, rh*0.44);
+        }
+      }
+    }
+  }
+  if (b.style === 'neon'){
+    var cols2 = ['#ff3b6b','#3bffd6','#ffd23b','#b83bff'];
+    var nc = cols2[Math.floor(b.seed * 4)];
+    ctx.globalAlpha *= 0.78;
+    ctx.fillStyle = nc;
+    ctx.fillRect(x-bw/2, top+bh*0.14, bw, Math.max(1, s*0.7));
+    ctx.fillRect(x-bw/2, top+bh*0.72, bw, Math.max(1, s*0.7));
+    ctx.globalAlpha /= 0.78;
+  }
+  if (fogAmt > 0.02){
+    ctx.fillStyle = rgba(sky.bot, fogAmt*0.88);
+    ctx.fillRect(x-bw/2, top, bw, bh);
+  }
+}
+
+function drawRoad(sky){
+  var SEG = 64;
+  var zNear = 1.8, zFar = 440;
+  var pts = [];
+  for (var i = 0; i <= SEG; i++){
+    var rz = zNear * Math.pow(zFar/zNear, i/SEG);
+    var s = FOCAL / rz;
+    pts.push({
+      rz: rz, s: s,
+      y: HORIZON_Y + 1.75 * s,
+      cx: W/2 + (roadOffset(rz) - G.camLat) * s,
+      hw: ROAD_HW * s,
+      sh: SHOULDER * s
+    });
+  }
+  var fogC = lerpC3(sky.bot, sky.top, 0.35);
+
+  // 路肩
+  for (var i0 = SEG-1; i0 >= 0; i0--){
+    var a0 = pts[i0+1], b0 = pts[i0];
+    if (a0.rz > 220) continue;
+    var fog0 = Math.min(1, a0.rz / 220);
+    var shoulderCol = lerpC3([68,66,60], fogC, fog0*0.94);
+    ctx.fillStyle = rgb(shoulderCol);
+    ctx.beginPath();
+    ctx.moveTo(a0.cx+a0.hw, a0.y);
+    ctx.lineTo(a0.cx+a0.hw+a0.sh, a0.y);
+    ctx.lineTo(b0.cx+b0.hw+b0.sh, b0.y);
+    ctx.lineTo(b0.cx+b0.hw, b0.y);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(a0.cx-a0.hw, a0.y);
+    ctx.lineTo(a0.cx-a0.hw-a0.sh, a0.y);
+    ctx.lineTo(b0.cx-b0.hw-b0.sh, b0.y);
+    ctx.lineTo(b0.cx-b0.hw, b0.y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 沥青
+  for (var i3 = SEG-1; i3 >= 0; i3--){
+    var a3 = pts[i3+1], b3 = pts[i3];
+    var fog = Math.min(1, a3.rz / 220);
+    var col = lerpC3([52,52,56], fogC, fog*0.94);
+    ctx.fillStyle = rgb(col);
+    ctx.beginPath();
+    ctx.moveTo(a3.cx-a3.hw, a3.y);
+    ctx.lineTo(a3.cx+a3.hw, a3.y);
+    ctx.lineTo(b3.cx+b3.hw, b3.y);
+    ctx.lineTo(b3.cx-b3.hw, b3.y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 中央隔离带
+  for (var i4 = SEG-1; i4 >= 0; i4--){
+    var a4 = pts[i4+1], b4 = pts[i4];
+    var mh_a = MEDIAN_HW * a4.s, mh_b = MEDIAN_HW * b4.s;
+    var fog4 = Math.min(1, a4.rz / 220);
+    var mc = lerpC3([70,72,68], fogC, fog4*0.94);
+    ctx.fillStyle = rgb(mc);
+    ctx.beginPath();
+    ctx.moveTo(a4.cx-mh_a, a4.y);
+    ctx.lineTo(a4.cx+mh_a, a4.y);
+    ctx.lineTo(b4.cx+mh_b, b4.y);
+    ctx.lineTo(b4.cx-mh_b, b4.y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  drawLaneMarkings();
+
+  // 边缘白线
+  ctx.fillStyle = 'rgba(240,240,235,0.68)';
+  for (var i5 = SEG-1; i5 >= 0; i5--){
+    var a5 = pts[i5+1], b5 = pts[i5];
+    if (a5.rz > 200) continue;
+    var lw_a = 0.30 * a5.s, lw_b = 0.30 * b5.s;
+    var off_a = (ROAD_HW-0.7) * a5.s, off_b = (ROAD_HW-0.7) * b5.s;
+    ctx.beginPath();
+    ctx.moveTo(a5.cx-off_a, a5.y);
+    ctx.lineTo(a5.cx-off_a+lw_a, a5.y);
+    ctx.lineTo(b5.cx-off_b+lw_b, b5.y);
+    ctx.lineTo(b5.cx-off_b, b5.y);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(a5.cx+off_a-lw_a, a5.y);
+    ctx.lineTo(a5.cx+off_a, a5.y);
+    ctx.lineTo(b5.cx+off_b, b5.y);
+    ctx.lineTo(b5.cx+off_b-lw_b, b5.y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 隔离带黄线
+  ctx.fillStyle = 'rgba(250,208,80,0.72)';
+  for (var i6 = SEG-1; i6 >= 0; i6--){
+    var a6 = pts[i6+1], b6 = pts[i6];
+    if (a6.rz > 200) continue;
+    var yw_a = 0.24 * a6.s, yw_b = 0.24 * b6.s;
+    var yo_a = MEDIAN_HW * a6.s, yo_b = MEDIAN_HW * b6.s;
+    ctx.beginPath();
+    ctx.moveTo(a6.cx-yo_a-yw_a, a6.y);
+    ctx.lineTo(a6.cx-yo_a, a6.y);
+    ctx.lineTo(b6.cx-yo_b, b6.y);
+    ctx.lineTo(b6.cx-yo_b-yw_b, b6.y);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(a6.cx+yo_a, a6.y);
+    ctx.lineTo(a6.cx+yo_a+yw_a, a6.y);
+    ctx.lineTo(b6.cx+yo_b+yw_b, b6.y);
+    ctx.lineTo(b6.cx+yo_b, b6.y);
+    ctx.closePath(); ctx.fill();
+  }
+  drawGuardrails(pts);
+}
+
+function drawLaneMarkings(){
+  var dashGap = 16, dashLen = 7;
+  var startWZ = Math.ceil((G.camZ + 4) / dashGap) * dashGap;
+  var laneBorders = [4.4, 7.8];
+  ctx.fillStyle = 'rgba(240,240,235,0.72)';
+  for (var wz = startWZ; wz < G.camZ + 240; wz += dashGap){
+    var rz1 = wz - G.camZ;
+    if (rz1 < 4) continue;
+    var rz2 = rz1 + dashLen;
+    var s1 = FOCAL/rz1, s2 = FOCAL/rz2;
+    var y1 = HORIZON_Y + 1.75*s1, y2 = HORIZON_Y + 1.75*s2;
+    var c1 = W/2 + (roadOffset(rz1) - G.camLat) * s1;
+    var c2 = W/2 + (roadOffset(rz2) - G.camLat) * s2;
+    var w1 = 0.20*s1, w2 = 0.20*s2;
+    if (w1 < 0.32) continue;
+    var fog = Math.min(1, rz1/220);
+    var alpha = 0.72 * (1 - fog*0.85);
+    if (alpha < 0.05) continue;
+    ctx.globalAlpha = alpha;
+    for (var lb = 0; lb < laneBorders.length; lb++){
+      var bo = laneBorders[lb];
+      var o1 = bo * s1, o2 = bo * s2;
+      ctx.beginPath();
+      ctx.moveTo(c1+o1-w1, y1); ctx.lineTo(c1+o1+w1, y1);
+      ctx.lineTo(c2+o2+w2, y2); ctx.lineTo(c2+o2-w2, y2);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(c1-o1-w1, y1); ctx.lineTo(c1-o1+w1, y1);
+      ctx.lineTo(c2-o2+w2, y2); ctx.lineTo(c2-o2-w2, y2);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+function drawGuardrails(pts){
+  ctx.fillStyle = 'rgba(160,168,175,0.62)';
+  for (var i = 2; i < pts.length-1; i += 3){
+    var p = pts[i];
+    if (p.rz > 170 || p.rz < 4) continue;
+    var gh = Math.max(1.2, p.s*0.55);
+    var gw = Math.max(0.8, p.s*0.28);
+    var alpha = clamp((170 - p.rz)/130, 0, 1) * 0.75;
+    ctx.globalAlpha = alpha;
+    ctx.fillRect(p.cx - p.hw - p.sh - gw*0.8, p.y - gh, gw, gh);
+    ctx.fillRect(p.cx + p.hw + p.sh - gw*0.2, p.y - gh, gw, gh);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawExitZonesVisual(sky){
+  var pz = G.camZ + 2.4;
+  var fogC = lerpC3(sky.bot, sky.top, 0.35);
+  for (var i = 0; i < G.exitZones.length; i++){
+    var zone = G.exitZones[i];
+    if (zone.exited) continue;
+    var distStart = zone.zStart - pz;
+    var distEnd = zone.zEnd - pz;
+    if (distEnd < -30 || distStart > 500) continue;
+    if (zone.type === 'city') drawCityRamp(sky, zone, fogC, i);
+    else if (zone.type === 'service') drawServiceRamp(sky, zone, fogC);
+  }
+}
+
+function drawCityRamp(sky, zone, fogC, zoneIndex){
+  var N = 18;
+  var pts = [];
+  for (var i = 0; i <= N; i++){
+    var t = i / N;
+    var rz = zone.zStart - G.camZ + (zone.zEnd - zone.zStart) * t;
+    if (rz < 3) continue;
+    var s = FOCAL / rz;
+    var offT = t * t * 0.9;
+    var lat = ROAD_HW + SHOULDER + offT * 8;
+    pts.push({
+      rz: rz, s: s,
+      y: HORIZON_Y + 1.75 * s,
+      cx: W/2 + (roadOffset(rz) + lat - G.camLat) * s,
+      hw: (2.4 + offT * 1.2) * s
+    });
+  }
+  if (pts.length < 2) return;
+
+  for (var j = pts.length-1; j >= 0; j--){
+    var p = pts[j];
+    var fog = Math.min(1, p.rz / 220);
+    var col = lerpC3([56,56,60], fogC, fog*0.9);
+    ctx.fillStyle = rgb(col);
+    ctx.beginPath();
+    ctx.moveTo(p.cx-p.hw, p.y);
+    ctx.lineTo(p.cx+p.hw, p.y);
+    if (j > 0){
+      var pn = pts[j-1];
+      ctx.lineTo(pn.cx+pn.hw, pn.y);
+      ctx.lineTo(pn.cx-pn.hw, pn.y);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 匝道路缘
+  ctx.fillStyle = 'rgba(240,240,235,0.55)';
+  for (var k = 0; k < pts.length-1; k++){
+    var pa = pts[k+1], pb = pts[k];
+    var wa = 0.16*pa.s, wb = 0.16*pb.s;
+    ctx.beginPath();
+    ctx.moveTo(pa.cx-pa.hw, pa.y); ctx.lineTo(pa.cx-pa.hw+wa, pa.y);
+    ctx.lineTo(pb.cx-pb.hw+wb, pb.y); ctx.lineTo(pb.cx-pb.hw, pb.y);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(pa.cx+pa.hw-wa, pa.y); ctx.lineTo(pa.cx+pa.hw, pa.y);
+    ctx.lineTo(pb.cx+pb.hw, pb.y); ctx.lineTo(pb.cx+pb.hw-wb, pb.y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 箭头
+  for (var m = 2; m < pts.length-2; m += 3){
+    var pm = pts[m];
+    if (pm.hw < 1.5) continue;
+    var alpha = clamp((pm.rz - 10) / 40, 0, 0.85);
+    ctx.fillStyle = 'rgba(240,235,180,' + alpha + ')';
+    var aw = pm.hw*0.5, ah = pm.hw*0.95;
+    ctx.beginPath();
+    ctx.moveTo(pm.cx, pm.y-ah);
+    ctx.lineTo(pm.cx-aw, pm.y);
+    ctx.lineTo(pm.cx-aw*0.4, pm.y);
+    ctx.lineTo(pm.cx-aw*0.4, pm.y+ah*0.7);
+    ctx.lineTo(pm.cx+aw*0.4, pm.y+ah*0.7);
+    ctx.lineTo(pm.cx+aw*0.4, pm.y);
+    ctx.lineTo(pm.cx+aw, pm.y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // ⚠ 标牌：显示将前往的城市
+  var lastP = pts[pts.length-1];
+  var targetCity = (zone.opts && zone.opts.length) ? CITY_MAP[zone.opts[0].to] : null;
+  if (lastP && lastP.hw > 1 && targetCity){
+    ctx.globalAlpha = 0.92;
+    ctx.fillStyle = '#0d5c34';
+    var labelW = Math.max(76, lastP.hw*14), labelH = Math.max(20, lastP.hw*4.5);
+    roundRect(lastP.cx - labelW/2, lastP.y - labelH - 10, labelW, labelH, 5); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 1;
+    roundRect(lastP.cx - labelW/2, lastP.y - labelH - 10, labelW, labelH, 5); ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold ' + Math.max(10, labelH*0.55) + 'px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(targetCity.name, lastP.cx, lastP.y - labelH/2 - 10);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawServiceRamp(sky, zone, fogC){
+  var N = 12;
+  var pts = [];
+  for (var i = 0; i <= N; i++){
+    var t = i / N;
+    var rz = zone.zStart - G.camZ + (zone.zEnd - zone.zStart) * t;
+    if (rz < 3) continue;
+    var s = FOCAL / rz;
+    var lat = ROAD_HW + SHOULDER + t*t * zone.lat * 0.85;
+    pts.push({
+      rz: rz, s: s,
+      y: HORIZON_Y + 1.75 * s,
+      cx: W/2 + (roadOffset(rz) + lat - G.camLat) * s,
+      hw: 2.2 * s
+    });
+  }
+  if (pts.length < 2) return;
+
+  for (var j = pts.length-1; j >= 0; j--){
+    var p = pts[j];
+    var fog = Math.min(1, p.rz / 220);
+    var col = lerpC3([58,58,62], fogC, fog*0.9);
+    ctx.fillStyle = rgb(col);
+    ctx.beginPath();
+    ctx.moveTo(p.cx-p.hw, p.y);
+    ctx.lineTo(p.cx+p.hw, p.y);
+    if (j > 0){
+      var pn = pts[j-1];
+      ctx.lineTo(pn.cx+pn.hw, pn.y);
+      ctx.lineTo(pn.cx-pn.hw, pn.y);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+
+  var lastP = pts[pts.length-1];
+  if (!lastP) return;
+  var sz = lastP.s;
+  var bx = lastP.cx + sz*4, by = lastP.y;
+  var cw = 7.5*sz, ch = 1.0*sz;
+
+  ctx.fillStyle = 'rgba(60,60,60,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(bx, by, cw*0.95, sz*0.55, 0, 0, 7);
+  ctx.fill();
+
+  if (zone.kind === 'gas'){
+    ctx.fillStyle = '#e8e8e0';
+    roundRect(bx-cw/2, by-ch*4.3, cw, ch, sz*0.3); ctx.fill();
+    ctx.fillStyle = '#c8c8c0';
+    ctx.fillRect(bx-cw*0.42, by-ch*3.4, cw*0.06, ch*3.4);
+    ctx.fillRect(bx+cw*0.36, by-ch*3.4, cw*0.06, ch*3.4);
+    ctx.fillStyle = '#f2f0e8';
+    roundRect(bx-cw*0.3, by-ch*1.6, cw*0.6, ch*1.6, sz*0.2); ctx.fill();
+    var brandCol = zone.name === 'Shell' ? '#f0c020' : zone.name === 'Chevron' ? '#2a5cb8' : zone.name === 'BP' ? '#4a9a3a' : '#d63a2a';
+    ctx.fillStyle = brandCol;
+    roundRect(bx-cw*0.52, by-ch*5.8, cw*1.04, ch*1.25, sz*0.24); ctx.fill();
+    if (sz > 1.8){
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold ' + Math.max(5, sz*0.8) + 'px system-ui,sans-serif';
+      ctx.fillText(zone.name, bx, by-ch*5.18);
+    }
+    ctx.fillStyle = '#4a4a4a';
+    ctx.fillRect(bx-cw*0.18, by-ch*0.9, cw*0.12, ch*0.9);
+    ctx.fillRect(bx+cw*0.06, by-ch*0.9, cw*0.12, ch*0.9);
+  } else {
+    var rw = 6.8*sz, rh = 1.6*sz;
+    ctx.fillStyle = '#d8d4c8';
+    roundRect(bx-rw/2, by-rh*3.2, rw, rh*3.2, sz*0.2); ctx.fill();
+    ctx.fillStyle = '#4a8a3a';
+    roundRect(bx-rw/2, by-rh*3.7, rw, rh*0.55, sz*0.16); ctx.fill();
+    if (sz > 1.8){
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.font = 'bold ' + Math.max(5, sz*0.7) + 'px system-ui,sans-serif';
+      ctx.fillText('服务区', bx, by-rh*2.2);
+    }
+  }
+}
+
+function drawScenery(sky){
+  var land = currentLandscape();
+  var list = [];
+  for (var i = 0; i < G.sceneries.length; i++){
+    var o = G.sceneries[i];
+    var rz = o.z - G.camZ;
+    if (rz > 5 && rz < 420) list.push({o:o, rz:rz});
+  }
+  list.sort(function(a, b){ return b.rz - a.rz; });
+
+  for (var j = 0; j < list.length; j++){
+    var it = list[j], o2 = it.o, rz2 = it.rz;
+    var s = FOCAL / rz2;
+    var x = W/2 + (roadOffset(rz2) + o2.lat - G.camLat) * s;
+    var y = HORIZON_Y + 1.75 * s;
+    ctx.globalAlpha = clamp((rz2 - 5) / 12, 0, 1);
+
+    var kind = o2.kind;
+    if (kind === 'auto'){
+      var r = o2.seed;
+      if (land.canyon) kind = r < 0.4 ? 'rock' : (r < 0.7 ? 'bush' : 'rock');
+      else if (land.h > 0.8) kind = r < 0.65 ? 'tree' : (r < 0.85 ? 'bush' : 'rock');
+      else if (land.h < 0.4) kind = r < 0.3 ? 'bush' : (r < 0.55 ? 'rock' : 'grass');
+      else {
+        if (o2.lat < 0 && Math.abs(o2.lat) < 22) kind = 'pole';
+        else if (r < 0.35) kind = 'tree';
+        else if (r < 0.5) kind = 'bush';
+        else if (r < 0.62) kind = 'rock';
+        else if (r < 0.75) kind = 'fence';
+        else if (r < 0.88) kind = 'grass';
+        else kind = 'pole';
+      }
+      o2.kind = kind;
+    }
+    var sz = s * o2.size;
+    if (sz < 0.3){ ctx.globalAlpha = 1; continue; }
+
+    if (kind === 'tree'){
+      ctx.fillStyle = '#4a3a2a';
+      ctx.fillRect(x - sz*0.16, y - sz*1.34, sz*0.32, sz*1.34);
+      ctx.fillStyle = land.tree || '#3f6b3c';
+      ctx.beginPath();
+      ctx.arc(x, y - sz*2.1, sz*1.1, 0, 7);
+      ctx.arc(x - sz*0.7, y - sz*1.5, sz*0.85, 0, 7);
+      ctx.arc(x + sz*0.7, y - sz*1.5, sz*0.85, 0, 7);
+      ctx.fill();
+    } else if (kind === 'bush'){
+      ctx.fillStyle = land.tree || '#436b40';
+      ctx.beginPath();
+      ctx.arc(x, y - sz*0.6, sz*0.78, 0, 7);
+      ctx.arc(x - sz*0.6, y - sz*0.38, sz*0.58, 0, 7);
+      ctx.arc(x + sz*0.6, y - sz*0.38, sz*0.58, 0, 7);
+      ctx.fill();
+    } else if (kind === 'rock'){
+      ctx.fillStyle = land.canyon ? '#a87858' : '#8a7a68';
+      ctx.beginPath();
+      ctx.moveTo(x-sz*1.0, y);
+      ctx.lineTo(x-sz*0.42, y-sz*0.85);
+      ctx.lineTo(x+sz*0.28, y-sz*1.05);
+      ctx.lineTo(x+sz*1.0, y-sz*0.22);
+      ctx.lineTo(x+sz*0.8, y);
+      ctx.closePath();
+      ctx.fill();
+    } else if (kind === 'fence'){
+      ctx.fillStyle = '#7a6248';
+      for (var fi = 0; fi < 3; fi++){
+        ctx.fillRect(x - sz*1.6 + fi*sz*1.6, y - sz*1.4, sz*0.22, sz*1.4);
+      }
+      ctx.fillRect(x - sz*1.7, y - sz*1.1, sz*3.4, sz*0.18);
+      ctx.fillRect(x - sz*1.7, y - sz*0.6, sz*3.4, sz*0.18);
+    } else if (kind === 'grass'){
+      ctx.strokeStyle = land.canyon ? '#a88858' : '#5a7a4a';
+      ctx.lineWidth = Math.max(0.6, sz*0.12);
+      for (var gi = -2; gi <= 2; gi++){
+        ctx.beginPath();
+        ctx.moveTo(x + gi*sz*0.3, y);
+        ctx.lineTo(x + gi*sz*0.4 + sz*0.2, y - sz*0.9);
+        ctx.stroke();
+      }
+    } else if (kind === 'pole'){
+      ctx.fillStyle = '#4a4a4a';
+      ctx.fillRect(x - sz*0.11, y - sz*7, sz*0.22, sz*7);
+      ctx.fillRect(x - sz*0.7, y - sz*6.6, sz*1.4, sz*0.16);
+      ctx.fillRect(x - sz*0.55, y - sz*6.0, sz*1.1, sz*0.14);
+      ctx.strokeStyle = '#3a3a3a';
+      ctx.lineWidth = Math.max(0.5, sz*0.07);
+      ctx.beginPath();
+      ctx.moveTo(x - sz*0.7, y - sz*6.6);
+      ctx.quadraticCurveTo(x, y - sz*6.0, x + sz*0.7, y - sz*6.6);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawTraffic(sky){
+  var list = [];
+  for (var i = 0; i < G.traffic.length; i++){
+    var t = G.traffic[i];
+    var rz = t.z - G.camZ;
+    if (rz > 3 && rz < 400) list.push({t:t, rz:rz});
+  }
+  list.sort(function(a, b){ return b.rz - a.rz; });
+  for (var j = 0; j < list.length; j++){
+    var it = list[j], t2 = it.t, rz2 = it.rz;
+    var s = FOCAL / rz2;
+    var x = W/2 + (roadOffset(rz2) + t2.lat - G.camLat) * s;
+    var y = HORIZON_Y + 1.75 * s;
+    ctx.globalAlpha = clamp((rz2 - 3) / 13, 0, 1);
+    var cw = (t2.kind === 'truck' ? 3.1 : 2.25) * s;
+    var ch = (t2.kind === 'truck' ? 2.7 : 1.45) * s;
+
+    ctx.fillStyle = 'rgba(0,0,0,0.32)';
+    ctx.beginPath();
+    ctx.ellipse(x, y, cw*0.6, s*0.32, 0, 0, 7);
+    ctx.fill();
+
+    if (t2.oncoming){
+      ctx.fillStyle = t2.color;
+      roundRect(x-cw/2, y-ch, cw, ch, s*0.24); ctx.fill();
+      ctx.fillStyle = 'rgba(18,24,34,0.78)';
+      roundRect(x-cw*0.35, y-ch*0.82, cw*0.7, ch*0.5, s*0.12); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.16)';
+      roundRect(x-cw*0.38, y-ch*0.96, cw*0.76, ch*0.16, s*0.08); ctx.fill();
+      ctx.fillStyle = 'rgba(255,248,215,0.95)';
+      ctx.fillRect(x-cw*0.44, y-ch*0.5, cw*0.18, ch*0.18);
+      ctx.fillRect(x+cw*0.26, y-ch*0.5, cw*0.18, ch*0.18);
+      if (sky.night > 0.2){
+        var gl = ctx.createRadialGradient(x, y-ch*0.4, 0, x, y-ch*0.4, cw*2.4);
+        gl.addColorStop(0, 'rgba(255,248,215,' + (0.28*sky.night) + ')');
+        gl.addColorStop(1, 'rgba(255,248,215,0)');
+        ctx.fillStyle = gl;
+        ctx.beginPath(); ctx.arc(x, y-ch*0.4, cw*2.4, 0, 7); ctx.fill();
+      }
+    } else {
+      ctx.fillStyle = t2.color;
+      roundRect(x-cw*0.35, y-ch*1.5, cw*0.7, ch*0.72, s*0.16); ctx.fill();
+      ctx.fillStyle = 'rgba(20,26,36,0.75)';
+      roundRect(x-cw*0.30, y-ch*1.42, cw*0.6, ch*0.5, s*0.12); ctx.fill();
+      ctx.fillStyle = 'rgba(140,190,225,0.20)';
+      roundRect(x-cw*0.26, y-ch*1.38, cw*0.5, ch*0.22, s*0.1); ctx.fill();
+      ctx.fillStyle = t2.color;
+      roundRect(x-cw/2, y-ch, cw, ch, s*0.24); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.13)';
+      roundRect(x-cw*0.42, y-ch*0.94, cw*0.84, ch*0.2, s*0.1); ctx.fill();
+      var blinkOn = (t2.blink % 2) > 1.6 ? 1 : 0.55;
+      ctx.fillStyle = 'rgba(255,60,55,' + (0.78*blinkOn) + ')';
+      ctx.fillRect(x-cw*0.46, y-ch*0.62, cw*0.18, ch*0.26);
+      ctx.fillRect(x+cw*0.28, y-ch*0.62, cw*0.18, ch*0.26);
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawSigns(sky){
+  if (!G.signs) return;
+  for (var i = 0; i < G.signs.length; i++){
+    var sg = G.signs[i];
+    var rz = sg.z - G.camZ;
+    if (rz < 4 || rz > 320) continue;
+    var s = FOCAL / rz;
+    var x = W/2 + (roadOffset(rz) + sg.lat - G.camLat) * s;
+    var y = HORIZON_Y + 1.75 * s;
+    ctx.globalAlpha = clamp((rz-4)/12, 0, 1) * clamp((320-rz)/50, 0, 1);
+    var postH = 5.5*s, postW = 0.32*s;
+    ctx.fillStyle = '#6a6a6a';
+    ctx.fillRect(x - postW/2, y - postH, postW, postH);
+    var sw = 10.5*s, sh = 5.4*s;
+    var sx = x - sw/2, sy = y - postH - sh;
+    if (sw > 4.5){
+      ctx.fillStyle = '#0d5c34';
+      roundRect(sx, sy, sw, sh, s*0.35); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.lineWidth = Math.max(0.8, s*0.14);
+      roundRect(sx+s*0.3, sy+s*0.3, sw-s*0.6, sh-s*0.6, s*0.22); ctx.stroke();
+      if (s > 1.6){
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold ' + Math.max(5, s*1.2) + 'px system-ui,sans-serif';
+        ctx.fillText(sg.city.name, x, sy + sh*0.32);
+        ctx.font = 'bold ' + Math.max(4, s*0.9) + 'px system-ui,sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.fillText(sg.distMi + ' 英里', x, sy + sh*0.70);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawHoodOrCockpit(){
+  var view = VIEW_MODES[G.viewIdx] || VIEW_MODES[0];
+  var hoodTop = H * view.hoodH;
+
+  // 车身姿态影响引擎盖视觉
+  var rollPx = G.bodyRoll * 40;
+  var pitchPx = G.bodyPitch * 30;
+
+  if (view.id === 'cockpit'){
+    var grad = ctx.createLinearGradient(0, hoodTop-20, 0, H);
+    grad.addColorStop(0, 'rgba(12,14,18,0)');
+    grad.addColorStop(0.35, 'rgba(12,14,18,0.92)');
+    grad.addColorStop(1, 'rgba(6,8,11,1)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, hoodTop-20, W, H-hoodTop+20);
+
+    var cx = W/2 + rollPx, cy = hoodTop + H*0.15;
+    ctx.strokeStyle = 'rgba(30,32,38,0.95)';
+    ctx.lineWidth = 12;
+    ctx.beginPath(); ctx.arc(cx, cy, 90, 0, Math.PI*2); ctx.stroke();
+    ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(cx-75, cy); ctx.lineTo(cx+75, cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy+75); ctx.stroke();
+    ctx.fillStyle = 'rgba(40,42,48,0.95)';
+    ctx.beginPath(); ctx.arc(cx, cy, 22, 0, 7); ctx.fill();
+  } else if (view.id === 'chase'){
+    // 追尾视角不画引擎盖
+  } else {
+    // 引擎盖
+    var grad2 = ctx.createLinearGradient(0, hoodTop-30, 0, H);
+    grad2.addColorStop(0, 'rgba(15,18,24,0)');
+    grad2.addColorStop(0.4, 'rgba(15,18,24,0.75)');
+    grad2.addColorStop(0.8, 'rgba(10,12,16,0.96)');
+    grad2.addColorStop(1, 'rgba(6,8,11,1)');
+    ctx.fillStyle = grad2;
+    ctx.fillRect(0, hoodTop-30, W, H-hoodTop+30);
+
+    // A柱（带侧倾）
+    ctx.fillStyle = 'rgba(18,20,26,0.88)';
+    ctx.beginPath();
+    ctx.moveTo(0 + rollPx, hoodTop-40);
+    ctx.lineTo(W*0.07 + rollPx, hoodTop+8);
+    ctx.lineTo(0 + rollPx, hoodTop+60);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(W + rollPx, hoodTop-40);
+    ctx.lineTo(W*0.93 + rollPx, hoodTop+8);
+    ctx.lineTo(W + rollPx, hoodTop+60);
+    ctx.closePath(); ctx.fill();
+
+    // 引擎盖
+    var hoodGrad = ctx.createLinearGradient(0, hoodTop-6, 0, hoodTop+70);
+    hoodGrad.addColorStop(0, 'rgba(58,62,70,0.92)');
+    hoodGrad.addColorStop(1, 'rgba(32,35,42,0.96)');
+    ctx.fillStyle = hoodGrad;
+    ctx.beginPath();
+    ctx.moveTo(-10, hoodTop+8 + pitchPx);
+    ctx.quadraticCurveTo(W/2 + rollPx, hoodTop-14 + pitchPx, W+10, hoodTop+8 + pitchPx);
+    ctx.lineTo(W+10, H+10);
+    ctx.lineTo(-10, H+10);
+    ctx.closePath(); ctx.fill();
+
+    ctx.strokeStyle = 'rgba(90,105,125,0.28)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-10, hoodTop+8 + pitchPx);
+    ctx.quadraticCurveTo(W/2 + rollPx, hoodTop-14 + pitchPx, W+10, hoodTop+8 + pitchPx);
+    ctx.stroke();
+
+    // 雨刷
+    ctx.strokeStyle = 'rgba(35,38,45,0.95)';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(W*0.22, hoodTop+18);
+    ctx.lineTo(W*0.42, hoodTop-4);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W*0.62, hoodTop+18);
+    ctx.lineTo(W*0.52, hoodTop-4);
+    ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
+
+  // 转向灯
+  if (G.blinkers > 0 && G.blinkSide !== 0){
+    var blinkOn = (Math.sin(G.time * 8) > 0);
+    if (blinkOn){
+      ctx.fillStyle = 'rgba(255,180,60,0.9)';
+      var indY = hoodTop - 14;
+      if (G.blinkSide === 1){
+        ctx.beginPath();
+        ctx.moveTo(W*0.86, indY);
+        ctx.lineTo(W*0.90, indY+6);
+        ctx.lineTo(W*0.86, indY+12);
+        ctx.closePath(); ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(W*0.14, indY);
+        ctx.lineTo(W*0.10, indY+6);
+        ctx.lineTo(W*0.14, indY+12);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  迷你地图
+// ═══════════════════════════════════════════════════════════════
+var MINI_W = 290, MINI_H = 170;
+var MINI_X = W - MINI_W - 20, MINI_Y = H - MINI_H - 20;
+var MN_LNG_MIN = -126, MN_LNG_MAX = -66, MN_LAT_MIN = 24, MN_LAT_MAX = 50;
+function mnX(lng){ return MINI_X + 22 + (lng - MN_LNG_MIN) / (MN_LNG_MAX - MN_LNG_MIN) * (MINI_W - 44); }
+function mnY(lat){ return MINI_Y + 26 + (MN_LAT_MAX - lat) / (MN_LAT_MAX - MN_LAT_MIN) * (MINI_H - 50); }
+var US_OUTLINE = [
+  [-124.7,48.4],[-124.2,43.0],[-124.4,40.4],[-122.4,37.8],[-121.0,35.5],
+  [-118.4,34.0],[-117.1,32.5],[-114.7,32.7],[-111.0,31.3],[-108.2,31.3],
+  [-106.5,31.8],[-103.1,29.0],[-101.4,29.8],[-99.1,26.4],[-97.1,25.9],
+  [-95.0,29.0],[-90.1,29.2],[-88.0,30.4],[-84.0,30.0],[-82.7,27.9],
+  [-81.1,25.1],[-80.1,25.8],[-80.5,28.5],[-81.5,30.7],[-79.5,33.0],
+  [-77.0,34.7],[-75.5,35.8],[-75.9,38.0],[-74.0,40.6],[-71.0,41.5],
+  [-70.0,43.0],[-67.0,44.8],[-69.0,47.0],[-71.5,45.0],[-76.5,44.0],
+  [-79.0,43.3],[-82.5,41.7],[-83.1,42.3],[-82.5,45.0],[-84.5,46.5],
+  [-88.0,48.2],[-95.0,49.0],[-110.0,49.0],[-122.8,49.0]
+];
+
+function drawMiniMap(){
+  if (!G.miniMapVisible || !G.route) return;
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 4;
+  ctx.fillStyle = 'rgba(10,14,22,0.88)';
+  roundRect(MINI_X, MINI_Y, MINI_W, MINI_H, 12);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.strokeStyle = 'rgba(140,180,255,0.35)';
+  ctx.lineWidth = 1.2;
+  roundRect(MINI_X, MINI_Y, MINI_W, MINI_H, 12);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(110,198,255,0.12)';
+  roundRect(MINI_X, MINI_Y, MINI_W, 22, 12); ctx.fill();
+  ctx.fillStyle = 'rgba(10,14,22,0.88)';
+  ctx.fillRect(MINI_X, MINI_Y+14, MINI_W, 8);
+
+  ctx.font = 'bold 10px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(180,215,255,0.9)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('◈ 行车地图', MINI_X+12, MINI_Y+11);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(140,180,255,0.5)';
+  ctx.font = 'bold 9px system-ui,sans-serif';
+  ctx.fillText('M 隐藏', MINI_X+MINI_W-12, MINI_Y+11);
+
+  // 美国轮廓
+  ctx.beginPath();
+  for (var i = 0; i < US_OUTLINE.length; i++){
+    var p = US_OUTLINE[i];
+    var x = mnX(p[0]), y = mnY(p[1]);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(90,140,220,0.10)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(120,170,255,0.4)'; ctx.lineWidth = 1.1; ctx.stroke();
+
+  // 完整路线
+  var segs = G.route.segments;
+  ctx.strokeStyle = 'rgba(255,255,255,0.20)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (var s = 0; s < segs.length; s++){
+    var a = CITY_MAP[segs[s].from], b = CITY_MAP[segs[s].to];
+    if (!a || !b) continue;
+    if (s === 0) ctx.moveTo(mnX(a.lng), mnY(a.lat));
+    ctx.lineTo(mnX(b.lng), mnY(b.lat));
+  }
+  ctx.stroke();
+
+  // 已走轨迹
+  var curSeg = segAtWorld(G.route, G.camZ);
+  if (!curSeg) return;
+  var prog = clamp((G.camZ - curSeg.worldStart) / Math.max(1, curSeg.worldLen), 0, 1);
+
+  ctx.strokeStyle = 'rgba(110,231,160,0.95)';
+  ctx.lineWidth = 2.8;
+  ctx.beginPath();
+  for (var s2 = 0; s2 < segs.length; s2++){
+    var sa = CITY_MAP[segs[s2].from], sb = CITY_MAP[segs[s2].to];
+    if (!sa || !sb) continue;
+    if (segs[s2] === curSeg){
+      ctx.moveTo(mnX(sa.lng), mnY(sa.lat));
+      var mx = lerp(mnX(sa.lng), mnX(sb.lng), prog);
+      var my = lerp(mnY(sa.lat), mnY(sb.lat), prog);
+      ctx.lineTo(mx, my);
+      break;
+    }
+    if (s2 === 0) ctx.moveTo(mnX(sa.lng), mnY(sa.lat));
+    ctx.lineTo(mnX(sb.lng), mnY(sb.lat));
+  }
+  ctx.stroke();
+
+  // 城市点
+  for (var ci2 = 0; ci2 < CITIES.length; ci2++){
+    var c = CITIES[ci2];
+    var cx = mnX(c.lng), cy = mnY(c.lat);
+    var isFrom = G.route.fromCity.id === c.id;
+    var isTo = G.route.toCity.id === c.id;
+    var isCur = (c.id === curSeg.from || c.id === curSeg.to);
+    if (isFrom || isTo || isCur){
+      ctx.beginPath();
+      ctx.arc(cx, cy, isFrom || isTo ? 4 : 3.5, 0, 7);
+      ctx.fillStyle = isFrom ? '#6ec6ff' : (isTo ? '#ff9f5a' : '#ffd166');
+      ctx.fill();
+      if (isFrom || isTo){
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    } else {
+      ctx.beginPath();
+      ctx.arc(cx, cy, 1.5, 0, 7);
+      ctx.fillStyle = 'rgba(190,215,255,0.35)';
+      ctx.fill();
+    }
+  }
+
+  // 当前位置脉冲
+  var a2 = CITY_MAP[curSeg.from], b2 = CITY_MAP[curSeg.to];
+  if (a2 && b2){
+    var px = lerp(mnX(a2.lng), mnX(b2.lng), prog);
+    var py = lerp(mnY(a2.lat), mnY(b2.lat), prog);
+    var pulse = 0.6 + Math.sin(G.time * 5) * 0.4;
+    ctx.fillStyle = 'rgba(255,220,120,' + pulse*0.4 + ')';
+    ctx.beginPath(); ctx.arc(px, py, 9, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,220,120,0.9)';
+    ctx.beginPath(); ctx.arc(px, py, 4, 0, 7); ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(px, py, 2, 0, 7); ctx.fill();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════════════════════════
+function displayMiles(){ return G.totalMilesDriven; }
+function totalDisplayMiles(){ return G.route ? G.route.totalMiles : 0; }
+
+function drawHUD(){
+  var route = G.route;
+  if (!route) return;
+  var prog = clamp(G.camZ / Math.max(1, route.totalWorld), 0, 1);
+
+  // ── 顶部进度条 ──
+  var barW = W - 500;
+  var barX = (W - barW)/2, barY = 28, barH = 6;
+
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  roundRect(barX-6, barY-6, barW+12, barH+12, 8); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  roundRect(barX, barY, barW, barH, 4); ctx.fill();
+
+  var g = ctx.createLinearGradient(barX, 0, barX+barW, 0);
+  g.addColorStop(0, '#6ec6ff');
+  g.addColorStop(0.5, '#ffd166');
+  g.addColorStop(1, '#ff8a5c');
+  ctx.save();
+  ctx.beginPath();
+  roundRect(barX, barY, Math.max(2, barW*prog), barH, 4);
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.restore();
+
+  for (var i = 1; i < route.segments.length; i++){
+    var seg = route.segments[i];
+    var x = barX + barW * (seg.worldStart / Math.max(1, route.totalWorld));
+    ctx.beginPath();
+    ctx.arc(x, barY+barH/2, 3.5, 0, 7);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fill();
+  }
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 11px system-ui,sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.fillText(route.fromCity.name, barX, barY-14);
+  ctx.textAlign = 'right';
+  ctx.fillText(route.toCity.name, barX+barW, barY-14);
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 10px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(Math.round(displayMiles()) + ' / ' + Math.round(totalDisplayMiles()) + ' 英里', W/2, barY+20);
+
+  // ── 视角按钮 ──
+  var vx = W-270, vy = 20, vw = 250, vh = 34;
+  ctx.fillStyle = 'rgba(0,0,0,0.42)';
+  roundRect(vx, vy, vw, vh, 10); ctx.fill();
+  ctx.strokeStyle = 'rgba(120,170,255,0.25)';
+  ctx.lineWidth = 1;
+  roundRect(vx, vy, vw, vh, 10); ctx.stroke();
+  for (var vi = 0; vi < VIEW_MODES.length; vi++){
+    var vm = VIEW_MODES[vi];
+    var vbx = vx + 5 + vi * (vw-10)/4, vby = vy+4, vbw = (vw-10)/4 - 3, vbh = vh-8;
+    var vActive = G.viewIdx === vi;
+    if (vActive){
+      var ag = ctx.createLinearGradient(vbx, vby, vbx, vby+vbh);
+      ag.addColorStop(0, 'rgba(110,198,255,0.5)');
+      ag.addColorStop(1, 'rgba(110,198,255,0.2)');
+      ctx.fillStyle = ag;
+      roundRect(vbx, vby, vbw, vbh, 6); ctx.fill();
+      ctx.strokeStyle = 'rgba(140,215,255,0.85)';
+      ctx.lineWidth = 1.3;
+      roundRect(vbx, vby, vbw, vbh, 6); ctx.stroke();
+    }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 9.5px system-ui,sans-serif';
+    ctx.fillStyle = vActive ? '#ffffff' : 'rgba(255,255,255,0.55)';
+    ctx.fillText(vm.name, vbx+vbw/2, vby+vbh/2);
+  }
+
+  // ── 速度表 ──
+  var mph = Math.round(G.speed * 2.2);
+  var SPEED_MAX = SPEED_MAX_MAP[G.driveMode] || 58;
+  var gaugeX = 82, gaugeY = H-82, gaugeR = 46;
+
+  ctx.beginPath();
+  ctx.arc(gaugeX, gaugeY, gaugeR, Math.PI*0.78, Math.PI*2.22);
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+  ctx.lineWidth = 10; ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(gaugeX, gaugeY, gaugeR, Math.PI*0.78, Math.PI*2.22);
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+  ctx.lineWidth = 7; ctx.stroke();
+
+  var spdRatio = clamp(G.speed / SPEED_MAX, 0, 1);
+  var grad = ctx.createLinearGradient(gaugeX-gaugeR, 0, gaugeX+gaugeR, 0);
+  grad.addColorStop(0, '#4ade80');
+  grad.addColorStop(0.6, '#ffd166');
+  grad.addColorStop(1, '#ff4d4d');
+  ctx.beginPath();
+  ctx.arc(gaugeX, gaugeY, gaugeR, Math.PI*0.78, Math.PI*0.78 + Math.PI*1.44*spdRatio);
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 7;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+  ctx.lineCap = 'butt';
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.font = 'bold 27px system-ui,sans-serif';
+  ctx.fillText(mph, gaugeX+1, gaugeY);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 26px system-ui,sans-serif';
+  ctx.fillText(mph, gaugeX, gaugeY-2);
+  ctx.font = 'bold 9px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText('MPH', gaugeX, gaugeY+16);
+
+  // ── 油量 ──
+  var fx = 152, fy = H-92, fw = 170, fh = 12;
+  ctx.fillStyle = 'rgba(0,0,0,0.42)';
+  roundRect(fx-2, fy-2, fw+4, fh+4, 8); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  roundRect(fx, fy, fw, fh, 5); ctx.fill();
+  var fRatio = G.fuel / 100;
+  var fuelColor = '#4ade80';
+  if (fRatio < 0.5) fuelColor = '#ffd166';
+  if (fRatio < 0.22) fuelColor = (Math.sin(G.time*14) > 0) ? '#ff4d4d' : '#ff8a5c';
+  ctx.save();
+  ctx.beginPath();
+  roundRect(fx+2, fy+2, (fw-4)*fRatio, fh-4, 3);
+  ctx.fillStyle = fuelColor;
+  ctx.fill();
+  ctx.restore();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 10.5px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText('⛽ 燃油', fx, fy-12);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText(Math.ceil(G.fuel) + '%', fx+fw, fy-12);
+  if (G.refueling){
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 12px system-ui,sans-serif';
+    ctx.fillStyle = '#6ee7a0';
+    ctx.fillText('正在加油…', fx+fw/2, fy+26);
+  }
+
+  // ── 模式徽章 ──
+  var modeLabel = G.driveMode === 'casual' ? '标准模式' : (G.driveMode === 'real' ? '真实模式' : '自由模式');
+  var modeColor = G.driveMode === 'casual' ? '#6ec6ff' : (G.driveMode === 'real' ? '#ffd166' : '#6ee7a0');
+  var iy = MINI_Y - 76;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 10px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  roundRect(W-120, iy-8, 100, 18, 5); ctx.fill();
+  ctx.fillStyle = modeColor;
+  ctx.fillText(modeLabel, W-20, iy);
+
+  // ── 下一站 ──
+  var curSeg = segAtWorld(route, G.camZ);
+  if (curSeg){
+    var segs = route.segments;
+    var segIdx = segs.indexOf(curSeg);
+    var nextSeg = segs[segIdx+1];
+    var targetCity = nextSeg ? CITY_MAP[nextSeg.to] : CITY_MAP[curSeg.to];
+    var segProgress = (G.camZ - curSeg.worldStart) / Math.max(1, curSeg.worldLen);
+    var remainMi = Math.max(0, Math.round(curSeg.miles * (1 - segProgress)));
+
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    roundRect(W-240, iy+18, 220, 62, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(120,170,255,0.15)';
+    ctx.lineWidth = 1;
+    roundRect(W-240, iy+18, 220, 62, 10); ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 9px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+    ctx.fillText('下一站', W-228, iy+32);
+
+    ctx.font = 'bold 18px system-ui,sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(targetCity ? targetCity.name : '—', W-228, iy+52);
+
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 15px system-ui,sans-serif';
+    ctx.fillStyle = '#ffd166';
+    ctx.fillText(remainMi, W-28, iy+52);
+    ctx.font = 'bold 9px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText('英里', W-28, iy+68);
+
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 10px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(110,198,255,0.75)';
+    ctx.fillText(curSeg.name, W-228, iy+70);
+  }
+
+  // ── 匝道提示 ──
+  if (G.activeExit){
+    var pulse = 0.6 + Math.sin(G.time * 4) * 0.4;
+    var msg = '↘ 前方匝道 · ' + (G.activeExit.city ? G.activeExit.city.name : '') + ' · 进入最右车道';
+    ctx.font = 'bold 14px system-ui,sans-serif';
+    var tw = ctx.measureText(msg).width;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(6,15,25,0.75)';
+    roundRect(W/2-tw/2-24, H-190, tw+48, 40, 12); ctx.fill();
+    ctx.strokeStyle = 'rgba(110,231,160,' + (0.4 + pulse*0.4) + ')';
+    ctx.lineWidth = 1.5;
+    roundRect(W/2-tw/2-24, H-190, tw+48, 40, 12); ctx.stroke();
+    ctx.fillStyle = 'rgba(110,231,160,' + pulse + ')';
+    ctx.fillText(msg, W/2, H-170);
+  }
+
+  // 双闪提示
+  if (G.stoppedTimer > 2){
+    var blink = (G.time*4) % 2 > 1;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 14px system-ui,sans-serif';
+    ctx.fillStyle = blink ? '#ffd166' : 'rgba(255,209,102,0.4)';
+    ctx.fillText('🚨 双闪 · 靠边停车中', W/2, H-220);
+  }
+
+  // 自动驾驶
+  if (G.autoDrive){
+    var pulse2 = 0.6 + Math.sin(G.time * 3) * 0.4;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 12px system-ui,sans-serif';
+    ctx.globalAlpha = pulse2;
+    ctx.fillStyle = '#6ee7a0';
+    ctx.fillText('● 自动驾驶运行中', W/2, H-150);
+    ctx.globalAlpha = 1;
+  }
+
+  // 通知
+  if (G.notif){
+    var a = Math.min(1, G.notif.t/0.6) * Math.min(1, (3.2-G.notif.t)/0.4);
+    ctx.globalAlpha = clamp(a, 0, 1);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 22px system-ui,sans-serif';
+    var tw2 = ctx.measureText(G.notif.text).width;
+    ctx.fillStyle = 'rgba(10,14,22,0.72)';
+    roundRect(W/2-tw2/2-32, H*0.24-26, tw2+64, 52, 26); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    roundRect(W/2-tw2/2-32, H*0.24-26, tw2+64, 52, 26); ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.fillText(G.notif.text, W/2, H*0.24);
+    ctx.globalAlpha = 1;
+  }
+
+  // 油量低警告
+  if (G.fuel < 20 && G.mode === 'playing'){
+    var wa = (Math.sin(G.time*7)*0.5 + 0.5) * 0.14;
+    ctx.fillStyle = 'rgba(255,60,50,' + wa + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // 暗角
+  var vg = ctx.createRadialGradient(W/2, H/2, H*0.42, W/2, H/2, H*0.98);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.45)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, H);
+
+  // REC
+  var blinkRec = (G.time * 1.2) % 2 > 1;
+  ctx.globalAlpha = blinkRec ? 0.7 : 0.25;
+  ctx.fillStyle = '#ff4444';
+  ctx.beginPath(); ctx.arc(28, 28, 5.5, 0, 7); ctx.fill();
+  ctx.globalAlpha = 0.45;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 11px monospace,system-ui,sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('REC', 42, 28);
+  ctx.globalAlpha = 1;
+
+  drawMiniMap();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  菜单
+// ═══════════════════════════════════════════════════════════════
+var MAP_X = 30, MAP_Y = 108, MAP_W = 560, MAP_H = 300;
+var LNG_MIN = -128, LNG_MAX = -64, LAT_MIN = 23, LAT_MAX = 50;
+function toMapX(lng){ return MAP_X + (lng - LNG_MIN) / (LNG_MAX - LNG_MIN) * MAP_W; }
+function toMapY(lat){ return MAP_Y + (LAT_MAX - lat) / (LAT_MAX - LAT_MIN) * MAP_H; }
+
+function cityAtPoint(mx, my){
+  for (var i = 0; i < CITIES.length; i++){
+    var c = CITIES[i];
+    var cx = toMapX(c.lng), cy = toMapY(c.lat);
+    if (Math.hypot(mx-cx, my-cy) < 9) return c;
+  }
+  return null;
+}
+var MODE_BUTTONS = [
+  {id:'casual', name:'标准模式', desc:'1:5.5 距离 · 快速穿越', x:626, y:100, w:302, h:50},
+  {id:'real',   name:'真实模式', desc:'1:22 距离 · 可选出发时间', x:626, y:158, w:302, h:50},
+  {id:'free',   name:'自由模式', desc:'立交枢纽 · 自由探索', x:626, y:216, w:302, h:50}
+];
+var TIME_BUTTONS = [
+  {id:'dawn', name:'黎明', x:626, y:280, w:70, h:38},
+  {id:'noon', name:'正午', x:704, y:280, w:70, h:38},
+  {id:'dusk', name:'黄昏', x:782, y:280, w:70, h:38},
+  {id:'night',name:'夜晚', x:860, y:280, w:68, h:38}
+];
+function modeButtonAt(mx, my){
+  for (var i = 0; i < MODE_BUTTONS.length; i++){
+    var b = MODE_BUTTONS[i];
+    if (mx >= b.x && mx <= b.x+b.w && my >= b.y && my <= b.y+b.h) return b;
+  }
+  return null;
+}
+function timeButtonAt(mx, my){
+  if (G.driveMode !== 'real') return null;
+  for (var i = 0; i < TIME_BUTTONS.length; i++){
+    var b = TIME_BUTTONS[i];
+    if (mx >= b.x && mx <= b.x+b.w && my >= b.y && my <= b.y+b.h) return b;
+  }
+  return null;
+}
+function menuStage(){
+  if (G.driveMode === 'free') return G.menuFrom ? 'ready' : 'from';
+  return !G.menuFrom ? 'from' : (!G.menuTo ? 'to' : 'ready');
+}
+
+function drawMenu(){
+  var bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#0a1018');
+  bg.addColorStop(0.5, '#0d1420');
+  bg.addColorStop(1, '#080c14');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(90,140,220,0.045)';
+  ctx.lineWidth = 1;
+  for (var gx = 0; gx < W; gx += 40){ ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+  for (var gy = 0; gy < H; gy += 40){ ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = 'bold 28px system-ui,sans-serif';
+  var tg = ctx.createLinearGradient(0, 30, 0, 64);
+  tg.addColorStop(0, '#ffe9a8');
+  tg.addColorStop(1, '#ff9f5a');
+  ctx.fillStyle = tg;
+  ctx.fillText('横跨美国', 30, 56);
+  ctx.font = 'bold 11px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.30)';
+  ctx.fillText('AMERICAN ROAD TRIP', 30+152, 54);
+
+  // 模式按钮
+  for (var mi = 0; mi < MODE_BUTTONS.length; mi++){
+    var b = MODE_BUTTONS[mi];
+    var active = G.driveMode === b.id;
+    var hover = G.modeHover && G.modeHover.id === b.id;
+    if (active){
+      var ag = ctx.createLinearGradient(b.x, b.y, b.x+b.w, b.y+b.h);
+      ag.addColorStop(0, 'rgba(110,198,255,0.18)');
+      ag.addColorStop(1, 'rgba(110,198,255,0.06)');
+      ctx.fillStyle = ag;
+    } else if (hover){ ctx.fillStyle = 'rgba(255,255,255,0.05)'; }
+    else { ctx.fillStyle = 'rgba(255,255,255,0.02)'; }
+    roundRect(b.x, b.y, b.w, b.h, 12); ctx.fill();
+    ctx.strokeStyle = active ? 'rgba(110,198,255,0.65)' : (hover ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)');
+    ctx.lineWidth = active ? 1.6 : 1;
+    roundRect(b.x, b.y, b.w, b.h, 12); ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(b.x+22, b.y+b.h/2, active ? 6 : 4.5, 0, 7);
+    ctx.fillStyle = active ? '#6ec6ff' : 'rgba(255,255,255,0.2)';
+    ctx.fill();
+    if (active){
+      ctx.strokeStyle = 'rgba(110,198,255,0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(b.x+22, b.y+b.h/2, 10, 0, 7);
+      ctx.stroke();
+    }
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 14px system-ui,sans-serif';
+    ctx.fillStyle = active ? '#ffffff' : 'rgba(255,255,255,0.68)';
+    ctx.fillText(b.name, b.x+42, b.y+22);
+    ctx.font = '11px system-ui,sans-serif';
+    ctx.fillStyle = active ? 'rgba(110,198,255,0.85)' : 'rgba(255,255,255,0.32)';
+    ctx.fillText(b.desc, b.x+42, b.y+38);
+  }
+
+  // 时间按钮
+  if (G.driveMode === 'real'){
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 11px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+    ctx.fillText('出发时间', 626, 275);
+    for (var ti = 0; ti < TIME_BUTTONS.length; ti++){
+      var tb = TIME_BUTTONS[ti];
+      var tActive = G.startTime === tb.id;
+      var tHover = G.timeHover && G.timeHover.id === tb.id;
+      if (tActive){
+        var tg2 = ctx.createLinearGradient(tb.x, tb.y, tb.x, tb.y+tb.h);
+        tg2.addColorStop(0, 'rgba(255,209,102,0.30)');
+        tg2.addColorStop(1, 'rgba(255,159,90,0.12)');
+        ctx.fillStyle = tg2;
+      } else if (tHover){ ctx.fillStyle = 'rgba(255,255,255,0.05)'; }
+      else { ctx.fillStyle = 'rgba(255,255,255,0.02)'; }
+      roundRect(tb.x, tb.y, tb.w, tb.h, 10); ctx.fill();
+      ctx.strokeStyle = tActive ? 'rgba(255,209,102,0.7)' : (tHover ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)');
+      ctx.lineWidth = tActive ? 1.5 : 1;
+      roundRect(tb.x, tb.y, tb.w, tb.h, 10); ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 12px system-ui,sans-serif';
+      ctx.fillStyle = tActive ? '#ffd166' : 'rgba(255,255,255,0.6)';
+      ctx.fillText(tb.name, tb.x+tb.w/2, tb.y+tb.h/2);
+      ctx.textBaseline = 'alphabetic';
+    }
+  }
+
+  // 地图面板
+  ctx.fillStyle = 'rgba(255,255,255,0.022)';
+  roundRect(MAP_X-12, MAP_Y-12, MAP_W+24, MAP_H+24, 16); ctx.fill();
+  ctx.strokeStyle = 'rgba(120,170,255,0.09)';
+  ctx.lineWidth = 1;
+  roundRect(MAP_X-12, MAP_Y-12, MAP_W+24, MAP_H+24, 16); ctx.stroke();
+
+  // 美国轮廓
+  ctx.beginPath();
+  for (var i = 0; i < US_OUTLINE.length; i++){
+    var p = US_OUTLINE[i];
+    var x = toMapX(p[0]), y = toMapY(p[1]);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(90,140,220,0.065)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(120,170,255,0.24)'; ctx.lineWidth = 1.3; ctx.stroke();
+
+  // 公路网
+  ctx.strokeStyle = 'rgba(120,170,255,0.10)';
+  ctx.lineWidth = 1;
+  for (var hi = 0; hi < HIGHWAYS.length; hi++){
+    var hw = HIGHWAYS[hi];
+    var a = CITY_MAP[hw[0]], bb = CITY_MAP[hw[1]];
+    if (!a || !bb) continue;
+    ctx.beginPath();
+    ctx.moveTo(toMapX(a.lng), toMapY(a.lat));
+    ctx.lineTo(toMapX(bb.lng), toMapY(bb.lat));
+    ctx.stroke();
+  }
+
+  var st = menuStage();
+  if (G.menuFrom && G.menuTo && st === 'ready' && G.driveMode !== 'free'){
+    var path = shortestPath(G.menuFrom.id, G.menuTo.id);
+    if (path){
+      ctx.strokeStyle = 'rgba(255,209,102,0.9)';
+      ctx.lineWidth = 2.4;
+      ctx.setLineDash([7, 6]);
+      ctx.lineDashOffset = -G.time * 28;
+      ctx.beginPath();
+      var cur = CITY_MAP[path[0].from];
+      ctx.moveTo(toMapX(cur.lng), toMapY(cur.lat));
+      for (var pi = 0; pi < path.length; pi++){
+        var nxt = CITY_MAP[path[pi].to];
+        ctx.lineTo(toMapX(nxt.lng), toMapY(nxt.lat));
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // 城市点
+  for (var ci3 = 0; ci3 < CITIES.length; ci3++){
+    var c2 = CITIES[ci3];
+    var cx2 = toMapX(c2.lng), cy2 = toMapY(c2.lat);
+    var isFrom = G.menuFrom && G.menuFrom.id === c2.id;
+    var isTo = G.menuTo && G.menuTo.id === c2.id;
+    var isHov = G.menuHover && G.menuHover.id === c2.id;
+    if (isFrom || isTo){
+      ctx.beginPath();
+      ctx.arc(cx2, cy2, 9 + Math.sin(G.time*3)*1.5, 0, 7);
+      ctx.fillStyle = isFrom ? 'rgba(110,198,255,0.16)' : 'rgba(255,159,90,0.16)';
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(cx2, cy2, isFrom || isTo ? 5 : (isHov ? 4.6 : 3), 0, 7);
+    ctx.fillStyle = isFrom ? '#6ec6ff' : (isTo ? '#ff9f5a' : (isHov ? '#ffffff' : 'rgba(190,215,255,0.48)'));
+    ctx.fill();
+    if (isFrom || isTo){
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    if (isFrom || isTo || isHov){
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 10px system-ui,sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(c2.name, cx2, cy2-12);
+    }
+  }
+
+  // 底部信息
+  var IX = 30, IY = 428, IW = 560, IH = 128;
+  ctx.fillStyle = 'rgba(255,255,255,0.025)';
+  roundRect(IX, IY, IW, IH, 14); ctx.fill();
+  ctx.strokeStyle = 'rgba(120,170,255,0.09)';
+  ctx.lineWidth = 1;
+  roundRect(IX, IY, IW, IH, 14); ctx.stroke();
+
+  var title, titleCol;
+  if (st === 'from'){ title = '① 点击地图选择出发城市'; titleCol = '#6ec6ff'; }
+  else if (st === 'to'){ title = '② 点击地图选择目的城市'; titleCol = '#ff9f5a'; }
+  else { title = '✓ 路线已就绪'; titleCol = '#6ee7a0'; }
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 13px system-ui,sans-serif';
+  ctx.fillStyle = titleCol;
+  ctx.fillText(title, IX+20, IY+26);
+
+  if (st === 'ready' && G.menuFrom){
+    if (G.driveMode === 'free'){
+      ctx.font = 'bold 14px system-ui,sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.fillText('出发地：' + G.menuFrom.name, IX+20, IY+62);
+      ctx.font = '12px system-ui,sans-serif';
+      ctx.fillStyle = 'rgba(190,215,255,0.65)';
+      ctx.fillText('到达后将自动通过匝道进入相连公路', IX+20, IY+92);
+    } else {
+      var path2 = shortestPath(G.menuFrom.id, G.menuTo.id);
+      var route = buildRouteFromPath(path2, G.menuFrom, G.menuTo);
+      var dReal = route ? route.totalMiles : 0;
+      ctx.font = 'bold 14px system-ui,sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.fillText(G.menuFrom.name, IX+20, IY+56);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillText('→', IX+20+54, IY+56);
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.fillText(G.menuTo.name, IX+20+76, IY+56);
+      ctx.font = 'bold 11px system-ui,sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.38)';
+      ctx.fillText('全程', IX+20, IY+84);
+      ctx.font = 'bold 26px system-ui,sans-serif';
+      ctx.fillStyle = '#ffd166';
+      ctx.fillText(Math.round(dReal).toLocaleString(), IX+20+36, IY+90);
+      if (route && route.segments.length > 1){
+        ctx.font = 'bold 11px system-ui,sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.38)';
+        ctx.fillText('途经 ' + (route.segments.length - 1) + ' 座城市', IX+20, IY+112);
+        ctx.font = '12px system-ui,sans-serif';
+        ctx.fillStyle = 'rgba(190,215,255,0.65)';
+        var midNames = [];
+        for (var si = 0; si < route.segments.length - 1; si++){
+          midNames.push(CITY_MAP[route.segments[si].to].name);
+        }
+        ctx.fillText(midNames.slice(0, 5).join(' · ') + (midNames.length > 5 ? ' …' : ''), IX+140, IY+112);
+      }
+    }
+    var pulse = 0.5 + Math.sin(G.time*3)*0.5;
+    var bw = 150, bh = 52;
+    var bx = IX+IW-bw-20, by = IY+IH-bh-16;
+    ctx.globalAlpha = 0.35 * (0.4 + pulse*0.6);
+    ctx.strokeStyle = '#ffd166';
+    ctx.lineWidth = 2;
+    roundRect(bx-6, by-6, bw+12, bh+12, 32); ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,190,90,' + (0.5 + pulse*0.5) + ')';
+    ctx.shadowBlur = 30 + pulse*24;
+    var bg2 = ctx.createLinearGradient(bx, by, bx, by+bh);
+    bg2.addColorStop(0, '#ffd166');
+    bg2.addColorStop(1, '#f79b3c');
+    ctx.fillStyle = bg2;
+    roundRect(bx, by, bw, bh, 26); ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1.5;
+    roundRect(bx, by, bw, bh, 26); ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#3a2208';
+    ctx.font = 'bold 20px system-ui,sans-serif';
+    ctx.fillText('出 发', bx+bw/2, by+bh/2+1);
+    ctx.textBaseline = 'alphabetic';
+  } else if (st === 'to' && G.menuFrom){
+    ctx.font = '13px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText('出发地：', IX+20, IY+66);
+    ctx.fillStyle = '#6ec6ff';
+    ctx.font = 'bold 18px system-ui,sans-serif';
+    ctx.fillText(G.menuFrom.name, IX+20+62, IY+68);
+    ctx.font = '12px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText('可从地图或右侧列表选择目的城市', IX+20, IY+100);
+  } else {
+    ctx.font = '12px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    if (G.driveMode === 'free'){
+      ctx.fillText('自由模式：选择起点即可出发', IX+20, IY+60);
+      ctx.fillText('到达城市后通过匝道进入下一条公路', IX+20, IY+84);
+      ctx.fillText('总城市数：' + CITIES.length + ' 座', IX+20, IY+108);
+    } else {
+      ctx.fillText('真实美国公路网 · 支持任意两城规划', IX+20, IY+60);
+      ctx.fillText('总城市数：' + CITIES.length + ' 座', IX+20, IY+84);
+      ctx.fillText('公路网：' + HIGHWAYS.length + ' 条路段', IX+20, IY+108);
+    }
+  }
+
+  // 城市列表
+  var LX = 626, LY = 336, LW = 302, LH = 220;
+  ctx.fillStyle = 'rgba(255,255,255,0.022)';
+  roundRect(LX, LY, LW, LH, 14); ctx.fill();
+  ctx.strokeStyle = 'rgba(120,170,255,0.09)';
+  ctx.lineWidth = 1;
+  roundRect(LX, LY, LW, LH, 14); ctx.stroke();
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 12px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.42)';
+  ctx.fillText('城市列表', LX+16, LY+22);
+
+  var rowH = 15;
+  var visibleRows = Math.floor((LH-50)/rowH);
+  var startIdx = G.cityListScroll;
+  var endIdx = Math.min(CITIES.length, startIdx + visibleRows*2);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(LX+8, LY+34, LW-16, LH-44);
+  ctx.clip();
+  var colW = (LW-32)/2;
+  for (var li = startIdx; li < endIdx; li++){
+    var c3 = CITIES[li];
+    var col = (li - startIdx) % 2;
+    var row = Math.floor((li - startIdx) / 2);
+    var rx = LX + 16 + col * colW;
+    var ry = LY + 42 + row * rowH;
+    var hov2 = G.menuHover && G.menuHover.id === c3.id;
+    var isFrom2 = G.menuFrom && G.menuFrom.id === c3.id;
+    var isTo2 = G.menuTo && G.menuTo.id === c3.id;
+    if (hov2){
+      ctx.fillStyle = 'rgba(255,255,255,0.055)';
+      roundRect(rx-3, ry-8, colW-4, 13, 4); ctx.fill();
+    }
+    ctx.textAlign = 'left';
+    ctx.font = (isFrom2 || isTo2 ? 'bold ' : '') + '10px system-ui,sans-serif';
+    ctx.fillStyle = isFrom2 ? '#6ec6ff' : (isTo2 ? '#ff9f5a' : (hov2 ? '#ffffff' : 'rgba(210,225,245,0.58)'));
+    ctx.fillText(c3.name, rx, ry);
+  }
+  ctx.restore();
+
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 11px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.fillText('Q 油门  A 刹车  ← → 转向  F 自动驾驶  V 视角  M 地图', W/2, H-14);
+}
+
+function drawFreeChoose(){
+  var t = Math.min(1, G.arrivedT / 0.5);
+  ctx.fillStyle = 'rgba(6,10,20,' + (0.80*t) + ')';
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = 'bold 16px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('到达', W/2, H*0.13);
+  ctx.font = 'bold 42px system-ui,sans-serif';
+  var g = ctx.createLinearGradient(0, H*0.13+16, 0, H*0.13+62);
+  g.addColorStop(0, '#ffe9a8');
+  g.addColorStop(1, '#ff9f5a');
+  ctx.fillStyle = g;
+  ctx.fillText(G.freeCity ? G.freeCity.name : '', W/2, H*0.13+54);
+  ctx.font = 'bold 13px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.42)';
+  ctx.fillText('选择要进入的公路', W/2, H*0.13+84);
+
+  var opts = G.freeOptions || [];
+  var cols = Math.min(3, opts.length);
+  var bw = 240, bh = 74;
+  var totalW = cols*bw + (cols-1)*16;
+  var startX = (W - totalW) / 2;
+  var startY = H*0.13 + 112;
+  for (var i = 0; i < opts.length; i++){
+    var o = opts[i];
+    var col = i % cols, row = Math.floor(i / cols);
+    var bx = startX + col * (bw+16);
+    var by = startY + row * (bh+14);
+    var hover = G.freeHoverIndex === i;
+    var bg2 = ctx.createLinearGradient(bx, by, bx, by+bh);
+    if (hover){ bg2.addColorStop(0, 'rgba(110,198,255,0.22)'); bg2.addColorStop(1, 'rgba(110,198,255,0.08)'); }
+    else { bg2.addColorStop(0, 'rgba(255,255,255,0.06)'); bg2.addColorStop(1, 'rgba(255,255,255,0.02)'); }
+    ctx.fillStyle = bg2;
+    roundRect(bx, by, bw, bh, 14); ctx.fill();
+    ctx.strokeStyle = hover ? 'rgba(110,198,255,0.7)' : 'rgba(255,255,255,0.10)';
+    ctx.lineWidth = hover ? 1.6 : 1;
+    roundRect(bx, by, bw, bh, 14); ctx.stroke();
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 11px system-ui,sans-serif';
+    ctx.fillStyle = hover ? '#6ec6ff' : 'rgba(255,255,255,0.35)';
+    ctx.fillText(o.highway, bx+18, by+24);
+    ctx.font = 'bold 20px system-ui,sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(o.name, bx+18, by+50);
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 12px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText(o.miles + ' 英里', bx+bw-18, by+50);
+    ctx.font = 'bold 10px system-ui,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.28)';
+    ctx.fillText(o.state, bx+bw-18, by+24);
+  }
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 11px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.fillText('点击卡片进入该公路', W/2, H-30);
+}
+
+function drawArrived(){
+  var t = Math.min(1, G.arrivedT / 0.8);
+  var ease = 1 - Math.pow(1-t, 3);
+  ctx.fillStyle = 'rgba(6,10,20,' + (0.78*ease) + ')';
+  ctx.fillRect(0, 0, W, H);
+  var cy = H*0.28*ease + 46;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.save();
+  ctx.font = 'bold 54px system-ui,sans-serif';
+  var g = ctx.createLinearGradient(0, cy-48, 0, cy+10);
+  g.addColorStop(0, '#ffe9a8');
+  g.addColorStop(1, '#ff9f5a');
+  ctx.fillStyle = g;
+  ctx.shadowColor = 'rgba(255,190,90,0.55)';
+  ctx.shadowBlur = 30;
+  ctx.fillText('抵达 ' + G.route.toCity.name, W/2, cy);
+  ctx.restore();
+  ctx.font = 'bold 14px system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(G.route.fromCity.name + '  →  ' + G.route.toCity.name, W/2, cy+44);
+  var pw = 440, ph = 170;
+  var px = W/2 - pw/2, py = H*0.46;
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  roundRect(px, py, pw, ph, 18); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.09)';
+  ctx.lineWidth = 1;
+  roundRect(px, py, pw, ph, 18); ctx.stroke();
+  var realMiles = G.route.totalMiles;
+  var modeName = G.driveMode === 'casual' ? '标准模式' : (G.driveMode === 'real' ? '真实模式' : '自由模式');
+  var rows = [
+    ['模式', modeName],
+    ['总里程', realMiles.toLocaleString() + ' 英里'],
+    ['途经路段', G.route.segments.length + ' 段'],
+    ['轨迹点数', G.trackPoints.length + ' 点']
+  ];
+  ctx.font = 'bold 14px system-ui,sans-serif';
+  for (var i = 0; i < rows.length; i++){
+    var ry = py + 34 + i * 30;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+    ctx.fillText(rows[i][0], px+36, ry);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(rows[i][1], px+pw-36, ry);
+  }
+  var pulse = 0.4 + Math.sin(G.time*3)*0.35;
+  ctx.globalAlpha = pulse * ease;
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 15px system-ui,sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('点击重新规划路线', W/2, H-60);
+  ctx.globalAlpha = 1;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  输入
+// ═══════════════════════════════════════════════════════════════
+function getMouse(e){
+  var r = cv.getBoundingClientRect();
+  return {x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H};
+}
+function screenToLat(clientX){
+  var r = cv.getBoundingClientRect();
+  var gx = (clientX - r.left) / r.width * W;
+  var s = FOCAL / 2.4;
+  var lat = (gx - W/2) / s - roadOffset(2.4) + G.camLat;
+  return clamp(lat, -WALL_LAT, WALL_LAT);
+}
+
+function handleMenuClick(mx, my){
+  var tb = timeButtonAt(mx, my);
+  if (tb){ G.startTime = tb.id; return; }
+  var mb = modeButtonAt(mx, my);
+  if (mb){ G.driveMode = mb.id; if (mb.id === 'free' && G.menuTo) G.menuTo = null; return; }
+
+  var LX = 626, LY = 336, LW = 302, LH = 220;
+  if (mx >= LX && mx <= LX+LW && my >= LY && my <= LY+LH){
+    var rowH = 15;
+    var visibleRows = Math.floor((LH-50)/rowH);
+    var startIdx = G.cityListScroll;
+    var endIdx = Math.min(CITIES.length, startIdx + visibleRows*2);
+    var colW = (LW-32)/2;
+    for (var li = startIdx; li < endIdx; li++){
+      var c = CITIES[li];
+      var col = (li - startIdx) % 2, row = Math.floor((li - startIdx) / 2);
+      var rx = LX + 16 + col * colW;
+      var ry = LY + 42 + row * rowH;
+      if (mx >= rx-4 && mx <= rx+colW-6 && my >= ry-9 && my <= ry+5){
+        selectCity(c); return;
+      }
+    }
+    return;
+  }
+  var st = menuStage();
+  if (st === 'ready'){
+    var IX = 30, IY = 428, IW = 560, IH = 128;
+    var bw = 150, bh = 52;
+    var bx = IX+IW-bw-20, by = IY+IH-bh-16;
+    if (mx >= bx && mx <= bx+bw && my >= by && my <= by+bh){ startGame(); return; }
+  }
+  var cm = cityAtPoint(mx, my);
+  if (cm){ selectCity(cm); return; }
+  if (my > MAP_Y && my < MAP_Y+MAP_H && mx > MAP_X && mx < MAP_X+MAP_W){
+    if (st === 'ready' || st === 'to'){ G.menuFrom = null; G.menuTo = null; }
+  }
+}
+function selectCity(c){
+  var st = menuStage();
+  if (st === 'from'){ G.menuFrom = c; G.menuTo = null; }
+  else if (st === 'to'){
+    if (G.menuFrom && G.menuFrom.id === c.id) return;
+    G.menuTo = c;
+  } else { G.menuFrom = c; G.menuTo = null; }
+}
+
+function startGame(){
+  if (!G.menuFrom) return;
+  if (G.driveMode === 'free'){
+    G.mode = 'free-choose';
+    G.freeCity = G.menuFrom;
+    G.arrivedT = 0; G.camZ = 0; G.speed = 0; G.throttle = 0; G.brake = 0;
+    G.lateralVel = 0; G.steerInput = 0; G.steerSmooth = 0;
+    G.playerLat = LANE_CENTERS[1]; G.playerLane = 1; G.targetLat = LANE_CENTERS[1]; G.camLat = LANE_CENTERS[1];
+    G.traffic = []; G.sceneries = []; G.signs = []; G.route = null;
+    G.fuel = 100; G.autoDrive = false; G.totalMilesDriven = 0;
+    G.nextTraffic = 90; G.nextScen = 25;
+    var nbrs = GRAPH[G.menuFrom.id] || [];
+    var opts = [];
+    for (var i = 0; i < nbrs.length; i++){
+      var n = nbrs[i];
+      var dest = CITY_MAP[n.to];
+      if (!dest) continue;
+      opts.push({id:n.to, name:dest.name, highway:n.name, miles:n.miles, state:dest.state});
+    }
+    G.freeOptions = opts;
+    G.freeHoverIndex = -1;
+    return;
+  }
+  if (!G.menuTo) return;
+  var from = G.menuFrom, to = G.menuTo;
+  var path = shortestPath(from.id, to.id);
+  if (!path || !path.length) return;
+  var route = buildRouteFromPath(path, from, to);
+  if (!route) return;
+  var signs = [];
+  var step = Math.max(300, route.totalWorld/12);
+  for (var z = 200; z < route.totalWorld - 150; z += step){
+    var seg = segAtWorld(route, z);
+    if (!seg) continue;
+    var targetCity = CITY_MAP[seg.to];
+    var segProgress = (z - seg.worldStart) / Math.max(1, seg.worldLen);
+    var remainMi = Math.max(0, Math.round(seg.miles * (1 - segProgress)));
+    signs.push({z: z, lat: Math.random() < 0.5 ? 14 : -14, city: targetCity, distMi: remainMi});
+  }
+  resetRun(route, signs);
+}
+function resetRun(route, signs){
+  G.mode = 'playing';
+  G.camZ = 0; G.speed = 0; G.throttle = 0; G.brake = 0;
+  G.lateralVel = 0; G.steerInput = 0; G.steerSmooth = 0;
+  G.bodyRoll = 0; G.bodyPitch = 0;
+  G.playerLane = 1;
+  G.playerLat = LANE_CENTERS[1]; G.targetLat = LANE_CENTERS[1]; G.camLat = LANE_CENTERS[1];
+  G.route = route; G.signs = signs;
+  G.traffic = []; G.sceneries = [];
+  G.nextTraffic = 90; G.nextScen = 25;
+  G.notif = {text:'出发 · ' + route.fromCity.name, t: 3.2};
+  G.shake = 0; G.arrivedT = 0; G.time = 0;
+  G.fuel = 100; G.totalMilesDriven = 0;
+  G.autoDrive = false; G.collisionCooldown = 0;
+  G.offRoadTime = 0; G.offRoadWarned = false;
+  G.hazardTimer = 0; G.stoppedTimer = 0;
+  G.fadeAlpha = 0.6;
+  G.blinkers = 0; G.blinkSide = 0;
+  G.exitZones = generateExitZones();
+  G.activeExit = null;
+  G.trackPoints = [];
+  G.autoState = {targetLane: 1, targetSpeed: 0, laneChangeCooldown: 0, targetGap: 0};
+}
+function enterFreeRoad(optIndex){
+  var o = G.freeOptions ? G.freeOptions[optIndex] : null;
+  if (!o) return;
+  var fromCity = G.freeCity;
+  var toCity = CITY_MAP[o.id];
+  if (!fromCity || !toCity) return;
+  var edge = {to:o.id, name:o.highway, miles:o.miles};
+  var route = buildFreeRoute(fromCity, edge, toCity);
+  if (!route) return;
+  var signs = [{z: route.totalWorld*0.42, lat:14, city:toCity, distMi:o.miles}];
+  resetRun(route, signs);
+}
+
+window.addEventListener('keydown', function(e){
+  keys[e.key] = true;
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].indexOf(e.key) >= 0) e.preventDefault();
+  if ((e.key === 'f' || e.key === 'F') && G.mode === 'playing'){
+    G.autoDrive = !G.autoDrive;
+    if (G.autoState){
+      G.autoState.targetLane = G.playerLane;
+      G.autoState.laneChangeCooldown = 1.0;
+    }
+    G.notif = {text: G.autoDrive ? '自动驾驶 已开启' : '手动驾驶', t: 1.8};
+  }
+  if ((e.key === 'v' || e.key === 'V') && G.mode === 'playing'){
+    G.viewIdx = (G.viewIdx + 1) % VIEW_MODES.length;
+    G.notif = {text: '视角 · ' + VIEW_MODES[G.viewIdx].name, t: 1.5};
+  }
+  if ((e.key === 'm' || e.key === 'M') && G.mode === 'playing'){
+    G.miniMapVisible = !G.miniMapVisible;
+  }
+  if (G.mode === 'arrived' && G.arrivedT > 0.8 && (e.key === ' ' || e.key === 'Enter')){
+    G.mode = 'menu'; G.menuFrom = null; G.menuTo = null;
+  }
+});
+window.addEventListener('keyup', function(e){ keys[e.key] = false; });
+
+cv.addEventListener('wheel', function(e){
+  if (G.mode === 'menu'){
+    var m = getMouse(e);
+    var LX = 626, LY = 336, LW = 302, LH = 220;
+    if (m.x >= LX && m.x <= LX+LW && m.y >= LY && m.y <= LY+LH){
+      var rowH = 15;
+      var visibleRows = Math.floor((LH-50)/rowH);
+      G.cityListScroll = clamp(G.cityListScroll + Math.sign(e.deltaY) * visibleRows, 0, Math.max(0, CITIES.length - visibleRows*2));
+      e.preventDefault();
+    }
+  }
+}, {passive: false});
+
+cv.addEventListener('pointerdown', function(e){
+  var m = getMouse(e);
+  if (G.mode === 'menu'){ handleMenuClick(m.x, m.y); return; }
+  if (G.mode === 'free-choose'){
+    if (G.arrivedT > 0.4){
+      var opts = G.freeOptions || [];
+      var cols = Math.min(3, opts.length);
+      var bw = 240, bh = 74;
+      var totalW = cols*bw + (cols-1)*16;
+      var startX = (W - totalW)/2;
+      var startY = H*0.13 + 112;
+      for (var i = 0; i < opts.length; i++){
+        var col = i % cols, row = Math.floor(i / cols);
+        var bx = startX + col * (bw+16);
+        var by = startY + row * (bh+14);
+        if (m.x >= bx && m.x <= bx+bw && m.y >= by && m.y <= by+bh){ enterFreeRoad(i); return; }
+      }
+    }
+    return;
+  }
+  if (G.mode === 'arrived'){
+    if (G.arrivedT > 0.8){ G.mode = 'menu'; G.menuFrom = null; G.menuTo = null; }
+    return;
+  }
+
+  var vx = W-270, vy = 20, vw = 250, vh = 34;
+  if (m.x >= vx && m.x <= vx+vw && m.y >= vy && m.y <= vy+vh){
+    var vi = Math.floor((m.x - vx - 5) / ((vw-10)/4));
+    if (vi >= 0 && vi < VIEW_MODES.length){ G.viewIdx = vi; return; }
+  }
+
+  if (e.button !== undefined && e.button !== 0) return;
+  dragging = true;
+  try { cv.setPointerCapture(e.pointerId); } catch(err){}
+  var lat = screenToLat(e.clientX);
+  G.targetLat = lat;
+  G.lateralVel = (G.targetLat - G.playerLat) * 2.5;
+  G.autoDrive = false;
+});
+cv.addEventListener('pointermove', function(e){
+  var m = getMouse(e);
+  if (G.mode === 'menu'){
+    G.menuHover = cityAtPoint(m.x, m.y);
+    G.modeHover = modeButtonAt(m.x, m.y);
+    G.timeHover = timeButtonAt(m.x, m.y);
+    return;
+  }
+  if (G.mode === 'free-choose'){
+    G.freeHoverIndex = -1;
+    var opts = G.freeOptions || [];
+    var cols = Math.min(3, opts.length);
+    var bw = 240, bh = 74;
+    var totalW = cols*bw + (cols-1)*16;
+    var startX = (W - totalW)/2;
+    var startY = H*0.13 + 112;
+    for (var i = 0; i < opts.length; i++){
+      var col = i % cols, row = Math.floor(i / cols);
+      var bx = startX + col * (bw+16);
+      var by = startY + row * (bh+14);
+      if (m.x >= bx && m.x <= bx+bw && m.y >= by && m.y <= by+bh){ G.freeHoverIndex = i; break; }
+    }
+    return;
+  }
+  if (!dragging || G.mode !== 'playing') return;
+  var lat = screenToLat(e.clientX);
+  G.targetLat = lat;
+  G.lateralVel = (G.targetLat - G.playerLat) * 3.5;
+  G.autoDrive = false;
+});
+cv.addEventListener('pointerup', function(e){
+  dragging = false;
+  try { if (cv.hasPointerCapture(e.pointerId)) cv.releasePointerCapture(e.pointerId); } catch(err){}
+});
+cv.addEventListener('pointercancel', function(){ dragging = false; });
+
+// ═══════════════════════════════════════════════════════════════
+//  主循环
+// ═══════════════════════════════════════════════════════════════
+var lastT = 0;
+function loop(t){
+  requestAnimationFrame(loop);
+  if (!lastT) lastT = t;
+  var dt = (t - lastT) / 1000;
+  lastT = t;
+  if (dt > 0.05) dt = 0.05;
+  if (dt <= 0) dt = 0.0001;
+  try {
+    update(dt);
+    render();
+  } catch(err){
+    console.error('Frame error:', err);
+  }
+}
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
