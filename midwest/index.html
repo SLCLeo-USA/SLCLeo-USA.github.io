@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美国中西部 · 深度图鉴 | Midwest States</title>
+<style>
+  :root {
+    --ground: #f5f5f7;
+    --surface: #ffffff;
+    --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed;
+    --radius-card: 18px;
+    --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #f5f5f7 0%, #e8ecf1 100%);
+    --table-stripe: #fafafa;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+  }
+
+  [data-theme="dark"] {
+    --ground: #000000;
+    --surface: #1c1c1e;
+    --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-tertiary: #636366;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.3);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8);
+    --hero-gradient: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+    --table-stripe: #2c2c2e;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-stack);
+    background: var(--ground);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: var(--nav-bg);
+    border-bottom: 0.5px solid var(--divider);
+    transition: background 0.4s ease;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 22px;
+    height: 52px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+  }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--accent); }
+  .nav-links { display: flex; gap: 3px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    text-decoration: none; padding: 5px 10px; border-radius: var(--radius-pill);
+    white-space: nowrap; transition: background 0.2s, color 0.2s;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  .theme-toggle {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 0.5px solid var(--divider); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all 0.25s ease;
+  }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+
+  .hero {
+    text-align: center; padding: 80px 22px 56px;
+    max-width: 860px; margin: 0 auto;
+    background: var(--hero-gradient); border-radius: 0 0 32px 32px;
+    transition: background 0.4s ease;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5.5vw, 54px); font-weight: 700;
+    letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 18px;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p {
+    font-size: clamp(15px, 2vw, 19px); color: var(--text-secondary);
+    max-width: 620px; margin: 0 auto 32px; line-height: 1.6;
+  }
+  .hero-stats { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong {
+    display: block; font-size: 28px; font-weight: 700;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .hero-stat span {
+    font-size: 11px; color: var(--text-tertiary); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .grid {
+    max-width: 1200px; margin: 0 auto; padding: 16px 22px 56px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    background: var(--surface); border-radius: var(--radius-card);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                background 0.4s ease;
+    cursor: pointer; position: relative;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+
+  .card-head {
+    padding: 24px 24px 0; display: flex;
+    align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .card-name { font-size: 20px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px;
+  }
+  .card-abbr {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 11px;
+    border-radius: var(--radius-pill); letter-spacing: 0.04em;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  .card-body { padding: 12px 24px 24px; }
+
+  .symbols { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+  .symbol-chip {
+    font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); border: 0.5px solid var(--divider);
+    padding: 4px 9px; border-radius: 6px; white-space: nowrap; line-height: 1.4;
+    transition: background 0.3s ease;
+  }
+  .symbol-chip b { font-weight: 600; color: var(--text-primary); }
+
+  .data-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 7px 14px; margin-bottom: 12px;
+  }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-tertiary);
+  }
+  .data-value {
+    font-size: 13.5px; font-weight: 600; color: var(--text-primary);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .data-value.green { color: var(--green); }
+  .data-value.orange { color: var(--orange); }
+  .data-value.red { color: var(--red); }
+
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 48px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+
+  .tags {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 0.5px solid var(--divider);
+  }
+  .tag {
+    font-size: 10.5px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); padding: 3px 9px;
+    border-radius: var(--radius-pill); letter-spacing: 0.01em;
+    transition: background 0.3s ease;
+  }
+
+  .card-detail {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.25,0.1,0.25,1),
+                padding 0.5s cubic-bezier(0.25,0.1,0.25,1);
+    padding: 0 24px; background: var(--surface-secondary);
+    transition: background 0.4s ease, max-height 0.5s ease, padding 0.5s ease;
+  }
+  .card.expanded .card-detail { max-height: 1600px; padding: 18px 24px 22px; }
+
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+
+  .detail-section { margin-bottom: 13px; }
+  .detail-section:last-child { margin-bottom: 0; }
+  .detail-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px;
+  }
+  .detail-text {
+    font-size: 12.5px; color: var(--text-secondary);
+    line-height: 1.62; letter-spacing: -0.005em;
+  }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+
+  .mini-table {
+    width: 100%; border-collapse: collapse; margin-top: 4px;
+    font-size: 12px; letter-spacing: -0.005em;
+  }
+  .mini-table td {
+    padding: 5px 7px; border-bottom: 0.5px solid var(--divider);
+    color: var(--text-secondary); vertical-align: top;
+  }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child {
+    color: var(--text-tertiary); font-weight: 500;
+    white-space: nowrap; width: 42%;
+  }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+
+  .expand-hint {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; padding: 9px 0 14px;
+    font-size: 11px; color: var(--text-tertiary);
+    font-weight: 500; transition: color 0.2s;
+  }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg {
+    width: 10px; height: 10px;
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+
+  .to-top {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 0.5px solid var(--divider);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    z-index: 200;
+  }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg {
+    width: 16px; height: 16px; stroke: var(--text-secondary);
+    stroke-width: 2.2; fill: none; transition: stroke 0.2s;
+  }
+
+  .footer {
+    text-align: center; padding: 48px 22px 72px;
+    font-size: 12px; color: var(--text-tertiary); line-height: 1.9;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer .copyright {
+    margin-top: 20px; padding-top: 16px;
+    border-top: 0.5px solid var(--divider);
+    font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; }
+    .card-head { padding: 20px 20px 0; }
+    .card-body { padding: 10px 20px 20px; }
+    .card-detail { padding: 0 20px; }
+    .card.expanded .card-detail { padding: 16px 20px 18px; }
+    .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; }
+    .hero-stats { gap: 24px; }
+    .data-grid { grid-template-columns: 1fr; gap: 5px; }
+    .nav-links a { font-size: 10.5px; padding: 4px 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 美国中西部<span> · 深度图鉴</span></div>
+    <div class="nav-links">
+      <a href="#card-il">IL</a>
+      <a href="#card-in">IN</a>
+      <a href="#card-mi">MI</a>
+      <a href="#card-oh">OH</a>
+      <a href="#card-wi">WI</a>
+      <a href="#card-ia">IA</a>
+      <a href="#card-ks">KS</a>
+      <a href="#card-mn">MN</a>
+      <a href="#card-mo">MO</a>
+      <a href="#card-ne">NE</a>
+      <a href="#card-nd">ND</a>
+      <a href="#card-sd">SD</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1>美国<em>中西部</em>十二州<br>全景深度图鉴</h1>
+  <p>伊利诺伊 · 印第安纳 · 密歇根 · 俄亥俄 · 威斯康星 · 艾奥瓦<br>堪萨斯 · 明尼苏达 · 密苏里 · 内布拉斯加 · 北达科他 · 南达科他</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>12</strong><span>州</span></div>
+    <div class="hero-stat"><strong>69.3M</strong><span>总人口</span></div>
+    <div class="hero-stat"><strong>$5.1T</strong><span>总 GDP</span></div>
+    <div class="hero-stat"><strong>99</strong><span>Fortune 500 总部</span></div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- ========== 伊利诺伊 ========== -->
+  <div class="card" id="card-il" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">伊利诺伊州<small>Illinois</small></div>
+      <div class="card-abbr">IL</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>蓝紫罗兰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~12,710,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$81,702</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$72,563</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">$1.23T</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">4.95% 统一</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">6.25% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">9.5%（全美最高之一）</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>28.3%</strong> · 严格管制州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 24 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Midlands</span><span class="tag">Great Lakes</span><span class="tag">草原之州</span><span class="tag">32 家 Fortune 500</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">
+          伊利诺伊是中西部经济总量最大的州，2025年 GDP 达 <strong>$1.23 万亿</strong>，较2019年增长超 <strong>$3000 亿</strong>。全州拥有 <strong>32 家 Fortune 500 总部</strong>，其中芝加哥独占 <strong>24 家</strong>，包括 Boeing（#34）、Caterpillar（#44）、UnitedHealth Group（#5，Minnetonka 为注册地但芝加哥设主要运营）、State Farm、CDW、Mondelez International、Illinois Tool Works 等。芝加哥为美国第二大金融中心（芝加哥期权交易所 CBOE、芝加哥商品交易所 CME），联邦储备银行第七区总部亦设于此。制造业、物流、农业（玉米、大豆）为传统支柱。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>4.95% 统一（州宪法限制统一税率）</td></tr>
+          <tr><td>企业所得税</td><td>9.5%（7.0% 标准 + 2.5% 替代税）</td></tr>
+          <tr><td>州销售税</td><td>6.25%（芝加哥合计约 10.25%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 2.07%，全美第二高</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">伊利诺伊企业所得税 <strong>9.5%</strong> 为全美最高之一，房产税有效税率 <strong>2.07%</strong> 仅次于新泽西。州养老金负债全美最严重之一，长期财政压力突出。2025年州长普利兹克宣布经济规模突破 <strong>$1.2 万亿</strong>，但人口持续外流（2020-2025年减少约 <strong>30 万</strong>）。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">伊利诺伊为<strong>严格管制州</strong>，2013年通过《枪支隐蔽携带法》（Firearm Concealed Carry Act），需申请许可证并完成16小时培训。2023年通过《保护伊利诺伊社区法》禁止攻击性武器销售。约 <strong>28.3%</strong> 成年人拥枪，低于全国平均。WalletHub 2025安全排名第 <strong>24 位</strong>，芝加哥部分南区/西区暴力犯罪率突出，但全州整体犯罪率呈下降趋势。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>芝加哥</strong>（千禧公园“豆子”、威利斯大厦、艺术博物馆、深盘披萨）为美国中西部文化之都。<strong>肖尼国家森林</strong>（伊利诺伊州最大国家森林，约 1,100 km²）位于南部。<strong>Starved Rock 州立公园</strong>以峡谷和瀑布闻名。<strong>66号公路</strong>起点位于芝加哥，是公路旅行文化圣地。密歇根湖畔的<strong>海军码头</strong>为夏季热门目的地。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>芝加哥奥黑尔国际机场（ORD）为全球起降架次最多的机场之一，联合航空与美航枢纽；中途国际机场（MDW）为西南航空重点机场。<br>
+          <strong>公路：</strong>I-90/94/55/57 在芝加哥交汇，I-74 连接中西部东西。<br>
+          <strong>铁路：</strong>芝加哥为 Amtrak 全国铁路网中心，California Zephyr、Empire Builder、Southwest Chief、Texas Eagle 等长距离线路均以此为起点。Borealis（圣保罗-芝加哥，2024年开通）两年内载客超 <strong>50 万</strong>。<br>
+          <strong>通勤：</strong>芝加哥 CTA 地铁（“L”）+ Metra 通勤铁路 + Pace 公交覆盖都会区。通勤时间中位数约 <strong>34 分钟</strong>，全美前列。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 印第安纳 ========== -->
+  <div class="card" id="card-in" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">印第安纳州<small>Indiana</small></div>
+      <div class="card-abbr">IN</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>牡丹</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~6,870,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$70,051</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$61,167</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$510B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">3.05% 统一</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">7.0%</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">4.9% 企业所得税</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>44.8%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 11 位</strong>（全美前列）</span></div>
+      <div class="tags">
+        <span class="tag">Midlands</span><span class="tag">Lower Midwest</span><span class="tag">胡希尔之州</span><span class="tag">赛车文化</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">印第安纳经济以<strong>制造业</strong>为绝对核心——汽车零部件、制药（Eli Lilly 总部印第安纳波利斯，全球市值最大制药公司之一）、医疗器械、航空发动机（Rolls-Royce 美国总部）。<strong>Elevance Health</strong>（前 Anthem，印第安纳波利斯）为 Fortune 500 第 51 位，营收超 <strong>$1,700 亿</strong>，为州内最大企业。州内拥有约 <strong>6 家</strong> Fortune 500 总部。农业（玉米、大豆、生猪）和物流（印第安纳波利斯为全美卡车运输枢纽）为传统产业。I-70 走廊连接堪萨斯城、圣路易斯、印第安纳波利斯和哥伦布，为中西部制造业物流战略网络。[reference:0]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>3.05% 统一（逐年递减中，目标 2.9%）</td></tr>
+          <tr><td>企业所得税</td><td>4.9%</td></tr>
+          <tr><td>州销售税</td><td><strong>7.0%</strong>（中西部最高，无地方附加）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 0.82%，有 1% 评估值上限（ homestead 等）</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">印第安纳销售税 <strong>7.0%</strong> 为中西部最高，销售税占州税收 <strong>42.0%</strong>，为州财政最大来源。个人所得税逐年递减，目标降至 <strong>2.9%</strong>。房产税有宪法性上限（1%-2%-3% 评估值），为中西部最具竞争力的房产税结构之一。[reference:1]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">印第安纳为<strong>宪法携带州</strong>（2022年 HEA 1296 生效），年满18岁无需许可即可携枪。约 <strong>44.8%</strong> 成年人拥枪，为中西部较高水平。WalletHub 2025安全排名<strong>全美第 11 位</strong>，暴力犯罪率低于全国平均，为中西部的“安全洼地”。印第安纳波利斯部分区域犯罪率较高，但郊区和农村地区安全水平突出。[reference:2]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>印第安纳沙丘国家公园</strong>沿密歇根湖岸 15 英里，拥有 50 英里步道，穿越沙丘、森林和湿地。[reference:3]<strong>印第安纳波利斯赛车场</strong>（Indianapolis Motor Speedway）为全球最大单日体育赛事 Indy 500 举办地。<strong>圣玛丽亚教堂</strong>（圣费迪南德）为法裔历史遗址。<strong>假日世界与飞溅水道</strong>为家庭主题公园。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>印第安纳波利斯国际机场（IND）为联邦快递第二大货运枢纽，年旅客约 1,000 万。<br>
+          <strong>公路：</strong>I-65 纵贯（芝加哥-印第安纳波利斯-路易斯维尔），I-70 横穿（圣路易斯-印第安纳波利斯-哥伦布），I-74 连接辛辛那提与皮奥里亚。<br>
+          <strong>铁路：</strong>Amtrak Cardinal（纽约-芝加哥）每周三班经停印第安纳波利斯，Hoosier State 已整合。<br>
+          <strong>通勤：</strong>印第安纳波利斯 IndyGo 公交覆盖有限，以汽车为主导。印第安纳波利斯近年推进 Bus Rapid Transit（Red Line）建设。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 密歇根 ========== -->
+  <div class="card" id="card-mi" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">密歇根州<small>Michigan</small></div>
+      <div class="card-abbr">MI</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>美洲知更鸟</b></span>
+        <span class="symbol-chip">🌸 <b>苹果花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~10,040,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$71,149</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$62,314</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$700B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">4.25% 统一</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">6.0%</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">6.0% 企业所得税</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>42.0%</strong> · 需背景审查 + 登记</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 25 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Great Lakes</span><span class="tag">Northwoods</span><span class="tag">汽车之州</span><span class="tag">五大湖海岸线最长</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">密歇根为<strong>全球汽车工业的诞生地</strong>——福特 T 型车在底特律下线，通用汽车（Detroit）、福特（Dearborn）、Stellantis 北美总部均在密歇根。三大车企合计雇佣数十万人。近年<strong>电动汽车与电池</strong>转型加速：福特 BlueOval City（田纳西）和 GM 的 Ultium Cells 电池工厂在密歇根和俄亥俄布局。密歇根拥有 <strong>19 家</strong> Fortune 500 总部，包括通用汽车（#17）、福特（#19）、Dow（#82）、Whirlpool（#179）等。医疗设备（Stryker）、农业（樱桃、蓝莓）和旅游业（五大湖、上半岛）为多元化支柱。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>4.25% 统一（2023年从 4.05% 上调）</td></tr>
+          <tr><td>企业所得税</td><td>6.0% 企业所得税</td></tr>
+          <tr><td>州销售税</td><td>6.0%（无地方附加）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.46%，有 Proposal A 限制评估值增长</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">密歇根个人所得税 <strong>4.25%</strong> 处于中西部中等偏低水平。房产税 <strong>1.46%</strong> 较高，但 Proposal A（1994）限制评估值年增幅不超过通胀率，长期保护房主。州财政对汽车产业周期敏感，2008-2009 年金融危机期间受冲击严重。[reference:4]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">密歇根为<strong>需背景审查 + 手枪登记州</strong>，购手枪需向当地警局登记。隐蔽携枪需申请许可证并完成培训。约 <strong>42.0%</strong> 成年人拥枪，为中西部较高水平。WalletHub 2025安全排名第 <strong>25 位</strong>。底特律部分区域犯罪率突出，但全州整体安全水平中等。2023年密歇根州立大学枪击案后，州议会通过“红旗法”和普遍背景审查法案。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>睡熊沙丘国家湖岸</strong>（Sleeping Bear Dunes）以密歇根湖岸的巨型沙丘闻名，可攀爬 450 英尺高的沙丘俯瞰湖景。[reference:5]<strong>麦基诺岛</strong>禁止机动车，以马车和自行车为交通工具，为维多利亚时代度假胜地。<strong>上半岛</strong>（UP）以苏必利尔湖、彩岩国家湖岸和芬兰裔文化闻名。<strong>底特律</strong>的汽车城复兴（福特皮奎特大道工厂、底特律艺术学院）为城市旅游新亮点。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>底特律都会韦恩县机场（DTW）为达美航空枢纽，年旅客超 3,500 万。<br>
+          <strong>公路：</strong>I-75 纵贯（底特律-弗林特-萨吉诺-麦基诺桥），I-94 连接底特律与芝加哥，I-96 连接底特律与兰辛/大急流城。<br>
+          <strong>铁路：</strong>Amtrak Wolverine（底特律-安娜堡-芝加哥，每日多班）、Blue Water（休伦港-芝加哥）、Pere Marquette（大急流城-芝加哥）。密歇根州获 <strong>$1.45 亿</strong>联邦资金用于客运铁路改善。[reference:6]<br>
+          <strong>通勤：</strong>底特律 QLINE 有轨电车（3.3 英里）连接市中心与新城。底特律公交（DDOT）和郊区 SMART 覆盖有限。通勤以汽车为主导。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 俄亥俄 ========== -->
+  <div class="card" id="card-oh" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">俄亥俄州<small>Ohio</small></div>
+      <div class="card-abbr">OH</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>猩红康乃馨</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~11,880,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$69,680</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$60,496</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$920B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">2.75%–3.5% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">5.75% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value green">无传统企业所得税 · 商业活动税（CAT）</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>32.4%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 26 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Midlands</span><span class="tag">Lower Midwest</span><span class="tag">七叶树之州</span><span class="tag">大选风向标</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">俄亥俄经济以<strong>制造业</strong>为传统支柱——汽车（本田在俄亥俄设有多家工厂，为州内最大制造业雇主之一）、航空（GE Aerospace 在辛辛那提为全球最大喷气发动机工厂之一）、钢铁和化工。<strong>医疗健康</strong>产业突出：<strong>Cleveland Clinic</strong>为全球顶级医疗机构，<strong>Cardinal Health</strong>（都柏林，Fortune 500 第 14 位，营收超 <strong>$2,200 亿</strong>）为全球最大医疗分销商之一。俄亥俄拥有 <strong>约 25 家</strong> Fortune 500 总部，包括 Procter & Gamble（#42，辛辛那提）、Kroger（#25，辛辛那提）、Cardinal Health、Nationwide（哥伦布）、Progressive（梅菲尔德村）。俄亥俄是<strong>美国政治的风向标州</strong>——几乎每次大选都准确预测获胜者。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>2.75%–3.5% 累进（2024年简化后）</td></tr>
+          <tr><td>企业所得税</td><td><strong>无传统企业所得税</strong>，征收商业活动税（CAT，总收入税 0.26%）</td></tr>
+          <tr><td>州销售税</td><td>5.75%（地方附加后合计约 7.0%–8.0%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.53%，有 10% 评估值减免</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">俄亥俄为全美<strong>唯一不征收传统企业所得税的州</strong>，取而代之的是<strong>商业活动税（Commercial Activity Tax, CAT）</strong>——对总收入征收 0.26% 的税，为中西部独特的税收结构。[reference:7]个人所得税为中西部最低之一。房产税 <strong>1.53%</strong> 较高，但 10% 评估值减免（rolling stock 豁免）提供一定缓解。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">俄亥俄为<strong>宪法携带州</strong>（2022年 SB 215 生效），年满21岁无需许可即可隐蔽携枪。约 <strong>32.4%</strong> 成年人拥枪。WalletHub 2025安全排名第 <strong>26 位</strong>。克利夫兰、哥伦布和辛辛那提的部分区域犯罪率较高，但郊区和农村地区安全水平中等偏上。俄亥俄州警（OSHP）在全州高速公路巡逻密度较高。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>Cuyahoga Valley 国家公园</strong>（克利夫兰-阿克伦之间）以俄亥俄-伊利运河遗迹和 Brandywine 瀑布闻名。<strong>Hocking Hills 州立公园</strong>以砂岩峡谷、洞穴和瀑布为特色，为俄亥俄最受欢迎的户外目的地之一。[reference:8]<strong>摇滚名人堂</strong>（克利夫兰）为全球音乐文化地标。<strong>职业橄榄球名人堂</strong>（坎顿）和<strong>美国空军国家博物馆</strong>（代顿）为历史与军事旅游胜地。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>克利夫兰霍普金斯国际机场（CLE）、哥伦布约翰·格伦国际机场（CMH）、辛辛那提/北肯塔基国际机场（CVG）为三大枢纽。<br>
+          <strong>公路：</strong>I-70 横穿（印第安纳波利斯-哥伦布-匹兹堡），I-75 纵贯（辛辛那提-代顿-托莱多-底特律），I-71 连接克利夫兰、哥伦布与辛辛那提，I-77 连接克利夫兰与阿克伦/坎顿。<br>
+          <strong>铁路：</strong>Amtrak Cardinal（纽约-芝加哥）每周三班经停辛辛那提、代顿和印第安纳波利斯。Amtrak Lake Shore Limited（芝加哥-纽约/波士顿）每日经停克利夫兰和托莱多。<br>
+          <strong>通勤：</strong>克利夫兰 RTA 轻轨 + 公交，辛辛那提 Metro 公交，哥伦布 COTA 公交。通勤以汽车为主导，哥伦布为全美增长最快的都会区之一。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 威斯康星 ========== -->
+  <div class="card" id="card-wi" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">威斯康星州<small>Wisconsin</small></div>
+      <div class="card-abbr">WI</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>美洲知更鸟</b></span>
+        <span class="symbol-chip">🌸 <b>林地紫罗兰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~5,950,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$75,670</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$64,158</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$420B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">3.54%–7.65% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">5.0% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">7.9% 企业所得税</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>44.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 18 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Northwoods</span><span class="tag">Upper Midwest</span><span class="tag">獾之州</span><span class="tag">奶酪与啤酒之乡</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">威斯康星经济以<strong>制造业</strong>（工业机械、食品加工、纸制品）和<strong>农业</strong>（乳制品——全美第一奶酪产量、啤酒花、蔓越莓）为传统支柱。<strong>保险业</strong>为金融核心：<strong>Northwestern Mutual</strong>（密尔沃基）为 Fortune 500 第 109 位，营收 <strong>$414 亿</strong>。[reference:9]<strong>医疗健康</strong>产业突出：Epic Systems（维罗纳）为全球最大电子病历系统供应商。威斯康星拥有 <strong>约 9 家</strong> Fortune 500 总部，包括 Northwestern Mutual、Kohler、Harley-Davidson（密尔沃基）、Rockwell Automation、ManpowerGroup 等。德国裔和北欧裔移民传统塑造了州的制造业伦理和合作社文化。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>3.54%–7.65% 累进</td></tr>
+          <tr><td>企业所得税</td><td>7.9%</td></tr>
+          <tr><td>州销售税</td><td>5.0%（密尔沃基县附加 0.9%，合计约 5.9%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.61%，全美较高</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">威斯康星个人所得税最高档 <strong>7.65%</strong> 为中西部较高水平，企业所得税 <strong>7.9%</strong> 亦偏高。房产税 <strong>1.61%</strong> 为中西部最高之一。州财政对制造业和农业周期敏感，近年因富士康项目（拉辛县）的争议和缩减，财政规划面临调整。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">威斯康星为<strong>宪法携带州</strong>（2011年 Act 35 生效），年满21岁无需许可即可隐蔽携枪。约 <strong>44.0%</strong> 成年人拥枪，为中西部较高水平。WalletHub 2025安全排名第 <strong>18 位</strong>。密尔沃基部分区域犯罪率较高，但全州整体安全水平中等偏上。威斯康星严重犯罪率在五大湖州中处于中等偏低水平。[reference:10]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>Apostle Islands 国家湖岸</strong>（苏必利尔湖）以海蚀洞和灯塔闻名，可划皮划艇探索。<strong>门县</strong>（Door County）为密歇根湖畔度假半岛，以樱桃园、灯塔和艺术社区著称。<strong>圣克罗伊国家风景河流</strong>（与明尼苏达交界）为独木舟和露营胜地。[reference:11]<strong>密尔沃基</strong>的哈雷戴维森博物馆、啤酒厂之旅（Miller、Pabst）和夏季音乐节（Summerfest）为文化亮点。<strong>威斯康星戴尔</strong>为水上乐园之都。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>密尔沃基米切尔国际机场（MKE）为最大机场，年旅客约 700 万。麦迪逊 Dane County 机场（MSN）为第二枢纽。<br>
+          <strong>公路：</strong>I-94 连接密尔沃基与芝加哥/麦迪逊/明尼阿波利斯，I-90 横穿南部，I-43 沿密歇根湖西岸连接密尔沃基与绿湾。<br>
+          <strong>铁路：</strong>Amtrak Hiawatha（密尔沃基-芝加哥，每日多班）、Empire Builder（芝加哥-西雅图/波特兰，经密尔沃基）、Borealis（圣保罗-芝加哥，经密尔沃基）。威斯康星获 <strong>$3800 万+</strong> 联邦资金用于客运铁路改善。[reference:12]<br>
+          <strong>通勤：</strong>密尔沃基 The Hop 有轨电车（2.1 英里）连接市中心与湖畔。密尔沃基县公交（MCTS）覆盖都会区。麦迪逊为全美自行车友好城市之一。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 艾奥瓦 ========== -->
+  <div class="card" id="card-ia" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">艾奥瓦州<small>Iowa</small></div>
+      <div class="card-abbr">IA</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>东部金翅雀</b></span>
+        <span class="symbol-chip">🌸 <b>野玫瑰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~3,240,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$73,147</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$62,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$277B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">3.8%–6.0% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">6.0% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">5.5%–8.4% 累进</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>42.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 12 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Midlands</span><span class="tag">Upper Midwest</span><span class="tag">鹰眼之州</span><span class="tag">总统初选第一州</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">艾奥瓦经济以<strong>农业</strong>为绝对核心——玉米（全美第一）、大豆、猪肉（全美第一）、鸡蛋和乙醇生产。农业机械（John Deere 在滑铁卢和得梅因设有工厂）和食品加工（Kellogg‘s、Cargill、Tyson）为制造业支柱。<strong>保险业</strong>为金融核心：<strong>Principal Financial Group</strong>（得梅因，Fortune 500 第 236 位）和 <strong>Nationwide</strong>（得梅因，注册地俄亥俄）为州内最大雇主之一。艾奥瓦拥有 <strong>约 2 家</strong> Fortune 500 总部。得梅因为全美保险业中心之一，联合太平洋铁路总部亦设于此。<strong>艾奥瓦每四年举办全美首个总统党团会议（Caucus）</strong>，赋予该州不成比例的政治影响力。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>3.8%–6.0% 累进（2025年简化）</td></tr>
+          <tr><td>企业所得税</td><td>5.5%–8.4% 累进</td></tr>
+          <tr><td>州销售税</td><td>6.0%（地方附加后合计约 7.0%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.57%，较高</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">艾奥瓦个人所得税近年持续简化，目标统一税率。销售税 <strong>6.0%</strong> 为中西部中等。房产税 <strong>1.57%</strong> 较高，为州内政治争议焦点。艾奥瓦对农业用地有特殊评估制度（productivity formula），降低农民实际税负。[reference:13]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">艾奥瓦为<strong>宪法携带州</strong>（2021年 HF 756 生效），年满21岁无需许可即可隐蔽携枪。约 <strong>42.0%</strong> 成年人拥枪。WalletHub 2025安全排名<strong>全美第 12 位</strong>，为中西部最安全的州之一。得梅因部分区域犯罪率较高，但全州农村地区安全水平突出，财产犯罪率低于全国平均。[reference:14]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>麦迪逊县廊桥</strong>（Bridges of Madison County）因同名小说和电影闻名，6 座历史廊桥保存完好。[reference:15]<strong>得梅因艺术中心</strong>和<strong>州议会大厦</strong>为建筑地标。<strong>密西西比河沿岸</strong>（Dubuque、Davenport）为河滨历史城镇。<strong>艾奥瓦州博览会</strong>（得梅因，8月）以黄油雕塑（Butter Cow）和农业展览为标志性文化符号。<strong>Loess Hills</strong>（黄土丘陵）为独特地质景观。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>得梅因国际机场（DSM）为最大机场。东艾奥瓦机场（CID，锡达拉皮兹）为第二枢纽。<br>
+          <strong>公路：</strong>I-80 横穿东西（得梅因-奥马哈-芝加哥），I-35 纵贯南北（得梅因-堪萨斯城-明尼阿波利斯），I-380 连接滑铁卢-锡达拉皮兹-艾奥瓦城。<br>
+          <strong>铁路：</strong>Amtrak California Zephyr（芝加哥-旧金山湾区）每日经停奥塔姆瓦、奥斯卡卢萨、克雷斯顿和奥马哈（内布拉斯加）。Amtrak Southwest Chief 经停东南部蒙茅斯和麦迪逊堡。芝加哥-四城（Quad Cities）客运铁路重启计划已获资金支持。[reference:16]<br>
+          <strong>通勤：</strong>得梅因 DART 公交覆盖有限，以汽车为主导。艾奥瓦城和锡达拉皮兹有有限公交。自行车道网络在得梅因和艾奥瓦城较为完善。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 堪萨斯 ========== -->
+  <div class="card" id="card-ks" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">堪萨斯州<small>Kansas</small></div>
+      <div class="card-abbr">KS</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>野生向日葵</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~2,970,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$72,639</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$63,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$230B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">3.1%–5.7% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">6.5% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">4.0% 企业所得税 + 3.0% 附加税</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>40.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 32 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Midlands</span><span class="tag">Southern Great Plains</span><span class="tag">向日葵之州</span><span class="tag">航空制造之都</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">堪萨斯经济以<strong>航空航天制造</strong>为标志性产业——<strong>威奇托</strong>被誉为“世界航空之都”，塞斯纳（Cessna）、比奇（Beechcraft）、庞巴迪 Learjet 和 Spirit AeroSystems（波音 737 机身主要供应商）均在此设厂。农业（小麦——全美第一、牛、高粱）和石油天然气为传统支柱。<strong>Garmin</strong>（奥拉西，GPS 导航设备）为州内最大科技企业。堪萨斯拥有 <strong>约 4 家</strong> Fortune 500 总部，包括 Seaboard（#237，猪肉加工）、Compass Minerals 等。威奇托的航空产业集群为中西部制造业核心节点之一。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>3.1%–5.7% 累进（2025年简化）</td></tr>
+          <tr><td>企业所得税</td><td>4.0% + 3.0% 附加税（合计 7.0%）</td></tr>
+          <tr><td>州销售税</td><td>6.5%（地方附加后合计约 8.0%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.41%，较高；州级房产税用于 K-12 教育</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">堪萨斯实行<strong>州级房产税</strong>用于 K-12 教育资金均等化，为中西部少数几个州级征收房产税的州之一。[reference:17]个人所得税和企业所得税近年持续简化。销售税 <strong>6.5%</strong> 加上地方附加后较高（威奇托合计约 7.5%）。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">堪萨斯为<strong>宪法携带州</strong>（2015年生效），年满21岁无需许可即可隐蔽携枪。约 <strong>40.0%</strong> 成年人拥枪。WalletHub 2025安全排名第 <strong>32 位</strong>。威奇托和堪萨斯城（堪萨斯州侧）部分区域犯罪率较高，但全州农村地区安全水平中等。堪萨斯高速公路（Kansas Turnpike）巡逻密度较高。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>威奇托</strong>的航空博物馆（Kansas Aviation Museum）和 Exploration Place 为航空文化地标。<strong>弗林特丘陵</strong>（Flint Hills）为北美现存最大的原生高草草原，风景驾车路线（Flint Hills Scenic Byway）为经典公路旅行。<strong>道奇城</strong>（Dodge City）为西部牛仔文化圣地（Boot Hill Museum）。<strong>纪念碑岩</strong>（Monument Rocks）为白垩纪地质奇观。<strong>堪萨斯城</strong>（堪萨斯州侧）以烧烤和赛车（Kansas Speedway）闻名。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>威奇托艾森豪威尔国家机场（ICT）为最大机场。堪萨斯城国际机场（MCI，密苏里州）服务堪萨斯城都会区。<br>
+          <strong>公路：</strong>I-70 横穿（堪萨斯城-托皮卡-海斯-丹佛），I-35 纵贯（威奇托-堪萨斯城-得梅因），I-135 连接威奇托与萨利纳。<br>
+          <strong>铁路：</strong>Amtrak Southwest Chief（芝加哥-洛杉矶）每日经停托皮卡、牛顿、哈钦森、道奇城和加登城。Amtrak Heartland Flyer 连接俄克拉荷马城与沃斯堡（经停堪萨斯州南部）。<br>
+          <strong>通勤：</strong>威奇托公交（Wichita Transit）覆盖有限，以汽车为主导。堪萨斯城都会区有 KCATA 公交和轻轨（KC Streetcar，2.2 英里）。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 明尼苏达 ========== -->
+  <div class="card" id="card-mn" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">明尼苏达州<small>Minnesota</small></div>
+      <div class="card-abbr">MN</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>普通潜鸟</b></span>
+        <span class="symbol-chip">🌸 <b>凤仙花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~5,800,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$87,556</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$74,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$480B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value red">5.35%–9.85% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">6.875% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">9.8% 企业所得税（全美最高之一）</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>40.0%</strong> · 需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 8 位</strong>（全美前十）</span></div>
+      <div class="tags">
+        <span class="tag">Northwoods</span><span class="tag">Upper Midwest</span><span class="tag">北星之州</span><span class="tag">15 家 Fortune 500</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">明尼苏达为中西部经济最多元化的州之一。<strong>医疗健康</strong>产业全球领先：<strong>UnitedHealth Group</strong>（Minnetonka，Fortune 500 <strong>第 5 位</strong>，营收超 <strong>$4,000 亿</strong>）、<strong>Mayo Clinic</strong>（罗切斯特，全球顶级医疗机构）、Medtronic（全球最大医疗器械公司，总部都柏林但运营中心在明尼阿波利斯）。<strong>零售业</strong>：Target（#33）、Best Buy（#78）总部均在明尼阿波利斯。明尼苏达拥有 <strong>15 家</strong> Fortune 500 总部，与亚特兰大并列全美都会区第 8 位。明尼阿波利斯-圣保罗“双城”为 Upper Midwest 文化、金融与交通中心。[reference:18]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>5.35%–9.85% 累进（全美较高）</td></tr>
+          <tr><td>企业所得税</td><td>9.8%（全美最高之一）</td></tr>
+          <tr><td>州销售税</td><td>6.875%（双城合计约 8.875%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.11%；州级商业房产税</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">明尼苏达以<strong>高税负、高福利</strong>为特征，个人所得税最高档 <strong>9.85%</strong> 为全美前列，企业所得税 <strong>9.8%</strong> 同样居前。州级房产税对商业和度假房产征收，用于州一般基金。[reference:19]但高税收换来了全美领先的公共服务——教育、医疗和基础设施质量均为中西部最优。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">明尼苏达为<strong>需许可携带州</strong>，隐蔽携枪需向县警局申请许可证。约 <strong>40.0%</strong> 成年人拥枪，为中西部中等水平。WalletHub 2025安全排名<strong>全美第 8 位</strong>，为最安全的州之一。明尼阿波利斯部分区域犯罪率较高，但双城郊区和全州农村地区安全水平突出。明尼苏达的“Minnesota Nice”文化强调社区和谐，对社会安全有正面影响。[reference:20]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>探险家国家公园</strong>（Voyageurs National Park，明尼苏达北部）以水上皮划艇和荒野露营闻名，名称源于18-19世纪法裔加拿大毛皮贸易者。[reference:21]<strong>边界水域独木舟区</strong>（Boundary Waters Canoe Area Wilderness）为全美最受欢迎的荒野保护区之一。<strong>双城</strong>（明尼阿波利斯-圣保罗）以剧院（Guthrie）、博物馆（沃克艺术中心）和音乐（First Avenue）为文化亮点。<strong>德卢斯</strong>（苏必利尔湖畔）为五大湖航运门户。<strong>罗切斯特</strong>的 Mayo Clinic 为医疗旅游胜地。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>明尼阿波利斯-圣保罗国际机场（MSP）为达美航空枢纽，年旅客超 <strong>3,800 万</strong>。<br>
+          <strong>公路：</strong>I-35 纵贯（双城-得梅因-堪萨斯城），I-94 连接双城与芝加哥/法戈，I-90 横穿南部。<br>
+          <strong>铁路：</strong>Amtrak Empire Builder（芝加哥-西雅图/波特兰）每日经停双城和圣克劳德。Amtrak Borealis（圣保罗-芝加哥，2024年5月开通）两年内载客超 <strong>50 万</strong>，与 Empire Builder 共同提供每日双向两班。[reference:22][reference:23]Northstar 通勤铁路连接双城与比格斯湖。<br>
+          <strong>通勤：</strong>双城 Metro Transit 公交 + 轻轨（蓝线、绿线）覆盖都会区。通勤时间中位数约 <strong>24 分钟</strong>，低于全美平均。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 密苏里 ========== -->
+  <div class="card" id="card-mo" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">密苏里州<small>Missouri</small></div>
+      <div class="card-abbr">MO</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>东蓝鸲</b></span>
+        <span class="symbol-chip">🌸 <b>山楂花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~6,200,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$68,920</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$59,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$430B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">2.0%–4.95% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">4.225% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">4.0% 企业所得税</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>48.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 38 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Midlands</span><span class="tag">Ozarks</span><span class="tag">索证之州</span><span class="tag">8 家 Fortune 500</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">密苏里经济以<strong>航空航天</strong>（圣路易斯为波音防务、SpaceX 和 Blue Origin 的重要制造基地）、<strong>汽车制造</strong>（堪萨斯城和圣路易斯的通用汽车和福特工厂）、<strong>农业</strong>（大豆、玉米、牛）和<strong>医疗健康</strong>为支柱。密苏里拥有 <strong>8 家</strong> Fortune 500 总部，包括 <strong>Centene</strong>（#26，圣路易斯，管理式医疗）、<strong>Emerson Electric</strong>（#181，圣路易斯，自动化设备）、<strong>Reinsurance Group of America</strong>（#245，Chesterfield）、<strong>Post Holdings</strong>（#477，圣路易斯）等。圣路易斯为美国向西扩张的门户（Gateway Arch 象征），堪萨斯城以爵士乐和烧烤闻名。[reference:24]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>2.0%–4.95% 累进（2025年简化）</td></tr>
+          <tr><td>企业所得税</td><td>4.0%</td></tr>
+          <tr><td>州销售税</td><td>4.225%（地方附加后合计约 7.0%–9.0%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 0.97%，中等</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">密苏里个人所得税和企业所得税在中西部处于较低水平，近年持续简化。销售税州级 <strong>4.225%</strong> 为中西部最低之一，但地方附加后合计较高。房产税 <strong>0.97%</strong> 为中西部中等偏低。州宪法要求平衡预算。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">密苏里为<strong>宪法携带州</strong>（2017年 SB 656 生效），年满19岁无需许可即可隐蔽携枪。约 <strong>48.0%</strong> 成年人拥枪，为中西部较高水平。WalletHub 2025安全排名第 <strong>38 位</strong>。圣路易斯和堪萨斯城部分区域暴力犯罪率突出，但全州农村地区安全水平中等。圣路易斯曾多年位列全美凶杀率最高城市之一。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>Gateway Arch 国家公园</strong>（圣路易斯）为美国最高国家纪念碑（630 英尺），可乘电车登顶俯瞰密西西比河。[reference:25]<strong>欧扎克国家风景河流</strong>（Ozark National Scenic Riverways）为密苏里南部露营、徒步和漂流胜地。[reference:26]<strong>Ste. Genevieve 国家历史公园</strong>为密苏里首个永久欧洲定居点（1750年建立），保留法式殖民建筑。[reference:27]<strong>布兰森</strong>（Branson）为乡村音乐表演之都。<strong>堪萨斯城</strong>以烧烤（Kansas City BBQ）和爵士乐（18th & Vine 区）闻名。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>圣路易斯兰伯特国际机场（STL）为最大机场。堪萨斯城国际机场（MCI）为第二枢纽，2023年启用新航站楼。<br>
+          <strong>公路：</strong>I-70 横穿（圣路易斯-堪萨斯城-丹佛），I-44 连接圣路易斯与塔尔萨/俄克拉荷马城，I-55 连接圣路易斯与芝加哥/孟菲斯，I-35 纵贯堪萨斯城。<br>
+          <strong>铁路：</strong>Amtrak Missouri River Runner（圣路易斯-堪萨斯城，每日两班）、Texas Eagle（芝加哥-圣安东尼奥，经圣路易斯）、Southwest Chief（芝加哥-洛杉矶，经堪萨斯城）。圣路易斯为 Amtrak 中西部枢纽之一。<br>
+          <strong>通勤：</strong>圣路易斯 MetroLink 轻轨（46 英里，红线+蓝线）连接机场、市中心和伊利诺伊州侧。堪萨斯城 KC Streetcar（2.2 英里）连接市中心与河市场。通勤以汽车为主导。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 内布拉斯加 ========== -->
+  <div class="card" id="card-ne" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">内布拉斯加州<small>Nebraska</small></div>
+      <div class="card-abbr">NE</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>秋麒麟草</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~2,000,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$74,985</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$65,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$170B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">2.46%–5.84% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">5.5% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">5.58%–5.84% 累进</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>38.6%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 15 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Midlands</span><span class="tag">Southern Great Plains</span><span class="tag">玉米壳之州</span><span class="tag">伯克希尔总部</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">内布拉斯加经济以<strong>农业</strong>（玉米、牛、大豆、猪肉）为绝对核心——农业和食品加工占州经济产出的重要份额。<strong>铁路与保险</strong>为奥马哈的支柱：<strong>Berkshire Hathaway</strong>（沃伦·巴菲特总部，Fortune 500 第 5 位，营收超 <strong>$3,700 亿</strong>）、<strong>Union Pacific</strong>（全美最大铁路公司，Fortune 500 第 138 位）、<strong>Kiewit</strong>（建筑与工程，Fortune 500 第 232 位）均总部设在奥马哈。内布拉斯加拥有 <strong>约 5 家</strong> Fortune 500 总部，奥马哈人均 Fortune 500 总部密度全美领先。内布拉斯加大学橄榄球队（Cornhuskers）为州级文化宗教。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>2.46%–5.84% 累进（2025年简化）</td></tr>
+          <tr><td>企业所得税</td><td>5.58%–5.84% 累进</td></tr>
+          <tr><td>州销售税</td><td>5.5%（地方附加后合计约 6.5%–7.0%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.61%，全美较高</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">内布拉斯加个人所得税和企业所得税近年持续简化，目标降低最高档。房产税 <strong>1.61%</strong> 较高，为州内政治争议焦点——农业用地评估值高但收入波动大，农民税负压力突出。州议会近年通过房产税减免法案，但结构性问题仍存。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">内布拉斯加为<strong>宪法携带州</strong>（2023年 LB 77 生效），年满21岁无需许可即可隐蔽携枪。约 <strong>38.6%</strong> 成年人拥枪。WalletHub 2025安全排名第 <strong>15 位</strong>，为中西部较安全的州之一。奥马哈部分区域犯罪率较高，但全州农村地区安全水平突出。内布拉斯加严重犯罪率在中西部处于中等偏低水平。[reference:28]</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>奥马哈</strong>的亨利·多利动物园（Henry Doorly Zoo）为全球顶级动物园之一。<strong>沙丘地区</strong>（Sandhills）覆盖全州四分之一，为北美最大原生草原之一，以观鸟和荒野驾车闻名。<strong>Scotts Bluff 国家纪念区</strong>为俄勒冈小径地标。<strong>Niobrara 国家风景河流</strong>为皮划艇和露营胜地。[reference:29]<strong>卡尼</strong>的 Archway 纪念碑为横贯大陆公路历史地标。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>奥马哈埃普利机场（OMA）为最大机场，年旅客约 500 万。<br>
+          <strong>公路：</strong>I-80 横穿（奥马哈-林肯-北普拉特-丹佛），I-29 沿密苏里河连接堪萨斯城与苏福尔斯，I-76 连接 I-80 与丹佛。<br>
+          <strong>铁路：</strong>Amtrak California Zephyr（芝加哥-旧金山湾区）每日经停奥马哈、林肯、黑斯廷斯和麦库克。联合太平洋铁路总部在奥马哈，为全美最大铁路公司。<br>
+          <strong>通勤：</strong>奥马哈 Metro 公交覆盖有限，以汽车为主导。林肯 StarTran 公交覆盖大学城。内布拉斯加无大型城市，通勤压力全美最低之一。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 北达科他 ========== -->
+  <div class="card" id="card-nd" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">北达科他州<small>North Dakota</small></div>
+      <div class="card-abbr">ND</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>野草原玫瑰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~800,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$75,949</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$70,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$75B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">1.95%–2.5% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">5.0% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value">1.41%–4.31% 累进</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>47.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 14 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Northwoods</span><span class="tag">Northern Great Plains</span><span class="tag">和平花园之州</span><span class="tag">巴肯页岩油</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">北达科他经济以<strong>石油</strong>为新兴支柱——<strong>巴肯页岩</strong>（Bakken Shale）开发使北达科他成为全美第二大产油州（仅次于得克萨斯），石油和天然气贡献州财政的重要份额。农业（小麦、向日葵、大麦、牛）和<strong>农业合作社</strong>（全美最密集）为传统支柱。北达科他拥有 <strong>约 1 家</strong> Fortune 500 总部（<strong>CHS Inc.</strong>，Inver Grove Heights，明尼苏达州注册但北达科他运营为农业合作社巨头）。法戈为最大城市和经济增长极，俾斯麦为州首府。州内人口密度极低（每平方公里不到 5 人）。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>1.95%–2.5% 累进（2025年大幅简化）</td></tr>
+          <tr><td>企业所得税</td><td>1.41%–4.31% 累进（全美最低之一）</td></tr>
+          <tr><td>州销售税</td><td>5.0%（地方附加后合计约 7.0%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 0.98%，中等</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">北达科他个人所得税和企业所得税近年<strong>大幅简化并降低</strong>，最高档仅 <strong>2.5%</strong>（个人）和 <strong>4.31%</strong>（企业），为中西部最低之一。石油收入注入州<strong>遗产基金</strong>（Legacy Fund），为长期财政储备。但油价波动对州预算影响显著。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">北达科他为<strong>宪法携带州</strong>（2017年生效），年满18岁无需许可即可隐蔽携枪。约 <strong>47.0%</strong> 成年人拥枪，为中西部较高水平。WalletHub 2025安全排名第 <strong>14 位</strong>，为较安全的州之一。法戈和俾斯麦犯罪率较低，农村地区安全水平突出。北达科他严重犯罪率全美最低之一。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>西奥多·罗斯福国家公园</strong>（俾斯麦以西约 209 公里）以恶地（Badlands）彩色岩层和野牛群闻名，1947年确立为国家古迹，1978年升级为国家公园，总面积 <strong>285 平方千米</strong>。[reference:30]<strong>彩绘峡谷</strong>（Painted Canyon）为公园最壮观观景点之一。[reference:31]<strong>法戈</strong>的 Plains Art Museum 和 Bonanzaville 为文化地标。<strong>国际和平花园</strong>（与加拿大曼尼托巴省交界）为跨境和平象征。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>法戈赫克托国际机场（FAR）为最大机场。俾斯麦市机场（BIS）为州首府枢纽。<br>
+          <strong>公路：</strong>I-94 横穿东西（法戈-俾斯麦-比林斯），I-29 纵贯南北沿红河（法戈-苏福尔斯-堪萨斯城）。<br>
+          <strong>铁路：</strong>Amtrak Empire Builder（芝加哥-西雅图/波特兰）每日经停法戈、大福克斯、德弗尔斯莱克和威利斯顿。<br>
+          <strong>通勤：</strong>法戈 MATBUS 公交覆盖有限，以汽车为主导。北达科他无大型城市，通勤压力全美最低之一。红河春季洪水为交通隐患。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 南达科他 ========== -->
+  <div class="card" id="card-sd" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">南达科他州<small>South Dakota</small></div>
+      <div class="card-abbr">SD</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>项环雉</b></span>
+        <span class="symbol-chip">🌸 <b>白头翁花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~920,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$72,421</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$66,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$70B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">4.2% + 地方</span></div>
+      </div>
+      <div class="info-row"><span class="label">企业税</span><span class="value green">无企业所得税</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>47.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 20 位</strong></span></div>
+      <div class="tags">
+        <span class="tag">Northern Great Plains</span><span class="tag">Frontier</span><span class="tag">拉什莫尔</span><span class="tag">无税天堂</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">南达科他经济以<strong>金融服务业</strong>为独特支柱——<strong>花旗银行</strong>（Citibank）在苏福尔斯设有大型信用卡运营中心，<strong>富国银行</strong>（Wells Fargo）亦在苏福尔斯有重要业务。南达科他<strong>无高利贷上限</strong>（usury cap），吸引信用卡和金融科技公司注册。农业（玉米、大豆、牛、猪肉）和旅游业（拉什莫尔山、恶地国家公园）为传统支柱。南达科他拥有 <strong>约 1 家</strong> Fortune 500 总部（<strong>Sanford Health</strong>，苏福尔斯，医疗系统，Fortune 500 排名约第 300 位）。苏福尔斯为全美金融后台运营中心之一。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td><strong>无</strong></td></tr>
+          <tr><td>企业所得税</td><td><strong>无</strong></td></tr>
+          <tr><td>州销售税</td><td>4.2%（中西部最低，地方附加后合计约 6.0%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.31%，中等偏高</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">南达科他<strong>无个人所得税和企业所得税</strong>，为全美仅有的两个同时无这两种税的州之一（另一个为怀俄明）。州财政高度依赖<strong>销售税</strong>（占州税收 <strong>80% 以上</strong>，为全美最高比例），且销售税基极广——对 <strong>152 种服务</strong>征税（2017年数据），中西部最多。[reference:32]销售税税率 <strong>4.2%</strong> 为全美最低之一，但税基广弥补了收入。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">南达科他为<strong>宪法携带州</strong>（2019年生效），年满18岁无需许可即可隐蔽携枪。约 <strong>47.0%</strong> 成年人拥枪，为中西部较高水平。WalletHub 2025安全排名第 <strong>20 位</strong>。苏福尔斯和拉皮德城犯罪率较低，农村地区安全水平突出。南达科他严重犯罪率全美最低之一。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text"><strong>拉什莫尔山国家纪念区</strong>（总统山）为美国最标志性纪念碑之一，四位总统头像雕刻于花岗岩山体。<strong>恶地国家公园</strong>（Badlands National Park）以彩色岩层、化石和星空闻名。[reference:33]<strong>疯马纪念山</strong>（Crazy Horse Memorial）为仍在雕刻中的巨型原住民英雄雕像，与拉什莫尔山形成历史叙事对照。<strong>黑山</strong>（Black Hills）为苏族神圣之地，提供徒步、露营和野生动物观赏。<strong>苏福尔斯</strong>的瀑布公园为城市地标。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>苏福尔斯地区机场（FSD）为最大机场，年旅客约 120 万。拉皮德城地区机场（RAP）为黑山门户。<br>
+          <strong>公路：</strong>I-90 横穿东西（苏福尔斯-拉皮德城-比林斯），I-29 纵贯东部（苏福尔斯-法戈-堪萨斯城），I-190 连接拉皮德城与拉什莫尔山。<br>
+          <strong>铁路：</strong>Amtrak Empire Builder（芝加哥-西雅图/波特兰）每日经停南达科他北部（苏福尔斯无 Amtrak 客运）。<br>
+          <strong>通勤：</strong>苏福尔斯公交（Sioux Area Metro）覆盖有限，以汽车为主导。南达科他无大型城市，通勤压力全美最低之一。冬季 I-90 和 I-29 因风雪频繁关闭。
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>美国中西部十二州 · 全景深度图鉴</p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Labor Statistics · WalletHub · Tax Foundation · CSG Midwest · Fortune · Amtrak</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">
+    SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved
+  </div>
+</footer>
+
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg>
+</div>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon(next);
+  }
+
+  function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    } else {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
+  }
+
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeIcon(saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      updateThemeIcon('dark');
+    }
+  })();
+
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('visible', window.scrollY > 600);
+  }, { passive: true });
+
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const offset = 64;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
