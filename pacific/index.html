@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美国太平洋沿岸 · 深度图鉴 | Pacific States</title>
+<style>
+  :root {
+    --ground: #f5f5f7;
+    --surface: #ffffff;
+    --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed;
+    --radius-card: 18px;
+    --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #f5f5f7 0%, #e8ecf1 100%);
+    --table-stripe: #fafafa;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+  }
+
+  [data-theme="dark"] {
+    --ground: #000000;
+    --surface: #1c1c1e;
+    --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-tertiary: #636366;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.3);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8);
+    --hero-gradient: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+    --table-stripe: #2c2c2e;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-stack);
+    background: var(--ground);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: var(--nav-bg);
+    border-bottom: 0.5px solid var(--divider);
+    transition: background 0.4s ease;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 22px;
+    height: 52px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+  }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--accent); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+    text-decoration: none; padding: 6px 12px; border-radius: var(--radius-pill);
+    white-space: nowrap; transition: background 0.2s, color 0.2s;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  .theme-toggle {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 0.5px solid var(--divider); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all 0.25s ease;
+  }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+
+  .hero {
+    text-align: center; padding: 80px 22px 56px;
+    max-width: 860px; margin: 0 auto;
+    background: var(--hero-gradient); border-radius: 0 0 32px 32px;
+    transition: background 0.4s ease;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 58px); font-weight: 700;
+    letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 18px;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p {
+    font-size: clamp(15px, 2vw, 19px); color: var(--text-secondary);
+    max-width: 620px; margin: 0 auto 32px; line-height: 1.6;
+  }
+  .hero-stats { display: flex; justify-content: center; gap: 44px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong {
+    display: block; font-size: 30px; font-weight: 700;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .hero-stat span {
+    font-size: 11px; color: var(--text-tertiary); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .grid {
+    max-width: 1200px; margin: 0 auto; padding: 16px 22px 56px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    background: var(--surface); border-radius: var(--radius-card);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                background 0.4s ease;
+    cursor: pointer; position: relative;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+
+  .card-head {
+    padding: 26px 26px 0; display: flex;
+    align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .card-name { font-size: 21px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px;
+  }
+  .card-abbr {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 11px;
+    border-radius: var(--radius-pill); letter-spacing: 0.04em;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  .card-body { padding: 14px 26px 26px; }
+
+  .symbols { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .symbol-chip {
+    font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); border: 0.5px solid var(--divider);
+    padding: 4px 10px; border-radius: 6px; white-space: nowrap; line-height: 1.4;
+    transition: background 0.3s ease;
+  }
+  .symbol-chip b { font-weight: 600; color: var(--text-primary); }
+
+  .data-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px 16px; margin-bottom: 14px;
+  }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-tertiary);
+  }
+  .data-value {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .data-value.green { color: var(--green); }
+  .data-value.orange { color: var(--orange); }
+  .data-value.red { color: var(--red); }
+
+  .info-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 13px; line-height: 1.55; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 52px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+
+  .tags {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: 14px; padding-top: 14px;
+    border-top: 0.5px solid var(--divider);
+  }
+  .tag {
+    font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); padding: 3px 10px;
+    border-radius: var(--radius-pill); letter-spacing: 0.01em;
+    transition: background 0.3s ease;
+  }
+
+  .card-detail {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.25,0.1,0.25,1),
+                padding 0.5s cubic-bezier(0.25,0.1,0.25,1);
+    padding: 0 26px; background: var(--surface-secondary);
+    transition: background 0.4s ease, max-height 0.5s ease, padding 0.5s ease;
+  }
+  .card.expanded .card-detail { max-height: 1600px; padding: 20px 26px 24px; }
+
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 16px; }
+
+  .detail-section { margin-bottom: 14px; }
+  .detail-section:last-child { margin-bottom: 0; }
+  .detail-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 5px;
+  }
+  .detail-text {
+    font-size: 13px; color: var(--text-secondary);
+    line-height: 1.65; letter-spacing: -0.005em;
+  }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+
+  .mini-table {
+    width: 100%; border-collapse: collapse; margin-top: 4px;
+    font-size: 12px; letter-spacing: -0.005em;
+  }
+  .mini-table td {
+    padding: 5px 8px; border-bottom: 0.5px solid var(--divider);
+    color: var(--text-secondary); vertical-align: top;
+  }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child {
+    color: var(--text-tertiary); font-weight: 500;
+    white-space: nowrap; width: 42%;
+  }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+
+  .expand-hint {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; padding: 10px 0 16px;
+    font-size: 11px; color: var(--text-tertiary);
+    font-weight: 500; transition: color 0.2s;
+  }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg {
+    width: 10px; height: 10px;
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+
+  .to-top {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 0.5px solid var(--divider);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    z-index: 200;
+  }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg {
+    width: 16px; height: 16px; stroke: var(--text-secondary);
+    stroke-width: 2.2; fill: none; transition: stroke 0.2s;
+  }
+
+  .footer {
+    text-align: center; padding: 48px 22px 72px;
+    font-size: 12px; color: var(--text-tertiary); line-height: 1.9;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer .copyright {
+    margin-top: 20px; padding-top: 16px;
+    border-top: 0.5px solid var(--divider);
+    font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; }
+    .card-head { padding: 22px 20px 0; }
+    .card-body { padding: 12px 20px 22px; }
+    .card-detail { padding: 0 20px; }
+    .card.expanded .card-detail { padding: 16px 20px 20px; }
+    .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; }
+    .hero-stats { gap: 28px; }
+    .data-grid { grid-template-columns: 1fr; gap: 6px; }
+    .nav-links a { font-size: 11px; padding: 5px 9px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 美国太平洋沿岸<span> · 深度图鉴</span></div>
+    <div class="nav-links">
+      <a href="#card-ca">加利福尼亚</a>
+      <a href="#card-or">俄勒冈</a>
+      <a href="#card-wa">华盛顿</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1>美国<em>太平洋沿岸</em>三州<br>全景深度图鉴</h1>
+  <p>加利福尼亚 · 俄勒冈 · 华盛顿</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>3</strong><span>州</span></div>
+    <div class="hero-stat"><strong>51.7M</strong><span>总人口</span></div>
+    <div class="hero-stat"><strong>$5.2T</strong><span>总 GDP</span></div>
+    <div class="hero-stat"><strong>3</strong><span>全球科技巨头总部</span></div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- ========== 加利福尼亚 ========== -->
+  <div class="card" id="card-ca" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">加利福尼亚州<small>California</small></div>
+      <div class="card-abbr">CA</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>加州鹌鹑</b></span>
+        <span class="symbol-chip">🌸 <b>加州罂粟</b></span>
+        <span class="symbol-chip">🐻 <b>加州灰熊</b></span>
+      </div>
+
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">~39,431,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$91,905</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$79,229</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$4.1T</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value red">1%–13.3% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">7.25% + 地方</span></div>
+      </div>
+
+      <div class="info-row"><span class="label">企业税</span><span class="value">8.84% 企业所得税</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>28.3%</strong> 成年人拥枪 · 全美最低之一 · 严格管制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 33 位</strong></span></div>
+
+      <div class="tags">
+        <span class="tag">Left Coast</span><span class="tag">SoCal / NorCal</span><span class="tag">金州</span><span class="tag">全球第五大经济体</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">
+          加利福尼亚若独立为国家，GDP 约 <strong>$4.1 万亿</strong>，为<strong>全球第五大经济体</strong>，仅次于美国、中国、德国、日本。加州拥有<strong>全美最多的 Fortune 500 总部</strong>（约 <strong>57 家</strong>），包括 Apple（#3）、Alphabet/Google（#8）、Chevron（#9）、Meta（#30）、Wells Fargo（#34）、Disney（#48）、Nvidia（#65）、Intel（#62）等。科技产业（硅谷）、娱乐产业（好莱坞）、农业（中央谷地，全美最大农业州）、国际贸易（洛杉矶/长滩港）和旅游业为五大支柱。硅谷风险投资占全美约 <strong>40%</strong>，纳斯达克市值前十大公司中多家总部在加州。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>1%–13.3% 累进（全美最高档）</td></tr>
+          <tr><td>企业所得税</td><td>8.84%（银行和金融企业 10.84%）</td></tr>
+          <tr><td>州销售税</td><td>7.25%（地方附加后最高达 10.75%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 0.75%（Prop 13 限制年增幅）</td></tr>
+          <tr><td>资本利得</td><td>按普通所得税率征税，最高 13.3%</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">加州以<strong>高税负、高福利</strong>为特征。个人所得税最高档 <strong>13.3%</strong> 为全美最高。Prop 13（1978）限制房产税年增幅不超过 2%，造成长期财政结构性问题。近年因人口外流和科技裁员，州财政面临压力。</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">加州为<strong>严格管制州</strong>，隐蔽携枪需向县警局申请并满足“正当理由”要求（2023年 SB 2 进一步收紧）。约 <strong>28.3%</strong> 成年人拥枪，为全美最低之一。WalletHub 2025安全排名第 <strong>33 位</strong>。旧金山和洛杉矶部分区域财产犯罪（尤其是砸车窗盗窃）突出，但暴力犯罪率低于全国平均。2025年加州总犯罪率较2024年下降约 <strong>5%</strong>。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text">
+          <strong>优胜美地国家公园</strong>（年游客约 400 万）以花岗岩悬崖和瀑布闻名。<strong>约书亚树国家公园</strong>为沙漠奇观。<strong>死亡谷国家公园</strong>为北美最低最热之地。<strong>金门大桥</strong>（旧金山）为全球最上镜桥梁之一。<strong>好莱坞</strong>与<strong>环球影城</strong>为娱乐朝圣地。<strong>迪士尼乐园</strong>（阿纳海姆）为全球第一座迪士尼。<strong>圣迭戈动物园</strong>为全球顶级动物园。<strong>纳帕谷</strong>与<strong>索诺玛</strong>为葡萄酒之乡。<strong>大苏尔</strong>（1号公路）为全球最美海岸公路之一。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>洛杉矶国际机场（LAX）为全球最繁忙机场之一，年旅客超 8,000 万。旧金山国际机场（SFO）、圣迭戈（SAN）、圣何塞（SJC）为区域枢纽。<br>
+          <strong>公路：</strong>I-5 纵贯南北（圣迭戈-洛杉矶-萨克拉门托-波特兰），I-80 连接旧金山与内华达，I-10 连接洛杉矶与凤凰城，I-15 连接圣迭戈与拉斯维加斯/盐湖城。加州高速公路系统全美最密集。<br>
+          <strong>铁路：</strong>Amtrak California Zephyr（旧金山-芝加哥）、Coast Starlight（西雅图-洛杉矶）、Pacific Surfliner（圣迭戈-圣路易斯奥比斯波）。加州高铁（在建）为美国首条真正高铁，连接旧金山与洛杉矶。<br>
+          <strong>通勤：</strong>洛杉矶地铁（Metro Rail + Bus）覆盖都会区，旧金山湾区捷运（BART）连接旧金山与东湾/半岛/机场。通勤时间中位数约 <strong>30 分钟</strong>，洛杉矶和旧金山通勤压力全美最大。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">文化与生活</div>
+        <div class="detail-text">
+          加州在 Woodard 的分区中属于 <strong>“Left Coast”</strong>——新英格兰移民带来的理想主义与西部边疆个人主义的混合。北加州（湾区）与南加州（洛杉矶）文化差异显著：前者为硅谷创新与环保进步主义，后者为好莱坞娱乐与汽车文化。中央谷地为农业腹地，政治倾向更保守。加州是“美国梦”的文化象征——淘金热、好莱坞、硅谷。In-N-Out 汉堡、墨西哥卷饼（Mission Burrito）、葡萄酒为标志性文化产品。海滩文化、冲浪、滑板为全球青年文化源头。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 俄勒冈 ========== -->
+  <div class="card" id="card-or" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">俄勒冈州<small>Oregon</small></div>
+      <div class="card-abbr">OR</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>俄勒冈葡萄</b></span>
+        <span class="symbol-chip">🦫 <b>海狸</b></span>
+      </div>
+
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">~4,270,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$80,000</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$63,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$320B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">4.75%–9.9% 累进</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value green">无</span></div>
+      </div>
+
+      <div class="info-row"><span class="label">企业税</span><span class="value">6.6%–7.6% 累进（最低 $25 万应税收入）</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>41.6%</strong> 成年人拥枪 · 需背景审查</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 35 位</strong></span></div>
+
+      <div class="tags">
+        <span class="tag">Left Coast</span><span class="tag">Cascadia</span><span class="tag">海狸之州</span><span class="tag">无销售税</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">
+          俄勒冈经济以<strong>科技</strong>（英特尔在希尔斯伯勒拥有全球最大园区之一）、<strong>林业</strong>（木材产品）、<strong>农业</strong>（黑莓、榛子、圣诞树、葡萄酒）和<strong>户外旅游</strong>为支柱。俄勒冈拥有 <strong>2 家 Fortune 500 总部</strong>：<strong>Nike</strong>（#88，全球最大运动品牌，总部比弗顿）和 <strong>Lithia Motors</strong>（#150，汽车零售）。<strong>Precision Castparts</strong>（伯克希尔哈撒韦子公司，航空航天零部件）为重要制造企业。波特兰为科技与创意产业中心，被称为“硅森林”（Silicon Forest）。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>4.75%–9.9% 累进</td></tr>
+          <tr><td>企业所得税</td><td>6.6%–7.6% 累进（最低 $25 万应税收入）</td></tr>
+          <tr><td>州销售税</td><td><strong>无</strong></td></tr>
+          <tr><td>房产税</td><td>有效税率约 0.93%，但评估值增长率受 Measure 50 限制</td></tr>
+          <tr><td>企业最低税</td><td>$150（低于 $100 万收入）</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">俄勒冈<strong>无销售税</strong>，为全美五个无销售税的州之一。州财政高度依赖个人所得税（占总收入约 <strong>70%</strong>），税基波动大。Measure 5（1990）和 Measure 50（1997）限制房产税增长，造成学校经费依赖州级拨款。</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">俄勒冈为<strong>需背景审查州</strong>，购枪需通过州警背景审查。2022年通过 <strong>Measure 114</strong>（要求隐蔽携枪许可和弹匣容量限制），但该法因法律挑战尚未完全生效。约 <strong>41.6%</strong> 成年人拥枪，高于全国平均。WalletHub 2025安全排名第 <strong>35 位</strong>。波特兰近年无家可归者危机和财产犯罪突出，但暴力犯罪率低于全国平均。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text">
+          <strong>火山口湖国家公园</strong>为美国最深湖泊（594 米），以深蓝色湖水闻名。<strong>胡德山</strong>为俄勒冈最高峰，全年滑雪。<strong>哥伦比亚河峡谷</strong>（Multnomah 瀑布）为壮丽峡谷景观。<strong>俄勒冈海岸</strong>（坎农海滩、海狮洞）为太平洋沿岸精华。<strong>波特兰</strong>以“Keep Portland Weird”为口号，微酿酒厂、独立书店和自行车文化闻名。<strong>本德</strong>为户外运动中心（攀岩、滑雪、精酿啤酒）。<strong>威拉米特谷</strong>为黑皮诺葡萄酒产区。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>波特兰国际机场（PDX）为最大机场，年旅客约 2,000 万。尤金（EUG）、本德（RDM）、梅德福（MFR）为区域机场。<br>
+          <strong>公路：</strong>I-5 纵贯南北（波特兰-塞勒姆-尤金-梅德福），I-84 沿哥伦比亚河连接波特兰与爱达荷，US-101 沿太平洋海岸。<br>
+          <strong>铁路：</strong>Amtrak Cascades（温哥华-西雅图-波特兰-尤金）、Coast Starlight（西雅图-洛杉矶）、Empire Builder（波特兰-芝加哥）。<br>
+          <strong>通勤：</strong>波特兰 TriMet 公交系统（MAX 轻轨 + 公交 + WES 通勤铁路）覆盖都会区，票价 $2.80。波特兰自行车基础设施全美领先。通勤时间中位数约 <strong>25 分钟</strong>。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">文化与生活</div>
+        <div class="detail-text">
+          俄勒冈与华盛顿共享 <strong>Cascadia</strong> 文化区域——环保主义、户外文化、对太平洋西北自然景观的深刻认同。波特兰以微酿啤酒（全美精酿啤酒之都）、独立咖啡文化和“另类”生活方式闻名。东部则更接近大盆地农牧文化。俄勒冈<strong>无销售税</strong>，但个人所得税较高，形成独特的财政文化。州民对户外活动的参与度全美领先——徒步、滑雪、皮划艇、露营为生活方式核心。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 华盛顿 ========== -->
+  <div class="card" id="card-wa" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">华盛顿州<small>Washington</small></div>
+      <div class="card-abbr">WA</div>
+    </div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>美洲金翅雀</b></span>
+        <span class="symbol-chip">🌸 <b>杜鹃花</b></span>
+        <span class="symbol-chip">🐟 <b>钢头鳟</b></span>
+      </div>
+
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">~7,960,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$90,000</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$75,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$800B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无（7% 资本利得税）</span></div>
+        <div class="data-item"><span class="data-label">销售税</span><span class="data-value">6.5% + 地方</span></div>
+      </div>
+
+      <div class="info-row"><span class="label">企业税</span><span class="value">B&O 税（总收入税 0.13%–1.75%）</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>34.5%</strong> 成年人拥枪 · 需背景审查 + 安全培训</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 22 位</strong></span></div>
+
+      <div class="tags">
+        <span class="tag">Left Coast</span><span class="tag">Cascadia</span><span class="tag">常青之州</span><span class="tag">科技双巨头总部</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+
+      <div class="detail-section">
+        <div class="detail-label">经济与企业</div>
+        <div class="detail-text">
+          华盛顿州经济以<strong>科技</strong>为绝对核心——<strong>Microsoft</strong>（雷德蒙德）和 <strong>Amazon</strong>（西雅图）为全球市值前五的公司，两家合计市值超 <strong>$6 万亿</strong>。华盛顿拥有 <strong>7 家 Fortune 500 总部</strong>：Amazon（#2）、Microsoft（#3）、Costco（#11）、Starbucks（#120）、Nordstrom（#275）、Expedia（#350）、Paccar（#160）。航空航天（波音在埃弗雷特和伦顿设有大型工厂，787 和 737 在此组装）、农业（苹果、樱桃、葡萄酒）、林业和国际贸易（西雅图-塔科马港）为传统支柱。西雅图地区人均专利数全美领先。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">税收与财政</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td><strong>无</strong>（2025年起征收 7% 资本利得税，最高档 9.9%）</td></tr>
+          <tr><td>企业所得税</td><td><strong>无</strong>传统所得税，征收 B&O 税（总收入税 0.13%–1.75%）</td></tr>
+          <tr><td>州销售税</td><td>6.5%（西雅图合计约 10.25%）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 0.84%</td></tr>
+          <tr><td>资本利得税</td><td>7%（超过 $27 万部分）</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:6px;">华盛顿<strong>无个人所得税</strong>，但征收 <strong>B&O 税（总收入税）</strong>——对企业总收入而非净利润征税，为全美独特的税收结构。2021年通过 <strong>7% 资本利得税</strong>（2025年州最高法院维持合宪），为州财政新增收入来源。销售税较高（西雅图 10.25% 为全美最高之一），形成<strong>累退税制</strong>（低收入者税负占比更高）。</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">安全与持枪</div>
+        <div class="detail-text">华盛顿为<strong>需背景审查 + 安全培训州</strong>，2018年通过 <strong>I-1639</strong> 法案，要求购枪者完成安全培训、提高购枪年龄至21岁、加强背景审查。约 <strong>34.5%</strong> 成年人拥枪，接近全国平均。WalletHub 2025安全排名第 <strong>22 位</strong>。西雅图部分区域财产犯罪和毒品问题突出，但整体暴力犯罪率低于全国平均。2025年州议会通过进一步限制攻击性武器销售的法案。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">旅游与景点</div>
+        <div class="detail-text">
+          <strong>雷尼尔山国家公园</strong>（4,392 米）为喀斯喀特山脉最高峰，以冰川和野花草地闻名。<strong>奥林匹克国家公园</strong>为 UNESCO 世界遗产，拥有温带雨林、海岸和雪山三种生态系统。<strong>北喀斯喀特国家公园</strong>为最原始的喀斯喀特山区。<strong>西雅图</strong>（太空针塔、派克市场、奇胡利玻璃艺术园）为太平洋西北文化中心。<strong>圣胡安群岛</strong>为观鲸和皮划艇胜地。<strong>莱文沃思</strong>为巴伐利亚风格小镇。<strong>哥伦比亚河峡谷</strong>（与俄勒冈共享）为壮丽峡谷。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">交通与通勤</div>
+        <div class="detail-text">
+          <strong>航空：</strong>西雅图-塔科马国际机场（SEA）为阿拉斯加航空枢纽，年旅客超 5,000 万。斯波坎国际机场（GEG）为东部枢纽。<br>
+          <strong>公路：</strong>I-5 纵贯南北（西雅图-塔科马-奥林匹亚-波特兰），I-90 横穿东西连接西雅图与斯波坎，I-82 连接雅基马与三城。<br>
+          <strong>铁路：</strong>Amtrak Cascades（温哥华-西雅图-波特兰-尤金）、Coast Starlight（西雅图-洛杉矶）、Empire Builder（西雅图-芝加哥）。Sounder 通勤铁路连接西雅图与塔科马/埃弗雷特。<br>
+          <strong>通勤：</strong>西雅图 Link 轻轨（1号线、2号线延伸中）连接机场、市中心和东区。华盛顿州渡轮系统为全美最大渡轮网络，连接普吉特海湾岛屿。通勤时间中位数约 <strong>28 分钟</strong>，西雅图早晚高峰 I-5 拥堵严重。
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">文化与生活</div>
+        <div class="detail-text">
+          华盛顿州与俄勒冈共享 <strong>Cascadia</strong> 文化区域，但西雅图的大都会科技文化更为突出。微软和亚马逊的总部塑造了东区的科技精英文化。东部（斯波坎、雅基马）更接近农牧与军事文化。星巴克诞生于西雅图派克市场（1971年），咖啡文化深入城市肌理。西雅图以音乐文化闻名——Nirvana、Pearl Jam、Soundgarden 引领的 grunge 摇滚运动在1990年代改变全球音乐。波音工厂（埃弗雷特）为全球最大建筑之一。州民对户外活动的参与度极高——徒步、滑雪、皮划艇、露营为生活方式核心。
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>美国太平洋沿岸三州 · 全景深度图鉴</p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Labor Statistics · WalletHub · Tax Foundation · Fortune</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">
+    SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved
+  </div>
+</footer>
+
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg>
+</div>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon(next);
+  }
+
+  function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    } else {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
+  }
+
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeIcon(saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      updateThemeIcon('dark');
+    }
+  })();
+
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('visible', window.scrollY > 600);
+  }, { passive: true });
+
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const offset = 64;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
