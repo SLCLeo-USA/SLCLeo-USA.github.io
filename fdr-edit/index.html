@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDR 生成器 · 飞行数据条带图</title>
+<style>
+  :root{
+    --bg:#eef2f9; --bg-2:#f7faff; --card:#ffffff;
+    --ink:#16202e; --muted:#6b7a90; --line:#e2e8f2;
+    --accent:#1f6feb; --accent-soft:#e8f1ff; --danger:#e5484d;
+    --alarm:#e5484d; --alarm-soft:rgba(229,72,77,0.14);
+    --tag:#f59e0b; --tag-soft:rgba(245,158,11,0.18);
+    --radius:8px; --radius-sm:6px;
+    --shadow:0 2px 8px rgba(20,40,80,.05);
+  }
+  body.dark{
+    --bg:#0a0e15; --bg-2:#0f1620; --card:#151c26;
+    --ink:#e6edf5; --muted:#7f92aa; --line:#242e3d;
+    --accent:#4aa3ff; --accent-soft:#1a2740; --danger:#ff6b6b;
+    --alarm:#ff5555; --alarm-soft:rgba(255,80,80,0.18);
+    --tag:#fbbf24; --tag-soft:rgba(251,191,36,0.22);
+    --shadow:0 2px 10px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    font-size:13.5px; -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; overflow:hidden;
+    transition:background .2s, color .2s;
+  }
+
+  /* ============ 顶栏 ============ */
+  .topbar{
+    flex-shrink:0; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 18px; gap:14px;
+    background:var(--card); border-bottom:1px solid var(--line);
+    position:relative; z-index:60;
+  }
+  .brand{display:flex; align-items:center; gap:10px}
+  .logo{
+    width:34px;height:34px;border-radius:var(--radius-sm);flex:none;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#1f6feb,#4aa3ff);
+    color:#fff;font-weight:800;font-size:11.5px;letter-spacing:.5px;
+    box-shadow:0 4px 12px rgba(31,111,235,.28);
+  }
+  .brand h1{margin:0;font-size:14.5px;font-weight:700;letter-spacing:.2px}
+  .badge{
+    font-size:10.5px; font-weight:600; color:var(--accent);
+    background:var(--accent-soft); padding:3px 8px; border-radius:20px;
+  }
+  .actions{display:flex;flex-wrap:wrap;gap:6px}
+
+  .btn{
+    appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;
+    cursor:pointer; transition:.12s; font-family:inherit;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .btn:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.1);background:var(--accent);color:#fff}
+  .btn.ghost-danger:hover{color:var(--danger);border-color:var(--danger);background:transparent}
+  .btn.icon{padding:6px 9px;font-size:13px;line-height:1}
+  .btn.guide{
+    background:linear-gradient(135deg,#1f6feb,#4aa3ff);
+    color:#fff; border-color:transparent;
+    box-shadow:0 3px 10px rgba(31,111,235,.3);
+  }
+  .btn.guide:hover{filter:brightness(1.08); background:linear-gradient(135deg,#1f6feb,#4aa3ff); color:#fff}
+
+  /* ============ 主体 ============ */
+  .app{flex:1; min-height:0; display:flex;}
+
+  /* ============ 侧边栏 ============ */
+  .sidebar{
+    width:420px; flex-shrink:0;
+    display:flex; flex-direction:column;
+    background:var(--bg);
+    border-right:1px solid var(--line);
+    overflow:hidden;
+  }
+  .sidebar-scroll{
+    flex:1; overflow-y:auto; padding:12px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .sidebar-scroll::-webkit-scrollbar{width:8px}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px 14px; box-shadow:var(--shadow);
+  }
+  .card-title{
+    margin:0 0 10px; font-size:10.5px; font-weight:700; letter-spacing:1.4px;
+    text-transform:uppercase; color:var(--muted);
+    display:flex; align-items:center; gap:8px;
+  }
+  .card-title::after{content:""; flex:1; height:1px; background:var(--line)}
+
+  .meta-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px 10px}
+  .meta-grid label{display:flex; flex-direction:column; gap:3px}
+  .meta-grid label.wide{grid-column:1/-1}
+  .meta-grid span{font-size:10.5px; color:var(--muted); font-weight:600}
+  input[type=text],input[type=date],input[type=number]{
+    font-family:inherit; font-size:12px; color:var(--ink);
+    background:var(--bg-2); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:6px 9px; width:100%; transition:.15s;
+  }
+  input:focus{outline:none; border-color:var(--accent); background:var(--card); box-shadow:0 0 0 2px var(--accent-soft)}
+  input::placeholder{color:var(--muted); opacity:.6}
+
+  .tl-row{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+  .tl-row label{display:flex; flex-direction:column; gap:3px}
+  .tl-row span{font-size:10.5px; color:var(--muted); font-weight:600}
+
+  .cursor-box{
+    margin-top:8px; padding:10px 12px; border-radius:var(--radius-sm);
+    background:var(--accent-soft); border:1px solid var(--line);
+  }
+  .cursor-main{display:flex; align-items:center; justify-content:space-between; gap:8px}
+  .cursor-info .lbl{
+    font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.6px;
+    text-transform:uppercase;
+  }
+  .cursor-info .time{
+    font-family:"SF Mono",Consolas,monospace; font-size:18px; font-weight:700;
+    color:var(--accent); letter-spacing:.5px;
+  }
+  .cursor-info .pt{
+    font-size:10.5px; color:var(--muted); font-family:"SF Mono",Consolas,monospace;
+    margin-top:1px;
+  }
+  .nav-btns{display:flex; gap:4px}
+  .nav-btn{
+    width:30px; height:30px; border-radius:6px; flex:none;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    font-size:12px; font-weight:700; line-height:1;
+    display:grid; place-items:center; cursor:pointer;
+    transition:.12s; font-family:inherit; padding:0;
+  }
+  .nav-btn:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-soft)}
+  .nav-btn:active{transform:scale(.94)}
+  .nav-btn.play{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .nav-btn.play:hover{filter:brightness(1.1)}
+
+  .alarm-bar{
+    margin-top:8px; padding:6px 10px; border-radius:6px;
+    font-size:11px; font-weight:600; letter-spacing:.2px;
+    display:none; align-items:center; gap:6px;
+    border:1px solid var(--danger);
+    background:var(--alarm-soft); color:var(--danger);
+  }
+  .alarm-bar.show{display:flex}
+  .alarm-bar .pulse{
+    width:7px; height:7px; border-radius:50%; background:var(--danger);
+    animation:pulse 1.2s ease-in-out infinite; flex:none;
+  }
+  @keyframes pulse{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.4; transform:scale(.7)}}
+
+  .tag-list{display:flex; flex-direction:column; gap:5px; margin-bottom:8px}
+  .tag-empty{
+    font-size:11px; color:var(--muted); text-align:center;
+    padding:10px 0; background:var(--bg-2); border-radius:var(--radius-sm);
+    border:1px dashed var(--line);
+  }
+  .tag-row{
+    display:grid;
+    grid-template-columns:70px minmax(0,1fr) 24px;
+    gap:6px; align-items:center;
+  }
+  .tag-row input{
+    font-family:"SF Mono",Consolas,monospace; font-size:11.5px;
+    padding:5px 7px;
+  }
+  .tag-row input.tag-time{text-align:right}
+  .tag-row input.tag-text{font-family:inherit; font-size:12px}
+  .tag-del{
+    width:24px;height:24px;border-radius:5px;
+    border:1px solid var(--line);background:var(--card);color:var(--muted);
+    cursor:pointer;font-size:11px;display:grid;place-items:center;
+    transition:.12s;padding:0;font-family:inherit;
+  }
+  .tag-del:hover{color:var(--danger);border-color:var(--danger)}
+  .tag-add{
+    width:100%;padding:7px;border-radius:var(--radius-sm);
+    border:1px dashed var(--line);background:transparent;color:var(--muted);
+    font-size:11.5px;font-weight:600;cursor:pointer;
+    font-family:inherit;transition:.12s;
+  }
+  .tag-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+  .param-list{display:flex; flex-direction:column; gap:2px}
+  .group-block{margin-bottom:4px}
+  .group-block:last-child{margin-bottom:0}
+  .group-hd{
+    display:flex; align-items:center; gap:6px;
+    padding:6px 8px; margin-bottom:3px;
+    background:var(--accent-soft);
+    border-left:3px solid var(--accent); border-radius:var(--radius-sm);
+  }
+  .group-hd .g-name{
+    flex:1; font-weight:700; font-size:11.5px; color:var(--accent);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .group-hd .g-count{
+    font-size:10px; color:var(--muted); background:var(--card);
+    border:1px solid var(--line); border-radius:20px; padding:1px 7px;
+  }
+  .group-toggle{
+    width:22px;height:22px;border-radius:5px;cursor:pointer;flex:none;
+    border:1px solid var(--line);background:var(--card);color:var(--muted);
+    font-size:11px;display:grid;place-items:center;transition:.12s;
+    padding:0;font-family:inherit;
+  }
+  .group-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  .group-toggle.locked{opacity:.4;cursor:not-allowed}
+  .group-toggle.locked:hover{border-color:var(--line);color:var(--muted)}
+
+  .param-row{
+    display:grid;
+    grid-template-columns:12px 16px minmax(0,1fr) 96px 40px;
+    gap:5px; align-items:center;
+    padding:3px 5px; border-radius:var(--radius-sm);
+    transition:.12s;
+  }
+  .param-row:hover{background:var(--bg-2)}
+  .param-row.hi{background:var(--accent-soft); box-shadow:inset 0 0 0 1px var(--accent)}
+  .param-row .swatch{
+    width:10px; height:10px; border-radius:2px; cursor:pointer; transition:.15s;
+  }
+  .param-row .swatch:hover{transform:scale(1.25)}
+  .param-row .swatch.off{opacity:.18}
+  .param-row input[type=checkbox]{
+    width:13px; height:13px; accent-color:var(--accent); cursor:pointer; margin:0;
+  }
+  .param-row .p-name{
+    font-size:12px; font-weight:500; color:var(--ink);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .param-row .p-value{
+    font-family:"SF Mono",Consolas,monospace; font-weight:600; font-size:11.5px;
+    color:var(--accent);
+    background:var(--bg-2); border:1px solid var(--line); border-radius:5px;
+    padding:4px 7px; width:100%; text-align:right;
+    transition:.15s;
+  }
+  .param-row .p-value:focus{
+    outline:none; border-color:var(--accent); background:var(--card);
+    box-shadow:0 0 0 2px var(--accent-soft);
+  }
+  .param-row .p-select{
+    font-family:inherit; font-size:11px; font-weight:600;
+    color:var(--accent);
+    background:var(--bg-2); border:1px solid var(--line); border-radius:5px;
+    padding:3px 4px; width:100%; text-align:center;
+    cursor:pointer; transition:.15s;
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 7 4'><path d='M0 0l3.5 4 3.5-4z' fill='%236b7a90'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 4px center;
+    padding-right:14px;
+  }
+  .param-row .p-select:focus{
+    outline:none; border-color:var(--accent);
+    box-shadow:0 0 0 2px var(--accent-soft);
+  }
+  .param-row .p-unit{
+    font-family:"SF Mono",Consolas,monospace; font-size:10px; color:var(--muted);
+    text-align:center; white-space:nowrap; overflow:hidden;
+  }
+
+  /* ============ 图表面板 ============ */
+  .chart-panel{
+    flex:1; display:flex; flex-direction:column;
+    min-width:0; background:var(--card);
+    position:relative;
+  }
+  .chart-head{
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:8px 16px 6px;
+    flex-wrap:wrap;
+  }
+  .chart-head h2{
+    margin:0; font-size:12.5px; font-weight:700; color:var(--accent);
+    display:flex; align-items:center; gap:7px; letter-spacing:.2px;
+  }
+  .chart-head h2::before{
+    content:""; width:3px; height:13px; border-radius:2px; background:var(--accent);
+  }
+  .head-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+
+  .zoom-group{display:flex; align-items:center; gap:5px}
+  .zoom-group .zg-label{
+    font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.6px;
+    text-transform:uppercase;
+  }
+  .zoom-controls{
+    display:flex; align-items:center; gap:2px;
+    background:var(--bg-2); border:1px solid var(--line);
+    border-radius:var(--radius-sm); padding:2px;
+  }
+  .zoom-btn{
+    height:22px; border:none; background:transparent; cursor:pointer;
+    color:var(--muted); font-size:13px; font-weight:700; line-height:1;
+    border-radius:4px; display:grid; place-items:center;
+    transition:.12s; font-family:inherit; padding:0; min-width:24px;
+  }
+  .zoom-btn:hover{background:var(--accent-soft); color:var(--accent)}
+  .zoom-btn.text{font-size:10.5px; padding:0 7px; letter-spacing:.3px}
+  .zoom-btn.active{background:var(--accent); color:#fff}
+  .zoom-level{
+    font-family:"SF Mono",Consolas,monospace; font-size:10px;
+    color:var(--muted); min-width:34px; text-align:center;
+  }
+
+  .ruler-wrap{
+    flex-shrink:0; height:36px;
+    position:relative; z-index:5;
+    background:var(--card); border-bottom:1px solid var(--line);
+  }
+  #ruler{display:block; width:100%; height:36px}
+
+  .chart-scroll{
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    position:relative; background:var(--card);
+  }
+  .chart-scroll::-webkit-scrollbar{width:10px}
+  .chart-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;border:2px solid var(--card)}
+  #chart{display:block; width:100%; user-select:none; touch-action:none}
+
+  .inline-editor{
+    position:fixed;
+    z-index:150;
+    font-family:"SF Mono",Consolas,monospace;
+    font-size:12px; font-weight:600;
+    color:var(--accent);
+    background:var(--card);
+    border:2px solid var(--accent);
+    border-radius:5px;
+    padding:0 6px;
+    text-align:right;
+    outline:none;
+    box-shadow:0 4px 14px rgba(31,111,235,.3);
+    transition:none;
+  }
+  .inline-editor.select-mode{
+    font-family:inherit; text-align:center;
+    padding:0; cursor:pointer;
+  }
+
+  .credit{
+    position:absolute; right:16px; bottom:10px;
+    font-family:"SF Mono",Consolas,monospace;
+    font-size:10px; letter-spacing:.9px;
+    color:var(--muted); opacity:.55;
+    pointer-events:none; user-select:none; z-index:10;
+  }
+  .credit b{color:var(--accent); font-weight:700; opacity:.85}
+
+  .hotkeys{
+    position:absolute; left:16px; bottom:10px;
+    font-family:"SF Mono",Consolas,monospace;
+    font-size:9.5px; letter-spacing:.4px;
+    color:var(--muted); opacity:.55;
+    pointer-events:none; user-select:none; z-index:10;
+  }
+
+  /* ============ 指南模态框 ============ */
+  .modal-mask{
+    position:fixed; inset:0; z-index:300;
+    background:rgba(10,20,35,.45);
+    backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center;
+    padding:20px; overflow-y:auto;
+  }
+  .modal-mask.show{display:flex}
+  .modal{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:14px; max-width:820px; width:100%;
+    max-height:90vh; overflow-y:auto;
+    box-shadow:0 20px 60px rgba(5,15,35,.35);
+    animation:modalIn .22s cubic-bezier(.2,.9,.3,1.1);
+  }
+  @keyframes modalIn{
+    from{opacity:0; transform:translateY(16px) scale(.98)}
+    to{opacity:1; transform:translateY(0) scale(1)}
+  }
+  .modal-head{
+    position:sticky; top:0; z-index:2;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px 14px;
+    background:var(--card); border-bottom:1px solid var(--line);
+  }
+  .modal-head h3{
+    margin:0; font-size:17px; font-weight:700; color:var(--accent);
+    display:flex; align-items:center; gap:10px;
+  }
+  .modal-head h3::before{
+    content:""; width:4px; height:18px; border-radius:2px; background:var(--accent);
+  }
+  .modal-close{
+    width:30px;height:30px;border-radius:7px;
+    border:1px solid var(--line);background:var(--card);color:var(--muted);
+    font-size:15px;cursor:pointer;display:grid;place-items:center;
+    font-family:inherit;transition:.12s;padding:0;
+  }
+  .modal-close:hover{color:var(--danger);border-color:var(--danger)}
+  .modal-body{padding:20px 24px 26px}
+
+  .guide-section{margin-bottom:22px}
+  .guide-section:last-child{margin-bottom:0}
+  .guide-section h4{
+    margin:0 0 12px; font-size:13px; font-weight:700; color:var(--ink);
+    letter-spacing:.3px; display:flex; align-items:center; gap:8px;
+  }
+  .guide-section h4 .num{
+    display:inline-grid; place-items:center;
+    width:20px;height:20px;border-radius:50%;
+    background:var(--accent); color:#fff;
+    font-size:11px; font-weight:700;
+  }
+
+  .guide-steps{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:10px;
+  }
+  .step-card{
+    background:var(--bg-2); border:1px solid var(--line);
+    border-radius:8px; padding:10px 12px;
+    transition:.15s;
+  }
+  .step-card:hover{border-color:var(--accent); background:var(--accent-soft)}
+  .step-card .step-title{
+    font-size:12.5px; font-weight:700; color:var(--accent);
+    margin-bottom:5px; display:flex; align-items:center; gap:6px;
+  }
+  .step-card .step-title .k{
+    font-family:"SF Mono",Consolas,monospace;
+    background:var(--card); border:1px solid var(--line);
+    padding:1px 6px; border-radius:4px;
+    font-size:10.5px; color:var(--ink); font-weight:600;
+  }
+  .step-card .step-desc{
+    font-size:11.5px; color:var(--muted); line-height:1.55;
+  }
+
+  .term-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:8px;
+  }
+  .term-item{
+    display:flex; gap:10px; padding:8px 10px;
+    background:var(--bg-2); border-radius:7px;
+    border:1px solid transparent; transition:.12s;
+  }
+  .term-item:hover{border-color:var(--line)}
+  .term-item .term-key{
+    flex-shrink:0; min-width:64px;
+    font-family:"SF Mono",Consolas,monospace;
+    font-size:11.5px; font-weight:700; color:var(--accent);
+    padding-top:1px;
+  }
+  .term-item .term-val{
+    font-size:11.5px; color:var(--ink); line-height:1.55;
+  }
+  .term-item .term-val small{
+    display:block; color:var(--muted); font-size:10.5px; margin-top:2px;
+  }
+
+  .guide-tip{
+    margin-top:14px; padding:10px 12px;
+    background:var(--accent-soft); border-radius:8px;
+    font-size:11.5px; color:var(--ink); line-height:1.6;
+    border-left:3px solid var(--accent);
+  }
+  .guide-tip b{color:var(--accent)}
+
+  #toast{
+    position:fixed; left:50%; bottom:30px; transform:translate(-50%,120%);
+    background:#16202e; color:#fff; padding:10px 20px; border-radius:8px;
+    font-size:12.5px; font-weight:500; z-index:400; opacity:0;
+    transition:.25s cubic-bezier(.2,.9,.3,1.2); pointer-events:none;
+    box-shadow:0 12px 30px rgba(10,25,50,.35);
+  }
+  #toast.show{transform:translate(-50%,0); opacity:1}
+  #toast.err{background:#b3272c}
+  #toast.ok{background:#0f7b3f}
+
+  @media (max-width:1080px){
+    .app{flex-direction:column}
+    body{overflow:auto}
+    .sidebar{width:100%; height:auto; border-right:none; border-bottom:1px solid var(--line)}
+    .sidebar-scroll{max-height:none; overflow:visible}
+    .chart-panel{height:72vh; min-height:420px}
+  }
+  @media (max-width:700px){
+    .meta-grid{grid-template-columns:1fr}
+    .tl-row{grid-template-columns:1fr 1fr}
+    .param-row{grid-template-columns:10px 14px minmax(0,1fr) 78px 34px; gap:3px}
+    .brand h1{font-size:13px}
+    .badge{display:none}
+    .btn{padding:5px 9px;font-size:11.5px}
+    .head-right{gap:6px}
+    .zoom-group .zg-label{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">FDR</div>
+    <h1>飞行数据记录器</h1>
+    <span class="badge">FLIGHT DATA</span>
+  </div>
+  <div class="actions">
+    <button class="btn guide" id="btnGuide" title="新手指南 & 术语解析">📖 指南</button>
+    <button class="btn icon" id="btnTheme" title="切换深色模式">🌙</button>
+    <button class="btn ghost-danger" id="btnClear">清除数据</button>
+    <button class="btn" id="btnReset">重置</button>
+    <button class="btn" id="btnImport">导入</button>
+    <button class="btn primary" id="btnExport">导出 LNFDR</button>
+    <button class="btn primary" id="btnPng">PNG</button>
+    <input type="file" id="fileInput" accept=".lnfdr,.LNFDR,.json,application/json" hidden>
+  </div>
+</header>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-scroll">
+
+      <section class="card">
+        <h2 class="card-title">记录器信息</h2>
+        <div class="meta-grid" id="metaGrid"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">时间线</h2>
+        <div class="tl-row">
+          <label><span>起始 (s)</span><input type="number" id="tlStart" min="0" step="1"></label>
+          <label><span>结束 (s)</span><input type="number" id="tlEnd" min="1" step="1"></label>
+          <label><span>采样点</span><input type="number" id="tlSamples" min="8" max="400" step="1"></label>
+        </div>
+        <div class="cursor-box">
+          <div class="cursor-main">
+            <div class="cursor-info">
+              <div class="lbl">当前时间点</div>
+              <div class="time" id="curTime">T = 0.0 s</div>
+              <div class="pt" id="curPoint">— / —</div>
+            </div>
+            <div class="nav-btns">
+              <button class="nav-btn" id="navPrev" title="上一个点 (←)">◀</button>
+              <button class="nav-btn play" id="navPlay" title="播放/暂停 (空格)">▶</button>
+              <button class="nav-btn" id="navNext" title="下一个点 (→)">▶</button>
+            </div>
+          </div>
+          <div class="alarm-bar" id="alarmBar">
+            <span class="pulse"></span>
+            <span id="alarmText">告警激活</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">时间点标签</h2>
+        <div class="tag-list" id="tagList"></div>
+        <button class="tag-add" id="tagAdd">＋ 添加标签</button>
+      </section>
+
+      <section class="card" style="padding:10px 8px 10px">
+        <h2 class="card-title" style="padding:0 6px">参数列表</h2>
+        <div class="param-list" id="paramList"></div>
+      </section>
+
+    </div>
+  </aside>
+
+  <main class="chart-panel">
+    <div class="chart-head">
+      <h2>飞行数据条带图</h2>
+      <div class="head-right">
+        <div class="zoom-group">
+          <span class="zg-label">横向</span>
+          <div class="zoom-controls">
+            <button class="zoom-btn" id="zoomOutX" title="横向缩小">−</button>
+            <button class="zoom-btn text active" id="zoomFitX" title="横向适应">适应</button>
+            <button class="zoom-btn" id="zoomInX" title="横向放大">+</button>
+          </div>
+          <span class="zoom-level" id="zoomXLevel">100%</span>
+        </div>
+        <div class="zoom-group">
+          <span class="zg-label">纵向</span>
+          <div class="zoom-controls">
+            <button class="zoom-btn" id="zoomOutY" title="纵向缩小">−</button>
+            <button class="zoom-btn text active" id="zoomFitY" title="纵向适应">适应</button>
+            <button class="zoom-btn" id="zoomInY" title="纵向放大">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ruler-wrap">
+      <canvas id="ruler"></canvas>
+    </div>
+    <div class="chart-scroll" id="chartScroll">
+      <canvas id="chart"></canvas>
+    </div>
+    <div class="hotkeys">← → 切换点 · 空格 播放 · 点击右侧值框直接编辑</div>
+    <div class="credit">LN-LAB · <b>Photaxis-Lab</b></div>
+  </main>
+
+</div>
+
+<!-- ============ 新手指南 ============ -->
+<div class="modal-mask" id="guideMask">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3>新手指南 & 术语解析</h3>
+      <button class="modal-close" id="guideClose" title="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="guide-section">
+        <h4><span class="num">1</span>操作步骤</h4>
+        <div class="guide-steps">
+          <div class="step-card">
+            <div class="step-title">选择时间点 <span class="k">点击图表</span></div>
+            <div class="step-desc">在图表任意位置点击或拖动，红色游标会跳到该时刻，左侧所有参数自动切换到该点的值。</div>
+          </div>
+          <div class="step-card">
+            <div class="step-title">微调时间 <span class="k">← →</span></div>
+            <div class="step-desc">使用键盘左右方向键，逐点移动游标。Home/End 跳转到首尾。</div>
+          </div>
+          <div class="step-card">
+            <div class="step-title">直接改值 <span class="k">点击右侧值框</span></div>
+            <div class="step-desc">图表右侧每个条带的值框都可直接点击编辑，回车确认，Esc 取消。</div>
+          </div>
+          <div class="step-card">
+            <div class="step-title">切换状态 <span class="k">下拉选项</span></div>
+            <div class="step-desc">对于告警、起落架等开关类参数，在左侧参数列表中使用下拉选项切换。</div>
+          </div>
+          <div class="step-card">
+            <div class="step-title">播放动画 <span class="k">空格 / ▶</span></div>
+            <div class="step-desc">点击播放按钮或按空格键，游标会自动前进，方便快速浏览整段记录。</div>
+          </div>
+          <div class="step-card">
+            <div class="step-title">缩放视图 <span class="k">+ / −</span></div>
+            <div class="step-desc">横向缩放时间轴查看细节，纵向调整条带高度。点击“适应”恢复全览。</div>
+          </div>
+          <div class="step-card">
+            <div class="step-title">添加标签 <span class="k">时间点标签</span></div>
+            <div class="step-desc">在左侧“时间点标签”区域添加标记，用于标注关键时刻。</div>
+          </div>
+          <div class="step-card">
+            <div class="step-title">导出数据 <span class="k">LNFDR / PNG</span></div>
+            <div class="step-desc">导出为 LNFDR 数据文件以便二次编辑，或导出 PNG 图片用于分享存档。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <h4><span class="num">2</span>术语解析</h4>
+        <div class="term-grid">
+          <div class="term-item">
+            <div class="term-key">FDR</div>
+            <div class="term-val">飞行数据记录器<small>Flight Data Recorder，“黑匣子”之一</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">GPWS</div>
+            <div class="term-val">近地警告系统<small>Ground Proximity Warning System，防止可控撞地</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">STALL</div>
+            <div class="term-val">失速警告<small>机翼迎角过大导致升力骤降</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">TCAS</div>
+            <div class="term-val">空中交通防撞系统<small>Traffic Alert and Collision Avoidance System</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">TA / RA</div>
+            <div class="term-val">交通咨询 / 决断咨询<small>TCAS 的两级警告，RA 会给出避让指令</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">N1</div>
+            <div class="term-val">发动机低压转子转速<small>以百分比表示，反映推力大小</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">EGT</div>
+            <div class="term-val">排气温度<small>Exhaust Gas Temperature，监控发动机健康</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">APPR</div>
+            <div class="term-val">进近模式<small>Approach，自动飞行捕捉航向道与下滑道</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">LOC</div>
+            <div class="term-val">航向道<small>Localizer，仪表着陆系统的水平引导</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">FLARE</div>
+            <div class="term-val">拉平<small>着陆前机头缓缓上仰，降低下降率</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">TD</div>
+            <div class="term-val">接地<small>Touchdown，主起落架接触跑道</small></div>
+          </div>
+          <div class="term-item">
+            <div class="term-key">Vref</div>
+            <div class="term-val">着陆参考速度<small>进近时的目标速度，通常为失速速度的 1.3 倍</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-tip">
+        <b>提示：</b>所有参数都可以修改。点击图表右侧的数值框直接编辑当前时刻的值；下拉选项类参数（如告警状态、起落架）请在左侧参数列表中切换。
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   主题
+   ========================================================= */
+const THEMES = {
+  light: {
+    canvasBg: '#fbfcff', stripBg: '#fbfcff', stripBgAlt: '#f5f8fd', stripHi: '#e8f1ff',
+    leftBg: '#ffffff', rightBg: '#ffffff', headerBg: '#eff5ff',
+    headerAccent: '#1f6feb', headerInk: '#1546a0', headerCount: '#8ba0bd',
+    grid: '#f0f4fa', gridRef: '#eaf0f8', border: '#dde5f0', separator: '#eef2f9',
+    label: '#1f2b3d', labelHi: '#1546a0', unit: '#93a2b8',
+    cursor: '#e5484d', timeTick: '#9aa8bc', rulerBg: '#ffffff', rulerBorder: '#e2e8f2',
+    alarm: 'rgba(229,72,77,0.20)',
+    tag: '#f59e0b', tagText: '#b45309',
+  },
+  dark: {
+    canvasBg: '#0f1620', stripBg: '#0f1620', stripBgAlt: '#121a26', stripHi: '#1a2740',
+    leftBg: '#121a26', rightBg: '#121a26', headerBg: '#142238',
+    headerAccent: '#4aa3ff', headerInk: '#6aa9ff', headerCount: '#607588',
+    grid: '#1a2433', gridRef: '#1e2a3d', border: '#2a3a52', separator: '#1a2433',
+    label: '#c5d2e2', labelHi: '#6aa9ff', unit: '#607588',
+    cursor: '#ff6b6b', timeTick: '#607588', rulerBg: '#121a26', rulerBorder: '#242e3d',
+    alarm: 'rgba(255,80,80,0.28)',
+    tag: '#fbbf24', tagText: '#fbbf24',
+  }
+};
+
+const PALETTE = {
+  light: ['#1f6feb','#0f7b3f','#e5484d','#f59e0b','#8b5cf6',
+          '#06b6d4','#ec4899','#84cc16','#f97316','#6366f1',
+          '#14b8a6','#a855f7','#ef4444','#eab308','#3b82f6',
+          '#10b981','#f43f5e','#8b5cf6','#0ea5e9','#d946ef'],
+  dark:  ['#4fc3f7','#66bb6a','#ef5350','#ffb74d','#ce93d8',
+          '#26c6da','#f06292','#9ccc65','#ff8a65','#9575cd',
+          '#4dd0e1','#ba68c8','#ffd54f','#aed581','#7986cb',
+          '#80cbc4','#e57373','#ffb74d','#81c784','#90caf9']
+};
+
+const MONO = '"SF Mono",Consolas,"Courier New",monospace';
+const FONT = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif';
+
+const LEFT_W  = 176;
+const RIGHT_W = 100;
+const STRIP_GAP  = 5;
+const GROUP_H    = 26;
+const TOP_PAD    = 8;
+const BOTTOM_PAD = 20;
+
+/* =========================================================
+   默认数据
+   ========================================================= */
+const META_FIELDS = [
+  ['aircraftType','机型','text'], ['tailNumber','机号 / 注册号','text'],
+  ['flightNumber','航班号','text'], ['date','日期','date'],
+  ['recorderType','记录器类型','text'], ['operator','运营人','text'],
+];
+
+const DEFAULT_DATA = {
+  meta:{
+    aircraftType:'A320-271N',
+    tailNumber:'N-939LN',
+    flightNumber:'DAL9999',
+    date:'2026-10-04',
+    recorderType:'FDR (Flight Data Recorder)',
+    operator:'Delta Air Lines'
+  },
+  timeline:{ start:0, end:180, samples:120 },
+  labels: [],
+  groups:[
+    { name:'飞行路径与速度', params:[
+      { name:'气压高度',     value:'2500',    unit:'ft',  type:'numeric' },
+      { name:'指示空速',     value:'145',     unit:'kt',  type:'numeric' },
+      { name:'航向',         value:'270',     unit:'°',   type:'numeric' },
+      { name:'偏流角',       value:'2.0',     unit:'°',   type:'numeric' },
+      { name:'风速',         value:'8',       unit:'kt',  type:'numeric' },
+      { name:'风向',         value:'200',     unit:'°',   type:'numeric' },
+    ]},
+    { name:'飞机姿态与加速度', params:[
+      { name:'俯仰姿态',     value:'2.5',     unit:'°',   type:'numeric' },
+      { name:'滚转姿态',     value:'0.5',     unit:'°',   type:'numeric' },
+      { name:'法向加速度',   value:'1.00',    unit:'g',   type:'numeric' },
+      { name:'纵向加速度',   value:'0.00',    unit:'g',   type:'numeric' },
+      { name:'横向加速度',   value:'0.00',    unit:'g',   type:'numeric' },
+      { name:'迎角',         value:'4.0',     unit:'°',   type:'numeric' },
+    ]},
+    { name:'发动机与动力系统', params:[
+      { name:'1 号发动机 N1',value:'58',      unit:'%',   type:'numeric' },
+      { name:'2 号发动机 N1',value:'58',      unit:'%',   type:'numeric' },
+      { name:'推力手柄位置', value:'45',      unit:'%',   type:'numeric' },
+      { name:'1 号发动机 EGT',value:'580',    unit:'°C',  type:'numeric' },
+      { name:'2 号发动机 EGT',value:'578',    unit:'°C',  type:'numeric' },
+    ]},
+    { name:'飞行操纵与系统状态', params:[
+      { name:'俯仰操纵输入', value:'0.0',     unit:'°',   type:'numeric' },
+      { name:'横向操纵输入', value:'0.0',     unit:'°',   type:'numeric' },
+      { name:'方向舵脚蹬输入',value:'0.0',    unit:'°',   type:'numeric' },
+      { name:'升降舵位置',   value:'-3.0',    unit:'°',   type:'numeric' },
+      { name:'副翼位置',     value:'0.0',     unit:'°',   type:'numeric' },
+      { name:'方向舵位置',   value:'0.0',     unit:'°',   type:'numeric' },
+      { name:'俯仰配平位置', value:'2.5',     unit:'unit',type:'numeric' },
+      { name:'后缘襟翼位置', value:'FULL',    unit:'—',   type:'select', options:['0','1','2','3','FULL'] },
+      { name:'前缘缝翼位置', value:'展开',    unit:'—',   type:'select', options:['收起','展开'] },
+      { name:'起落架状态',   value:'放下',    unit:'—',   type:'select', options:['收起','放下'] },
+      { name:'地面扰流板',   value:'未展开',  unit:'—',   type:'select', options:['未展开','展开'] },
+      { name:'空 / 地状态',  value:'空中',    unit:'—',   type:'select', options:['空中','地面'] },
+    ]},
+    { name:'告警与警告系统', params:[
+      { name:'近地警告 (GPWS)',    value:'正常', unit:'—', type:'select', options:['正常','警告'], alarmOption:'警告' },
+      { name:'失速警告 (STALL)',   value:'正常', unit:'—', type:'select', options:['正常','警告'], alarmOption:'警告' },
+      { name:'风切变警告 (WS)',    value:'正常', unit:'—', type:'select', options:['正常','警告'], alarmOption:'警告' },
+      { name:'构型警告 (CONFIG)',  value:'正常', unit:'—', type:'select', options:['正常','警告'], alarmOption:'警告' },
+      { name:'超速警告 (OVERSPD)', value:'正常', unit:'—', type:'select', options:['正常','警告'], alarmOption:'警告' },
+      { name:'TCAS 交通咨询',      value:'无',   unit:'—', type:'select', options:['无','TA','RA'], alarmOption:'RA' },
+    ]},
+    { name:'通信与自动化系统', params:[
+      { name:'自动驾驶仪接通',value:'接通',   unit:'—',   type:'select', options:['断开','接通'] },
+      { name:'自动飞行模式', value:'APPR',    unit:'—',   type:'select', options:['OFF','HDG','NAV','LOC','APPR'] },
+      { name:'自动油门模式', value:'SPEED',   unit:'—',   type:'select', options:['OFF','SPEED','MACH','N1'] },
+      { name:'主警告',       value:'正常',    unit:'—',   type:'select', options:['正常','警告'] },
+    ]},
+    { name:'其他环境与状态参数', params:[
+      { name:'外界大气总温', value:'15.0',    unit:'°C',  type:'numeric' },
+      { name:'1 号导航接收机频率', value:'110.30', unit:'MHz', type:'numeric' },
+      { name:'2 号导航接收机频率', value:'110.90', unit:'MHz', type:'numeric' },
+    ]},
+  ]
+};
+
+/* =========================================================
+   工具
+   ========================================================= */
+const uid = () => Math.random().toString(36).slice(2,9);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const deepClone = o => JSON.parse(JSON.stringify(o));
+
+function hashStr(s){
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return (h % 997) / 997;
+}
+function formatTime(sec){
+  if (sec >= 3600) return (sec/3600).toFixed(1) + 'h';
+  if (sec >= 60)   return Math.floor(sec/60) + 'm' + Math.round(sec%60) + 's';
+  return Math.round(sec) + 's';
+}
+function formatNum(v){
+  if (!isFinite(v)) return '—';
+  const a = Math.abs(v);
+  if (a >= 1000) return v.toFixed(0);
+  if (a >= 100)  return v.toFixed(1);
+  if (a >= 1)    return v.toFixed(2);
+  return v.toFixed(3);
+}
+function formatValue(p, v){
+  if (p.type === 'select'){
+    const opts = p.options || [];
+    const idx = Math.round(clamp(v, 0, opts.length - 1));
+    return opts[idx] ?? '—';
+  }
+  return formatNum(v);
+}
+function labelToRatio(labelTime){
+  const { start, end } = state.timeline;
+  const span = Math.max(0.001, end - start);
+  return clamp((labelTime - start) / span, 0, 1);
+}
+
+let toastTimer = null;
+function toast(msg, type=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.className = type; }, 2200);
+}
+
+/* =========================================================
+   曲线生成
+   ========================================================= */
+function generateSeries(param, N){
+  if (param.type === 'select') return generateSelectSeries(param, N);
+  return generateNumericSeries(param, N);
+}
+
+function generateNumericSeries(param, N){
+  const base = parseFloat(param.value);
+  const b = isFinite(base) ? base : 0;
+  const name = String(param.name || '');
+  const seed = hashStr(name);
+  const noise = (i, f, a) =>
+    Math.sin(i * f + seed * 9.7) * a +
+    Math.sin(i * f * 2.3 + seed * 5.1) * a * 0.45 +
+    Math.sin(i * f * 5.1 + seed * 2.3) * a * 0.18;
+
+  const TD = 0.88, FLARE = 0.76, SETTLE = 0.95;
+  const out = [];
+  for (let i = 0; i < N; i++){
+    const t = N > 1 ? i / (N - 1) : 0;
+    let v = b;
+
+    if (/气压高度/.test(name)){
+      if (t < TD){ const u = t / TD; v = b * (1 - u * 0.72 - u * u * 0.28); } else v = 0;
+      v += noise(i, 0.35, Math.max(b * 0.0008, 0.5));
+    } else if (/指示空速/.test(name)){
+      if (t < TD) v = b * (1 - 0.05 * t / TD);
+      else { const u = (t - TD) / (1 - TD); v = b * 0.95 * Math.max(0, 1 - u * u * 1.08); }
+      v += noise(i, 0.8, b * 0.004);
+    } else if (/航向/.test(name)) v = b + noise(i, 0.15, 0.6);
+    else if (/偏流角/.test(name)) v = b * (1 - 0.6 * t) + noise(i, 0.3, 0.12);
+    else if (/风速/.test(name)) v = b * (1 - 0.5 * t) + noise(i, 0.4, 0.35);
+    else if (/风向/.test(name)) v = b + noise(i, 0.2, 3);
+    else if (/俯仰姿态/.test(name)){
+      if (t < FLARE) v = b;
+      else if (t < TD){ const u = (t - FLARE) / (TD - FLARE); v = b + (6.5 - b) * (u * u * (3 - 2 * u)); }
+      else if (t < SETTLE){ const u = (t - TD) / (SETTLE - TD); v = 6.5 - 8.0 * u; }
+      else { const u = (t - SETTLE) / (1 - SETTLE); v = -1.5 + 1.5 * Math.min(1, u); }
+      v += noise(i, 2, 0.08);
+    } else if (/滚转姿态/.test(name)) v = b * (1 - 0.7 * t) + noise(i, 0.8, 0.14);
+    else if (/法向加速度/.test(name)){
+      v = 1.0;
+      if (t > TD - 0.03 && t < TD + 0.05) v += 0.35 * Math.exp(-Math.pow((t - TD) / 0.020, 2));
+      v += noise(i, 3, 0.012);
+    } else if (/纵向加速度/.test(name)){
+      if (t < TD) v = b + noise(i, 3, 0.008);
+      else { const u = (t - TD) / (1 - TD); v = -0.35 * u + noise(i, 3, 0.008); }
+    } else if (/横向加速度/.test(name)) v = b + noise(i, 2, 0.009);
+    else if (/迎角/.test(name)){
+      if (t < FLARE) v = b + noise(i, 0.5, 0.15);
+      else if (t < TD){ const u = (t - FLARE) / (TD - FLARE); v = b + (8.0 - b) * (u * u * (3 - 2 * u)); }
+      else if (t < SETTLE){ const u = (t - TD) / (SETTLE - TD); v = 8.0 - 8.0 * u; }
+      else v = 0;
+      v += noise(i, 2, 0.12);
+    } else if (/N1/.test(name)){
+      if (t < TD) v = b + noise(i, 1.2, 0.35);
+      else if (t < 0.94){ const u = (t - TD) / 0.06; v = b + (78 - b) * u; }
+      else { const u = (t - 0.94) / 0.06; v = 78 - (78 - 45) * Math.min(1, u); }
+      v += noise(i, 1.5, 0.28);
+    } else if (/推力手柄/.test(name)){
+      if (t < TD) v = b + noise(i, 1, 0.25);
+      else if (t < 0.93) v = b - 15 * ((t - TD) / 0.05);
+      else v = b - 15 - 10 * ((t - 0.93) / 0.07);
+      v = Math.max(0, v + noise(i, 1, 0.3));
+    } else if (/EGT/.test(name)){
+      if (t < TD) v = b + noise(i, 0.6, 2.2);
+      else { const u = (t - TD) / (1 - TD); v = b + 42 * Math.sin(Math.PI * u) - 32 * u + noise(i, 0.8, 2.0); }
+    } else if (/俯仰操纵输入/.test(name)){
+      if (t < FLARE) v = b;
+      else if (t < TD){ const u = (t - FLARE) / (TD - FLARE); v = 3.5 * u * u * (3 - 2 * u); }
+      else v = Math.max(0, 3.5 - 8 * (t - TD));
+      v += noise(i, 2, 0.08);
+    } else if (/升降舵位置/.test(name)){
+      if (t < FLARE) v = b + noise(i, 1, 0.14);
+      else if (t < TD){ const u = (t - FLARE) / (TD - FLARE); v = b - 5.0 * u * u * (3 - 2 * u); }
+      else { const u = (t - TD) / 0.07; v = b - 5.0 + 12 * Math.min(1, u); }
+      v += noise(i, 2, 0.22);
+    } else if (/俯仰配平/.test(name)) v = b * (1 - 0.35 * t) + noise(i, 0.4, 0.05);
+    else if (/横向操纵输入|副翼位置|方向舵位置|方向舵脚蹬/.test(name))
+      v = b + noise(i, 1.3, Math.max(Math.abs(b) * 0.55, 0.22));
+    else if (/外界大气总温/.test(name)){
+      const p = t < TD ? t / TD : 1;
+      v = b + 4.2 * p + noise(i, 0.3, 0.35);
+    } else if (/导航接收机|频率/.test(name)) v = b;
+    else v = b + noise(i, 1.2, Math.max(Math.abs(b) * 0.012, 0.01));
+
+    out.push(v);
+  }
+  return out;
+}
+
+function generateSelectSeries(param, N){
+  const opts = param.options || [];
+  const n = opts.length;
+  if (n <= 1) return new Array(N).fill(0);
+  const curIdx = Math.max(0, opts.indexOf(String(param.value)));
+  const name = String(param.name || '');
+  const TD = 0.88;
+  const out = [];
+  for (let i = 0; i < N; i++){
+    const t = N > 1 ? i / (N - 1) : 0;
+    let v = curIdx;
+
+    if (/近地警告|GPWS/.test(name)) v = (t > 0.70 && t < 0.74) ? 1 : 0;
+    else if (/失速警告|STALL/.test(name)) v = (t > 0.80 && t < 0.83) ? 1 : 0;
+    else if (/风切变/.test(name)) v = 0;
+    else if (/构型警告|CONFIG/.test(name)) v = 0;
+    else if (/超速警告|OVERSPD/.test(name)) v = 0;
+    else if (/TCAS/.test(name)) v = 0;
+    else if (/自动驾驶仪接通/.test(name)) v = t < 0.62 ? 1 : 0;
+    else if (/自动飞行模式/.test(name)) v = t < 0.72 ? curIdx : 0;
+    else if (/自动油门模式/.test(name)) v = t < 0.75 ? curIdx : 0;
+    else if (/主警告/.test(name)) v = (t > 0.86 && t < 0.90) ? 1 : 0;
+    else if (/起落架状态/.test(name)) v = 1;
+    else if (/前缘缝翼/.test(name)) v = 1;
+    else if (/后缘襟翼/.test(name)) v = curIdx;
+    else if (/地面扰流板/.test(name)) v = t > TD ? 1 : 0;
+    else if (/空.?地状态/.test(name)) v = t > TD ? 1 : 0;
+    else v = curIdx;
+
+    out.push(Math.round(clamp(v, 0, n - 1)));
+  }
+  return out;
+}
+
+function resampleSeries(oldSeries, newN, isDiscrete){
+  const oldN = oldSeries.length;
+  if (oldN === newN) return oldSeries.slice();
+  if (oldN === 0) return new Array(newN).fill(0);
+  if (oldN === 1) return new Array(newN).fill(oldSeries[0]);
+  const out = new Array(newN);
+  for (let i = 0; i < newN; i++){
+    const t = newN > 1 ? i / (newN - 1) : 0;
+    const pos = t * (oldN - 1);
+    const i0 = Math.floor(pos);
+    const i1 = Math.min(i0 + 1, oldN - 1);
+    const frac = pos - i0;
+    const v = oldSeries[i0] * (1 - frac) + oldSeries[i1] * frac;
+    out[i] = isDiscrete ? Math.round(v) : v;
+  }
+  return out;
+}
+
+/* =========================================================
+   状态
+   ========================================================= */
+let state = null;
+
+function buildState(raw){
+  const s = {
+    meta: { ...raw.meta },
+    timeline: { ...raw.timeline },
+    labels: Array.isArray(raw.labels) ? raw.labels.map(l => ({
+      id: uid(),
+      time: Number(l.time) || 0,
+      text: String(l.text || '')
+    })) : [],
+    groups: [],
+    cursorIdx: 0,
+    hiGi: -1, hiPi: -1,
+    dark: false,
+    playing: false,
+    view: { autoFitY: true, stripH: 32, autoFitX: true, zoomX: 1, startIdx: 0 }
+  };
+  raw.groups.forEach(g => {
+    s.groups.push({
+      name: g.name,
+      params: g.params.map(p => ({
+        id: uid(),
+        name: String(p.name ?? ''),
+        value: String(p.value ?? ''),
+        unit: String(p.unit ?? ''),
+        type: p.type === 'select' ? 'select' : 'numeric',
+        options: Array.isArray(p.options) ? p.options.slice() : null,
+        alarmOption: p.alarmOption || null,
+        visible: p.visible !== false,
+        series: Array.isArray(p.series) && p.series.length === s.timeline.samples
+          ? p.series.slice() : null
+      }))
+    });
+  });
+  s.groups.forEach(g => g.params.forEach(p => {
+    if (!p.series) p.series = generateSeries(p, s.timeline.samples);
+  }));
+  s.cursorIdx = Math.round((s.timeline.samples - 1) * 0.5);
+  return s;
+}
+
+function clearAll(){
+  state.groups.forEach(g => g.params.forEach(p => {
+    const base = p.type === 'select'
+      ? Math.max(0, (p.options || []).indexOf(String(p.value)))
+      : (parseFloat(p.value) || 0);
+    p.series = new Array(state.timeline.samples).fill(base);
+  }));
+}
+
+function applyTheme(){
+  if (state.dark) document.body.classList.add('dark');
+  else document.body.classList.remove('dark');
+  document.getElementById('btnTheme').textContent = state.dark ? '☀' : '🌙';
+}
+
+function T(){ return state.dark ? THEMES.dark : THEMES.light; }
+
+function paramColor(gi, pi){
+  let flat = 0;
+  for (let i = 0; i < gi; i++) flat += state.groups[i].params.length;
+  flat += pi;
+  const pal = state.dark ? PALETTE.dark : PALETTE.light;
+  return pal[flat % pal.length];
+}
+
+state = buildState(deepClone(DEFAULT_DATA));
+
+/* =========================================================
+   视图
+   ========================================================= */
+function getViewRange(N){
+  if (state.view.autoFitX || state.view.zoomX <= 1.001){
+    return { start: 0, end: N - 1, count: N };
+  }
+  const visCount = Math.max(4, Math.min(N, Math.round(N / state.view.zoomX)));
+  const start = clamp(state.view.startIdx, 0, Math.max(0, N - visCount));
+  return { start, end: start + visCount - 1, count: visCount };
+}
+function ensureCursorVisible(){
+  if (state.view.autoFitX) return;
+  const N = state.timeline.samples;
+  const v = getViewRange(N);
+  let need = false;
+  if (state.cursorIdx < v.start){ state.view.startIdx = state.cursorIdx; need = true; }
+  else if (state.cursorIdx > v.end){ state.view.startIdx = state.cursorIdx - v.count + 1; need = true; }
+  if (need) state.view.startIdx = clamp(state.view.startIdx, 0, Math.max(0, N - v.count));
+}
+function centerCursor(){
+  const N = state.timeline.samples;
+  const v = getViewRange(N);
+  state.view.startIdx = clamp(state.cursorIdx - Math.floor(v.count / 2), 0, Math.max(0, N - v.count));
+}
+
+/* =========================================================
+   范围 / 布局
+   ========================================================= */
+function getRange(param){
+  if (param.type === 'select'){
+    const n = (param.options || []).length;
+    if (n > 1) return { mn: -0.5, mx: n - 0.5 };
+    return { mn: -1, mx: 1 };
+  }
+  const s = param.series;
+  if (!s || !s.length) return { mn: 0, mx: 1 };
+  let mn = Infinity, mx = -Infinity;
+  for (let i = 0; i < s.length; i++){
+    const v = s[i];
+    if (v < mn) mn = v;
+    if (v > mx) mx = v;
+  }
+  if (!isFinite(mn)){ mn = 0; mx = 1; }
+  if (mx - mn < 1e-9){
+    const p = Math.max(Math.abs(mn) * 0.1, 0.5);
+    mn -= p; mx += p;
+  }
+  return { mn, mx };
+}
+
+function computeLayout(overrideH){
+  const viewportH = overrideH || chartScroll.clientHeight || 500;
+  const visibleGroups = [];
+  state.groups.forEach((g, gi) => {
+    const vis = g.params.filter(p => p.visible);
+    if (vis.length) visibleGroups.push({ gi, g, vis });
+  });
+  let stripCount = 0;
+  visibleGroups.forEach(vg => stripCount += vg.vis.length);
+
+  let stripH;
+  if (state.view.autoFitY){
+    const avail = viewportH - TOP_PAD - BOTTOM_PAD;
+    const fixed = visibleGroups.length * (GROUP_H + 8);
+    const forStrips = avail - fixed;
+    stripH = stripCount > 0
+      ? Math.max(14, Math.min(80, forStrips / stripCount - STRIP_GAP))
+      : 32;
+  } else stripH = state.view.stripH;
+
+  const items = [];
+  let y = TOP_PAD;
+  visibleGroups.forEach(vg => {
+    items.push({ type:'group', y, h: GROUP_H, gi: vg.gi, name: vg.g.name, count: vg.vis.length });
+    y += GROUP_H;
+    vg.vis.forEach(p => {
+      const pi = vg.g.params.indexOf(p);
+      items.push({ type:'strip', y, h: stripH, gi: vg.gi, pi, param: p });
+      y += stripH + STRIP_GAP;
+    });
+    y += 8;
+  });
+  return { items, totalH: y + BOTTOM_PAD, stripH };
+}
+
+/* =========================================================
+   DOM
+   ========================================================= */
+const metaGrid    = document.getElementById('metaGrid');
+const tlStart     = document.getElementById('tlStart');
+const tlEnd       = document.getElementById('tlEnd');
+const tlSamples   = document.getElementById('tlSamples');
+const curTimeEl   = document.getElementById('curTime');
+const curPointEl  = document.getElementById('curPoint');
+const paramListEl = document.getElementById('paramList');
+const tagListEl   = document.getElementById('tagList');
+const chartScroll = document.getElementById('chartScroll');
+const chartCanvas = document.getElementById('chart');
+const rulerCanvas = document.getElementById('ruler');
+const fileInput   = document.getElementById('fileInput');
+const alarmBar    = document.getElementById('alarmBar');
+const alarmText   = document.getElementById('alarmText');
+const zoomXLevel  = document.getElementById('zoomXLevel');
+const guideMask   = document.getElementById('guideMask');
+
+/* 元信息 */
+META_FIELDS.forEach(([k, label, type]) => {
+  const lab = document.createElement('label');
+  if (k === 'operator') lab.classList.add('wide');
+  lab.innerHTML = `<span>${label}</span>
+    <input type="${type}" data-meta="${k}" placeholder="${label}">`;
+  metaGrid.appendChild(lab);
+});
+function renderMeta(){
+  metaGrid.querySelectorAll('[data-meta]').forEach(inp => {
+    inp.value = state.meta[inp.dataset.meta] ?? '';
+  });
+}
+metaGrid.addEventListener('input', e => {
+  const k = e.target.dataset.meta;
+  if (k) state.meta[k] = e.target.value;
+});
+
+/* 时间线 */
+function renderTimeline(){
+  tlStart.value   = state.timeline.start;
+  tlEnd.value     = state.timeline.end;
+  tlSamples.value = state.timeline.samples;
+}
+tlStart.addEventListener('input', () => {
+  const v = parseFloat(tlStart.value);
+  if (!isFinite(v) || v < 0 || v >= state.timeline.end) return;
+  state.timeline.start = v;
+  updateAll();
+});
+tlEnd.addEventListener('input', () => {
+  const v = parseFloat(tlEnd.value);
+  if (!isFinite(v) || v <= state.timeline.start) return;
+  state.timeline.end = v;
+  updateAll();
+});
+tlSamples.addEventListener('input', () => {
+  let v = Math.round(parseFloat(tlSamples.value));
+  if (!isFinite(v)) return;
+  v = clamp(v, 8, 400);
+  if (v === state.timeline.samples) return;
+  const oldN = state.timeline.samples;
+  const oldIdx = state.cursorIdx;
+  state.timeline.samples = v;
+  state.groups.forEach(g => g.params.forEach(p => {
+    p.series = resampleSeries(p.series, v, p.type === 'select');
+  }));
+  state.cursorIdx = clamp(Math.round((oldIdx / Math.max(1, oldN - 1)) * (v - 1)), 0, v - 1);
+  state.view.startIdx = 0;
+  renderParams();
+  updateAll();
+});
+
+/* =========================================================
+   时间点标签
+   ========================================================= */
+function renderLabels(){
+  tagListEl.innerHTML = '';
+  if (!state.labels.length){
+    const empty = document.createElement('div');
+    empty.className = 'tag-empty';
+    empty.textContent = '暂无标签 · 点击下方按钮添加';
+    tagListEl.appendChild(empty);
+    return;
+  }
+  state.labels.forEach((l, i) => {
+    const row = document.createElement('div');
+    row.className = 'tag-row';
+    row.innerHTML = `
+      <input class="tag-time" type="number" data-i="${i}" value="${l.time.toFixed ? l.time.toFixed(1) : l.time}"
+             step="0.1" min="0" title="时间（秒）">
+      <input class="tag-text" type="text" data-i="${i}" value="${esc(l.text)}"
+             placeholder="标签文字" maxlength="20">
+      <button class="tag-del" data-i="${i}" title="删除">✕</button>`;
+    tagListEl.appendChild(row);
+  });
+}
+
+tagListEl.addEventListener('input', e => {
+  const i = +e.target.dataset.i;
+  if (!state.labels[i]) return;
+  if (e.target.classList.contains('tag-time')){
+    const v = parseFloat(e.target.value);
+    if (isFinite(v)) state.labels[i].time = clamp(v, state.timeline.start, state.timeline.end);
+  } else if (e.target.classList.contains('tag-text')){
+    state.labels[i].text = e.target.value;
+  }
+  drawRuler();
+});
+
+tagListEl.addEventListener('click', e => {
+  const del = e.target.closest('.tag-del');
+  if (!del) return;
+  const i = +del.dataset.i;
+  state.labels.splice(i, 1);
+  renderLabels();
+  drawRuler();
+});
+
+document.getElementById('tagAdd').addEventListener('click', () => {
+  const { start, end } = state.timeline;
+  const span = end - start;
+  const curT = start + span * state.cursorIdx / Math.max(1, state.timeline.samples - 1);
+  state.labels.push({ id: uid(), time: +curT.toFixed(1), text: '新标签' });
+  renderLabels();
+  drawRuler();
+});
+
+/* =========================================================
+   参数列表
+   ========================================================= */
+function renderParams(){
+  paramListEl.innerHTML = '';
+  state.groups.forEach((g, gi) => {
+    const block = document.createElement('div');
+    block.className = 'group-block';
+    const isLocked = gi === 0;
+    const groupVisible = g.params.some(p => p.visible);
+    const hd = document.createElement('div');
+    hd.className = 'group-hd';
+    hd.innerHTML = `
+      <span class="g-name" title="${esc(g.name)}">${esc(g.name)}</span>
+      <span class="g-count">${g.params.length}</span>
+      <button class="group-toggle${isLocked ? ' locked' : ''}"
+              data-gi="${gi}"
+              title="${isLocked ? '第一类数据不可关闭' : (groupVisible ? '隐藏整组' : '显示整组')}">
+        ${groupVisible ? '◉' : '○'}
+      </button>`;
+    block.appendChild(hd);
+
+    g.params.forEach((p, pi) => {
+      const row = document.createElement('div');
+      row.className = 'param-row';
+      row.dataset.gi = gi; row.dataset.pi = pi;
+      const color = paramColor(gi, pi);
+      const isSelect = p.type === 'select';
+      const curVal = p.series[state.cursorIdx];
+      let valueEl;
+      if (isSelect){
+        const opts = p.options || [];
+        const curIdx = Math.round(clamp(curVal, 0, opts.length - 1));
+        valueEl = `<select class="p-select" data-gi="${gi}" data-pi="${pi}">
+          ${opts.map((o, i) => `<option value="${i}" ${i === curIdx ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+        </select>`;
+      } else {
+        valueEl = `<input class="p-value" data-gi="${gi}" data-pi="${pi}"
+                        value="${esc(formatNum(curVal))}">`;
+      }
+      const unitTxt = p.unit && p.unit !== '—' ? p.unit : '';
+      row.innerHTML = `
+        <span class="swatch${p.visible ? '' : ' off'}" style="background:${color}"
+              data-gi="${gi}" data-pi="${pi}" title="切换显示/隐藏"></span>
+        <input type="checkbox" class="p-vis" data-gi="${gi}" data-pi="${pi}"
+               ${p.visible ? 'checked' : ''} title="显示">
+        <span class="p-name" title="${esc(p.name)}">${esc(p.name)}</span>
+        ${valueEl}
+        <span class="p-unit" title="${esc(p.unit || '')}">${esc(unitTxt)}</span>`;
+      block.appendChild(row);
+    });
+    paramListEl.appendChild(block);
+  });
+  refreshHightlight();
+}
+
+function refreshParamValues(){
+  paramListEl.querySelectorAll('.p-value').forEach(inp => {
+    if (inp === document.activeElement) return;
+    const gi = +inp.dataset.gi, pi = +inp.dataset.pi;
+    const p = state.groups[gi]?.params[pi];
+    if (!p) return;
+    inp.value = formatNum(p.series[state.cursorIdx]);
+  });
+  paramListEl.querySelectorAll('.p-select').forEach(sel => {
+    if (sel === document.activeElement) return;
+    const gi = +sel.dataset.gi, pi = +sel.dataset.pi;
+    const p = state.groups[gi]?.params[pi];
+    if (!p) return;
+    const opts = p.options || [];
+    const curIdx = Math.round(clamp(p.series[state.cursorIdx], 0, opts.length - 1));
+    sel.value = String(curIdx);
+  });
+}
+
+function refreshHightlight(){
+  paramListEl.querySelectorAll('.param-row').forEach(row => {
+    const gi = +row.dataset.gi, pi = +row.dataset.pi;
+    row.classList.toggle('hi', gi === state.hiGi && pi === state.hiPi);
+  });
+}
+
+paramListEl.addEventListener('input', e => {
+  const t = e.target;
+  if (t.classList.contains('p-value')){
+    const gi = +t.dataset.gi, pi = +t.dataset.pi;
+    const v = parseFloat(t.value);
+    if (!isFinite(v)) return;
+    const p = state.groups[gi]?.params[pi];
+    if (!p) return;
+    p.series[state.cursorIdx] = v;
+    scheduleChartDraw();
+  }
+});
+
+paramListEl.addEventListener('change', e => {
+  if (e.target.classList.contains('p-select')){
+    const gi = +e.target.dataset.gi, pi = +e.target.dataset.pi;
+    const p = state.groups[gi]?.params[pi];
+    if (!p) return;
+    const newIdx = parseInt(e.target.value, 10);
+    if (isFinite(newIdx)){
+      p.series[state.cursorIdx] = newIdx;
+      scheduleChartDraw();
+      updateAlarmBar();
+    }
+    return;
+  }
+  if (e.target.classList.contains('p-vis')){
+    const gi = +e.target.dataset.gi, pi = +e.target.dataset.pi;
+    const p = state.groups[gi]?.params[pi];
+    if (!p) return;
+    p.visible = e.target.checked;
+    const row = e.target.closest('.param-row');
+    row?.querySelector('.swatch')?.classList.toggle('off', !p.visible);
+    scheduleChartDraw();
+  }
+});
+
+paramListEl.addEventListener('click', e => {
+  const sw = e.target.closest('.swatch');
+  if (sw){
+    e.stopPropagation();
+    const row = sw.closest('.param-row');
+    const cb = row.querySelector('.p-vis');
+    cb.checked = !cb.checked;
+    cb.dispatchEvent(new Event('change', { bubbles: true }));
+    return;
+  }
+});
+
+paramListEl.addEventListener('click', e => {
+  const toggle = e.target.closest('.group-toggle');
+  if (toggle){
+    const gi = +toggle.dataset.gi;
+    if (gi === 0){ toast('第一类数据不可关闭', 'err'); return; }
+    const group = state.groups[gi];
+    if (!group) return;
+    const anyVisible = group.params.some(p => p.visible);
+    group.params.forEach(p => p.visible = !anyVisible);
+    renderParams();
+    scheduleChartDraw();
+    return;
+  }
+});
+
+paramListEl.addEventListener('click', e => {
+  if (e.target.closest('.swatch') ||
+      e.target.closest('input[type=checkbox]') ||
+      e.target.closest('.p-select') ||
+      e.target.closest('.p-value') ||
+      e.target.closest('.group-toggle')) return;
+  const row = e.target.closest('.param-row');
+  if (!row) return;
+  const gi = +row.dataset.gi, pi = +row.dataset.pi;
+  if (state.hiGi === gi && state.hiPi === pi){
+    state.hiGi = -1; state.hiPi = -1;
+  } else {
+    state.hiGi = gi; state.hiPi = pi;
+  }
+  refreshHightlight();
+  scheduleChartDraw();
+});
+
+/* =========================================================
+   告警
+   ========================================================= */
+function getActiveAlarms(){
+  const idx = state.cursorIdx;
+  const alarms = [];
+  state.groups.forEach(g => g.params.forEach(p => {
+    if (!p.alarmOption) return;
+    const alarmIdx = (p.options || []).indexOf(p.alarmOption);
+    if (alarmIdx >= 0 && Math.round(p.series[idx]) === alarmIdx){
+      alarms.push(p.name);
+    }
+  }));
+  return alarms;
+}
+function updateAlarmBar(){
+  const alarms = getActiveAlarms();
+  if (alarms.length){
+    alarmBar.classList.add('show');
+    alarmText.textContent = '⚠ ' + alarms.join(' · ');
+  } else alarmBar.classList.remove('show');
+}
+
+/* =========================================================
+   时间显示
+   ========================================================= */
+function updateTimeDisplay(){
+  const N = state.timeline.samples;
+  const { start, end } = state.timeline;
+  const t = start + (end - start) * state.cursorIdx / Math.max(1, N - 1);
+  curTimeEl.textContent = `T = ${t.toFixed(1)} s`;
+  curPointEl.textContent = `第 ${state.cursorIdx + 1} / ${N} 点`;
+}
+
+/* =========================================================
+   标尺
+   ========================================================= */
+function drawRuler(){
+  const W = chartScroll.clientWidth;
+  const H = 36;
+  const dpr = window.devicePixelRatio || 1;
+  const th = T();
+  rulerCanvas.width  = Math.round(W * dpr);
+  rulerCanvas.height = Math.round(H * dpr);
+  rulerCanvas.style.width  = W + 'px';
+  rulerCanvas.style.height = H + 'px';
+  const ctx = rulerCanvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = th.rulerBg;
+  ctx.fillRect(0, 0, W, H);
+
+  const plotX = LEFT_W;
+  const plotW = Math.max(10, W - LEFT_W - RIGHT_W);
+  const N = state.timeline.samples;
+  const v = getViewRange(N);
+
+  const ts0 = state.timeline.start +
+    (state.timeline.end - state.timeline.start) * v.start / Math.max(1, N - 1);
+  const ts1 = state.timeline.start +
+    (state.timeline.end - state.timeline.start) * v.end / Math.max(1, N - 1);
+
+  ctx.fillStyle = th.timeTick;
+  ctx.font = `600 9.5px ${FONT}`;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillText('PARAM', 12, 8);
+  ctx.textAlign = 'right';
+  ctx.fillText('VALUE', W - 12, 8);
+
+  const ticks = 6;
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= ticks; i++){
+    const x = plotX + plotW * i / ticks;
+    const t = ts0 + (ts1 - ts0) * i / ticks;
+    ctx.fillStyle = th.timeTick;
+    ctx.font = `10px ${MONO}`;
+    ctx.fillText(formatTime(t), x, 18);
+
+    ctx.strokeStyle = th.rulerBorder;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(Math.round(x) + 0.5, 24);
+    ctx.lineTo(Math.round(x) + 0.5, 29);
+    ctx.stroke();
+  }
+
+  state.labels.forEach(l => {
+    const ratio = labelToRatio(l.time);
+    const visT0 = v.start / Math.max(1, N - 1);
+    const visT1 = v.end / Math.max(1, N - 1);
+    if (ratio < visT0 || ratio > visT1) return;
+    const x = plotX + plotW * (ratio - visT0) / Math.max(0.0001, visT1 - visT0);
+
+    ctx.strokeStyle = th.tag;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x, 2);
+    ctx.lineTo(x, H - 3);
+    ctx.stroke();
+
+    ctx.fillStyle = th.tag;
+    ctx.beginPath();
+    ctx.moveTo(x - 3.5, H - 3);
+    ctx.lineTo(x + 3.5, H - 3);
+    ctx.lineTo(x, H - 8);
+    ctx.closePath();
+    ctx.fill();
+
+    if (l.text){
+      ctx.save();
+      ctx.fillStyle = th.tagText;
+      ctx.font = `600 9.5px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      const txtW = ctx.measureText(l.text).width;
+      const tx = clamp(x, plotX + txtW/2, plotX + plotW - txtW/2);
+      ctx.fillText(l.text, tx, 2);
+      ctx.restore();
+    }
+  });
+
+  if (state.cursorIdx >= v.start && state.cursorIdx <= v.end){
+    const span = Math.max(1, v.end - v.start);
+    const cx = plotX + plotW * (state.cursorIdx - v.start) / span;
+    ctx.beginPath();
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
+    ctx.strokeStyle = th.cursor;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = th.cursor;
+    ctx.beginPath();
+    ctx.moveTo(cx - 4, 0); ctx.lineTo(cx + 4, 0); ctx.lineTo(cx, 6);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+/* =========================================================
+   主图
+   ========================================================= */
+let drawPending = false;
+function scheduleChartDraw(){
+  if (drawPending) return;
+  drawPending = true;
+  requestAnimationFrame(() => {
+    drawPending = false;
+    drawChart();
+  });
+}
+
+function drawChart(){
+  const W = chartScroll.clientWidth;
+  if (W < 40) return;
+  const layout = computeLayout();
+  const H = layout.totalH;
+  const dpr = window.devicePixelRatio || 1;
+  chartCanvas.width  = Math.round(W * dpr);
+  chartCanvas.height = Math.round(H * dpr);
+  chartCanvas.style.width  = W + 'px';
+  chartCanvas.style.height = H + 'px';
+  const ctx = chartCanvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  paintChart(ctx, W, H, layout);
+}
+
+function paintChart(ctx, W, H, layout){
+  const th = T();
+  const items = layout.items;
+  const plotX = LEFT_W;
+  const plotW = Math.max(10, W - LEFT_W - RIGHT_W);
+  const N = state.timeline.samples;
+  const v = getViewRange(N);
+
+  ctx.fillStyle = th.canvasBg;
+  ctx.fillRect(0, 0, W, H);
+
+  items.forEach(item => {
+    if (item.type === 'group') drawGroupHeader(ctx, item, W, th);
+    else drawStrip(ctx, item, W, plotX, plotW, N, th, v);
+  });
+
+  if (state.cursorIdx >= v.start && state.cursorIdx <= v.end){
+    const span = Math.max(1, v.end - v.start);
+    const cx = plotX + plotW * (state.cursorIdx - v.start) / span;
+    ctx.save();
+    ctx.strokeStyle = th.cursor;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawGroupHeader(ctx, item, W, th){
+  const { y, h, name, count } = item;
+  ctx.fillStyle = th.headerBg;
+  ctx.fillRect(0, y, W, h);
+  ctx.fillStyle = th.headerAccent;
+  ctx.fillRect(0, y, 3, h);
+  ctx.fillStyle = th.headerInk;
+  ctx.font = `700 11.5px ${FONT}`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(name, 12, y + h / 2);
+  ctx.fillStyle = th.headerCount;
+  ctx.font = `400 10px ${MONO}`;
+  ctx.textAlign = 'right';
+  ctx.fillText(`${count} PARAM`, W - 12, y + h / 2);
+}
+
+function drawStrip(ctx, item, W, plotX, plotW, N, th, view){
+  const { y, h, param, gi, pi } = item;
+  const color = paramColor(gi, pi);
+  const series = param.series;
+  if (!series || series.length < 2) return;
+  if (view.count < 2) return;
+
+  const isHi = (gi === state.hiGi && pi === state.hiPi);
+  const span = Math.max(1, view.end - view.start);
+
+  ctx.fillStyle = isHi ? th.stripHi : ((gi % 2) ? th.stripBgAlt : th.stripBg);
+  ctx.fillRect(plotX, y, plotW, h);
+  ctx.fillStyle = isHi ? th.stripHi : th.leftBg;
+  ctx.fillRect(0, y, plotX, h);
+  ctx.fillRect(plotX + plotW, y, W - plotX - plotW, h);
+
+  const ticks = 6;
+  ctx.strokeStyle = th.grid;
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= ticks; i++){
+    const x = Math.round(plotX + plotW * i / ticks) + 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y); ctx.lineTo(x, y + h);
+    ctx.stroke();
+  }
+
+  if (param.alarmOption){
+    const alarmIdx = (param.options || []).indexOf(param.alarmOption);
+    if (alarmIdx >= 0){
+      ctx.fillStyle = th.alarm;
+      const cellW = plotW / span;
+      for (let k = view.start; k <= view.end; k++){
+        if (Math.round(series[k]) === alarmIdx){
+          const x = plotX + plotW * (k - view.start) / span;
+          ctx.fillRect(x - cellW / 2, y, cellW + 0.5, h);
+        }
+      }
+    }
+  }
+
+  const { mn, mx } = getRange(param);
+  const range = mx - mn || 1;
+  const padY = h * 0.16;
+  const innerH = h - padY * 2;
+
+  const pts = [];
+  for (let k = view.start; k <= view.end; k++){
+    pts.push({
+      x: plotX + plotW * (k - view.start) / span,
+      y: y + padY + innerH * (1 - (series[k] - mn) / range)
+    });
+  }
+
+  const isDiscrete = param.type === 'select';
+  if (isDiscrete){
+    const n = (param.options || []).length;
+    if (n > 1){
+      ctx.strokeStyle = th.gridRef;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < n; i++){
+        const ratio = (i - mn) / range;
+        const ly = y + padY + innerH * (1 - ratio);
+        ctx.beginPath();
+        ctx.moveTo(plotX, Math.round(ly) + 0.5);
+        ctx.lineTo(plotX + plotW, Math.round(ly) + 0.5);
+        ctx.stroke();
+      }
+    }
+  }
+
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = isHi ? 2.0 : 1.6;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  if (state.dark){
+    ctx.shadowColor = color;
+    ctx.shadowBlur = isHi ? 10 : 5;
+  }
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  if (isDiscrete){
+    for (let k = 1; k < pts.length; k++){
+      ctx.lineTo(pts[k].x, pts[k-1].y);
+      ctx.lineTo(pts[k].x, pts[k].y);
+    }
+  } else {
+    for (let k = 0; k < pts.length - 1; k++){
+      const p0 = pts[k - 1] || pts[k];
+      const p1 = pts[k];
+      const p2 = pts[k + 1];
+      const p3 = pts[k + 2] || pts[k + 1];
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  if (view.count <= 140 && h >= 18){
+    ctx.fillStyle = color;
+    for (let k = 0; k < pts.length; k++){
+      ctx.beginPath();
+      ctx.arc(pts[k].x, pts[k].y, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (state.cursorIdx >= view.start && state.cursorIdx <= view.end){
+    const ci = state.cursorIdx - view.start;
+    const cx = pts[ci].x, cy = pts[ci].y;
+    ctx.save();
+    if (state.dark){
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 12;
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+    ctx.fillStyle = color + (state.dark ? '44' : '33');
+    ctx.fill();
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fillStyle = state.dark ? th.canvasBg : '#ffffff';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.stroke();
+  }
+
+  const nameSize = h < 20 ? 10.5 : (h < 26 ? 11.5 : 12);
+  ctx.fillStyle = isHi ? th.labelHi : th.label;
+  ctx.font = `${isHi ? 700 : 500} ${nameSize}px ${FONT}`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(param.name, 12, y + h / 2);
+
+  const val = series[state.cursorIdx];
+  const valTxt = formatValue(param, val);
+  const unitTxt = param.unit && param.unit !== '—' ? param.unit : '';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  if (unitTxt){
+    ctx.fillStyle = th.unit;
+    ctx.font = `400 10px ${MONO}`;
+    ctx.fillText(unitTxt, W - 10, y + h / 2 + 1);
+  }
+  const valSize = h < 20 ? 10.5 : (h < 26 ? 11.5 : 12.5);
+  ctx.fillStyle = color;
+  ctx.font = `${isDiscrete ? '600' : '700'} ${valSize}px ${isDiscrete ? FONT : MONO}`;
+  ctx.fillText(valTxt, W - 10 - (unitTxt ? 46 : 0), y + h / 2);
+
+  if (isHi){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 0.35;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.strokeRect(plotX + plotW + 3.5, y + 2.5, RIGHT_W - 7, h - 5);
+    ctx.restore();
+  }
+
+  ctx.strokeStyle = th.separator;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, Math.round(y + h + STRIP_GAP / 2) + 0.5);
+  ctx.lineTo(W, Math.round(y + h + STRIP_GAP / 2) + 0.5);
+  ctx.stroke();
+}
+
+/* =========================================================
+   图表右侧值框编辑
+   ========================================================= */
+let activeEditor = null;
+
+function closeEditor(){
+  if (activeEditor){
+    activeEditor.remove();
+    activeEditor = null;
+    updateAll();
+  }
+}
+
+function openValueEditor(item){
+  closeEditor();
+  const { y, h, param } = item;
+
+  const canvasRect = chartCanvas.getBoundingClientRect();
+  const W = chartCanvas.clientWidth;
+  const leftPx = canvasRect.left + W - RIGHT_W + 4;
+  const topPx  = canvasRect.top + y + 2;
+  const widthPx = RIGHT_W - 8;
+  const heightPx = h - 4;
+
+  const isSelect = param.type === 'select';
+  let editor;
+
+  if (isSelect){
+    editor = document.createElement('select');
+    editor.className = 'inline-editor select-mode';
+    const opts = param.options || [];
+    const curIdx = Math.round(clamp(param.series[state.cursorIdx], 0, opts.length - 1));
+    editor.innerHTML = opts.map((o, i) =>
+      `<option value="${i}" ${i === curIdx ? 'selected' : ''}>${esc(o)}</option>`
+    ).join('');
+    editor.addEventListener('change', () => {
+      const newIdx = parseInt(editor.value, 10);
+      if (isFinite(newIdx)){
+        param.series[state.cursorIdx] = newIdx;
+        scheduleChartDraw();
+        updateAlarmBar();
+      }
+    });
+    editor.addEventListener('blur', closeEditor);
+  } else {
+    editor = document.createElement('input');
+    editor.type = 'text';
+    editor.className = 'inline-editor';
+    editor.value = formatNum(param.series[state.cursorIdx]);
+    editor.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter'){
+        ev.preventDefault();
+        commit(editor.value);
+      } else if (ev.key === 'Escape'){
+        ev.preventDefault();
+        closeEditor();
+      }
+    });
+    editor.addEventListener('blur', () => commit(editor.value));
+  }
+
+  function commit(val){
+    if (editor && editor.dataset.committed) return;
+    editor.dataset.committed = '1';
+    const v = parseFloat(val);
+    if (isFinite(v)){
+      param.series[state.cursorIdx] = v;
+      scheduleChartDraw();
+    } else {
+      toast('请输入有效数值', 'err');
+    }
+    closeEditor();
+  }
+
+  editor.style.left = leftPx + 'px';
+  editor.style.top = topPx + 'px';
+  editor.style.width = widthPx + 'px';
+  editor.style.height = Math.max(20, heightPx) + 'px';
+
+  document.body.appendChild(editor);
+  activeEditor = editor;
+
+  editor.addEventListener('pointerdown', e => e.stopPropagation());
+  editor.addEventListener('click', e => e.stopPropagation());
+
+  setTimeout(() => {
+    editor.focus();
+    if (editor.select) editor.select();
+  }, 10);
+}
+
+chartScroll.addEventListener('scroll', closeEditor, { passive: true });
+window.addEventListener('resize', closeEditor);
+
+/* =========================================================
+   交互
+   ========================================================= */
+let isDragging = false;
+
+function pickIndexFromX(clientX){
+  const rect = chartCanvas.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const W = chartCanvas.clientWidth;
+  const plotX = LEFT_W;
+  const plotW = W - LEFT_W - RIGHT_W;
+  if (x < plotX || x > plotX + plotW) return null;
+  const u = (x - plotX) / plotW;
+  const N = state.timeline.samples;
+  const v = getViewRange(N);
+  return clamp(Math.round(v.start + u * (v.end - v.start)), 0, N - 1);
+}
+
+function pickParamFromY(clientY){
+  const rect = chartCanvas.getBoundingClientRect();
+  const y = clientY - rect.top;
+  const layout = computeLayout();
+  for (const item of layout.items){
+    if (item.type !== 'strip') continue;
+    if (y >= item.y && y <= item.y + item.h) return item;
+  }
+  return null;
+}
+
+function hitRightValueBox(clientX, clientY){
+  const rect = chartCanvas.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  const W = chartCanvas.clientWidth;
+  if (x < W - RIGHT_W + 2) return null;
+  const layout = computeLayout();
+  for (const item of layout.items){
+    if (item.type !== 'strip') continue;
+    if (y >= item.y && y <= item.y + item.h) return item;
+  }
+  return null;
+}
+
+chartCanvas.addEventListener('pointerdown', e => {
+  const boxHit = hitRightValueBox(e.clientX, e.clientY);
+  if (boxHit){
+    e.preventDefault();
+    e.stopPropagation();
+    openValueEditor(boxHit);
+    return;
+  }
+
+  const idx = pickIndexFromX(e.clientX);
+  if (idx === null) return;
+
+  isDragging = true;
+  chartCanvas.setPointerCapture(e.pointerId);
+
+  const item = pickParamFromY(e.clientY);
+  if (item){
+    const { y: sy, h, param } = item;
+    const { mn, mx } = getRange(param);
+    const range = mx - mn || 1;
+    const padY = h * 0.16;
+    const innerH = h - padY * 2;
+    const py = sy + padY + innerH * (1 - (param.series[state.cursorIdx] - mn) / range);
+    if (Math.abs(py - (e.clientY - chartCanvas.getBoundingClientRect().top)) < Math.max(14, h * 0.5)){
+      state.hiGi = item.gi; state.hiPi = item.pi;
+    } else {
+      state.hiGi = -1; state.hiPi = -1;
+    }
+  } else {
+    state.hiGi = -1; state.hiPi = -1;
+  }
+
+  state.cursorIdx = idx;
+  ensureCursorVisible();
+  updateAll();
+  e.preventDefault();
+});
+
+chartCanvas.addEventListener('pointermove', e => {
+  if (!isDragging) return;
+  const idx = pickIndexFromX(e.clientX);
+  if (idx === null || idx === state.cursorIdx) return;
+  state.cursorIdx = idx;
+  ensureCursorVisible();
+  updateAll();
+});
+
+chartCanvas.addEventListener('pointerup', e => {
+  if (!isDragging) return;
+  isDragging = false;
+  try { chartCanvas.releasePointerCapture(e.pointerId); } catch(_){}
+});
+
+chartCanvas.addEventListener('pointercancel', () => { isDragging = false; });
+
+/* =========================================================
+   缩放
+   ========================================================= */
+const zoomInXBtn   = document.getElementById('zoomInX');
+const zoomOutXBtn  = document.getElementById('zoomOutX');
+const zoomFitXBtn  = document.getElementById('zoomFitX');
+const zoomInYBtn   = document.getElementById('zoomInY');
+const zoomOutYBtn  = document.getElementById('zoomOutY');
+const zoomFitYBtn  = document.getElementById('zoomFitY');
+
+function updateZoomUI(){
+  zoomFitXBtn.classList.toggle('active', state.view.autoFitX);
+  zoomFitYBtn.classList.toggle('active', state.view.autoFitY);
+  zoomXLevel.textContent = state.view.autoFitX ? '100%' : `${Math.round(state.view.zoomX * 100)}%`;
+}
+
+zoomInXBtn.addEventListener('click', () => {
+  const oldZoom = state.view.autoFitX ? 1 : state.view.zoomX;
+  state.view.zoomX = Math.min(20, oldZoom * 1.6);
+  state.view.autoFitX = false;
+  centerCursor();
+  updateZoomUI();
+  updateAll();
+});
+zoomOutXBtn.addEventListener('click', () => {
+  const oldZoom = state.view.autoFitX ? 1 : state.view.zoomX;
+  const newZoom = oldZoom / 1.6;
+  if (newZoom <= 1.001){
+    state.view.zoomX = 1;
+    state.view.autoFitX = true;
+    state.view.startIdx = 0;
+  } else {
+    state.view.zoomX = newZoom;
+    state.view.autoFitX = false;
+  }
+  updateZoomUI();
+  updateAll();
+});
+zoomFitXBtn.addEventListener('click', () => {
+  state.view.autoFitX = true;
+  state.view.zoomX = 1;
+  state.view.startIdx = 0;
+  updateZoomUI();
+  updateAll();
+});
+zoomInYBtn.addEventListener('click', () => {
+  const cur = computeLayout().stripH;
+  state.view.autoFitY = false;
+  state.view.stripH = Math.min(120, Math.round(cur + 4));
+  updateZoomUI();
+  updateAll();
+});
+zoomOutYBtn.addEventListener('click', () => {
+  const cur = computeLayout().stripH;
+  state.view.autoFitY = false;
+  state.view.stripH = Math.max(10, Math.round(cur - 4));
+  updateZoomUI();
+  updateAll();
+});
+zoomFitYBtn.addEventListener('click', () => {
+  state.view.autoFitY = true;
+  updateZoomUI();
+  updateAll();
+});
+
+/* =========================================================
+   播放 / 导航
+   ========================================================= */
+const navPrev = document.getElementById('navPrev');
+const navNext = document.getElementById('navNext');
+const navPlay = document.getElementById('navPlay');
+
+navPrev.addEventListener('click', () => {
+  if (state.cursorIdx > 0){
+    state.cursorIdx--;
+    ensureCursorVisible();
+    updateAll();
+  }
+});
+navNext.addEventListener('click', () => {
+  if (state.cursorIdx < state.timeline.samples - 1){
+    state.cursorIdx++;
+    ensureCursorVisible();
+    updateAll();
+  }
+});
+
+let playTimer = null;
+function startPlay(){
+  stopPlay();
+  state.playing = true;
+  navPlay.textContent = '⏸';
+  navPlay.title = '暂停 (空格)';
+  playTimer = setInterval(() => {
+    if (state.cursorIdx >= state.timeline.samples - 1){
+      stopPlay();
+      return;
+    }
+    state.cursorIdx++;
+    ensureCursorVisible();
+    updateAll();
+  }, 80);
+}
+function stopPlay(){
+  state.playing = false;
+  if (playTimer){ clearInterval(playTimer); playTimer = null; }
+  navPlay.textContent = '▶';
+  navPlay.title = '播放 (空格)';
+}
+function togglePlay(){
+  if (state.playing) stopPlay(); else startPlay();
+}
+navPlay.addEventListener('click', togglePlay);
+
+/* =========================================================
+   键盘
+   ========================================================= */
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, select, textarea')) return;
+  if (guideMask.classList.contains('show')){
+    if (e.key === 'Escape'){ hideGuide(); e.preventDefault(); }
+    return;
+  }
+  if (e.key === 'ArrowLeft'){
+    if (state.cursorIdx > 0){
+      state.cursorIdx--;
+      ensureCursorVisible();
+      updateAll();
+    }
+    e.preventDefault();
+  } else if (e.key === 'ArrowRight'){
+    if (state.cursorIdx < state.timeline.samples - 1){
+      state.cursorIdx++;
+      ensureCursorVisible();
+      updateAll();
+    }
+    e.preventDefault();
+  } else if (e.key === 'Home'){
+    state.cursorIdx = 0;
+    ensureCursorVisible(); updateAll();
+    e.preventDefault();
+  } else if (e.key === 'End'){
+    state.cursorIdx = state.timeline.samples - 1;
+    ensureCursorVisible(); updateAll();
+    e.preventDefault();
+  } else if (e.key === ' '){
+    togglePlay();
+    e.preventDefault();
+  }
+});
+
+/* =========================================================
+   更新
+   ========================================================= */
+function updateAll(){
+  updateTimeDisplay();
+  refreshParamValues();
+  refreshHightlight();
+  updateAlarmBar();
+  drawRuler();
+  scheduleChartDraw();
+}
+
+/* =========================================================
+   指南
+   ========================================================= */
+function showGuide(){
+  guideMask.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function hideGuide(){
+  guideMask.classList.remove('show');
+  document.body.style.overflow = '';
+}
+document.getElementById('btnGuide').addEventListener('click', showGuide);
+document.getElementById('guideClose').addEventListener('click', hideGuide);
+guideMask.addEventListener('click', e => {
+  if (e.target === guideMask) hideGuide();
+});
+
+/* =========================================================
+   主题 / 清除 / 重置
+   ========================================================= */
+document.getElementById('btnTheme').addEventListener('click', () => {
+  state.dark = !state.dark;
+  applyTheme();
+  renderParams();
+  updateAll();
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  if (!confirm('确定清除所有数据？所有参数将回到基准值。')) return;
+  clearAll();
+  renderParams();
+  updateAll();
+  toast('已清除所有数据', 'ok');
+});
+
+document.getElementById('btnReset').addEventListener('click', () => {
+  if (!confirm('确定重置为示例数据？')) return;
+  const dark = state.dark;
+  const view = { ...state.view };
+  state = buildState(deepClone(DEFAULT_DATA));
+  state.dark = dark;
+  state.view = view;
+  applyTheme();
+  renderMeta();
+  renderTimeline();
+  renderLabels();
+  renderParams();
+  updateZoomUI();
+  updateAll();
+  toast('已重置为示例数据', 'ok');
+});
+
+/* =========================================================
+   尺寸
+   ========================================================= */
+if (window.ResizeObserver){
+  new ResizeObserver(() => {
+    drawRuler();
+    scheduleChartDraw();
+  }).observe(chartScroll);
+}
+window.addEventListener('resize', () => {
+  drawRuler();
+  scheduleChartDraw();
+});
+
+/* =========================================================
+   LNFDR
+   ========================================================= */
+function buildLNFDR(){
+  const total = state.groups.reduce((s, g) => s + g.params.length, 0);
+  const N = state.timeline.samples;
+  const span = state.timeline.end - state.timeline.start;
+  const times = [];
+  for (let i = 0; i < N; i++){
+    times.push(+(state.timeline.start + span * i / Math.max(1, N - 1)).toFixed(3));
+  }
+  return JSON.stringify({
+    format: 'LNFDR', version: '2.4',
+    generator: 'LN-LAB & Photaxis-Lab',
+    createdAt: new Date().toISOString(),
+    meta: { ...state.meta },
+    timeline: { start: state.timeline.start, end: state.timeline.end, samples: state.timeline.samples, times },
+    labels: state.labels.map(l => ({ time: l.time, text: l.text })),
+    stats: { groupCount: state.groups.length, parameterCount: total },
+    groups: state.groups.map(g => ({
+      name: g.name,
+      parameters: g.params.map(p => ({
+        name: p.name, unit: p.unit,
+        type: p.type || 'numeric',
+        options: p.options || undefined,
+        alarmOption: p.alarmOption || undefined,
+        visible: p.visible, baseValue: p.value,
+        series: p.series.map(v => +v.toFixed(6))
+      }))
+    }))
+  }, null, 2);
+}
+
+function fileStamp(){
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+document.getElementById('btnExport').addEventListener('click', () => {
+  const content = buildLNFDR();
+  const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `FDR_${(state.meta.tailNumber || 'UNKNOWN').replace(/\s+/g, '')}_${fileStamp()}.LNFDR`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  toast('已导出 LNFDR 文件', 'ok');
+});
+
+document.getElementById('btnImport').addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const raw = JSON.parse(String(reader.result));
+      const dark = state.dark;
+      const view = { ...state.view };
+      state = normalizeImport(raw);
+      state.dark = dark;
+      state.view = view;
+      applyTheme();
+      renderMeta();
+      renderTimeline();
+      renderLabels();
+      renderParams();
+      updateZoomUI();
+      updateAll();
+      toast(`已导入：${f.name}`, 'ok');
+    } catch(err){
+      console.error(err);
+      toast('导入失败：文件格式无效', 'err');
+    }
+  };
+  reader.onerror = () => toast('读取文件失败', 'err');
+  reader.readAsText(f);
+  fileInput.value = '';
+});
+
+function normalizeImport(raw){
+  const out = {
+    meta: {},
+    timeline: { start: 0, end: 180, samples: 120 },
+    labels: [],
+    groups: [],
+    cursorIdx: 0, hiGi: -1, hiPi: -1,
+    dark: false, playing: false,
+    view: { autoFitY: true, stripH: 32, autoFitX: true, zoomX: 1, startIdx: 0 }
+  };
+  META_FIELDS.forEach(([k]) => {
+    out.meta[k] = (raw && raw.meta && raw.meta[k] != null) ? String(raw.meta[k]) : '';
+  });
+  if (raw && raw.timeline){
+    out.timeline.start   = Number(raw.timeline.start) || 0;
+    out.timeline.end     = Number(raw.timeline.end) || 180;
+    out.timeline.samples = clamp(Number(raw.timeline.samples) || 120, 8, 400);
+  }
+  if (Array.isArray(raw && raw.labels)){
+    out.labels = raw.labels.map(l => ({
+      id: uid(),
+      time: Number(l.time) || 0,
+      text: String(l.text || '')
+    }));
+  }
+  const src = Array.isArray(raw && raw.groups) ? raw.groups : [];
+  src.forEach(g => {
+    const params = Array.isArray(g.parameters) ? g.parameters : [];
+    out.groups.push({
+      name: String(g.name ?? '未命名分组'),
+      params: params.map(p => ({
+        id: uid(),
+        name: String(p.name ?? ''),
+        value: String(p.baseValue ?? p.value ?? '0'),
+        unit: String(p.unit ?? ''),
+        type: p.type === 'select' ? 'select' : 'numeric',
+        options: Array.isArray(p.options) ? p.options.slice() : null,
+        alarmOption: p.alarmOption || null,
+        visible: p.visible !== false,
+        series: Array.isArray(p.series) && p.series.length === out.timeline.samples
+          ? p.series.slice() : null
+      }))
+    });
+  });
+  if (!out.groups.length){
+    const fb = buildState(deepClone(DEFAULT_DATA));
+    fb.timeline = out.timeline;
+    return fb;
+  }
+  out.groups.forEach(g => g.params.forEach(p => {
+    if (!p.series) p.series = generateSeries(p, out.timeline.samples);
+  }));
+  out.cursorIdx = Math.round((out.timeline.samples - 1) * 0.5);
+  return out;
+}
+
+/* =========================================================
+   PNG 导出
+   ========================================================= */
+document.getElementById('btnPng').addEventListener('click', () => {
+  closeEditor();
+  const dpr = 2;
+  const W = 1500;
+  const savedAutoFit = state.view.autoFitY;
+  const savedH = state.view.stripH;
+  const savedAutoFitX = state.view.autoFitX;
+  const savedStart = state.view.startIdx;
+
+  state.view.autoFitY = false;
+  state.view.stripH = 34;
+  state.view.autoFitX = true;
+  state.view.startIdx = 0;
+
+  const pngLayout = computeLayout(99999);
+  const totalH = pngLayout.totalH;
+  const headerH = 92, footerH = 48;
+  const H = headerH + totalH + footerH;
+
+  const c = document.createElement('canvas');
+  c.width  = Math.round(W * dpr);
+  c.height = Math.round(H * dpr);
+  const ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const th = T();
+  const inkColor = state.dark ? '#e6edf5' : '#0f1b2d';
+  const mutedColor = state.dark ? '#7f92aa' : '#7d90ab';
+  const lineColor = state.dark ? '#242e3d' : '#e4eaf3';
+
+  ctx.fillStyle = th.canvasBg;
+  ctx.fillRect(0, 0, W, H);
+
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, '#1f6feb');
+  grad.addColorStop(1, '#4aa3ff');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, 4);
+
+  ctx.fillStyle = inkColor;
+  ctx.font = `700 22px ${FONT}`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('飞行数据记录器 (FDR) · 飞行数据条带图', 38, 46);
+
+  const metaLine = [
+    state.meta.aircraftType, state.meta.tailNumber,
+    state.meta.flightNumber, state.meta.date
+  ].filter(Boolean).join('   ·   ');
+  ctx.fillStyle = mutedColor;
+  ctx.font = `400 12px ${MONO}`;
+  ctx.fillText(metaLine, 38, 68);
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = mutedColor;
+  ctx.font = `400 11.5px ${MONO}`;
+  const total = state.groups.reduce((s, g) => s + g.params.length, 0);
+  ctx.fillText(
+    `${state.timeline.end - state.timeline.start}s · ${state.timeline.samples} samples · ${total} params`,
+    W - 38, 46
+  );
+  ctx.fillText('LNFDR · 2.4', W - 38, 68);
+
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(38, 84.5);
+  ctx.lineTo(W - 38, 84.5);
+  ctx.stroke();
+
+  ctx.save();
+  ctx.translate(0, headerH);
+  paintChart(ctx, W, totalH, pngLayout);
+  ctx.restore();
+
+  if (state.labels.length){
+    ctx.save();
+    const tagY = headerH + totalH + 18;
+    ctx.font = `600 10px ${FONT}`;
+    ctx.fillStyle = th.tagText;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('标签：', 38, tagY);
+
+    let tx = 38 + 42;
+    state.labels.forEach(l => {
+      const label = `${l.text || '(未命名)'} @ ${l.time.toFixed(1)}s`;
+      const w = ctx.measureText(label).width;
+      if (tx + w > W - 38){
+        tx = 38 + 42;
+      }
+      ctx.fillStyle = th.tag;
+      ctx.fillRect(tx, tagY - 3, 3, 6);
+      ctx.fillStyle = inkColor;
+      ctx.font = `500 10px ${FONT}`;
+      ctx.fillText(label, tx + 7, tagY);
+      tx += w + 22;
+    });
+    ctx.restore();
+  }
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = mutedColor;
+  ctx.font = `400 11px ${MONO}`;
+  ctx.fillText(`生成时间 ${new Date().toLocaleString('zh-CN')}`, 38, H - 18);
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = state.dark ? '#4aa3ff' : '#1f6feb';
+  ctx.font = `700 11px ${MONO}`;
+  ctx.fillText('LN-LAB · Photaxis-Lab', W - 38, H - 18);
+
+  state.view.autoFitY = savedAutoFit;
+  state.view.stripH = savedH;
+  state.view.autoFitX = savedAutoFitX;
+  state.view.startIdx = savedStart;
+
+  c.toBlob(blob => {
+    if (!blob){ toast('PNG 生成失败', 'err'); return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `FDR_${(state.meta.tailNumber || 'UNKNOWN').replace(/\s+/g, '')}_${fileStamp()}.png`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    toast('已导出 PNG 图片', 'ok');
+  }, 'image/png');
+});
+
+/* =========================================================
+   启动
+   ========================================================= */
+applyTheme();
+renderMeta();
+renderTimeline();
+renderLabels();
+renderParams();
+updateZoomUI();
+updateAll();
+setTimeout(() => {
+  drawRuler();
+  scheduleChartDraw();
+}, 100);
+</script>
+</body>
+</html>
