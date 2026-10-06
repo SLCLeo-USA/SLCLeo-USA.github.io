@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoFS ⇄ LNFDR 双向转换器 · LN-LAB</title>
+<style>
+  :root{
+    --bg:#05080d; --card:rgba(15,22,34,.88); --ink:#e8eef7;
+    --muted:#7f92aa; --line:rgba(90,120,160,.22);
+    --accent:#5ab4ff; --accent-glow:rgba(90,180,255,.35);
+    --accent2:#3fe08a; --accent2-glow:rgba(63,224,138,.4);
+    --danger:#ff4d4d; --ok:#3fe08a; --warn:#ffc043;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    font-size:13px;-webkit-font-smoothing:antialiased}
+  body{background:
+    radial-gradient(ellipse at top left, rgba(30,60,110,.35), transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(20,80,140,.2), transparent 55%),
+    var(--bg);min-height:100vh}
+
+  header{position:sticky;top:0;z-index:50;display:flex;align-items:center;
+    justify-content:space-between;padding:12px 24px;gap:16px;
+    background:rgba(5,8,13,.85);backdrop-filter:blur(14px) saturate(160%);
+    border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:38px;height:38px;border-radius:10px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(135deg,#0f6fe0,#5ab4ff);color:#fff;font-weight:800;
+    font-size:11px;letter-spacing:.5px;box-shadow:0 4px 18px rgba(31,111,235,.5)}
+  .brand h1{margin:0;font-size:15.5px;font-weight:700}
+  .brand .sub{font-size:11px;color:var(--muted);margin-top:1px}
+
+  .mode-switch{display:flex;align-items:center;gap:0;
+    background:rgba(8,13,22,.8);border:1px solid var(--line);
+    border-radius:9px;padding:3px}
+  .mode-btn{appearance:none;border:none;background:transparent;color:var(--muted);
+    padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:.18s;
+    display:inline-flex;align-items:center;gap:7px;
+    letter-spacing:.3px;white-space:nowrap}
+  .mode-btn:hover{color:var(--ink)}
+  .mode-btn.active.g2l{background:linear-gradient(135deg,#0f6fe0,#5ab4ff);color:#fff;
+    box-shadow:0 3px 12px rgba(31,111,235,.45)}
+  .mode-btn.active.l2g{background:linear-gradient(135deg,#22a35a,#3fe08a);color:#fff;
+    box-shadow:0 3px 12px rgba(63,224,138,.4)}
+  .mode-btn .arrow{font-size:14px;opacity:.9}
+
+  .header-actions{display:flex;gap:8px;align-items:center}
+
+  .btn{appearance:none;border:1px solid var(--line);background:rgba(15,22,34,.88);
+    color:var(--ink);padding:8px 15px;border-radius:7px;font-size:12.5px;
+    font-weight:600;cursor:pointer;font-family:inherit;transition:.12s;
+    backdrop-filter:blur(10px);display:inline-flex;align-items:center;gap:6px}
+  .btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(30,50,80,.9)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#04121f;font-weight:700}
+  .btn.primary:hover{filter:brightness(1.15);color:#04121f;background:var(--accent)}
+  .btn.primary.green{background:var(--accent2);border-color:var(--accent2);color:#04121f}
+  .btn.primary.green:hover{filter:brightness(1.15);color:#04121f;background:var(--accent2)}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+
+  main{max-width:1520px;margin:0 auto;padding:22px 26px 80px;
+    display:grid;grid-template-columns:420px 1fr;gap:20px;align-items:start}
+  @media (max-width:1080px){main{grid-template-columns:1fr;padding:16px 16px 60px}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px 18px;margin-bottom:14px;
+    box-shadow:0 8px 28px rgba(0,0,0,.4), 0 0 0 1px rgba(90,180,255,.05) inset;
+    backdrop-filter:blur(14px)}
+  .card h2{margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:1.4px;
+    text-transform:uppercase;color:var(--muted);
+    display:flex;align-items:center;gap:9px}
+  .card h2::before{content:"";width:3px;height:12px;border-radius:2px;
+    background:var(--accent);box-shadow:0 0 8px var(--accent-glow);transition:.2s}
+  body.mode-l2g .card h2::before{background:var(--accent2);box-shadow:0 0 8px var(--accent2-glow)}
+
+  #dropzone{border:2px dashed var(--line);border-radius:10px;padding:26px 20px;
+    text-align:center;cursor:pointer;transition:.15s;background:rgba(15,22,34,.5)}
+  #dropzone:hover,#dropzone.drag{border-color:var(--accent);
+    background:rgba(30,55,90,.4);box-shadow:0 0 0 4px rgba(90,180,255,.08)}
+  body.mode-l2g #dropzone:hover,body.mode-l2g #dropzone.drag{border-color:var(--accent2);
+    background:rgba(30,80,55,.4);box-shadow:0 0 0 4px rgba(63,224,138,.08)}
+  #dropzone .icon{font-size:32px;margin-bottom:8px;opacity:.85;display:block}
+  #dropzone .ttl{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+  #dropzone .sub{font-size:11.5px;color:var(--muted);line-height:1.6}
+
+  #fileStatus{margin-top:12px;padding:10px 12px;background:rgba(20,29,44,.6);
+    border:1px solid var(--line);border-radius:8px;font-size:12px;
+    color:var(--muted);line-height:1.65;display:none}
+  #fileStatus.show{display:block}
+  #fileStatus.err{border-color:rgba(255,77,77,.4);background:rgba(50,15,20,.5);color:#ffb0b0}
+  #fileStatus.ok{border-color:rgba(63,224,138,.35);background:rgba(15,50,32,.4);color:#9effc6}
+  #fileStatus .lbl{color:var(--muted);display:inline-block;min-width:88px}
+  #fileStatus .val{color:var(--ink);font-family:"SF Mono",Consolas,monospace;font-weight:600}
+  #fileStatus .val.hl{color:var(--accent)}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-grid label{display:flex;flex-direction:column;gap:5px;font-size:11px;
+    color:var(--muted);font-weight:600;letter-spacing:.4px}
+  .form-grid label.wide{grid-column:1/-1}
+  .form-grid input,.form-grid select{font-family:inherit;font-size:12.5px;color:var(--ink);
+    background:rgba(8,13,22,.8);border:1px solid var(--line);border-radius:6px;
+    padding:7px 10px;width:100%;transition:.15s}
+  .form-grid select{
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 9 6'><path d='M0 0l4.5 6 4.5-6z' fill='%235ab4ff'/></svg>");
+    background-repeat:no-repeat;background-position:right 10px center;
+    padding-right:30px;cursor:pointer}
+  body.mode-l2g .form-grid select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 9 6'><path d='M0 0l4.5 6 4.5-6z' fill='%233fe08a'/></svg>")}
+  .form-grid input:focus,.form-grid select:focus{outline:none;border-color:var(--accent);
+    background:rgba(15,25,40,.9);box-shadow:0 0 0 3px rgba(90,180,255,.12)}
+  body.mode-l2g .form-grid input:focus,body.mode-l2g .form-grid select:focus{
+    border-color:var(--accent2);box-shadow:0 0 0 3px rgba(63,224,138,.12)}
+  .form-grid input::placeholder{color:#4a5a72}
+  .form-grid select option{background:#0f1622;color:var(--ink)}
+  .form-grid .hint-sm{font-size:10px;color:#5a6d85;font-weight:500;margin-top:-2px}
+
+  .slider-row{display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:8px;font-size:12px}
+  .slider-row .lbl{color:var(--muted);font-weight:600}
+  .slider-row .val{font-family:"SF Mono",Consolas,monospace;font-size:14px;
+    font-weight:700;color:var(--accent);text-shadow:0 0 12px var(--accent-glow);transition:.2s}
+  body.mode-l2g .slider-row .val{color:var(--accent2);text-shadow:0 0 12px var(--accent2-glow)}
+  input[type=range].slider{width:100%;-webkit-appearance:none;appearance:none;
+    height:6px;border-radius:3px;
+    background:linear-gradient(90deg,#0f6fe0 0%,#5ab4ff var(--p,0%),#1a2636 var(--p,0%),#1a2636 100%);
+    outline:none;cursor:pointer;margin:6px 0 4px}
+  body.mode-l2g input[type=range].slider{
+    background:linear-gradient(90deg,#22a35a 0%,#3fe08a var(--p,0%),#1a2636 var(--p,0%),#1a2636 100%)}
+  input[type=range].slider::-webkit-slider-thumb{-webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;background:#fff;
+    border:3px solid var(--accent);
+    box-shadow:0 0 0 3px rgba(90,180,255,.25),0 0 12px rgba(90,180,255,.55);
+    cursor:pointer;transition:.12s}
+  body.mode-l2g input[type=range].slider::-webkit-slider-thumb{
+    border-color:var(--accent2);
+    box-shadow:0 0 0 3px rgba(63,224,138,.25),0 0 12px rgba(63,224,138,.55)}
+  input[type=range].slider::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range].slider::-moz-range-thumb{width:16px;height:16px;
+    border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer}
+
+  .hint-row{display:flex;justify-content:space-between;font-size:10.5px;
+    color:#5a6d85;font-family:"SF Mono",Consolas,monospace;margin-top:2px}
+
+  .info-block{margin-top:10px;padding:9px 12px;background:rgba(20,29,44,.5);
+    border:1px solid var(--line);border-radius:7px;font-size:11.5px;line-height:1.7}
+  .info-block .kv{display:flex;justify-content:space-between;gap:10px}
+  .info-block .k{color:var(--muted)}
+  .info-block .v{color:var(--ink);font-family:"SF Mono",Consolas,monospace;
+    font-weight:600;text-align:right}
+  .info-block .v.hl{color:var(--accent)}
+  body.mode-l2g .info-block .v.hl{color:var(--accent2)}
+
+  .preview-wrap{position:sticky;top:88px;display:flex;flex-direction:column;gap:14px}
+  @media (max-width:1080px){.preview-wrap{position:static}}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .stat-box{background:rgba(20,29,44,.6);border:1px solid var(--line);
+    border-radius:9px;padding:11px 13px}
+  .stat-box .sk{font-size:10px;color:var(--muted);font-weight:700;
+    letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+  .stat-box .sv{font-family:"SF Mono",Consolas,monospace;font-size:18px;
+    font-weight:700;color:var(--accent);letter-spacing:.5px;line-height:1.1;
+    text-shadow:0 0 14px var(--accent-glow)}
+  body.mode-l2g .stat-box .sv{color:var(--accent2);text-shadow:0 0 14px var(--accent2-glow)}
+  .stat-box.alt .sv{color:#3fe08a;text-shadow:0 0 14px rgba(63,224,138,.4)}
+  .stat-box.alt2 .sv{color:#ffc043;text-shadow:0 0 14px rgba(255,192,67,.4)}
+
+  #preview{display:block;width:100%;height:auto;background:rgba(8,13,22,.6);
+    border:1px solid var(--line);border-radius:10px;
+    box-shadow:0 8px 28px rgba(0,0,0,.4) inset}
+  .preview-title{font-size:11px;font-weight:700;color:var(--muted);
+    letter-spacing:1.4px;text-transform:uppercase;
+    display:flex;align-items:center;gap:9px;padding:2px 2px 0}
+  .preview-title::before{content:"";width:3px;height:12px;border-radius:2px;
+    background:var(--accent);box-shadow:0 0 8px var(--accent-glow);transition:.2s}
+  body.mode-l2g .preview-title::before{background:var(--accent2);box-shadow:0 0 8px var(--accent2-glow)}
+
+  .credit{position:fixed;right:20px;bottom:14px;z-index:40;
+    font-family:"SF Mono",Consolas,monospace;font-size:10px;letter-spacing:1.1px;
+    color:var(--muted);opacity:.6;pointer-events:none;user-select:none;
+    text-align:right;line-height:1.5}
+  .credit b{color:var(--accent);font-weight:700;opacity:.95}
+  body.mode-l2g .credit b{color:var(--accent2)}
+
+  #toast{position:fixed;left:50%;top:74px;transform:translate(-50%,-16px);
+    background:#0f1622;color:#fff;padding:11px 22px;border-radius:8px;
+    font-size:12.5px;font-weight:500;z-index:300;opacity:0;
+    transition:.25s cubic-bezier(.2,.9,.3,1.2);pointer-events:none;
+    box-shadow:0 14px 40px rgba(0,0,0,.7);border:1px solid rgba(90,180,255,.25);
+    max-width:80vw}
+  #toast.show{transform:translate(-50%,0);opacity:1}
+  #toast.err{background:#2a0e12;border-color:rgba(255,77,77,.5);color:#ffb0b0}
+  #toast.ok{background:#0a2818;border-color:rgba(63,224,138,.5);color:#9effc6}
+
+  @media (max-width:600px){
+    header{padding:10px 14px}
+    .brand h1{font-size:14px}
+    .brand .sub{display:none}
+    .form-grid{grid-template-columns:1fr}
+    .stats-grid{grid-template-columns:1fr 1fr}
+    .mode-btn{padding:6px 10px;font-size:11px}
+    .mode-btn .arrow{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">⇄</div>
+    <div>
+      <h1>GeoFS ⇄ LNFDR 双向转换器</h1>
+      <div class="sub" id="brandSub">选择转换方向 · 拖入文件即可转换</div>
+    </div>
+  </div>
+
+  <div class="mode-switch" role="tablist">
+    <button class="mode-btn g2l active" id="modeG2L" role="tab">
+      GeoFS <span class="arrow">→</span> LNFDR
+    </button>
+    <button class="mode-btn l2g" id="modeL2G" role="tab">
+      LNFDR <span class="arrow">→</span> GeoFS
+    </button>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn" id="btnReset">重置</button>
+    <button class="btn primary" id="btnExport" disabled>💾 导出</button>
+  </div>
+</header>
+
+<main>
+
+  <aside>
+
+    <section class="card">
+      <h2 id="loadTitle">1 · 载入 GeoFS 数据</h2>
+      <div id="dropzone">
+        <span class="icon" id="dzIcon">📁</span>
+        <div class="ttl" id="dzTitle">拖放 GeoFS JSON / TXT 文件</div>
+        <div class="sub" id="dzSub">支持 .json / .txt · 包含 <code style="color:var(--accent);font-family:monospace">tape</code> 数组</div>
+      </div>
+      <input type="file" id="fileInput"
+             accept=".json,.txt,.lnfdr,.LNFDR,.JSON,.TXT,application/json,text/plain" hidden>
+      <div id="fileStatus"></div>
+    </section>
+
+    <section class="card">
+      <h2>2 · 航班信息</h2>
+      <div class="form-grid">
+        <label class="wide">
+          机型
+          <input type="text" id="fAircraft" placeholder="例如 Cessna 172 / Boeing 737-800">
+        </label>
+        <label>
+          机号 / 注册号
+          <input type="text" id="fTail" placeholder="例如 N12345">
+        </label>
+        <label>
+          航班号
+          <input type="text" id="fFlight" placeholder="例如 UA1234">
+        </label>
+        <label>
+          日期
+          <input type="date" id="fDate">
+        </label>
+        <label>
+          运营人
+          <input type="text" id="fOperator" placeholder="例如 Delta Air Lines">
+        </label>
+
+        <label class="wide" id="geoIdField" style="display:none">
+          GeoFS 机型代码
+          <input type="text" id="fGeoAircraftId" placeholder="例如 25" value="25">
+          <span class="hint-sm">输出 GeoFS 时写入 aircraft 字段的数值编号</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- 初始坐标卡片：仅 LNFDR → GeoFS 模式显示 -->
+    <section class="card" id="baseCoordCard" style="display:none">
+      <h2>3 · 起点坐标（仅 LNFDR → GeoFS 使用）</h2>
+      <div class="form-grid">
+        <label class="wide">
+          起点位置
+          <select id="fBaseCoord">
+            <option value="ont" selected>洛杉矶安大略 (KONT) · 34.056°N 117.601°W</option>
+            <option value="lhr">伦敦希思罗 (EGLL) · 51.478°N 0.461°W</option>
+            <option value="jfk">纽约肯尼迪 (KJFK) · 40.641°N 73.778°W</option>
+            <option value="sea">西雅图塔科马 (KSEA) · 47.450°N 122.309°W</option>
+            <option value="custom">自定义...</option>
+          </select>
+        </label>
+      </div>
+      <div class="form-grid" id="customCoordRow" style="display:none;margin-top:10px">
+        <label>
+          纬度
+          <input type="number" id="fBaseLat" step="0.000001" placeholder="34.0560">
+        </label>
+        <label>
+          经度
+          <input type="number" id="fBaseLon" step="0.000001" placeholder="-117.6012">
+        </label>
+      </div>
+      <div class="info-block" id="baseCoordInfo">
+        起点坐标是航迹积分的起始位置。<br>
+        转换器将以此为起点，用航向、速度、时间逐点积分，还原出其余坐标。
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 id="windowCardTitle">3 · 时间窗口</h2>
+      <div class="slider-row">
+        <span class="lbl">保留最近时长</span>
+        <span class="val" id="windowVal">—</span>
+      </div>
+      <input type="range" class="slider" id="windowSlider"
+             min="5" max="1800" value="1800" step="1" disabled>
+      <div class="hint-row"><span>最少 5 秒</span><span id="windowMaxHint">—</span></div>
+      <div class="info-block" id="windowInfo">请先载入数据…</div>
+    </section>
+
+    <section class="card">
+      <h2 id="intervalCardTitle">4 · 采样间隔</h2>
+      <div class="slider-row">
+        <span class="lbl">输出间隔</span>
+        <span class="val" id="intervalVal">1.0 s</span>
+      </div>
+      <input type="range" class="slider" id="intervalSlider"
+             min="0.2" max="5" value="1" step="0.1">
+      <div class="hint-row"><span>0.2 s（5 点/秒）</span><span>5 s（每 5 秒 1 点）</span></div>
+      <div class="info-block" id="sampleInfo">请先载入数据…</div>
+    </section>
+
+  </aside>
+
+  <section class="preview-wrap">
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="sk">原始点数</div>
+        <div class="sv" id="statRaw">—</div>
+      </div>
+      <div class="stat-box alt">
+        <div class="sk">原始时长</div>
+        <div class="sv" id="statDur">—</div>
+      </div>
+      <div class="stat-box alt2">
+        <div class="sk">输出点数</div>
+        <div class="sv" id="statOut">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="sk">输出时长</div>
+        <div class="sv" id="statOutDur">—</div>
+      </div>
+    </div>
+    <div class="preview-title">飞行轨迹预览</div>
+    <canvas id="preview" width="900" height="560"></canvas>
+  </section>
+
+</main>
+
+<div class="credit">
+  <b>LN-LAB</b> · Photaxis-Lab<br>
+  GeoFS ⇄ LNFDR v3.0
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* =========================================================
+   预设机场坐标
+   ========================================================= */
+var BASE_COORDS = {
+  ont: { lat: 34.0560, lon: -117.6012, name: '洛杉矶安大略 (KONT)' },
+  lhr: { lat: 51.4775, lon: -0.4614,  name: '伦敦希思罗 (EGLL)' },
+  jfk: { lat: 40.6413, lon: -73.7781, name: '纽约肯尼迪 (KJFK)' },
+  sea: { lat: 47.4502, lon: -122.3088, name: '西雅图塔科马 (KSEA)' }
+};
+
+/* =========================================================
+   状态
+   ========================================================= */
+var appState = {
+  mode: 'g2l',
+  records: null,       // 标准化记录
+                       // g2l: 含 lat/lon（来自 GeoFS）
+                       // l2g: 不含 lat/lon（LNFDR 本身没位置）
+  aircraft: null,
+  available: null,
+  totalDuration: 0,
+  windowSize: 1800,
+  interval: 1.0,
+  sourceMeta: null,
+  sourceInfo: null
+};
+
+var $ = function(id){ return document.getElementById(id); };
+
+var toastTimer = null;
+function toast(msg, type){
+  var el = $('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'show ' + (type || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.className = ''; }, 2600);
+}
+
+function fmtTime(sec){
+  if (!isFinite(sec) || sec < 0) return '—';
+  if (sec >= 3600){
+    var h = Math.floor(sec/3600);
+    var m = Math.floor((sec % 3600)/60);
+    var s = Math.round(sec % 60);
+    return h + 'h ' + String(m).padStart(2,'0') + 'm ' + String(s).padStart(2,'0') + 's';
+  }
+  if (sec >= 60){
+    var m2 = Math.floor(sec/60);
+    var s2 = Math.round(sec % 60);
+    return m2 + 'm ' + String(s2).padStart(2,'0') + 's';
+  }
+  return sec.toFixed(1) + 's';
+}
+
+function fmtMinute(sec){
+  if (!isFinite(sec)) return '—';
+  if (sec >= 60) return (sec/60).toFixed(sec >= 600 ? 0 : 1) + ' min';
+  return sec.toFixed(1) + ' s';
+}
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function numOrUndef(v){
+  if (typeof v === 'number') return isFinite(v) ? v : undefined;
+  if (typeof v === 'string'){
+    var n = parseFloat(v);
+    if (isFinite(n)) return n;
+  }
+  return undefined;
+}
+
+/* =========================================================
+   方向 A：GeoFS tape → 内部标准记录
+   ---------------------------------------------------------
+   内部记录保留 lat/lon（因为 3D 阅读器/预览需要），
+   但导出 LNFDR 时会忽略 lat/lon（LNFDR 不含绝对位置）。
+   俯仰/滚转从 GeoFS 约定取反为航空标准
+   ========================================================= */
+function parseGeoFSTape(json){
+  var tape = json.tape;
+  var aircraftCode = json.aircraft;
+  var livery = json.livery;
+  var records = [];
+
+  for (var i = 0; i < tape.length; i++){
+    var f = tape[i];
+    if (!f || typeof f !== 'object') continue;
+    var co = f.co;
+    if (!Array.isArray(co) || co.length < 3) continue;
+
+    var latV = numOrUndef(co[0]);
+    var lonV = numOrUndef(co[1]);
+    var altV = numOrUndef(co[2]);
+    var hdgV = numOrUndef(co[3]);
+    var pitchRaw = numOrUndef(co[4]);
+    var rollRaw  = numOrUndef(co[5]);
+
+    var rec = {
+      lat: latV, lon: lonV, altM: altV, hdg: hdgV,
+      pitch: isFinite(pitchRaw) ? -pitchRaw : undefined,
+      roll:  isFinite(rollRaw)  ? -rollRaw  : undefined,
+      tRaw:  numOrUndef(f.ti)
+    };
+    if (isFinite(rec.lat) && isFinite(rec.lon)) records.push(rec);
+  }
+
+  if (records.length < 2) throw new Error('tape 中有效记录不足');
+
+  normalizeTimeAndUnit(records);
+  var available = buildAvailableStats(records);
+  var totalDuration = records[records.length - 1].tSec - records[0].tSec;
+
+  var aircraft = null;
+  if (aircraftCode !== undefined && aircraftCode !== null && String(aircraftCode).length){
+    aircraft = 'GeoFS #' + aircraftCode;
+  }
+
+  return {
+    records: records, aircraft: aircraft, available: available,
+    totalDuration: totalDuration,
+    sourceInfo: { livery: livery, aircraftCode: aircraftCode }
+  };
+}
+
+function normalizeTimeAndUnit(records){
+  var t0ms = Infinity;
+  for (var a = 0; a < records.length; a++){
+    if (isFinite(records[a].tRaw) && records[a].tRaw < t0ms) t0ms = records[a].tRaw;
+  }
+  if (!isFinite(t0ms)) t0ms = 0;
+
+  var hasTime = false;
+  for (var b = 0; b < records.length; b++){
+    if (isFinite(records[b].tRaw)){
+      records[b].tSec = (records[b].tRaw - t0ms) / 1000;
+      hasTime = true;
+    } else records[b].tSec = NaN;
+  }
+  if (!hasTime){
+    for (var c = 0; c < records.length; c++) records[c].tSec = c * 0.25;
+  }
+
+  records.sort(function(a, b){
+    var ta = isFinite(a.tSec) ? a.tSec : 0;
+    var tb = isFinite(b.tSec) ? b.tSec : 0;
+    return ta - tb;
+  });
+
+  var uniq = [records[0]];
+  for (var d = 1; d < records.length; d++){
+    if (records[d].tSec - uniq[uniq.length - 1].tSec > 0.001){
+      uniq.push(records[d]);
+    }
+  }
+  if (uniq.length >= 2){
+    records.length = 0;
+    for (var e = 0; e < uniq.length; e++) records.push(uniq[e]);
+  }
+
+  for (var g = 0; g < records.length; g++){
+    if (!isFinite(records[g].altFt) && isFinite(records[g].altM)){
+      records[g].altFt = records[g].altM * 3.28084;
+    }
+    if (!isFinite(records[g].altM) && isFinite(records[g].altFt)){
+      records[g].altM = records[g].altFt / 3.28084;
+    }
+  }
+
+  for (var h = 0; h < records.length; h++){
+    if (!isFinite(records[h].spdKt)){
+      if (h === 0) records[h].spdKt = records.length > 1 ? calcSpeed(records[0], records[1]) : 0;
+      else records[h].spdKt = calcSpeed(records[h-1], records[h]);
+    }
+  }
+  for (var k = 0; k < records.length; k++){
+    if (!isFinite(records[k].vsFpm)){
+      if (k === 0) records[k].vsFpm = records.length > 1 ? calcVS(records[0], records[1]) : 0;
+      else records[k].vsFpm = calcVS(records[k-1], records[k]);
+    }
+  }
+}
+
+function buildAvailableStats(records){
+  var available = {
+    lat: 0, lon: 0, alt: 0, hdg: 0, pitch: 0, roll: 0,
+    spd: 0, vs: 0, time: 0
+  };
+  for (var i = 0; i < records.length; i++){
+    var r = records[i];
+    if (isFinite(r.lat))   available.lat++;
+    if (isFinite(r.lon))   available.lon++;
+    if (isFinite(r.altFt)) available.alt++;
+    if (isFinite(r.hdg))   available.hdg++;
+    if (isFinite(r.pitch)) available.pitch++;
+    if (isFinite(r.roll))  available.roll++;
+    if (isFinite(r.spdKt)) available.spd++;
+    if (isFinite(r.vsFpm)) available.vs++;
+    if (isFinite(r.tSec))  available.time++;
+  }
+  return available;
+}
+
+function calcSpeed(r1, r2){
+  if (!isFinite(r1.lat) || !isFinite(r1.lon) ||
+      !isFinite(r2.lat) || !isFinite(r2.lon)) return 0;
+  var dt = r2.tSec - r1.tSec;
+  if (dt <= 0) return 0;
+  var R = 6371000;
+  var dLat = (r2.lat - r1.lat) * Math.PI / 180;
+  var dLon = (r2.lon - r1.lon) * Math.PI / 180;
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(r1.lat * Math.PI / 180) * Math.cos(r2.lat * Math.PI / 180) *
+          Math.sin(dLon/2) * Math.sin(dLon/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return (R * c / dt) * 1.94384;
+}
+
+function calcVS(r1, r2){
+  if (!isFinite(r1.altFt) || !isFinite(r2.altFt)) return 0;
+  var dt = r2.tSec - r1.tSec;
+  if (dt <= 0) return 0;
+  return (r2.altFt - r1.altFt) / dt * 60;
+}
+
+/* =========================================================
+   方向 B：LNFDR → 内部标准记录
+   ---------------------------------------------------------
+   LNFDR 不含绝对位置，所以 records 里 lat/lon 保持 undefined。
+   预览和导出时需要调用 integratePosition() 从起点积分得到。
+   俯仰/滚转已经是航空标准（LNFDR 就是这样），直接读取。
+   ========================================================= */
+function parseLNFDR(json){
+  if (!json || typeof json !== 'object' || json.format !== 'LNFDR'){
+    throw new Error('不是有效的 LNFDR 文件');
+  }
+
+  var timeline = json.timeline || {};
+  var times = Array.isArray(timeline.times) ? timeline.times.slice() : [];
+  var N = Number(timeline.samples) || times.length;
+  if (!N || N < 2) throw new Error('LNFDR 中没有足够的采样点');
+
+  if (!times.length){
+    var ts = Number(timeline.start) || 0;
+    var te = Number(timeline.end) || (N - 1);
+    for (var i = 0; i < N; i++){
+      times.push(ts + (te - ts) * i / Math.max(1, N - 1));
+    }
+  }
+
+  var paramMap = {};
+  var groups = json.groups || [];
+  for (var g = 0; g < groups.length; g++){
+    var ps = groups[g].parameters || [];
+    for (var p = 0; p < ps.length; p++){
+      var par = ps[p];
+      var nm = String(par.name || '');
+      if (nm && !paramMap[nm]) paramMap[nm] = par;
+    }
+  }
+
+  function findP(keys){
+    for (var i = 0; i < keys.length; i++){
+      var k = keys[i];
+      for (var nm in paramMap){
+        if (Object.prototype.hasOwnProperty.call(paramMap, nm) &&
+            nm.toLowerCase().indexOf(k.toLowerCase()) >= 0){
+          return paramMap[nm];
+        }
+      }
+    }
+    return null;
+  }
+
+  // 只读非位置类参数
+  var altP   = findP(['气压高度', '高度', 'altitude']);
+  var hdgP   = findP(['航向', 'heading']);
+  var pitchP = findP(['俯仰']);
+  var rollP  = findP(['滚转']);
+  var spdP   = findP(['指示空速', '空速', '地速', 'airspeed', 'speed']);
+  var vsP    = findP(['垂直速度', 'vertical']);
+
+  if (!hdgP) throw new Error('LNFDR 缺少航向参数，无法进行坐标积分');
+  if (!spdP) throw new Error('LNFDR 缺少速度参数，无法进行坐标积分');
+
+  function sVal(p, i){
+    if (!p || !Array.isArray(p.series)) return undefined;
+    var v = p.series[i];
+    return isFinite(v) ? v : undefined;
+  }
+
+  var records = [];
+  for (var k = 0; k < N; k++){
+    var rec = {
+      tSec: isFinite(times[k]) ? +times[k] : k,
+      // 注意：lat/lon 留空，由 integratePosition 填充
+      lat: undefined, lon: undefined,
+      hdg:   sVal(hdgP, k),
+      pitch: sVal(pitchP, k),
+      roll:  sVal(rollP, k),
+      spdKt: sVal(spdP, k),
+      vsFpm: sVal(vsP, k)
+    };
+    var altFtV = sVal(altP, k);
+    if (isFinite(altFtV)){
+      rec.altFt = altFtV;
+      rec.altM  = altFtV / 3.28084;
+    }
+    records.push(rec);
+  }
+
+  records.sort(function(a, b){ return a.tSec - b.tSec; });
+  var uniq = [records[0]];
+  for (var m = 1; m < records.length; m++){
+    if (records[m].tSec - uniq[uniq.length-1].tSec > 0.001){
+      uniq.push(records[m]);
+    }
+  }
+  if (uniq.length >= 2){
+    records.length = 0;
+    for (var n = 0; n < uniq.length; n++) records.push(uniq[n]);
+  }
+
+  // 补速度、垂直速度
+  for (var q = 0; q < records.length; q++){
+    if (!isFinite(records[q].spdKt)){
+      records[q].spdKt = q > 0 ? records[q-1].spdKt : 100;
+    }
+    if (!isFinite(records[q].vsFpm)){
+      if (q === 0) records[q].vsFpm = 0;
+      else {
+        var dt = records[q].tSec - records[q-1].tSec;
+        if (dt > 0 && isFinite(records[q].altFt) && isFinite(records[q-1].altFt)){
+          records[q].vsFpm = (records[q].altFt - records[q-1].altFt) / dt * 60;
+        } else records[q].vsFpm = 0;
+      }
+    }
+  }
+
+  var tBase = records[0].tSec;
+  for (var r = 0; r < records.length; r++) records[r].tSec -= tBase;
+
+  var available = {
+    lat: 0, lon: 0,
+    alt: 0, hdg: 0, pitch: 0, roll: 0,
+    spd: 0, vs: 0, time: records.length
+  };
+  for (var s = 0; s < records.length; s++){
+    if (isFinite(records[s].altFt)) available.alt++;
+    if (isFinite(records[s].hdg))   available.hdg++;
+    if (isFinite(records[s].pitch)) available.pitch++;
+    if (isFinite(records[s].roll))  available.roll++;
+    if (isFinite(records[s].spdKt)) available.spd++;
+    if (isFinite(records[s].vsFpm)) available.vs++;
+  }
+
+  var totalDuration = records[records.length - 1].tSec;
+  var meta = json.meta || {};
+  var aircraft = meta.aircraftType || null;
+
+  return {
+    records: records, aircraft: aircraft, available: available,
+    totalDuration: totalDuration,
+    sourceMeta: meta,
+    sourceInfo: {}
+  };
+}
+
+/* =========================================================
+   坐标积分：从起点出发，用航向 + 速度 + 时间逐点推算
+   ---------------------------------------------------------
+   返回一个带 lat/lon 的新数组，不修改输入的 records
+   简化平面近似（适用于短距离，几公里内误差很小）
+   ========================================================= */
+function integratePosition(records, baseLat, baseLon){
+  if (!records || records.length === 0) return [];
+
+  var out = new Array(records.length);
+  var lat = baseLat;
+  var lon = baseLon;
+
+  out[0] = Object.assign({}, records[0], { lat: lat, lon: lon });
+
+  for (var i = 1; i < records.length; i++){
+    var prev = records[i - 1];
+    var cur  = records[i];
+
+    var dt = cur.tSec - prev.tSec;
+    if (!isFinite(dt) || dt <= 0) dt = 0.1;
+
+    // 用上一点的速度与航向（更接近物理模型）
+    var spdKt = isFinite(prev.spdKt) ? prev.spdKt : 100;
+    var hdgDeg = isFinite(prev.hdg) ? prev.hdg : 0;
+
+    var spdMps = spdKt * 0.51444;
+    var distM = spdMps * dt;
+
+    var hdgRad = hdgDeg * Math.PI / 180;
+    var dNorth = distM * Math.cos(hdgRad);
+    var dEast  = distM * Math.sin(hdgRad);
+
+    // 米 → 度
+    lat += dNorth / 111320;
+    var cosLat = Math.cos(lat * Math.PI / 180);
+    if (Math.abs(cosLat) < 1e-6) cosLat = 1e-6;
+    lon += dEast / (111320 * cosLat);
+
+    out[i] = Object.assign({}, cur, { lat: lat, lon: lon });
+  }
+
+  return out;
+}
+
+/* 获取起点坐标 */
+function getBaseCoord(){
+  var v = $('fBaseCoord').value;
+  if (v === 'custom'){
+    var lat = parseFloat($('fBaseLat').value);
+    var lon = parseFloat($('fBaseLon').value);
+    if (!isFinite(lat) || !isFinite(lon)) return null;
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+    return { lat: lat, lon: lon, name: '自定义' };
+  }
+  return BASE_COORDS[v] || null;
+}
+
+/* 给 samples 附加位置（仅 l2g 模式需要） */
+function attachPosition(samples){
+  if (!samples || samples.length === 0) return samples;
+  if (appState.mode === 'g2l'){
+    // GeoFS 源已经有 lat/lon
+    return samples;
+  }
+  // LNFDR 源：从起点积分
+  var base = getBaseCoord();
+  if (!base) return samples.map(function(s){
+    return Object.assign({}, s, { lat: undefined, lon: undefined });
+  });
+  return integratePosition(samples, base.lat, base.lon);
+}
+
+/* =========================================================
+   通用：插值
+   ========================================================= */
+function lerpNum(a, b, f){
+  var ha = isFinite(a), hb = isFinite(b);
+  if (ha && hb) return a + (b - a) * f;
+  if (ha) return a;
+  if (hb) return b;
+  return undefined;
+}
+
+function lerpAngle(a, b, f){
+  if (!isFinite(a) || !isFinite(b)){
+    if (isFinite(a)) return a;
+    if (isFinite(b)) return b;
+    return undefined;
+  }
+  var diff = ((b - a + 540) % 360) - 180;
+  return a + diff * f;
+}
+
+function findBracket(records, t){
+  var lo = 0, hi = records.length - 1;
+  if (t <= records[0].tSec) return [0, 0, 0];
+  if (t >= records[hi].tSec) return [hi, hi, 0];
+
+  while (lo + 1 < hi){
+    var mid = (lo + hi) >> 1;
+    if (records[mid].tSec <= t) lo = mid;
+    else hi = mid;
+  }
+  var span = records[hi].tSec - records[lo].tSec;
+  var f = span > 1e-9 ? (t - records[lo].tSec) / span : 0;
+  return [lo, hi, f];
+}
+
+function interpolateAt(records, t){
+  var b = findBracket(records, t);
+  var r0 = records[b[0]], r1 = records[b[1]], f = b[2];
+  return {
+    tSec: t,
+    lat:   lerpNum(r0.lat,   r1.lat,   f),
+    lon:   lerpNum(r0.lon,   r1.lon,   f),
+    altFt: lerpNum(r0.altFt, r1.altFt, f),
+    hdg:   lerpAngle(r0.hdg, r1.hdg,   f),
+    pitch: lerpNum(r0.pitch, r1.pitch, f),
+    roll:  lerpNum(r0.roll,  r1.roll,  f),
+    spdKt: lerpNum(r0.spdKt, r1.spdKt, f),
+    vsFpm: lerpNum(r0.vsFpm, r1.vsFpm, f)
+  };
+}
+
+/* =========================================================
+   采样
+   ========================================================= */
+function sampleWindow(records, windowSize, interval){
+  var tEnd = records[records.length - 1].tSec;
+  var tStart = Math.max(records[0].tSec, tEnd - windowSize);
+
+  var samples = [];
+  var t = tStart;
+  var safety = 0;
+  while (t <= tEnd + 1e-6 && safety < 200000){
+    samples.push(interpolateAt(records, t));
+    t += interval;
+    safety++;
+  }
+
+  if (samples.length > 0 && tEnd - samples[samples.length - 1].tSec > interval * 0.3){
+    samples.push(interpolateAt(records, tEnd));
+  }
+
+  if (samples.length < 2){
+    samples = [interpolateAt(records, tStart), interpolateAt(records, tEnd)];
+  }
+
+  var base = samples[0].tSec;
+  for (var i = 0; i < samples.length; i++) samples[i].tSec -= base;
+
+  return samples;
+}
+
+/* =========================================================
+   输出 A：构建 LNFDR
+   ---------------------------------------------------------
+   不写入经纬度参数（LNFDR 不包含绝对位置）
+   ========================================================= */
+function buildLNFDR(samples, meta){
+  var N = samples.length;
+  var altS = [], hdgS = [];
+  var pitchS = [], rollS = [], spdS = [], vsS = [];
+  var altV = false, hdgV = false, pitchV = false, rollV = false;
+
+  for (var i = 0; i < N; i++){
+    var s = samples[i];
+    altS.push(isFinite(s.altFt) ? s.altFt : 0);
+    hdgS.push(isFinite(s.hdg) ? s.hdg : 0);
+    pitchS.push(isFinite(s.pitch) ? s.pitch : 0);
+    rollS.push(isFinite(s.roll) ? s.roll : 0);
+    spdS.push(isFinite(s.spdKt) ? s.spdKt : 0);
+    vsS.push(isFinite(s.vsFpm) ? s.vsFpm : 0);
+
+    if (isFinite(s.altFt)) altV = true;
+    if (isFinite(s.hdg))   hdgV = true;
+    if (isFinite(s.pitch)) pitchV = true;
+    if (isFinite(s.roll))  rollV = true;
+  }
+
+  var times = samples.map(function(s){ return +s.tSec.toFixed(3); });
+  var tEnd = times[times.length - 1];
+
+  var groups = [];
+
+  // 飞行路径与速度（无经纬度）
+  var pathParams = [];
+  if (altV){
+    pathParams.push({
+      name: '气压高度', unit: 'ft', type: 'numeric', visible: true,
+      baseValue: String(Math.round(altS[0])),
+      series: altS.map(function(v){ return +v.toFixed(1); })
+    });
+  }
+  pathParams.push({
+    name: '指示空速', unit: 'kt', type: 'numeric', visible: true,
+    baseValue: String(Math.round(spdS[0])),
+    series: spdS.map(function(v){ return +v.toFixed(2); })
+  });
+  if (hdgV){
+    pathParams.push({
+      name: '航向', unit: '°', type: 'numeric', visible: true,
+      baseValue: String(Math.round(hdgS[0])),
+      series: hdgS.map(function(v){ return +v.toFixed(2); })
+    });
+  }
+  pathParams.push({
+    name: '垂直速度', unit: 'ft/min', type: 'numeric', visible: true,
+    baseValue: String(Math.round(vsS[0])),
+    series: vsS.map(function(v){ return +v.toFixed(1); })
+  });
+
+  groups.push({ name: '飞行路径与速度', parameters: pathParams });
+
+  // 飞机姿态
+  var attParams = [];
+  if (pitchV){
+    attParams.push({
+      name: '俯仰姿态', unit: '°', type: 'numeric', visible: true,
+      baseValue: pitchS[0].toFixed(2),
+      series: pitchS.map(function(v){ return +v.toFixed(3); })
+    });
+  }
+  if (rollV){
+    attParams.push({
+      name: '滚转姿态', unit: '°', type: 'numeric', visible: true,
+      baseValue: rollS[0].toFixed(2),
+      series: rollS.map(function(v){ return +v.toFixed(3); })
+    });
+  }
+  if (attParams.length){
+    groups.push({ name: '飞机姿态', parameters: attParams });
+  }
+
+  var paramCount = groups.reduce(function(s, g){ return s + g.parameters.length; }, 0);
+
+  return {
+    format: 'LNFDR', version: '3.0',
+    generator: 'GeoFS ⇄ LNFDR Converter · LN-LAB',
+    createdAt: new Date().toISOString(),
+    meta: meta,
+    timeline: { start: 0, end: +tEnd.toFixed(3), samples: N, times: times },
+    labels: [],
+    stats: { groupCount: groups.length, parameterCount: paramCount },
+    groups: groups
+  };
+}
+
+/* =========================================================
+   输出 B：构建 GeoFS tape
+   ---------------------------------------------------------
+   samples 已经包含 lat/lon（由 attachPosition 补充），
+   俯仰/滚转从航空标准取反回 GeoFS 约定
+   ========================================================= */
+function buildGeoFS(samples, opts){
+  var tape = [];
+  for (var i = 0; i < samples.length; i++){
+    var s = samples[i];
+
+    var lat = isFinite(s.lat) ? s.lat : 0;
+    var lon = isFinite(s.lon) ? s.lon : 0;
+    var altM = isFinite(s.altFt) ? (s.altFt / 3.28084) : 0;
+    var hdg = isFinite(s.hdg) ? normHdg(s.hdg) : 0;
+
+    // 航空标准 → GeoFS 约定（取反）
+    var pitchRaw = isFinite(s.pitch) ? -s.pitch : 0;
+    var rollRaw  = isFinite(s.roll)  ? -s.roll  : 0;
+
+    var ti = Math.round(s.tSec * 1000);
+
+    // 估算速度向量
+    var spdKt = isFinite(s.spdKt) ? s.spdKt : 0;
+    var spdMps = spdKt / 1.94384;
+    var hdgRad = hdg * Math.PI / 180;
+    var vx = spdMps * Math.sin(hdgRad);
+    var vz = -spdMps * Math.cos(hdgRad);
+    var vy = isFinite(s.vsFpm) ? (s.vsFpm / 60) * 0.00508 : 0;
+
+    tape.push({
+      ti: ti,
+      co: [
+        +lat.toFixed(8),
+        +lon.toFixed(8),
+        +altM.toFixed(2),
+        +hdg.toFixed(2),
+        +pitchRaw.toFixed(3),
+        +rollRaw.toFixed(3)
+      ],
+      ct: [0,0,0,0,0,0,0,0,0],
+      st: [1,1,0,1000],
+      ve: [
+        +vx.toFixed(8), +vy.toFixed(8), +vz.toFixed(8),
+        0, 0, 0
+      ],
+      acc: [0,0,0,0,0,0]
+    });
+  }
+
+  var aircraftId = String(opts.aircraftId || '25').replace(/[^0-9]/g, '') || '25';
+
+  return {
+    aircraft: aircraftId,
+    livery: String(opts.livery || '0'),
+    tape: tape
+  };
+}
+
+function normHdg(h){
+  h = h % 360;
+  if (h > 180) h -= 360;
+  if (h < -180) h += 360;
+  return h;
+}
+
+/* =========================================================
+   预览
+   ========================================================= */
+function updatePreview(){
+  if (!appState.records){
+    renderStats(null);
+    drawEmptyCanvas();
+    return;
+  }
+  var rawSamples = sampleWindow(appState.records, appState.windowSize, appState.interval);
+  // 位置信息（l2g 模式需要从起点积分）
+  var samples = attachPosition(rawSamples);
+  renderStats(rawSamples);
+  drawTrackPreview(samples);
+  updateInfoBlocks(rawSamples);
+  updateBaseCoordInfo();
+}
+
+function renderStats(samples){
+  var rawCount = appState.records ? appState.records.length : 0;
+  var rawDur = appState.totalDuration || 0;
+  var outCount = samples ? samples.length : 0;
+  var outDur = samples && samples.length ? samples[samples.length - 1].tSec : 0;
+
+  $('statRaw').textContent = rawCount ? rawCount.toLocaleString() : '—';
+  $('statDur').textContent = rawCount ? fmtMinute(rawDur) : '—';
+  $('statOut').textContent = outCount ? outCount.toLocaleString() : '—';
+  $('statOutDur').textContent = outCount ? fmtMinute(outDur) : '—';
+}
+
+function updateInfoBlocks(samples){
+  var winInfo = $('windowInfo');
+  if (appState.records){
+    var lastT = appState.records[appState.records.length - 1].tSec;
+    var firstT = appState.records[0].tSec;
+    var wStart = Math.max(firstT, lastT - appState.windowSize);
+    winInfo.innerHTML =
+      '<div class="kv"><span class="k">原始总时长</span><span class="v">' + fmtTime(appState.totalDuration) + '</span></div>' +
+      '<div class="kv"><span class="k">窗口起始</span><span class="v">' + fmtTime(wStart) + '</span></div>' +
+      '<div class="kv"><span class="k">窗口结束</span><span class="v hl">' + fmtTime(lastT) + '</span></div>';
+  }
+
+  var sInfo = $('sampleInfo');
+  if (appState.records && samples.length){
+    var outCount = samples.length;
+    var winDur = samples[samples.length - 1].tSec;
+    var density = winDur > 0 ? (outCount / winDur) : 0;
+    var approxSize = Math.round(outCount * (appState.mode === 'g2l' ? 45 : 220) / 1024) + ' KB';
+    sInfo.innerHTML =
+      '<div class="kv"><span class="k">输出点数</span><span class="v hl">' + outCount.toLocaleString() + '</span></div>' +
+      '<div class="kv"><span class="k">数据密度</span><span class="v">' + density.toFixed(2) + ' pt/s</span></div>' +
+      '<div class="kv"><span class="k">估算大小</span><span class="v">' + approxSize + '</span></div>';
+  }
+}
+
+function updateBaseCoordInfo(){
+  var infoEl = $('baseCoordInfo');
+  if (!infoEl) return;
+  if (appState.mode !== 'l2g'){ return; }
+  if (!appState.records){
+    infoEl.innerHTML = '请先载入 LNFDR 数据…';
+    return;
+  }
+
+  var lines = [];
+  lines.push('<div class="kv"><span class="k">LNFDR 点数</span><span class="v">' +
+    appState.records.length.toLocaleString() + '</span></div>');
+  lines.push('<div class="kv"><span class="k">时长</span><span class="v">' +
+    fmtTime(appState.totalDuration) + '</span></div>');
+
+  var v = $('fBaseCoord').value;
+  if (v === 'custom'){
+    var lat = parseFloat($('fBaseLat').value);
+    var lon = parseFloat($('fBaseLon').value);
+    if (isFinite(lat) && isFinite(lon)){
+      lines.push('<div class="kv"><span class="k">起点</span><span class="v hl">' +
+        lat.toFixed(5) + ', ' + lon.toFixed(5) + '</span></div>');
+    } else {
+      lines.push('<div class="kv"><span class="k">起点</span><span class="v" style="color:var(--danger)">请填写有效经纬度</span></div>');
+    }
+  } else {
+    var base = BASE_COORDS[v];
+    if (base){
+      lines.push('<div class="kv"><span class="k">起点</span><span class="v hl">' +
+        base.name + '</span></div>');
+      lines.push('<div class="kv"><span class="k">坐标</span><span class="v">' +
+        base.lat.toFixed(4) + '°, ' + base.lon.toFixed(4) + '°</span></div>');
+    }
+  }
+
+  lines.push('<div class="kv"><span class="k">方法</span><span class="v" style="color:var(--muted)">航向×速度×时间 积分</span></div>');
+
+  infoEl.innerHTML = lines.join('');
+}
+
+function drawEmptyCanvas(){
+  var cvs = $('preview');
+  var ctx = cvs.getContext('2d');
+  var W = cvs.width, H = cvs.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(90,180,255,.15)';
+  ctx.font = '16px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('载入数据后显示轨迹预览', W/2, H/2);
+}
+
+function drawTrackPreview(samples){
+  var cvs = $('preview');
+  var ctx = cvs.getContext('2d');
+  var W = cvs.width, H = cvs.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (!samples || samples.length < 2){ drawEmptyCanvas(); return; }
+
+  var valid = samples.filter(function(s){
+    return isFinite(s.lat) && isFinite(s.lon);
+  });
+  if (valid.length < 2){ drawEmptyCanvas(); return; }
+
+  var minLat = Infinity, maxLat = -Infinity;
+  var minLon = Infinity, maxLon = -Infinity;
+  for (var i = 0; i < valid.length; i++){
+    var s = valid[i];
+    if (s.lat < minLat) minLat = s.lat;
+    if (s.lat > maxLat) maxLat = s.lat;
+    if (s.lon < minLon) minLon = s.lon;
+    if (s.lon > maxLon) maxLon = s.lon;
+  }
+
+  var latRange = maxLat - minLat;
+  var lonRange = maxLon - minLon;
+  if (latRange < 1e-6) latRange = 0.0005;
+  if (lonRange < 1e-6) lonRange = 0.0005;
+
+  var padLat = latRange * 0.08;
+  var padLon = lonRange * 0.08;
+  minLat -= padLat; maxLat += padLat;
+  minLon -= padLon; maxLon += padLon;
+  latRange = maxLat - minLat;
+  lonRange = maxLon - minLon;
+
+  var padding = 40;
+  var innerW = W - padding * 2;
+  var innerH = H - padding * 2;
+
+  var aspect = lonRange / latRange;
+  var canvasAspect = innerW / innerH;
+  var drawW, drawH, offsetX, offsetY;
+  if (aspect > canvasAspect){
+    drawW = innerW; drawH = innerW / aspect;
+    offsetX = padding; offsetY = padding + (innerH - drawH) / 2;
+  } else {
+    drawH = innerH; drawW = innerH * aspect;
+    offsetX = padding + (innerW - drawW) / 2; offsetY = padding;
+  }
+
+  function project(lat, lon){
+    return [
+      offsetX + ((lon - minLon) / lonRange) * drawW,
+      offsetY + (1 - (lat - minLat) / latRange) * drawH
+    ];
+  }
+
+  ctx.strokeStyle = 'rgba(90,120,160,.1)';
+  ctx.lineWidth = 1;
+  for (var gx = 0; gx <= 10; gx++){
+    var xx = offsetX + (gx / 10) * drawW;
+    ctx.beginPath(); ctx.moveTo(xx, offsetY); ctx.lineTo(xx, offsetY + drawH); ctx.stroke();
+  }
+  for (var gy = 0; gy <= 10; gy++){
+    var yy = offsetY + (gy / 10) * drawH;
+    ctx.beginPath(); ctx.moveTo(offsetX, yy); ctx.lineTo(offsetX + drawW, yy); ctx.stroke();
+  }
+
+  ctx.strokeStyle = 'rgba(90,120,160,.3)';
+  ctx.strokeRect(offsetX, offsetY, drawW, drawH);
+
+  var altMin = Infinity, altMax = -Infinity, hasAlt = false;
+  for (var k = 0; k < valid.length; k++){
+    if (isFinite(valid[k].altFt)){
+      hasAlt = true;
+      if (valid[k].altFt < altMin) altMin = valid[k].altFt;
+      if (valid[k].altFt > altMax) altMax = valid[k].altFt;
+    }
+  }
+  var altRange = hasAlt ? Math.max(1, altMax - altMin) : 1;
+
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  for (var m = 0; m < valid.length - 1; m++){
+    var p0 = project(valid[m].lat, valid[m].lon);
+    var p1 = project(valid[m+1].lat, valid[m+1].lon);
+
+    if (hasAlt && isFinite(valid[m].altFt)){
+      var u = (valid[m].altFt - altMin) / altRange;
+      var r = Math.round(255 * (0.95 - u * 0.75));
+      var g = Math.round(255 * (0.32 + u * 0.55));
+      var b = Math.round(255 * (0.30 + u * 0.68));
+      ctx.strokeStyle = 'rgba(' + r + ',' + g + ',' + b + ',.95)';
+    } else {
+      ctx.strokeStyle = 'rgba(90,180,255,.9)';
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(p0[0], p0[1]);
+    ctx.lineTo(p1[0], p1[1]);
+    ctx.stroke();
+  }
+
+  var start = project(valid[0].lat, valid[0].lon);
+  var end = project(valid[valid.length-1].lat, valid[valid.length-1].lon);
+
+  ctx.fillStyle = '#3fe08a';
+  ctx.beginPath(); ctx.arc(start[0], start[1], 7, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(63,224,138,.4)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(start[0], start[1], 12, 0, Math.PI * 2); ctx.stroke();
+
+  ctx.fillStyle = '#ff4d4d';
+  ctx.beginPath(); ctx.arc(end[0], end[1], 7, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,77,77,.4)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(end[0], end[1], 12, 0, Math.PI * 2); ctx.stroke();
+
+  ctx.font = 'bold 11px "SF Mono", monospace';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#3fe08a';
+  ctx.textAlign = 'left';
+  ctx.fillText('起点', start[0] + 16, start[1] - 2);
+  ctx.fillStyle = '#ff4d4d';
+  ctx.fillText('终点', end[0] + 16, end[1] - 2);
+
+  if (hasAlt){
+    var lx = offsetX + 10, ly = offsetY + 10;
+    ctx.fillStyle = 'rgba(8,13,22,.75)';
+    ctx.fillRect(lx - 4, ly - 4, 118, 24);
+    ctx.strokeStyle = 'rgba(90,120,160,.3)';
+    ctx.strokeRect(lx - 4, ly - 4, 118, 24);
+    ctx.font = 'bold 10px "SF Mono", monospace';
+    ctx.fillStyle = '#7f92aa';
+    ctx.textAlign = 'left';
+    ctx.fillText('ALT', lx + 2, ly + 8);
+    ctx.fillStyle = '#5ab4ff';
+    ctx.textAlign = 'right';
+    ctx.fillText(Math.round(altMax) + ' ft', lx + 110, ly + 8);
+  }
+}
+
+/* =========================================================
+   载入文件
+   ========================================================= */
+function handleFile(file){
+  var statusEl = $('fileStatus');
+  statusEl.className = 'show';
+  statusEl.textContent = '正在读取 ' + file.name + ' ...';
+
+  var reader = new FileReader();
+  reader.onload = function(){
+    var text = String(reader.result);
+    var json;
+    try {
+      json = JSON.parse(text);
+    } catch(e){
+      statusEl.className = 'show err';
+      statusEl.innerHTML = '<div>⚠ JSON 解析失败</div><div style="margin-top:4px">' + escapeHtml(e.message) + '</div>';
+      toast('JSON 解析失败', 'err');
+      return;
+    }
+
+    try {
+      var isGeoFS = json && Array.isArray(json.tape);
+      var isLNFDR = json && json.format === 'LNFDR';
+
+      if (!isGeoFS && !isLNFDR){
+        throw new Error('未识别的格式');
+      }
+
+      var detectedMode = isGeoFS ? 'g2l' : 'l2g';
+      if (appState.mode !== detectedMode) setMode(detectedMode, true);
+
+      var result = isGeoFS ? parseGeoFSTape(json) : parseLNFDR(json);
+      appState.records = result.records;
+      appState.aircraft = result.aircraft;
+      appState.available = result.available;
+      appState.totalDuration = result.totalDuration;
+      appState.sourceMeta = result.sourceMeta || null;
+      appState.sourceInfo = result.sourceInfo || null;
+
+      var defaultWindow = Math.min(result.totalDuration, 1800);
+      appState.windowSize = Math.max(5, defaultWindow);
+
+      onDataLoaded(file, isGeoFS ? 'GeoFS' : 'LNFDR');
+
+      var avail = result.available;
+      var lines = [];
+      lines.push('<div><span class="lbl">文件</span> <span class="val">' + escapeHtml(file.name) + '</span></div>');
+      lines.push('<div><span class="lbl">来源格式</span> <span class="val hl">' + (isGeoFS ? 'GeoFS tape' : 'LNFDR') + '</span></div>');
+      if (result.aircraft) lines.push('<div><span class="lbl">机型</span> <span class="val hl">' + escapeHtml(result.aircraft) + '</span></div>');
+      lines.push('<div><span class="lbl">数据点数</span> <span class="val">' + result.records.length.toLocaleString() + '</span></div>');
+      lines.push('<div><span class="lbl">总时长</span> <span class="val hl">' + fmtTime(result.totalDuration) + '</span></div>');
+      if (isGeoFS){
+        lines.push('<div><span class="lbl">经纬度</span> <span class="val">' + avail.lat + ' 有效点</span></div>');
+      }
+      lines.push('<div><span class="lbl">高度</span> <span class="val">' + avail.alt + ' 有效点</span></div>');
+      lines.push('<div><span class="lbl">航向</span> <span class="val">' + avail.hdg + ' 有效点</span></div>');
+      lines.push('<div><span class="lbl">速度</span> <span class="val">' + avail.spd + ' 有效点</span></div>');
+      lines.push('<div><span class="lbl">俯仰/滚转</span> <span class="val">' + avail.pitch + ' / ' + avail.roll + '</span></div>');
+      statusEl.className = 'show ok';
+      statusEl.innerHTML = lines.join('');
+
+      toast('已解析 ' + result.records.length.toLocaleString() + ' 点 · ' + (isGeoFS ? 'GeoFS' : 'LNFDR'), 'ok');
+
+    } catch(err){
+      console.error(err);
+      statusEl.className = 'show err';
+      statusEl.innerHTML = '<div>⚠ ' + escapeHtml(err.message) + '</div>';
+      toast('解析失败：' + err.message, 'err');
+    }
+  };
+  reader.onerror = function(){
+    statusEl.className = 'show err';
+    statusEl.textContent = '文件读取失败';
+    toast('文件读取失败', 'err');
+  };
+  reader.readAsText(file);
+}
+
+function onDataLoaded(file, sourceLabel){
+  var airInput = $('fAircraft');
+  if (appState.aircraft){
+    airInput.value = appState.aircraft;
+  } else if (appState.sourceMeta && appState.sourceMeta.aircraftType){
+    airInput.value = appState.sourceMeta.aircraftType;
+  } else {
+    airInput.value = '';
+    airInput.placeholder = '（未自动识别，请手动输入）';
+  }
+
+  if (appState.sourceMeta){
+    var m = appState.sourceMeta;
+    if (m.tailNumber   && !$('fTail').value)     $('fTail').value = m.tailNumber;
+    if (m.flightNumber && !$('fFlight').value)   $('fFlight').value = m.flightNumber;
+    if (m.date)                                  $('fDate').value = m.date;
+    if (m.operator     && !$('fOperator').value) $('fOperator').value = m.operator;
+  }
+
+  var dateInput = $('fDate');
+  if (!dateInput.value){
+    dateInput.value = new Date().toISOString().slice(0, 10);
+  }
+
+  var slider = $('windowSlider');
+  slider.disabled = false;
+  slider.min = 5;
+  slider.max = Math.max(5, Math.round(appState.totalDuration));
+  slider.value = Math.round(appState.windowSize);
+  slider.step = appState.totalDuration > 1000 ? 5 : 1;
+  updateSliderVisual(slider);
+
+  $('windowMaxHint').textContent = '最大 ' + fmtMinute(appState.totalDuration);
+  updateWindowLabel();
+  updateIntervalLabel();
+
+  $('btnExport').disabled = false;
+  updatePreview();
+}
+
+function updateWindowLabel(){
+  var v = appState.windowSize;
+  var el = $('windowVal');
+  if (v >= 60){
+    el.textContent = (v/60).toFixed(v >= 600 ? 0 : 1) + ' min';
+  } else {
+    el.textContent = v.toFixed(0) + ' s';
+  }
+}
+
+function updateIntervalLabel(){
+  $('intervalVal').textContent = appState.interval.toFixed(1) + ' s';
+}
+
+function updateSliderVisual(slider){
+  var min = parseFloat(slider.min) || 0;
+  var max = parseFloat(slider.max) || 1;
+  var val = parseFloat(slider.value) || 0;
+  var pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
+  slider.style.setProperty('--p', pct + '%');
+}
+
+/* =========================================================
+   模式切换
+   ========================================================= */
+function setMode(mode, silent){
+  appState.mode = mode;
+  document.body.classList.toggle('mode-l2g', mode === 'l2g');
+
+  $('modeG2L').classList.toggle('active', mode === 'g2l');
+  $('modeL2G').classList.toggle('active', mode === 'l2g');
+
+  if (mode === 'g2l'){
+    $('loadTitle').textContent = '1 · 载入 GeoFS 数据';
+    $('dzTitle').textContent = '拖放 GeoFS JSON / TXT 文件';
+    $('dzSub').innerHTML = '支持 .json / .txt · 包含 <code style="color:var(--accent);font-family:monospace">tape</code> 数组';
+    $('dzIcon').textContent = '📁';
+    $('brandSub').textContent = '将 GeoFS tape 转为 3D 阅读器可用的 LNFDR';
+    $('btnExport').textContent = '💾 导出 LNFDR';
+    $('btnExport').classList.remove('green');
+    $('geoIdField').style.display = 'none';
+    $('baseCoordCard').style.display = 'none';
+    $('windowCardTitle').textContent = '3 · 时间窗口';
+    $('intervalCardTitle').textContent = '4 · 采样间隔';
+    $('fileInput').accept = '.json,.txt,.JSON,.TXT,application/json,text/plain';
+  } else {
+    $('loadTitle').textContent = '1 · 载入 LNFDR 数据';
+    $('dzTitle').textContent = '拖放 LNFDR 文件';
+    $('dzSub').innerHTML = '支持 .lnfdr / .json · 包含 <code style="color:var(--accent2);font-family:monospace">format: "LNFDR"</code>';
+    $('dzIcon').textContent = '📋';
+    $('brandSub').textContent = '从起点坐标出发 · 用航向速度时间积分还原航迹';
+    $('btnExport').textContent = '💾 导出 GeoFS';
+    $('btnExport').classList.add('green');
+    $('geoIdField').style.display = 'flex';
+    $('baseCoordCard').style.display = '';
+    $('windowCardTitle').textContent = '4 · 时间窗口';
+    $('intervalCardTitle').textContent = '5 · 采样间隔';
+    $('fileInput').accept = '.lnfdr,.LNFDR,.json,.JSON,application/json';
+  }
+
+  if (!silent){
+    clearData(false);
+    toast(mode === 'g2l' ? '已切换到 GeoFS → LNFDR' : '已切换到 LNFDR → GeoFS', 'ok');
+  }
+}
+
+function clearData(keepStatus){
+  appState.records = null;
+  appState.aircraft = null;
+  appState.totalDuration = 0;
+  appState.windowSize = 1800;
+  appState.interval = 1.0;
+  appState.sourceMeta = null;
+  appState.sourceInfo = null;
+
+  $('fAircraft').value = '';
+  $('fTail').value = '';
+  $('fFlight').value = '';
+  $('fOperator').value = '';
+
+  if (!keepStatus){
+    var st = $('fileStatus');
+    st.className = ''; st.innerHTML = '';
+  }
+
+  var ws = $('windowSlider');
+  ws.disabled = true;
+  ws.min = 5; ws.max = 1800; ws.value = 1800;
+  ws.style.setProperty('--p', '0%');
+
+  $('btnExport').disabled = true;
+  $('windowVal').textContent = '—';
+  $('windowMaxHint').textContent = '—';
+  $('windowInfo').innerHTML = '请先载入数据…';
+  $('sampleInfo').innerHTML = '请先载入数据…';
+
+  renderStats(null);
+  drawEmptyCanvas();
+  updateBaseCoordInfo();
+}
+
+/* =========================================================
+   导出
+   ========================================================= */
+function exportFile(){
+  if (!appState.records){ toast('请先载入数据', 'err'); return; }
+
+  var rawSamples = sampleWindow(appState.records, appState.windowSize, appState.interval);
+  if (rawSamples.length < 2){ toast('输出点数不足', 'err'); return; }
+
+  if (appState.mode === 'g2l'){
+    exportLNFDRFile(rawSamples);
+  } else {
+    exportGeoFSFile(rawSamples);
+  }
+}
+
+function exportLNFDRFile(samples){
+  var meta = {
+    aircraftType: $('fAircraft').value.trim() || 'Unknown Aircraft',
+    tailNumber:   $('fTail').value.trim() || '',
+    flightNumber: $('fFlight').value.trim() || '',
+    date:         $('fDate').value || new Date().toISOString().slice(0, 10),
+    recorderType: 'GeoFS Flight Data',
+    operator:     $('fOperator').value.trim() || ''
+  };
+
+  var lnfdr = buildLNFDR(samples, meta);
+  var content = JSON.stringify(lnfdr, null, 2);
+
+  var parts = ['GeoFS'];
+  if (meta.flightNumber) parts.push(meta.flightNumber);
+  else if (meta.tailNumber) parts.push(meta.tailNumber);
+  else if (meta.aircraftType) parts.push(meta.aircraftType.replace(/\s+/g, '_').replace(/#/g, ''));
+
+  var d = new Date();
+  var p = function(n){ return String(n).padStart(2, '0'); };
+  parts.push(d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()));
+
+  var filename = parts.join('_') + '.LNFDR';
+  downloadBlob(content, filename, 'application/json;charset=utf-8');
+  toast('已导出 LNFDR · ' + samples.length + ' 点 → ' + filename, 'ok');
+}
+
+function exportGeoFSFile(rawSamples){
+  var selVal = $('fBaseCoord').value;
+  var base = getBaseCoord();
+
+  if (!base){
+    toast('请选择或填写有效的起点坐标', 'err');
+    return;
+  }
+
+  // 从起点积分
+  var samples = integratePosition(rawSamples, base.lat, base.lon);
+
+  var opts = {
+    aircraftId: $('fGeoAircraftId').value.trim() || '25',
+    livery: (appState.sourceInfo && appState.sourceInfo.livery) || '0'
+  };
+
+  var geo = buildGeoFS(samples, opts);
+  var content = JSON.stringify(geo);
+
+  var airTxt = $('fAircraft').value.trim().replace(/\s+/g, '_').replace(/#/g, '') || 'GeoFS';
+  var tag = '_' + base.name.replace(/\s+/g, '').replace(/[()]/g, '');
+  var d = new Date();
+  var p = function(n){ return String(n).padStart(2, '0'); };
+  var stamp = d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes());
+
+  var filename = 'GeoFS_' + airTxt + tag + '_' + stamp + '.json';
+  downloadBlob(content, filename, 'application/json;charset=utf-8');
+
+  toast('已导出 GeoFS · ' + samples.length + ' 帧 · 起点 ' + base.name, 'ok');
+}
+
+function downloadBlob(content, filename, mime){
+  var blob = new Blob([content], { type: mime || 'application/octet-stream' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1500);
+}
+
+/* =========================================================
+   UI 绑定
+   ========================================================= */
+function bindUI(){
+  $('modeG2L').addEventListener('click', function(){
+    if (appState.mode !== 'g2l') setMode('g2l');
+  });
+  $('modeL2G').addEventListener('click', function(){
+    if (appState.mode !== 'l2g') setMode('l2g');
+  });
+
+  var input = $('fileInput');
+  input.addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0];
+    if (f) handleFile(f);
+    e.target.value = '';
+  });
+
+  var dz = $('dropzone');
+  dz.addEventListener('click', function(){ input.click(); });
+  dz.addEventListener('dragover', function(e){
+    e.preventDefault(); dz.classList.add('drag');
+  });
+  dz.addEventListener('dragleave', function(){ dz.classList.remove('drag'); });
+  dz.addEventListener('drop', function(e){
+    e.preventDefault(); dz.classList.remove('drag');
+    var f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+
+  var windowSlider = $('windowSlider');
+  windowSlider.addEventListener('input', function(){
+    appState.windowSize = parseFloat(windowSlider.value) || 1800;
+    updateWindowLabel();
+    updateSliderVisual(windowSlider);
+    updatePreview();
+  });
+
+  var intervalSlider = $('intervalSlider');
+  intervalSlider.addEventListener('input', function(){
+    appState.interval = parseFloat(intervalSlider.value) || 1;
+    updateIntervalLabel();
+    updateSliderVisual(intervalSlider);
+    updatePreview();
+  });
+  updateSliderVisual(intervalSlider);
+
+  // 起点选择
+  var baseSelect = $('fBaseCoord');
+  baseSelect.addEventListener('change', function(){
+    if (baseSelect.value === 'custom'){
+      $('customCoordRow').style.display = '';
+    } else {
+      $('customCoordRow').style.display = 'none';
+    }
+    updatePreview();
+  });
+
+  $('fBaseLat').addEventListener('input', updatePreview);
+  $('fBaseLon').addEventListener('input', updatePreview);
+
+  $('btnExport').addEventListener('click', exportFile);
+
+  $('btnReset').addEventListener('click', function(){
+    if (appState.records && !confirm('确定重置？当前数据将丢失。')) return;
+    clearData(false);
+    $('fBaseCoord').value = 'ont';
+    $('customCoordRow').style.display = 'none';
+    $('fBaseLat').value = '';
+    $('fBaseLon').value = '';
+    toast('已重置', 'ok');
+  });
+}
+
+/* =========================================================
+   启动
+   ========================================================= */
+function boot(){
+  bindUI();
+
+  var is = $('intervalSlider');
+  is.style.setProperty('--p', ((1 - 0.2)/(5 - 0.2)*100) + '%');
+
+  renderStats(null);
+  drawEmptyCanvas();
+
+  $('fDate').value = new Date().toISOString().slice(0, 10);
+  setMode('g2l', true);
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+
+})();
+</script>
+</body>
+</html>
