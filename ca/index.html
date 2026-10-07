@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CA</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-hover: #0077ed; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --gold: #b8860b;
+  }
+  [data-theme="dark"] {
+    --ground: #000000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-hover: #409cff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #2a2000 0%, #3d2e00 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --gold: #e8b923;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--gold); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--gold); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); letter-spacing: 0.01em; }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s cubic-bezier(0.25,0.1,0.25,1); padding: 0 24px; background: var(--surface-secondary); transition: background 0.4s ease, max-height 0.55s ease, padding 0.55s ease; }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; } .detail-section:last-child { margin-bottom: 0; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; letter-spacing: -0.005em; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; letter-spacing: -0.005em; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1); }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s, background 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; transition: stroke 0.2s; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; gap: 6px; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>加利福尼亚州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#sec-overview">概览</a><a href="#sec-population">人口</a><a href="#sec-economy">经济就业</a>
+      <a href="#sec-business">企业与产业</a><a href="#sec-healthcare">医疗</a><a href="#sec-safety">公共安全</a>
+      <a href="#sec-tax">税收财政</a><a href="#sec-transport">交通</a><a href="#sec-housing">住房</a>
+      <a href="#sec-climate">气候</a><a href="#sec-politics">政治政府</a><a href="#sec-education">教育</a>
+      <a href="#sec-sports">体育</a><a href="#sec-media">媒体</a><a href="#sec-tourism">旅游</a>
+      <a href="#sec-energy">能源</a><a href="#sec-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌟</div>
+  <h1>加利福尼亚州<br><em>California</em></h1>
+  <p class="subtitle">金州 · 全球第五大经济体 · 科技与娱乐之都 · 农业第一州</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>39,355,309</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$4.2T</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>5.5%</strong><span>失业率 (2025.6)</span></div>
+    <div class="hero-stat"><strong>#1</strong><span>旅游支出全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 最高个税 <b>13.3%</b></span>
+    <span class="hero-badge orange">🏥 UCSF/UCLA/Cedars <b>全美Top</b></span>
+    <span class="hero-badge red">🔫 <b>严格管制州</b></span>
+    <span class="hero-badge">🚀 <b>56家Fortune 500</b></span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="sec-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1850年9月9日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">萨克拉门托</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">洛杉矶</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">423,970 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">加州鹌鹑</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">加州罂粟</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">金州（The Golden State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Eureka"（我发现了）</span></div>
+      <div class="tags"><span class="tag">Left Coast</span><span class="tag">SoCal / NorCal</span><span class="tag">金州</span><span class="tag">全球第五大经济体</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">加利福尼亚位于美国西海岸，北接俄勒冈，东邻内华达和亚利桑那，南界墨西哥。在 Colin Woodard 的文化分区中，加州属于 <strong>Left Coast</strong>——新英格兰移民带来的理想主义与西部边疆个人主义的混合。北加州（湾区）为硅谷创新与环保进步主义，南加州（洛杉矶）为好莱坞娱乐与汽车文化。中央谷地为农业腹地，政治倾向更保守。地形从海岸线到内华达山脉，死亡谷为北美最低点，惠特尼山为本土最高峰。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1542年葡萄牙探险家首次抵达。1769年西班牙建立第一个传教站。1821年墨西哥独立后属墨西哥。1848年美墨战争后割让给美国，同年发现黄金引发<strong>淘金热</strong>。1850年9月9日成为美国第 <strong>31 个州</strong>。20世纪好莱坞和硅谷的崛起使加州成为全球文化与科技之都。2025年GDP达 <strong>$4.2 万亿</strong>，为全球第五大经济体。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="sec-population" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">39,355,309</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value">第1</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$105,300</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$49,513</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">12.0%</span></div>
+        <div class="data-item"><span class="data-label">外国出生</span><span class="data-value">26.5%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">西语裔 39.4% · 白人 34.7% · 亚裔 15.1% · 黑人 5.4%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">洛杉矶 3.9M · 圣迭戈 1.4M · 圣何塞 1.0M</span></div>
+      <div class="tags"><span class="tag">人口全美第1</span><span class="tag">西语裔近40%</span><span class="tag">外国出生26.5%</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2025)</td><td><strong>39,355,309</strong>（全美第1）</td></tr>
+        <tr><td>西语裔占比</td><td><strong>39.4%</strong></td></tr>
+        <tr><td>亚裔占比</td><td>15.1%</td></tr>
+        <tr><td>外国出生</td><td><strong>26.5%</strong>（全美最高之一）</td></tr>
+        <tr><td>洛杉矶人口</td><td>3.9M（全美第2大城市）</td></tr>
+        <tr><td>中位家庭收入</td><td>$105,300（全美最高之一）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$105,300</strong>（2025年），比全美中位数高约 <strong>22.7%</strong>。但生活成本同样全美最高之一——中位房价 <strong>$869,300</strong>（2025 Q4），仅 <strong>18%</strong>家庭可负担中位价住房。人口自2020年以来持续净流出，2025年约 <strong>39.4M</strong>，较峰值有所下降。失业率 <strong>5.5%</strong> 为全美最高之一，超过 <strong>100 万</strong>失业工人。科技行业就业占比从 <strong>19%</strong> 降至 <strong>16.5%</strong>，但仍是全美科技劳动力最集中的州（<strong>524,000 人</strong>，占全美 18%）。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="sec-economy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$4.2T</span></div>
+        <div class="data-item"><span class="data-label">全球排名</span><span class="data-value">第5大经济体</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value red">5.5%</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value red">最高</span></div>
+        <div class="data-item"><span class="data-label">GDP增长</span><span class="data-value green">+3.3%</span></div>
+        <div class="data-item"><span class="data-label">科技就业</span><span class="data-value">524,000</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">科技 · 娱乐 · 农业 · 国际贸易 · 旅游</span></div>
+      <div class="info-row"><span class="label">失业困境</span><span class="value">超 100 万失业 · 全美最高失业率</span></div>
+      <div class="tags"><span class="tag">全球第5大经济体</span><span class="tag">科技占全美18%</span><span class="tag">失业率全美最高</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现</div><table class="mini-table">
+        <tr><td>Gross State Product (2025)</td><td><strong>$4.2 万亿</strong> · 全球第5大经济体</td></tr>
+        <tr><td>GDP 增长 (2025)</td><td>+3.3%（全美 2.5%）</td></tr>
+        <tr><td>失业率 (2025.6)</td><td><strong>5.5%</strong>（全美最高）</td></tr>
+        <tr><td>失业工人</td><td>超 100 万</td></tr>
+        <tr><td>科技就业</td><td>524,000 人 · 全美 18%</td></tr>
+        <tr><td>制造业产出</td><td>$4056 亿 · 124 万工人</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">加州经济<strong>总量全球第5</strong>，但<strong>就业市场严重分化</strong>——GDP 持续增长，但失业率 <strong>5.5%</strong> 为全美最高，超过 <strong>100 万</strong>人失业。科技产业雇佣 <strong>52.4 万</strong>人（全美 18%），但科技岗位占比从峰值 19% 降至 16.5%，硅谷 2025 年初裁员数千人。制造业产出 <strong>$4056 亿</strong>，雇佣 <strong>124 万</strong>工人。UCLA Anderson Forecast 预测失业率将维持 <strong>5.5%</strong> 至2026年初。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="sec-business" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">56 家</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value">第2（德州第1）</span></div>
+        <div class="data-item"><span class="data-label">科技企业</span><span class="data-value">61,000+ 家</span></div>
+        <div class="data-item"><span class="data-label">全球市值Top</span><span class="data-value green">Apple · Alphabet · Nvidia</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级企业</span><span class="value">Apple · Google · Nvidia · Meta · Disney</span></div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">2026年被德州超越 · 但仍为科技之都</span></div>
+      <div class="tags"><span class="tag">56家Fortune 500</span><span class="tag">Apple/Alphabet/Nvidia</span><span class="tag">好莱坞</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500 概况</div><div class="detail-text">加州拥有 <strong>56 家</strong> Fortune 500 总部，长期为全美第1，但2026年被德州超越降至第2。Apple、Alphabet（Google）、Nvidia 为加州排名最高的三家企业。Tesla、Oracle、Charles Schwab 和 Chevron 已将总部迁出加州（Tesla 迁至奥斯汀，Chevron 迁至休斯顿）。科技产业雇佣 <strong>52.4 万</strong>人，分布在 <strong>61,000+</strong> 家企业。加州仍为全球 AI、量子计算和航空航天初创企业的核心——2025年南加州25大风投交易筹集 <strong>$88.5 亿</strong>，多数流向航空航天和国防初创公司。</div></div>
+      <div class="detail-section"><div class="detail-label">重点企业</div><table class="mini-table">
+        <tr><td>Apple</td><td>库比蒂诺 · 全球市值最高公司之一</td></tr>
+        <tr><td>Alphabet (Google)</td><td>山景城 · AI 与搜索全球领导者</td></tr>
+        <tr><td>Nvidia</td><td>圣克拉拉 · AI 芯片全球领导者</td></tr>
+        <tr><td>Meta</td><td>门洛帕克 · 社交媒体与AI</td></tr>
+        <tr><td>Disney</td><td>伯班克 · 全球娱乐巨头</td></tr>
+        <tr><td>Wells Fargo</td><td>旧金山 · 银行</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="sec-healthcare" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州并列第1</span><span class="data-value">UCSF · Cedars-Sinai · UCLA</span></div>
+        <div class="data-item"><span class="data-label">UCLA 荣誉榜</span><span class="data-value green">连续 36 年</span></div>
+        <div class="data-item"><span class="data-label">Cedars 荣誉榜</span><span class="data-value green">连续 10 年</span></div>
+        <div class="data-item"><span class="data-label">全美Top 4</span><span class="data-value">4 家医院</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">UCSF · Cedars-Sinai · UCLA · Stanford</span></div>
+      <div class="info-row"><span class="label">专科领先</span><span class="value">UCSF 神经/老年/肺/风湿全州第1</span></div>
+      <div class="tags"><span class="tag">4家全美Top</span><span class="tag">UCLA 36年荣誉榜</span><span class="tag">Cedars 10年荣誉榜</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. UCSF Medical Center</td><td>旧金山 · 并列全州第1 · 全美荣誉榜</td></tr>
+        <tr><td>1. Cedars-Sinai Medical Center</td><td>洛杉矶 · 并列全州第1 · 连续 10 年荣誉榜</td></tr>
+        <tr><td>1. UCLA Medical Center</td><td>洛杉矶 · 并列全州第1 · 连续 36 年荣誉榜</td></tr>
+        <tr><td>4. Stanford Health Care</td><td>帕洛阿尔托 · 全美荣誉榜</td></tr>
+        <tr><td>5. UC Davis Medical Center</td><td>萨克拉门托 · 全州第7</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text">加州拥有<strong>全美最集中的顶级医疗资源</strong>——4家医院进入 U.S. News 全美荣誉榜。UCSF 在神经外科/神经病学、老年医学、肺病学和风湿病学领域<strong>全州第1</strong>，全美第2（神经/老年）。Cedars-Sinai 在胃肠外科（全美第2）、骨科和心脏病学领域领先。UCLA 连续 <strong>36 年</strong>入选全美荣誉榜，多个专科位列全美前十。加州还拥有全美最大的 Kaiser Permanente 整合医疗系统。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="sec-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">凶杀率</span><span class="data-value green">3.5 / 10万</span></div>
+        <div class="data-item"><span class="data-label">60年最低</span><span class="data-value green">是</span></div>
+        <div class="data-item"><span class="data-label">抢劫率下降</span><span class="data-value green">-31%</span></div>
+        <div class="data-item"><span class="data-label">财产犯罪下降</span><span class="data-value green">-24%</span></div>
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value">约 28.3%</span></div>
+        <div class="data-item"><span class="data-label">LAPD 警力</span><span class="data-value">约 8,800 人</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>严格管制州</strong> · 攻击性武器禁令 · 30天限购3支</span></div>
+      <div class="info-row"><span class="label">2025犯罪</span><span class="value">所有主要犯罪类别双位数下降</span></div>
+      <div class="tags"><span class="tag">凶杀率60年最低</span><span class="tag">严格枪支管制</span><span class="tag">攻击性武器禁令</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">犯罪趋势（2025）</div><table class="mini-table">
+        <tr><td>凶杀率</td><td><strong>3.5 / 10万</strong> · 60年来最低</td></tr>
+        <tr><td>抢劫率</td><td><strong>-31%</strong></td></tr>
+        <tr><td>财产犯罪率</td><td><strong>-24%</strong></td></tr>
+        <tr><td>机动车盗窃率</td><td>-19%</td></tr>
+        <tr><td>暴力犯罪率</td><td>-3%</td></tr>
+        <tr><td>圣迭戈整体犯罪</td><td>-6.3%（2025）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">持枪法规</div><div class="detail-text">加州为全美<strong>枪支管制最严格的州之一</strong>。2025年 AB 1078 将30天内购枪上限从1支提高到 <strong>3 支</strong>，并更新隐蔽携枪（CCW）法律以符合最高法院判决。攻击性武器和大容量弹匣被禁。2025年7月，第九巡回上诉法院裁定<strong>弹药背景审查法违宪</strong>（2-1裁决）。持枪率约 <strong>28.3%</strong>，低于全国平均。州长纽森强调公共安全投资成效显著——2025年所有主要犯罪类别均下降，凶杀率降至 <strong>60 年来最低</strong>。UC Berkeley 研究发现社区暴力干预项目使枪支凶杀和枪击事件下降 <strong>61%</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="sec-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value red">1%–13.3%</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">8.84%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">7.25%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value red">7.25%–10.75%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value">~0.75%</span></div>
+        <div class="data-item"><span class="data-label">百万附加税</span><span class="data-value">+1%</span></div>
+      </div>
+      <div class="info-row"><span class="label">税负特征</span><span class="value">个人所得税全美最高 · Prop 13 限制房产税</span></div>
+      <div class="info-row"><span class="label">预算</span><span class="value">$157 亿储备 · K-12 教育 $1376 亿</span></div>
+      <div class="tags"><span class="tag">个税全美最高</span><span class="tag">Prop 13</span><span class="tag">销售税全美最高基础</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>1%–13.3%</strong> 九级累进（全美最高）</td></tr>
+        <tr><td>百万附加税</td><td>超过 $100 万部分额外 <strong>1%</strong></td></tr>
+        <tr><td>企业所得税</td><td>8.84%（银行/金融 10.84%）</td></tr>
+        <tr><td>州销售税</td><td><strong>7.25%</strong>（全美最高基础税率）</td></tr>
+        <tr><td>综合销售税</td><td>7.25%–10.75%（Oakland 10.75%）</td></tr>
+        <tr><td>房产税</td><td>有效税率约 0.75%（Prop 13 限制年增幅≤2%）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">加州个人所得税最高档 <strong>13.3%</strong> 为全美最高，加上百万附加税后综合最高可达 <strong>14.3%</strong>。销售税基础税率 <strong>7.25%</strong> 同样为全美最高。Prop 13（1978）限制房产税年增幅不超过 <strong>2%</strong>，造成长期财政结构性问题。2025-26 预算包含 <strong>$157 亿</strong>储备，K-12 教育拨款 <strong>$1376 亿</strong>，低收入住房税收抵免 <strong>$5 亿</strong>。高税负是加州人口和企业外流的重要因素之一。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="sec-transport" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">机场总数</span><span class="data-value">4,702 个</span></div>
+        <div class="data-item"><span class="data-label">州属桥梁</span><span class="data-value">13,000+ 座</span></div>
+        <div class="data-item"><span class="data-label">公共交通</span><span class="data-value">209 系统</span></div>
+        <div class="data-item"><span class="data-label">公交乘客</span><span class="data-value">8.35 亿</span></div>
+        <div class="data-item"><span class="data-label">货运公路</span><span class="data-value">3,054 英里</span></div>
+        <div class="data-item"><span class="data-label">公路状况</span><span class="data-value red">45% 差/一般</span></div>
+      </div>
+      <div class="info-row"><span class="label">高铁</span><span class="value">加州高铁在建 · 连接旧金山与洛杉矶</span></div>
+      <div class="info-row"><span class="label">港口</span><span class="value">12 个海港 · 洛杉矶/长滩全美最忙</span></div>
+      <div class="tags"><span class="tag">高铁在建</span><span class="tag">LAX全美最忙</span><span class="tag">公路状况差</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>洛杉矶国际机场（LAX）</strong>为全球最繁忙机场之一，年旅客超 <strong>8,000 万</strong>。旧金山国际机场（SFO）、圣迭戈（SAN）、圣何塞（SJC）为区域枢纽。安大略国际机场（ONT）2025年新增台湾、墨西哥等国际航线。加州有 <strong>241 个</strong>公共机场，其中 <strong>115 个</strong>位于11条城际走廊 2 英里内。</div></div>
+      <div class="detail-section"><div class="detail-label">公路、铁路与水运</div><div class="detail-text"><strong>公路：</strong>I-5 纵贯南北（圣迭戈-洛杉矶-萨克拉门托-波特兰），I-80 连接旧金山与内华达，I-10 连接洛杉矶与凤凰城。2025年车辆行驶里程约 <strong>3254 亿英里</strong>。但 <strong>45%</strong> 道路状况为“差或一般”（ASCE 2025）。<strong>铁路：</strong>Amtrak California Zephyr、Coast Starlight、Pacific Surfliner。加州高铁在建，连接旧金山与洛杉矶。209个公共交通系统年运送 <strong>8.35 亿</strong>乘客。<strong>港口：</strong>洛杉矶港与长滩港为全美最繁忙集装箱港，12个海港和12个货运机场构成全美最大货运网络之一。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="sec-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025 Q4)</span><span class="data-value red">$869,300</span></div>
+        <div class="data-item"><span class="data-label">全美中位价</span><span class="data-value">$413,000</span></div>
+        <div class="data-item"><span class="data-label">可负担家庭</span><span class="data-value red">仅 18%</span></div>
+        <div class="data-item"><span class="data-label">中位自住房价值</span><span class="data-value">$828,300</span></div>
+        <div class="data-item"><span class="data-label">洛杉矶低于要价</span><span class="data-value">54%</span></div>
+        <div class="data-item"><span class="data-label">萨克拉门托低于要价</span><span class="data-value">61%</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房危机</span><span class="value">全美最不可负担 · 7城需六位数收入</span></div>
+      <div class="info-row"><span class="label">2025趋势</span><span class="value">可负担性略有改善 · 利率下降</span></div>
+      <div class="tags"><span class="tag">房价全美最高</span><span class="tag">仅18%可负担</span><span class="tag">购房折扣机会</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025年Q4加州中位单户住宅价格 <strong>$869,300</strong>，为全美中位价（约 <strong>$413,000</strong>）的两倍以上。仅 <strong>18%</strong> 家庭可负担中位价住房（Q4 2025），较Q3的16%略有改善。中位自住房价值 <strong>$828,300</strong>。2025年多个都会区出现购房折扣：萨克拉门托 <strong>61%</strong> 房屋低于要价成交（平均节省6.2%），河滨 <strong>60%</strong>，圣迭戈 <strong>58%</strong>，洛杉矶 <strong>54%</strong>。Clever Real Estate 研究显示，全美需六位数收入才能负担中位价住房的城市中有 <strong>7 个</strong>在加州。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>中位房价 (2025 Q4)</td><td><strong>$869,300</strong></td></tr>
+        <tr><td>全美中位价</td><td>$413,000</td></tr>
+        <tr><td>可负担家庭比例</td><td><strong>18%</strong></td></tr>
+        <tr><td>中位自住房价值</td><td>$828,300</td></tr>
+        <tr><td>萨克拉门托低于要价成交</td><td>61%（节省 6.2%）</td></tr>
+        <tr><td>圣迭戈低于要价成交</td><td>58%</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="sec-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">地中海 / 沙漠</span></div>
+        <div class="data-item"><span class="data-label">2025秋降水</span><span class="data-value green">异常偏多</span></div>
+        <div class="data-item"><span class="data-label">北加州大气河</span><span class="data-value">9 次</span></div>
+        <div class="data-item"><span class="data-label">南加州大气河</span><span class="data-value red">0 次强</span></div>
+        <div class="data-item"><span class="data-label">2025水年</span><span class="data-value orange">略低于平均</span></div>
+        <div class="data-item"><span class="data-label">升温趋势</span><span class="data-value red">+0.234°C/十年</span></div>
+      </div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">野火 · 干旱 · 大气河洪水</span></div>
+      <div class="info-row"><span class="label">2025野火</span><span class="value">洛杉矶野火为气候警钟</span></div>
+      <div class="tags"><span class="tag">地中海气候</span><span class="tag">野火风险</span><span class="tag">大气河</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">气温与降水</div><table class="mini-table">
+        <tr><td>气候类型</td><td>地中海（沿海）/ 沙漠（内陆）/ 高山（内华达山脉）</td></tr>
+        <tr><td>2025秋降水</td><td>大部分地区异常偏多 · 拉斯维加斯/圣巴巴拉/凤凰城创纪录</td></tr>
+        <tr><td>北加州大气河</td><td><strong>9 次</strong>（年均 6 次）</td></tr>
+        <tr><td>南加州大气河</td><td>无强事件 · 仅 1 次中等</td></tr>
+        <tr><td>2025水年</td><td>略低于平均</td></tr>
+        <tr><td>最高温升温趋势</td><td>+0.234°C/十年（1950s→2025）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">极端天气与野火</div><div class="detail-text">加州气候以<strong>地中海气候</strong>为特征——夏季干燥、冬季湿润。2025年秋季降水<strong>异常偏多</strong>，北加州经历 <strong>9 次</strong>大气河事件（年均6次），但南加州无强大气河，导致南北水资源分布不均。2025年初洛杉矶野火造成重大损失，被专家称为“气候警钟”，提醒大型体育赛事（2026世界杯、2028奥运会）组织者需适应气候变化。中央谷地最高温自1950年代以来持续上升，2025年超过 <strong>24°C</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="sec-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Gavin Newsom (D)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">民主党绝对多数</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名民主党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">52 席 · 43D / 9R</span></div>
+        <div class="data-item"><span class="data-label">2024大选</span><span class="data-value">哈里斯 +20</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">深蓝州</span></div>
+      </div>
+      <div class="info-row"><span class="label">当前议题</span><span class="value">选区重划 · 野火重建 · 量子科技 · 无家可归</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">$157亿储备 · 教育 $1376亿 · 住房税收抵免 $5亿</span></div>
+      <div class="tags"><span class="tag">深蓝州</span><span class="tag">民主党绝对多数</span><span class="tag">选区重划争议</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">加州为<strong>深蓝州</strong>，民主党在州长办公室、州参议院和州众议院均占绝对多数。州长 <strong>Gavin Newsom</strong>（民主党）自2019年上任。联邦层面，两名参议员均为民主党，众议院52席中民主党占 <strong>43 席</strong>、共和党仅 <strong>9 席</strong>，尽管共和党在全州得票率约 <strong>38%</strong>——这一差距反映了独立选区重划委员会的争议。2024年大选哈里斯以 <strong>+20</strong> 优势赢得加州。</div></div>
+      <div class="detail-section"><div class="detail-label">2025年关键议题</div><table class="mini-table">
+        <tr><td>选区重划</td><td>Newsom 推动特别选举 · 共和党反对</td></tr>
+        <tr><td>野火重建</td><td>行政令豁免公用事业 CEQA/Coastal Act 合规</td></tr>
+        <tr><td>量子科技</td><td>“Quantum California”倡议 · 两个国家量子研究中心之一</td></tr>
+        <tr><td>无家可归</td><td>全美最大无家可归人口 · 持续政策挑战</td></tr>
+        <tr><td>预算</td><td>$157 亿储备 · K-12 教育 $1376 亿</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="sec-education" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公立学校系统</span><span class="data-value orange">全美第30</span></div>
+        <div class="data-item"><span class="data-label">质量排名</span><span class="data-value">第29</span></div>
+        <div class="data-item"><span class="data-label">安全排名</span><span class="data-value red">第37</span></div>
+        <div class="data-item"><span class="data-label">全美Top高中</span><span class="data-value green">1,646 所</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value">UC Berkeley · UCLA · Stanford · Caltech</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Whitney (Cerritos) 全美第16</span></div>
+      <div class="tags"><span class="tag">UC系统全美最强</span><span class="tag">Whitney全美第16</span><span class="tag">公校安全排名低</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">加州公立学校系统全美第 <strong>30</strong>，质量第29，安全第 <strong>37</strong>。但加州拥有全美最多的 U.S. News 排名高中（<strong>1,646 所</strong>）。<strong>Whitney High School</strong>（Cerritos）全美第 <strong>16</strong>，Oxford Academy（Cypress）第19，Science Academy STEM Magnet（北好莱坞）第20。<strong>San Jose-Sunnyvale-Santa Clara</strong> 为全美第4受教育程度最高都会区，旧金山-奥克兰-伯克利第7。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>UC Berkeley</td><td>全美最佳公立大学之一 · 全美第5公立</td></tr>
+        <tr><td>UCLA</td><td>全美第1公立大学（并列）· 全美荣誉榜36年</td></tr>
+        <tr><td>Stanford University</td><td>全球顶尖私立 · 硅谷核心</td></tr>
+        <tr><td>Caltech</td><td>全球顶尖理工 · 帕萨迪纳</td></tr>
+        <tr><td>UC San Diego</td><td>全美前列 · 生物科技强</td></tr>
+        <tr><td>UC系统整体</td><td>全美最佳价值教育系统</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="sec-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">NBA</span><span class="data-value">Lakers · Warriors · Clippers · Kings</span></div>
+        <div class="data-item"><span class="data-label">MLB</span><span class="data-value">Dodgers · Giants · Padres · Angels</span></div>
+        <div class="data-item"><span class="data-label">NFL</span><span class="data-value">Rams · Chargers · 49ers</span></div>
+        <div class="data-item"><span class="data-label">WNBA</span><span class="data-value">Golden State Valkyries</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025亮点</span><span class="value">道奇队卫冕世界大赛 · 湖人交易东契奇</span></div>
+      <div class="info-row"><span class="label">大学体育</span><span class="value">USC · UCLA · Stanford · Cal</span></div>
+      <div class="tags"><span class="tag">道奇世界大赛冠军</span><span class="tag">湖人东契奇交易</span><span class="tag">Valkyries新军</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><table class="mini-table">
+        <tr><td>Los Angeles Dodgers</td><td>MLB · 2025年卫冕世界大赛冠军</td></tr>
+        <tr><td>Los Angeles Lakers</td><td>NBA · 2025年交易得到 Luka Doncic</td></tr>
+        <tr><td>Golden State Warriors</td><td>NBA · 4次总冠军（2015-2022）</td></tr>
+        <tr><td>San Francisco 49ers</td><td>NFL · 5次超级碗冠军</td></tr>
+        <tr><td>Los Angeles Rams</td><td>NFL · 2022年超级碗冠军</td></tr>
+        <tr><td>Golden State Valkyries</td><td>WNBA · 2025年扩军新军</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">2025年体育亮点</div><div class="detail-text">2025年是加州体育的丰收年——<strong>道奇队</strong>连续第二年赢得世界大赛冠军，<strong>湖人队</strong>完成震撼交易得到 Luka Doncic，成为全球体育头条。<strong>Golden State Valkyries</strong> 作为 WNBA 扩军球队首个赛季表现出色。UCLA Bruins 与 KABC Radio 签署多年广播协议。Telemundo 52 推出全新足球节目 Pasión Fútbol。加州将在2026年举办世界杯比赛，2028年举办洛杉矶奥运会，体育基础设施投资持续加码。</div></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="sec-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">Los Angeles Times</span></div>
+        <div class="data-item"><span class="data-label">科技媒体中心</span><span class="data-value">旧金山湾区</span></div>
+        <div class="data-item"><span class="data-label">娱乐媒体中心</span><span class="data-value">好莱坞</span></div>
+        <div class="data-item"><span class="data-label">体育媒体</span><span class="data-value">Spectrum SportsNet</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要报纸</span><span class="value">LA Times · SF Chronicle · Mercury News · OC Register</span></div>
+      <div class="info-row"><span class="label">媒体变动</span><span class="value">California Post 挖角 LA Times 体育记者</span></div>
+      <div class="tags"><span class="tag">LA Times最大</span><span class="tag">科技媒体中心</span><span class="tag">体育媒体竞争激烈</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Los Angeles Times</td><td>全美最大报纸之一 · 洛杉矶</td></tr>
+        <tr><td>San Francisco Chronicle</td><td>旧金山主要报纸</td></tr>
+        <tr><td>Mercury News</td><td>圣何塞 · 硅谷科技报道</td></tr>
+        <tr><td>Orange County Register</td><td>南加州 · 橙县</td></tr>
+        <tr><td>Spectrum SportsNet</td><td>湖人/道奇地区体育转播</td></tr>
+        <tr><td>California Post</td><td>新兴数字媒体 · 挖角 LA Times 体育团队</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">加州拥有<strong>全美最复杂多元的媒体市场</strong>——洛杉矶为娱乐媒体之都（好莱坞、Variety、Hollywood Reporter），旧金山湾区为科技媒体中心（TechCrunch、Wired、The Information）。LA Times 为全美最大报纸之一，但2025年面临人才流失——California Post 挖角其体育专栏作家 Dylan Hernandez 和道奇队记者 Jack Harris。LA Times 印刷发行量约 <strong>7.5 万份</strong>（2025年初）。Spectrum SportsNet 和 KABC Radio 为南加州体育转播核心。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="sec-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏖️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">旅游支出</span><span class="data-value green">$158.9B</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value green">第1</span></div>
+        <div class="data-item"><span class="data-label">旅游就业</span><span class="data-value">1.2M</span></div>
+        <div class="data-item"><span class="data-label">新增岗位</span><span class="data-value green">+4,350</span></div>
+        <div class="data-item"><span class="data-label">酒店间夜增长</span><span class="data-value green">+0.8%</span></div>
+        <div class="data-item"><span class="data-label">全美酒店间夜</span><span class="data-value red">-0.5%</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">优胜美地 · 金门大桥 · 好莱坞 · 迪士尼</span></div>
+      <div class="info-row"><span class="label">韧性</span><span class="value">全美酒店需求下降时加州逆势增长</span></div>
+      <div class="tags"><span class="tag">旅游支出全美第1</span><span class="tag">1.2M旅游就业</span><span class="tag">逆势增长</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济（2025）</div><table class="mini-table">
+        <tr><td>旅游支出</td><td><strong>$1589 亿</strong>（+1.7%）</td></tr>
+        <tr><td>全美排名</td><td><strong>第1</strong></td></tr>
+        <tr><td>旅游就业</td><td><strong>120 万</strong>（+4,350）</td></tr>
+        <tr><td>酒店间夜增长</td><td><strong>+0.8%</strong>（+120万间夜）</td></tr>
+        <tr><td>全美酒店间夜</td><td>-0.5%</td></tr>
+        <tr><td>税收贡献</td><td>$136 亿</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>优胜美地国家公园</strong>（年游客约 400 万）以花岗岩悬崖和瀑布闻名。<strong>金门大桥</strong>（旧金山）为全球最上镜桥梁之一。<strong>好莱坞</strong>与<strong>环球影城</strong>为娱乐朝圣地。<strong>迪士尼乐园</strong>（阿纳海姆）为全球第一座迪士尼。<strong>纳帕谷</strong>与<strong>索诺玛</strong>为葡萄酒之乡。<strong>大苏尔</strong>（1号公路）为全球最美海岸公路之一。<strong>死亡谷国家公园</strong>为北美最低最热之地。加州在2025年全美酒店需求下降 <strong>0.5%</strong> 的背景下逆势增长 <strong>0.8%</strong>，显示旅游韧性。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="sec-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">太阳能发电</span><span class="data-value green">40.3 BkWh</span></div>
+        <div class="data-item"><span class="data-label">太阳能占比</span><span class="data-value green">29%</span></div>
+        <div class="data-item"><span class="data-label">天然气发电</span><span class="data-value">45.5 BkWh</span></div>
+        <div class="data-item"><span class="data-label">天然气下降</span><span class="data-value green">-18%</span></div>
+        <div class="data-item"><span class="data-label">新增清洁能源</span><span class="data-value green">30,000 MW</span></div>
+        <div class="data-item"><span class="data-label">储能</span><span class="data-value green">10,000+ MW</span></div>
+      </div>
+      <div class="info-row"><span class="label">清洁能源里程碑</span><span class="value">2019年以来新增 30,000 MW 清洁能源+储能</span></div>
+      <div class="info-row"><span class="label">Diablo Canyon</span><span class="value">核电站获准运营至 2030 年</span></div>
+      <div class="tags"><span class="tag">太阳能全美领先</span><span class="tag">化石燃料骤降</span><span class="tag">2030核电延期</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">电力结构（2025.1-8）</div><table class="mini-table">
+        <tr><td>总发电量</td><td>140.9 BkWh（+8% vs 2020）</td></tr>
+        <tr><td>太阳能发电</td><td><strong>40.3 BkWh</strong>（2020年 22 BkWh）</td></tr>
+        <tr><td>天然气发电</td><td>45.5 BkWh（<strong>-18%</strong>）</td></tr>
+        <tr><td>化石燃料总发电</td><td>2025年7月 36,416 GWh（-40% YoY）</td></tr>
+        <tr><td>储能</td><td>10,000+ MW（2019年以来新增）</td></tr>
+        <tr><td>Diablo Canyon 核电</td><td>获准运营至 <strong>2030 年</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">清洁能源转型</div><div class="detail-text">加州为全美<strong>清洁能源转型领导者</strong>。2019年以来新增超过 <strong>30,000 MW</strong> 清洁能源和储能容量，另有 <strong>21,000 MW</strong> 已签约开发中，预计2029年底投运。太阳能发电在2025年前8个月达到 <strong>40.3 BkWh</strong>，较2020年翻倍。天然气发电持续下降——2025年7月化石燃料发电较2024年同期骤降 <strong>40%</strong>。Diablo Canyon 核电站获准运营至 <strong>2030 年</strong>，为清洁能源过渡提供基荷电力。加州继续投资超过 <strong>$1 亿</strong>于清洁能源技术。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="sec-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">科技就业</span><span class="data-value">524,000</span></div>
+        <div class="data-item"><span class="data-label">全美占比</span><span class="data-value">18%</span></div>
+        <div class="data-item"><span class="data-label">科技企业</span><span class="data-value">61,000+ 家</span></div>
+        <div class="data-item"><span class="data-label">量子研究中心</span><span class="data-value">2 个国家级</span></div>
+        <div class="data-item"><span class="data-label">南加州风投</span><span class="data-value">$88.5 亿</span></div>
+        <div class="data-item"><span class="data-label">科技岗位占比</span><span class="data-value red">16.5%</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">AI · 量子计算 · 航空航天 · 生物科技 · 娱乐科技</span></div>
+      <div class="info-row"><span class="label">重大倡议</span><span class="value">“Quantum California” · 州长纽森启动</span></div>
+      <div class="tags"><span class="tag">AI全球中心</span><span class="tag">Quantum California</span><span class="tag">科技岗位占比下降</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">科技产业概况</div><div class="detail-text">加州仍是<strong>全球科技之都</strong>——雇佣 <strong>52.4 万</strong>科技工人（全美 <strong>18%</strong>），分布在 <strong>61,000+</strong> 家企业。但科技岗位占全州就业比例从峰值 <strong>19%</strong> 降至 <strong>16.5%</strong>，2025年硅谷裁员数千人。加州拥有全球大多数最大 AI 公司（Google、OpenAI、Meta、Anthropic）。<strong>“Quantum California”</strong> 倡议由州长纽森2025年11月启动，整合政府、学术界和产业推进量子创新。南加州2025年25大风投交易筹集 <strong>$88.5 亿</strong>，多数流向航空航天和国防初创公司。加州制造业产出 <strong>$4056 亿</strong>，雇佣 <strong>124 万</strong>工人，CalCompetes 拨款近 <strong>$1 亿</strong>支持先进制造。</div></div>
+      <div class="detail-section"><div class="detail-label">重点企业与创新</div><table class="mini-table">
+        <tr><td>Apple</td><td>库比蒂诺 · 全球市值最高</td></tr>
+        <tr><td>Alphabet (Google)</td><td>山景城 · AI 全球领导者</td></tr>
+        <tr><td>Nvidia</td><td>圣克拉拉 · AI 芯片霸主</td></tr>
+        <tr><td>OpenAI</td><td>旧金山 · 生成式 AI 先驱</td></tr>
+        <tr><td>Meta</td><td>门洛帕克 · 社交媒体与AI</td></tr>
+        <tr><td>Anthropic</td><td>旧金山 · AI 安全研究</td></tr>
+        <tr><td>SpaceX</td><td>霍桑 · 商业航天</td></tr>
+        <tr><td>Quantum California</td><td>两个国家级量子研究中心之一</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>加利福尼亚州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · Visit California · California DOJ · EIA · Fortune</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
