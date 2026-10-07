@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AK</title>
+<style>
+  :root {
+    --ground: #f5f5f7;
+    --surface: #ffffff;
+    --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed;
+    --radius-card: 18px;
+    --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #eaf0f6 0%, #d4e0ec 100%);
+    --table-stripe: #fafafa;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --aurora: #0a4d68;
+  }
+
+  [data-theme="dark"] {
+    --ground: #000000;
+    --surface: #1c1c1e;
+    --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-tertiary: #636366;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.3);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8);
+    --hero-gradient: linear-gradient(135deg, #0d1b26 0%, #142a3a 100%);
+    --table-stripe: #2c2c2e;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+    --aurora: #4db8e8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-stack);
+    background: var(--ground);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: var(--nav-bg);
+    border-bottom: 0.5px solid var(--divider);
+    transition: background 0.4s ease;
+  }
+  .nav-inner {
+    max-width: 1240px; margin: 0 auto; padding: 0 22px;
+    height: 52px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+  }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--aurora); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    font-size: 11.5px; font-weight: 500; color: var(--text-secondary);
+    text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill);
+    white-space: nowrap; transition: background 0.2s, color 0.2s;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  .theme-toggle {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 0.5px solid var(--divider); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all 0.25s ease;
+  }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+
+  .hero {
+    text-align: center; padding: 72px 22px 52px;
+    max-width: 900px; margin: 0 auto;
+    background: var(--hero-gradient); border-radius: 0 0 32px 32px;
+    transition: background 0.4s ease;
+  }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 58px); font-weight: 700;
+    letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px;
+  }
+  .hero h1 em { font-style: normal; color: var(--aurora); }
+  .hero .subtitle {
+    font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary);
+    margin-bottom: 32px; line-height: 1.6;
+  }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong {
+    display: block; font-size: 26px; font-weight: 700;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .hero-stat span {
+    font-size: 10.5px; color: var(--text-tertiary); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .hero-badges {
+    display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .hero-badge {
+    font-size: 11.5px; font-weight: 600; padding: 6px 14px;
+    border-radius: var(--radius-pill); line-height: 1.4;
+    background: var(--surface); border: 0.5px solid var(--divider);
+    color: var(--text-secondary);
+  }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+
+  .grid {
+    max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    background: var(--surface); border-radius: var(--radius-card);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                background 0.4s ease;
+    cursor: pointer; position: relative;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+
+  .card-head {
+    padding: 24px 24px 0; display: flex;
+    align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small {
+    display: block; font-size: 11.5px; font-weight: 500;
+    color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px;
+  }
+  .card-icon {
+    font-size: 22px; flex-shrink: 0; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-secondary); border-radius: 10px;
+  }
+
+  .card-body { padding: 12px 24px 24px; }
+
+  .data-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px 14px; margin-bottom: 12px;
+  }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label {
+    font-size: 9.5px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-tertiary);
+  }
+  .data-value {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .data-value.green { color: var(--green); }
+  .data-value.orange { color: var(--orange); }
+  .data-value.red { color: var(--red); }
+
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+
+  .tags {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 0.5px solid var(--divider);
+  }
+  .tag {
+    font-size: 10.5px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); padding: 3px 9px;
+    border-radius: var(--radius-pill); letter-spacing: 0.01em;
+  }
+
+  .card-detail {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1),
+                padding 0.55s cubic-bezier(0.25,0.1,0.25,1);
+    padding: 0 24px; background: var(--surface-secondary);
+    transition: background 0.4s ease, max-height 0.55s ease, padding 0.55s ease;
+  }
+  .card.expanded .card-detail { max-height: 2400px; padding: 18px 24px 22px; }
+
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+
+  .detail-section { margin-bottom: 13px; }
+  .detail-section:last-child { margin-bottom: 0; }
+  .detail-label {
+    font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px;
+  }
+  .detail-text {
+    font-size: 12.5px; color: var(--text-secondary);
+    line-height: 1.65; letter-spacing: -0.005em;
+  }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+
+  .mini-table {
+    width: 100%; border-collapse: collapse; margin-top: 4px;
+    font-size: 12px; letter-spacing: -0.005em;
+  }
+  .mini-table td {
+    padding: 5px 7px; border-bottom: 0.5px solid var(--divider);
+    color: var(--text-secondary); vertical-align: top;
+  }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child {
+    color: var(--text-tertiary); font-weight: 500;
+    white-space: nowrap; width: 44%;
+  }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+
+  .bar-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 3px;
+  }
+  .bar-track {
+    flex: 1; height: 5px; border-radius: 3px;
+    background: var(--divider); overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .bar-fill.green { background: var(--green); }
+  .bar-fill.orange { background: var(--orange); }
+  .bar-fill.red { background: var(--red); }
+  .bar-fill.accent { background: var(--accent); }
+  .bar-score {
+    font-size: 11.5px; font-weight: 700; color: var(--text-primary);
+    font-variant-numeric: tabular-nums; min-width: 32px; text-align: right;
+  }
+
+  .expand-hint {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; padding: 9px 0 14px;
+    font-size: 10.5px; color: var(--text-tertiary);
+    font-weight: 500; transition: color 0.2s;
+  }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg {
+    width: 9px; height: 9px;
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+
+  .to-top {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 0.5px solid var(--divider);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    z-index: 200;
+  }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg {
+    width: 16px; height: 16px; stroke: var(--text-secondary);
+    stroke-width: 2.2; fill: none; transition: stroke 0.2s;
+  }
+
+  .footer {
+    text-align: center; padding: 48px 22px 72px;
+    font-size: 12px; color: var(--text-tertiary); line-height: 1.9;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer .copyright {
+    margin-top: 20px; padding-top: 16px;
+    border-top: 0.5px solid var(--divider);
+    font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; }
+    .card-head { padding: 20px 20px 0; }
+    .card-body { padding: 10px 20px 20px; }
+    .card-detail { padding: 0 20px; }
+    .card.expanded .card-detail { padding: 16px 20px 18px; }
+    .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; }
+    .hero-stats { gap: 24px; }
+    .data-grid { grid-template-columns: 1fr; gap: 6px; }
+    .nav-links a { font-size: 10.5px; padding: 4px 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>阿拉斯加州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#sec-overview">概览</a>
+      <a href="#sec-population">人口</a>
+      <a href="#sec-economy">经济就业</a>
+      <a href="#sec-business">企业与产业</a>
+      <a href="#sec-healthcare">医疗</a>
+      <a href="#sec-safety">公共安全</a>
+      <a href="#sec-tax">税收财政</a>
+      <a href="#sec-transport">交通</a>
+      <a href="#sec-housing">住房</a>
+      <a href="#sec-climate">气候</a>
+      <a href="#sec-politics">政治政府</a>
+      <a href="#sec-education">教育</a>
+      <a href="#sec-sports">体育</a>
+      <a href="#sec-media">媒体</a>
+      <a href="#sec-tourism">旅游</a>
+      <a href="#sec-fishing">渔业</a>
+      <a href="#sec-energy">能源</a>
+      <a href="#sec-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌌</div>
+  <h1>阿拉斯加州<br><em>Alaska</em></h1>
+  <p class="subtitle">最后的边疆 · 极光之乡 · 石油基金分红 · 原住民文化</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>740,133</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$69.4B</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>4.1%</strong><span>失业率 (2025.11)</span></div>
+    <div class="hero-stat"><strong>$1,000+</strong><span>年度 PFD 分红</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 无州所得税 · 无州销售税</span>
+    <span class="hero-badge orange">🛡️ 持枪率全美 <b>前3</b></span>
+    <span class="hero-badge red">📚 教育全美 <b>后段</b></span>
+    <span class="hero-badge">🛢️ 石油 = 州财政 <b>核心</b></span>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- 1. 概览 -->
+  <div class="card" id="sec-overview" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">州概况<small>State Overview</small></div>
+      <div class="card-icon">📍</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1959年1月3日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">朱诺</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">安克雷奇</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">1,717,856 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">柳雷鸟</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">勿忘我</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">最后的边疆（The Last Frontier）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"North to the Future"</span></div>
+      <div class="tags">
+        <span class="tag">First Nation</span><span class="tag">Far West</span><span class="tag">最后边疆</span><span class="tag">极光</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">地理与文化定位</div>
+        <div class="detail-text">
+          阿拉斯加是美国面积最大的州（<strong>1,717,856 km²</strong>），是得克萨斯州的 2.5 倍，占全美国土面积的 <strong>约 18%</strong>。位于北美洲西北端，东接加拿大育空地区和卑诗省，西隔白令海峡与俄罗斯相望，北临北冰洋，南滨太平洋。在 Colin Woodard 的文化分区中，阿拉斯加属于 <strong>First Nation</strong> 文化区——因纽特（Inuit）、尤皮克（Yup'ik）、阿留申（Aleut）和特林吉特（Tlingit）等原住民文化根深蒂固。州内拥有 <strong>8 座</strong>国家公园，包括北美最高峰德纳利山（6,190 米）。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">历史节点</div>
+        <div class="detail-text">
+          1741年俄国探险家白令抵达阿拉斯加，1784年俄国在此建立第一个永久定居点。1867年美国以 <strong>$720 万</strong>（约每英亩 2 美分）从俄国购得阿拉斯加，被当时媒体嘲讽为“苏华德的冰箱”。1896年克朗代克淘金热吸引大量移民。1912年成为美国建制领地，<strong>1959年1月3日</strong>成为美国第 <strong>49 个州</strong>。1968年发现北坡大油田，1977年跨阿拉斯加输油管道建成，石油收入彻底重塑州经济。1971年《阿拉斯加原住民土地索赔法案》是美国原住民权利的重要里程碑。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 人口与社会 -->
+  <div class="card" id="sec-population" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">人口与社会<small>Population & Society</small></div>
+      <div class="card-icon">👥</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">740,133</span></div>
+        <div class="data-item"><span class="data-label">2020-2025 增长</span><span class="data-value red">-0.1%</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~35 岁</span></div>
+        <div class="data-item"><span class="data-label">65岁以上</span><span class="data-value">13.2%</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$89,336</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">11.0%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 65.7% · 原住民 15.6% · 西语裔 7.5% · 亚裔 6.8%</span></div>
+      <div class="info-row"><span class="label">家庭</span><span class="value">户均 2.65 人 · 自有住房率 65.9%</span></div>
+      <div class="tags">
+        <span class="tag">原住民占比全美最高</span><span class="tag">人口密度全美最低</span><span class="tag">净迁出趋势</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">人口结构深度</div>
+        <table class="mini-table">
+          <tr><td>总人口 (2025)</td><td><strong>740,133</strong>（全美第48）</td></tr>
+          <tr><td>人口密度</td><td>约 0.49 人/km²（全美最低）</td></tr>
+          <tr><td>原住民占比</td><td><strong>15.6%</strong>（全美最高）</td></tr>
+          <tr><td>18岁以下</td><td>24.1%</td></tr>
+          <tr><td>65岁以上</td><td>13.2%</td></tr>
+          <tr><td>退伍军人</td><td>约 67,000 人（占比全美前列）</td></tr>
+          <tr><td>外国出生</td><td>7.5%</td></tr>
+          <tr><td>无医保（65岁以下）</td><td>11.2%</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">收入与人口趋势</div>
+        <div class="detail-text">
+          中位家庭收入 <strong>$89,336</strong>，高于全美中位数，但生活成本同样偏高。2025年阿拉斯加人口约 <strong>74 万</strong>，近年呈轻微<strong>净迁出</strong>趋势——2020-2025年约减少 <strong>1,000 人</strong>。安克雷奇都会区集中了全州约 <strong>40%</strong> 人口。原住民社区（尤其是农村和偏远地区）面临更高的贫困率、失业率和自杀率，为州政府长期政策挑战。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 经济与就业 -->
+  <div class="card" id="sec-economy" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">经济与就业<small>Economy & Employment</small></div>
+      <div class="card-icon">📊</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$69.4B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长</span><span class="data-value green">+1.2%</span></div>
+        <div class="data-item"><span class="data-label">总就业</span><span class="data-value">~340K</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">4.1%</span></div>
+        <div class="data-item"><span class="data-label">劳动参与率</span><span class="data-value">65.9%</span></div>
+        <div class="data-item"><span class="data-label">个人收入增长</span><span class="data-value">+3.8%</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">石油主导 · 联邦政府为最大雇主</span></div>
+      <div class="info-row"><span class="label">就业排名</span><span class="value">U.S. News 全美 <strong>第28</strong></span></div>
+      <div class="tags">
+        <span class="tag">石油贡献州财政50%+</span><span class="tag">联邦政府最大雇主</span><span class="tag">渔业与旅游为支柱</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济表现</div>
+        <table class="mini-table">
+          <tr><td>Gross State Product (2025)</td><td><strong>$69.4B</strong>（全美第46）</td></tr>
+          <tr><td>GDP 增速 (2025)</td><td>+1.2%</td></tr>
+          <tr><td>失业率 (2025.11)</td><td><strong>4.1%</strong>（全美 4.3%）</td></tr>
+          <tr><td>劳动参与率</td><td>65.9%（全美 62.5%）</td></tr>
+          <tr><td>人均 GDP</td><td>约 $93,000（全美前列）</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">经济结构</div>
+        <div class="detail-text">
+          阿拉斯加经济由三大支柱构成：<strong>石油天然气</strong>（占州财政收入的 50%–60% 和 GDP 的约 20%）、<strong>联邦政府</strong>（军事基地、国家公园、原住民事务，为最大雇主）、<strong>渔业与旅游</strong>。2025年石油产量约 <strong>48 万桶/日</strong>，北坡油田（Prudhoe Bay）为核心产区。跨阿拉斯加输油管道（Trans-Alaska Pipeline）全长 <strong>1,288 公里</strong>，连接北坡与瓦尔德兹港。联邦政府通过 <strong>永久基金（Permanent Fund）</strong> 将石油收入转化为全民分红。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">就业结构</div>
+        <table class="mini-table">
+          <tr><td>联邦政府</td><td>约 15,000 人 · 最大单一雇主</td></tr>
+          <tr><td>石油天然气</td><td>约 10,000 人 · 高薪岗位</td></tr>
+          <tr><td>医疗健康</td><td>约 35,000 人</td></tr>
+          <tr><td>旅游与酒店</td><td>约 20,000 人（季节性波动）</td></tr>
+          <tr><td>渔业</td><td>约 15,000 人（季节性）</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 企业与产业 -->
+  <div class="card" id="sec-business" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">企业与产业<small>Business & Industry</small></div>
+      <div class="card-icon">🏭</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">0</span></div>
+        <div class="data-item"><span class="data-label">最大雇主</span><span class="data-value">联邦政府</span></div>
+        <div class="data-item"><span class="data-label">石油公司</span><span class="data-value">ConocoPhillips / Hilcorp</span></div>
+        <div class="data-item"><span class="data-label">航空公司</span><span class="data-value">Alaska Air Group</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级产业</span><span class="value">石油 · 渔业 · 旅游 · 航空 · 矿业</span></div>
+      <div class="info-row"><span class="label">州企旗舰</span><span class="value"><strong>Alaska Air Group</strong>（Fortune 500 #482）</span></div>
+      <div class="tags">
+        <span class="tag">Alaska Air全美知名</span><span class="tag">ConocoPhillips北坡</span><span class="tag">原住民公司</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">主要雇主</div>
+        <table class="mini-table">
+          <tr><td>联邦政府（含军方）</td><td>约 15,000 人 · 最大雇主</td></tr>
+          <tr><td>Providence Health & Services</td><td>医疗系统 · 约 5,000 人</td></tr>
+          <tr><td>State of Alaska</td><td>州政府 · 约 15,000 人</td></tr>
+          <tr><td>ConocoPhillips Alaska</td><td>石油 · 约 1,500 人</td></tr>
+          <tr><td>Hilcorp Alaska</td><td>石油 · 约 1,200 人</td></tr>
+          <tr><td>Alaska Air Group</td><td>航空 · 约 20,000 人（全集团）</td></tr>
+          <tr><td>Alaska Native Corporations (ANCs)</td><td>12 家区域公司 + 200+ 村庄公司</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">原住民公司体系</div>
+        <div class="detail-text">
+          根据1971年《阿拉斯加原住民土地索赔法案》（ANCSA），成立了 <strong>12 家</strong>区域原住民公司和 <strong>200 多家</strong>村庄公司，原住民通过公司持有约 <strong>4,400 万英亩</strong>土地和 <strong>$9.625 亿</strong>补偿金。这些公司（如 Arctic Slope Regional Corporation、NANA Regional Corporation）现已成为阿拉斯加重要的经济力量，涉足石油服务、建筑、工程、电信和旅游业。ASRC 年收入约 <strong>$30 亿</strong>，为全美最大原住民企业之一。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗健康 -->
+  <div class="card" id="sec-healthcare" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">医疗健康<small>Healthcare</small></div>
+      <div class="card-icon">🏥</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">U.S. News 医疗</span><span class="data-value orange">第31</span></div>
+        <div class="data-item"><span class="data-label">医疗可及性</span><span class="data-value orange">第35</span></div>
+        <div class="data-item"><span class="data-label">公共卫生</span><span class="data-value orange">第28</span></div>
+        <div class="data-item"><span class="data-label">无医保率</span><span class="data-value">11.2%</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value"><strong>Alaska Native Medical Center</strong>（安克雷奇）</span></div>
+      <div class="info-row"><span class="label">最大系统</span><span class="value">Providence Alaska · 约 5,000 员工</span></div>
+      <div class="tags">
+        <span class="tag">农村医疗挑战大</span><span class="tag">原住民医疗服务</span><span class="tag">远程医疗先锋</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">主要医院</div>
+        <table class="mini-table">
+          <tr><td>1. Alaska Native Medical Center</td><td>安克雷奇 · 原住民医疗旗舰</td></tr>
+          <tr><td>2. Providence Alaska Medical Center</td><td>安克雷奇 · 全州最大综合医院</td></tr>
+          <tr><td>3. Alaska Regional Hospital</td><td>安克雷奇</td></tr>
+          <tr><td>4. Fairbanks Memorial Hospital</td><td>费尔班克斯</td></tr>
+          <tr><td>5. Bartlett Regional Hospital</td><td>朱诺</td></tr>
+          <tr><td>6. Mat-Su Regional Medical Center</td><td>帕尔默</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">医疗体系特点</div>
+        <div class="detail-text">
+          阿拉斯加医疗体系的最大挑战是<strong>地理分散</strong>——许多偏远社区不通公路，只能依赖<strong>小型飞机和远程医疗</strong>。阿拉斯加原住民部落健康联盟（Alaska Native Tribal Health Consortium）运营的 <strong>Alaska Native Medical Center</strong> 为全州原住民提供医疗服务，通过 <strong>Community Health Aide Program</strong> 培训村庄卫生员。远程医疗（telehealth）在阿拉斯加发展领先全美，为农村患者提供专科会诊。但全州医疗资源仍高度集中在安克雷奇和费尔班克斯，偏远地区产科和急诊服务不足。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="sec-safety" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div>
+      <div class="card-icon">🚔</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">U.S. News 公共安全</span><span class="data-value orange">第37</span></div>
+        <div class="data-item"><span class="data-label">暴力犯罪率</span><span class="data-value red">838 / 10万</span></div>
+        <div class="data-item"><span class="data-label">财产犯罪率</span><span class="data-value red">2,567 / 10万</span></div>
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value">约 64.5%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>宪法携带州</strong> · 年满21岁无需许可</span></div>
+      <div class="info-row"><span class="label">执法机构</span><span class="value">Alaska State Troopers · 覆盖全州</span></div>
+      <div class="tags">
+        <span class="tag">持枪率全美第3</span><span class="tag">暴力犯罪率高于全美</span><span class="tag">农村治安挑战</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">犯罪与安全指标</div>
+        <table class="mini-table">
+          <tr><td>暴力犯罪率</td><td>838 / 10万（全美 359）</td></tr>
+          <tr><td>财产犯罪率</td><td>2,567 / 10万（全美 1,954）</td></tr>
+          <tr><td>凶杀率</td><td>约 7.5 / 10万（全美 6.1）</td></tr>
+          <tr><td>公共安全排名</td><td>全美第37</td></tr>
+          <tr><td>紧急准备</td><td>全美第1（WalletHub 2025）</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">警察与消防</div>
+        <div class="detail-text">
+          <strong>Alaska State Troopers</strong>（阿拉斯加州警）为全州主要执法机构，覆盖除安克雷奇（有市警）以外的广大区域，许多偏远社区只能依赖州警定期巡逻或村庄公共安全官（VPSO）。安克雷奇警察局为州内最大市警机构。消防服务在城市地区由职业消防局提供，农村社区多依赖志愿消防队。阿拉斯加原住民村庄的治安问题（尤其是家庭暴力和自杀率）为长期挑战。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">持枪法规</div>
+        <div class="detail-text">
+          阿拉斯加为<strong>宪法携带州</strong>（2013年生效），年满21岁无需许可即可隐蔽携枪。持枪率约 <strong>64.5%</strong>，为全美第三高。持枪在阿拉斯加不仅是权利，更是生活方式——狩猎、钓鱼、野外生存和防范野生动物（棕熊、黑熊、狼）是日常生活的一部分。尽管持枪率极高，阿拉斯加的暴力犯罪率仍高于全美平均，但农村地区的“持枪率高+犯罪率低”模式与城市地区形成对比。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 税收与财政 -->
+  <div class="card" id="sec-tax" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">税收与财政<small>Tax & Fiscal</small></div>
+      <div class="card-icon">💰</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value green">无</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value green">无</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">1%–9.4%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value">1.0%–1.2%</span></div>
+        <div class="data-item"><span class="data-label">永久基金分红</span><span class="data-value green">$1,000+/年</span></div>
+        <div class="data-item"><span class="data-label">税竞争力</span><span class="data-value green">全美前列</span></div>
+      </div>
+      <div class="info-row"><span class="label">财政来源</span><span class="value">石油开采税 + 石油特许权税 = 州财政 <strong>50%+</strong></span></div>
+      <div class="info-row"><span class="label">永久基金</span><span class="value">市值超 <strong>$800 亿</strong> · 1976年设立</span></div>
+      <div class="tags">
+        <span class="tag">无个人所得税</span><span class="tag">无州销售税</span><span class="tag">PFD全民分红</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">税率明细（2026）</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td><strong>无</strong></td></tr>
+          <tr><td>州销售税</td><td><strong>无州级</strong>（部分市镇征收 0%–7%）</td></tr>
+          <tr><td>企业所得税</td><td>1%–9.4% 累进（基于联邦应税收入）</td></tr>
+          <tr><td>房产税</td><td>有效税率约 1.0%–1.2%（无州级）</td></tr>
+          <tr><td>石油开采税</td><td>35%（净利润税）</td></tr>
+          <tr><td>遗产税 / 继承税</td><td><strong>无</strong></td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">永久基金（Permanent Fund）</div>
+        <div class="detail-text">
+          1976年阿拉斯加宪法修正案设立<strong>永久基金</strong>，将至少 <strong>25%</strong> 的石油矿产开采税收入存入基金，为后代保留财富。基金市值超 <strong>$800 亿</strong>（2025年），年均收益约 <strong>6%–8%</strong>。每年收益的一部分以<strong>永久基金分红（PFD）</strong>形式发放给所有符合条件的居民——2025年每人约 <strong>$1,000–$1,700</strong>。这一制度为全球主权财富基金的先驱之一，使阿拉斯加成为美国唯一向居民发放年度分红的州。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">财政挑战</div>
+        <div class="detail-text">
+          阿拉斯加财政高度依赖石油收入（占州财政 50%–60%），油价波动直接影响预算。北坡油田产量自1988年峰值（<strong>200 万桶/日</strong>）持续下降至 2025 年的约 <strong>48 万桶/日</strong>，长期收入前景承压。州长提出引入<strong>4% 季节性销售税</strong>以应对长期赤字，但政治阻力较大。永久基金分红规模也因州财政压力而波动。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="sec-transport" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">交通基础设施<small>Transportation</small></div>
+      <div class="card-icon">🛣️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公路里程</span><span class="data-value">16,000 英里</span></div>
+        <div class="data-item"><span class="data-label">铁路里程</span><span class="data-value">~500 英里</span></div>
+        <div class="data-item"><span class="data-label">机场</span><span class="data-value">400+ 公共</span></div>
+        <div class="data-item"><span class="data-label">渡轮系统</span><span class="data-value">AMHS 全州</span></div>
+        <div class="data-item"><span class="data-label">跨州公路</span><span class="data-value green">无</span></div>
+        <div class="data-item"><span class="data-label">货运机场</span><span class="data-value">ANC 全球第3</span></div>
+      </div>
+      <div class="info-row"><span class="label">航空特征</span><span class="value">小型飞机为许多社区唯一交通方式</span></div>
+      <div class="info-row"><span class="label">安克雷奇机场</span><span class="value">全球货运最繁忙机场之一</span></div>
+      <div class="tags">
+        <span class="tag">无跨州公路</span><span class="tag">航空为生命线</span><span class="tag">渡轮系统</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">公路与铁路</div>
+        <div class="detail-text">
+          阿拉斯加<strong>无跨州际公路</strong>连接美国本土。主要公路系统包括：<strong>阿拉斯加公路</strong>（Alaska Highway，连接育空地区至费尔班克斯）、<strong>道尔顿公路</strong>（Dalton Highway，通往北坡油田，为著名的“死亡公路”）、<strong>苏厄德公路</strong>（连接安克雷奇与苏厄德）、<strong>帕克斯公路</strong>（连接费尔班克斯与安克雷奇）。<strong>阿拉斯加铁路</strong>（Alaska Railroad）全长约 <strong>500 英里</strong>，连接苏厄德-安克雷奇-费尔班克斯，夏季每日客运，冬季货运为主。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">航空与渡轮</div>
+        <table class="mini-table">
+          <tr><td>泰德·史蒂文斯安克雷奇国际机场 (ANC)</td><td>全球货运最繁忙机场之一 · 客运枢纽</td></tr>
+          <tr><td>费尔班克斯国际机场 (FAI)</td><td>北极门户 · 极光旅游枢纽</td></tr>
+          <tr><td>朱诺国际机场 (JNU)</td><td>州首府机场 · 无公路连接</td></tr>
+          <tr><td>阿拉斯加海洋公路 (AMHS)</td><td>全州渡轮系统 · 连接沿海社区</td></tr>
+          <tr><td>小型飞机</td><td>许多社区唯一交通方式 · 水上飞机常见</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">交通特点</div>
+        <div class="detail-text">
+          阿拉斯加的交通地理极为特殊——州首府<strong>朱诺</strong>不通公路，只能乘飞机或渡轮抵达。许多偏远社区（如巴罗/乌特恰维克、诺姆）完全依赖小型飞机和季节性补给船。安克雷奇国际机场为<strong>全球货运最繁忙机场之一</strong>（联邦快递和 UPS 的跨太平洋货运枢纽）。冬季暴风雪和极寒天气常导致公路和航空中断。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="sec-housing" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">住房市场<small>Housing Market</small></div>
+      <div class="card-icon">🏠</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025)</span><span class="data-value">$389,000</span></div>
+        <div class="data-item"><span class="data-label">年涨幅</span><span class="data-value orange">+3.5%</span></div>
+        <div class="data-item"><span class="data-label">自有住房率</span><span class="data-value">65.9%</span></div>
+        <div class="data-item"><span class="data-label">中位月租</span><span class="data-value">$1,450</span></div>
+        <div class="data-item"><span class="data-label">有贷款月供</span><span class="data-value">$2,100</span></div>
+        <div class="data-item"><span class="data-label">建筑许可</span><span class="data-value">~2,500 /年</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房成本</span><span class="value">高于全美平均 · 安克雷奇和朱诺最贵</span></div>
+      <div class="info-row"><span class="label">特点</span><span class="value">偏远社区住房短缺 · 冬季取暖成本高</span></div>
+      <div class="tags">
+        <span class="tag">房价高于全美</span><span class="tag">偏远地区住房短缺</span><span class="tag">取暖成本高</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">房价趋势</div>
+        <div class="detail-text">
+          2025年阿拉斯加中位房价约 <strong>$389,000</strong>，高于全美中位数。安克雷奇都会区中位价约 <strong>$420,000</strong>，朱诺约 <strong>$450,000</strong>。费尔班克斯相对较低（约 <strong>$340,000</strong>）。偏远原住民村庄面临严重住房短缺——许多社区住房过度拥挤，缺乏自来水和下水道系统。冬季取暖成本极高，部分地区年取暖费超过 <strong>$3,000</strong>。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">住房成本</div>
+        <table class="mini-table">
+          <tr><td>中位房价</td><td>$389,000</td></tr>
+          <tr><td>有贷款月供（中位）</td><td>约 $2,100</td></tr>
+          <tr><td>中位月租</td><td>$1,450</td></tr>
+          <tr><td>自有住房率</td><td>65.9%</td></tr>
+          <tr><td>年建筑许可</td><td>约 2,500 个</td></tr>
+          <tr><td>取暖成本（年均）</td><td>$2,000–$3,500</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="sec-climate" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">气候<small>Climate</small></div>
+      <div class="card-icon">🌡️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">亚北极 / 极地</span></div>
+        <div class="data-item"><span class="data-label">安克雷奇年均温</span><span class="data-value">37°F (3°C)</span></div>
+        <div class="data-item"><span class="data-label">冬季均温</span><span class="data-value">5–20°F</span></div>
+        <div class="data-item"><span class="data-label">夏季均温</span><span class="data-value">50–65°F</span></div>
+        <div class="data-item"><span class="data-label">年降水量</span><span class="data-value">15–60 英寸</span></div>
+        <div class="data-item"><span class="data-label">极端最低</span><span class="data-value red">-80°F (-62°C)</span></div>
+      </div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">极寒 · 暴风雪 · 极昼极夜</span></div>
+      <div class="info-row"><span class="label">极光季</span><span class="value">8月–4月 · 费尔班克斯最佳</span></div>
+      <div class="tags">
+        <span class="tag">极昼极夜</span><span class="tag">北极光</span><span class="tag">极端寒冷</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">气温与降水</div>
+        <table class="mini-table">
+          <tr><td>安克雷奇年均温</td><td>37°F (3°C)</td></tr>
+          <tr><td>费尔班克斯年均温</td><td>27°F (-3°C)</td></tr>
+          <tr><td>巴罗/乌特恰维克年均温</td><td>13°F (-11°C)</td></tr>
+          <tr><td>冬季均温（内陆）</td><td>-10°F 至 10°F</td></tr>
+          <tr><td>夏季均温（内陆）</td><td>50°F 至 70°F</td></tr>
+          <tr><td>年降水量（东南部）</td><td>60+ 英寸（温带雨林）</td></tr>
+          <tr><td>年降水量（北部）</td><td>5–10 英寸（北极沙漠）</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">极昼极夜与极光</div>
+        <div class="detail-text">
+          阿拉斯加地处高纬度，经历显著的<strong>极昼极夜</strong>现象。巴罗（乌特恰维克，北纬71°）每年有约 <strong>80 天</strong>极昼和 <strong>65 天</strong>极夜。安克雷奇夏至日日照约 <strong>19 小时</strong>，冬至日仅约 <strong>5 小时</strong>。阿拉斯加是<strong>北极光</strong>（Aurora Borealis）全球最佳观赏地之一——费尔班克斯位于极光椭圆带正下方，每年约 <strong>8月21日至4月21日</strong>可观测，年均极光出现超过 <strong>200 晚</strong>。极端最低气温记录为 <strong>-80°F（-62°C）</strong>（1971年Prospect Creek）。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. 政治与政府 -->
+  <div class="card" id="sec-politics" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">政治与政府<small>Politics & Government</small></div>
+      <div class="card-icon">🏛️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Mike Dunleavy (R)</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名共和党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">1 席 · 共和党</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">共和党多数</span></div>
+        <div class="data-item"><span class="data-label">2024大选</span><span class="data-value red">特朗普 +13</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">红州 · 有独立倾向</span></div>
+      </div>
+      <div class="info-row"><span class="label">特点</span><span class="value">共和党主导但 libertarian 倾向强</span></div>
+      <div class="info-row"><span class="label">原住民</span><span class="value">部落主权与州政府关系复杂</span></div>
+      <div class="tags">
+        <span class="tag">红州</span><span class="tag">独立倾向</span><span class="tag">石油政治</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">政府结构</div>
+        <div class="detail-text">
+          阿拉斯加为<strong>红州</strong>，共和党在州长办公室和州议会均占多数。但阿拉斯加政治具有强烈的<strong>自由意志主义（libertarian）</strong>倾向——低税、少监管、个人自由为核心价值。州长 <strong>Mike Dunleavy</strong>（共和党）自2018年上任，2022年连任。联邦层面，两名参议员均为共和党，众议院唯一席位为共和党。阿拉斯加原住民部落拥有<strong>部落主权</strong>，与州政府和联邦政府的关系复杂，涉及土地、狩猎权和自治权。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">关键议题</div>
+        <table class="mini-table">
+          <tr><td>石油税收</td><td>州财政核心 · 税率争议持续</td></tr>
+          <tr><td>永久基金分红</td><td>分红规模与州财政平衡</td></tr>
+          <tr><td>气候政策</td><td>石油经济 vs 环境保护</td></tr>
+          <tr><td>原住民权利</td><td>部落主权 · 狩猎与捕鱼权</td></tr>
+          <tr><td>农村医疗与教育</td><td>偏远社区服务不足</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="sec-education" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">教育<small>Education</small></div>
+      <div class="card-icon">🎓</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">U.S. News 教育</span><span class="data-value red">第48</span></div>
+        <div class="data-item"><span class="data-label">高中毕业率</span><span class="data-value">83%</span></div>
+        <div class="data-item"><span class="data-label">本科及以上</span><span class="data-value">30.2%</span></div>
+        <div class="data-item"><span class="data-label">生均支出</span><span class="data-value green">全美前列</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>University of Alaska</strong> 系统</span></div>
+      <div class="info-row"><span class="label">特点</span><span class="value">地理分散 · 农村教育挑战大</span></div>
+      <div class="tags">
+        <span class="tag">生均支出高</span><span class="tag">农村学校分散</span><span class="tag">原住民教育</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">高等教育</div>
+        <table class="mini-table">
+          <tr><td>University of Alaska Anchorage (UAA)</td><td>最大校区 · 商科与护理强</td></tr>
+          <tr><td>University of Alaska Fairbanks (UAF)</td><td>旗舰校区 · 北极研究全球领先</td></tr>
+          <tr><td>University of Alaska Southeast (UAS)</td><td>朱诺 · 环境科学</td></tr>
+          <tr><td>Alaska Pacific University</td><td>私立 · 安克雷奇</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">K-12 教育</div>
+        <div class="detail-text">
+          U.S. News 2026 将阿拉斯加教育列为<strong>全美第48</strong>。高中毕业率 <strong>83%</strong>，低于全美平均。但阿拉斯加<strong>生均教育支出</strong>为全美最高之一（因地理分散、小规模学校运营成本高）。农村原住民社区面临教师短缺、课程与文化脱节、学生辍学率高等挑战。州政府通过<strong>寄宿学校</strong>和<strong>远程教育</strong>为偏远社区提供教育服务。阿拉斯加大学费尔班克斯分校（UAF）在<strong>北极研究、气候变化和地球科学</strong>领域全球领先。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="sec-sports" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">体育<small>Sports</small></div>
+      <div class="card-icon">🏈</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">职业冰球</span><span class="data-value">Alaska Aces (ECHL)</span></div>
+        <div class="data-item"><span class="data-label">大学冰球</span><span class="data-value">UAA / UAF</span></div>
+        <div class="data-item"><span class="data-label">棒球</span><span class="data-value">Alaska Baseball League</span></div>
+        <div class="data-item"><span class="data-label">标志赛事</span><span class="value">Iditarod 狗拉雪橇</span></div>
+      </div>
+      <div class="info-row"><span class="label">特色运动</span><span class="value">狗拉雪橇 · 冰钓 · 滑雪 · 雪地摩托</span></div>
+      <div class="info-row"><span class="label">大学体育</span><span class="value">UAA / UAF 冰球为传统强项</span></div>
+      <div class="tags">
+        <span class="tag">Iditarod</span><span class="tag">冰球文化</span><span class="tag">户外运动天堂</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">标志性赛事</div>
+        <div class="detail-text">
+          <strong>Iditarod 狗拉雪橇大赛</strong>是阿拉斯加最具标志性的体育赛事——每年3月从安克雷奇出发，终点为诺姆，全程约 <strong>1,000 英里</strong>（1,600 公里），穿越阿拉斯加荒野、山脉和冰冻河流，历时 8–15 天。赛事纪念1925年血清接力（Serum Run）——狗拉雪橇队将白喉抗毒素从安克雷奇运至诺姆，拯救了疫情中的小镇。<strong>阿拉斯加大学安克雷奇分校（UAA）</strong>和<strong>费尔班克斯分校（UAF）</strong>的冰球队为西部大学冰球联盟（WCHA）传统强队。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">户外运动</div>
+        <table class="mini-table">
+          <tr><td>狗拉雪橇</td><td>州运动 · Iditarod 全球知名</td></tr>
+          <tr><td>冰钓</td><td>冬季传统 · 全州湖泊</td></tr>
+          <tr><td>滑雪</td><td>Alyeska 度假村 · 北极圈滑雪</td></tr>
+          <tr><td>雪地摩托</td><td>冬季主要交通与娱乐方式</td></tr>
+          <tr><td>徒步与登山</td><td>德纳利山 · 迪纳利国家公园</td></tr>
+          <tr><td>钓鱼</td><td>三文鱼 · 鳟鱼 · 大比目鱼</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="sec-media" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">媒体<small>Media</small></div>
+      <div class="card-icon">📰</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">Anchorage Daily News</span></div>
+        <div class="data-item"><span class="data-label">公共广播</span><span class="data-value">Alaska Public Media</span></div>
+        <div class="data-item"><span class="data-label">电视市场</span><span class="data-value">安克雷奇 · 费尔班克斯</span></div>
+        <div class="data-item"><span class="data-label">数字媒体</span><span class="data-value">Alaska Beacon</span></div>
+      </div>
+      <div class="info-row"><span class="label">媒体特征</span><span class="value">地理分散 · 公共广播覆盖广</span></div>
+      <div class="info-row"><span class="label">原住民媒体</span><span class="value">Koahnic Broadcast Corporation</span></div>
+      <div class="tags">
+        <span class="tag">ADN最大报纸</span><span class="tag">公共广播网络</span><span class="tag">原住民媒体</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">主要媒体</div>
+        <table class="mini-table">
+          <tr><td>Anchorage Daily News (ADN)</td><td>全州最大报纸 · 安克雷奇</td></tr>
+          <tr><td>Fairbanks Daily News-Miner</td><td>费尔班克斯主要报纸</td></tr>
+          <tr><td>Juneau Empire</td><td>州首府报纸</td></tr>
+          <tr><td>Alaska Public Media</td><td>公共广播 · 电视+广播</td></tr>
+          <tr><td>Koahnic Broadcast Corporation</td><td>原住民广播 · 全国原住民新闻</td></tr>
+          <tr><td>Alaska Beacon</td><td>非营利数字新闻</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">媒体特点</div>
+        <div class="detail-text">
+          阿拉斯加媒体面临<strong>地理分散</strong>的独特挑战——许多偏远社区只能通过卫星和公共广播接收信息。<strong>Alaska Public Media</strong>（安克雷奇）和<strong>KUAC</strong>（费尔班克斯）为公共广播核心，覆盖全州大部分地区。<strong>Koahnic Broadcast Corporation</strong> 运营 <strong>Native Voice One</strong> 和 <strong>KNBA</strong>，为全美原住民提供新闻和文化节目。数字媒体近年兴起，<strong>Alaska Beacon</strong> 为非营利州级政治新闻网站，隶属 States Newsroom 网络。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="sec-tourism" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">旅游<small>Tourism</small></div>
+      <div class="card-icon">🏔️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">国家公园</span><span class="data-value">8 座</span></div>
+        <div class="data-item"><span class="data-label">年游客</span><span class="data-value">~200 万</span></div>
+        <div class="data-item"><span class="data-label">邮轮游客</span><span class="data-value">~130 万</span></div>
+        <div class="data-item"><span class="data-label">旅游收入</span><span class="data-value">~$45 亿</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">德纳利 · 冰川湾 · 卡特迈 · 北极光</span></div>
+      <div class="info-row"><span class="label">标志体验</span><span class="value">邮轮 · 极光 · 狗拉雪橇 · 冰川徒步</span></div>
+      <div class="tags">
+        <span class="tag">德纳利国家公园</span><span class="tag">极光旅游</span><span class="tag">邮轮经济</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">国家公园</div>
+        <table class="mini-table">
+          <tr><td>德纳利国家公园</td><td>北美最高峰 · 年游客约 60 万</td></tr>
+          <tr><td>冰川湾国家公园</td><td>UNESCO 世界遗产 · 潮水冰川</td></tr>
+          <tr><td>卡特迈国家公园</td><td>布鲁克斯瀑布 · 棕熊捕鱼</td></tr>
+          <tr><td>基奈峡湾国家公园</td><td>冰川入海 · 海洋野生动物</td></tr>
+          <tr><td>兰格尔-圣伊莱亚斯国家公园</td><td>美国最大国家公园 · 冰川与火山</td></tr>
+          <tr><td>北极门国家公园</td><td>全美最北 · 荒野</td></tr>
+          <tr><td>科伯克谷国家公园</td><td>沙丘与驯鹿迁徙</td></tr>
+          <tr><td>克拉克湖国家公园</td><td>湖泊与火山景观</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">旅游体验</div>
+        <div class="detail-text">
+          <strong>邮轮：</strong>阿拉斯加邮轮季为 5 月至 9 月，约 <strong>130 万</strong>游客乘邮轮抵达，主要停靠朱诺、史凯威、凯奇坎和惠蒂尔。<strong>极光：</strong>费尔班克斯为全球最佳极光观赏地之一，8 月至 4 月可观测，年均超过 200 晚出现。<strong>狗拉雪橇：</strong>冬季旅游核心体验，Iditarod 赛事为年度盛事。<strong>冰川徒步：</strong>马塔努斯卡冰川和门登霍尔冰川为热门目的地。<strong>野生动物：</strong>棕熊、黑熊、驼鹿、驯鹿、鲸鱼、海獭为观赏明星。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 16. 渔业 -->
+  <div class="card" id="sec-fishing" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">渔业<small>Fishing Industry</small></div>
+      <div class="card-icon">🐟</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">渔业产值</span><span class="data-value">$20 亿+/年</span></div>
+        <div class="data-item"><span class="data-label">就业</span><span class="data-value">~15,000 人</span></div>
+        <div class="data-item"><span class="data-label">三文鱼产量</span><span class="data-value">全美第1</span></div>
+        <div class="data-item"><span class="data-label">帝王蟹</span><span class="data-value">全球知名</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要产品</span><span class="value">三文鱼 · 帝王蟹 · 大比目鱼 · 鳕鱼</span></div>
+      <div class="info-row"><span class="label">渔港</span><span class="value">Dutch Harbor 全美最大渔获量</span></div>
+      <div class="tags">
+        <span class="tag">三文鱼全美第一</span><span class="tag">Dutch Harbor全美最大</span><span class="tag">帝王蟹</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">渔业概况</div>
+        <div class="detail-text">
+          阿拉斯加渔业为全美最大、全球最重要的渔业之一。年产值超过 <strong>$20 亿</strong>，直接雇佣约 <strong>15,000 人</strong>（季节性高峰更多）。<strong>三文鱼</strong>（五种：国王、红、银、粉、狗）为最具标志性产品，阿拉斯加供应全球约 <strong>50%</strong> 的野生三文鱼。<strong>帝王蟹</strong>和<strong>雪蟹</strong>为高价值出口产品。<strong>Dutch Harbor</strong>（乌纳拉斯卡）连续多年为<strong>全美渔获量最大港口</strong>。渔业管理以可持续为核心，通过限量许可和配额制度保护资源。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">主要渔获</div>
+        <table class="mini-table">
+          <tr><td>三文鱼（五种）</td><td>全美第1 · 全球约50%野生供应</td></tr>
+          <tr><td>帝王蟹 / 雪蟹</td><td>高价值出口 · 全球知名</td></tr>
+          <tr><td>大比目鱼</td><td>底拖网与延绳钓</td></tr>
+          <tr><td>鳕鱼</td><td>白令海与阿留申群岛</td></tr>
+          <tr><td>狭鳕 (Pollock)</td><td>全球最大单一鱼类资源之一</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">文化与经济意义</div>
+        <div class="detail-text">
+          渔业不仅是经济支柱，也是阿拉斯加<strong>生活方式和文化认同</strong>的核心。原住民社区数千年来依赖三文鱼洄游为生，<strong>捕鱼权</strong>为部落主权的重要组成部分。许多家庭在夏季以捕鱼为生，冬季则依赖储存的三文鱼和鱼干。商业渔业许可（Limited Entry Permits）为稀缺资产，价值可达数十万美元。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 17. 能源 -->
+  <div class="card" id="sec-energy" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">能源<small>Energy</small></div>
+      <div class="card-icon">⚡</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">石油产量</span><span class="data-value">全美第4</span></div>
+        <div class="data-item"><span class="data-label">原油产量</span><span class="data-value">~48万桶/日</span></div>
+        <div class="data-item"><span class="data-label">天然气产量</span><span class="data-value">全美前列</span></div>
+        <div class="data-item"><span class="data-label">水电占比</span><span class="data-value">~25%</span></div>
+      </div>
+      <div class="info-row"><span class="label">核心油田</span><span class="value">Prudhoe Bay · 北坡</span></div>
+      <div class="info-row"><span class="label">输油管道</span><span class="value">Trans-Alaska Pipeline 1,288 km</span></div>
+      <div class="tags">
+        <span class="tag">石油主导</span><span class="tag">北坡油田</span><span class="tag">跨阿拉斯加管道</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">石油与天然气</div>
+        <table class="mini-table">
+          <tr><td>原油产量 (2025)</td><td>约 48 万桶/日 · 全美第4</td></tr>
+          <tr><td>峰值产量 (1988)</td><td>约 200 万桶/日</td></tr>
+          <tr><td>核心油田</td><td>Prudhoe Bay · Kuparuk · Alpine</td></tr>
+          <tr><td>输油管道</td><td>Trans-Alaska Pipeline · 1,288 km</td></tr>
+          <tr><td>天然气</td><td>北坡储量巨大 · Alaska LNG 项目规划中</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">电力结构</div>
+        <div class="detail-text">
+          阿拉斯加电力结构以<strong>天然气</strong>（约 45%）和<strong>水电</strong>（约 25%）为主，<strong>石油</strong>（约 15%）和<strong>煤炭</strong>（约 10%）为辅。可再生能源占比约 <strong>30%</strong>，其中水电为最大来源（23 座水电站）。偏远社区依赖柴油发电，成本极高（部分地区电价超过 <strong>$0.50/kWh</strong>）。太阳能和风能在近年逐步发展，但受限于高纬度冬季日照不足。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">能源挑战</div>
+        <div class="detail-text">
+          北坡油田产量自1988年峰值持续下降，石油收入长期承压。阿拉斯加正推动<strong>Alaska LNG</strong>项目（将北坡天然气液化出口亚洲），但投资规模巨大（约 <strong>$400 亿</strong>），尚在规划阶段。气候变化导致永久冻土融化，影响管道和基础设施稳定性。偏远社区能源成本极高，为州政府长期补贴重点。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 18. 科技 -->
+  <div class="card" id="sec-tech" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">科技与创新<small>Technology & Innovation</small></div>
+      <div class="card-icon">💻</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">重点领域</span><span class="data-value">北极研究 · 远程医疗</span></div>
+        <div class="data-item"><span class="data-label">无人机</span><span class="data-value">全球领先</span></div>
+        <div class="data-item"><span class="data-label">卫星</span><span class="data-value">阿拉斯加大学</span></div>
+        <div class="data-item"><span class="data-label">数据中心</span><span class="data-value">冷却优势</span></div>
+      </div>
+      <div class="info-row"><span class="label">科技特色</span><span class="value">北极研究 · 远程通信 · 无人机</span></div>
+      <div class="info-row"><span class="label">研究机构</span><span class="value">UAF 北极研究 · 地球物理研究所</span></div>
+      <div class="tags">
+        <span class="tag">北极研究全球领先</span><span class="tag">无人机测试</span><span class="tag">远程医疗</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">科技优势领域</div>
+        <table class="mini-table">
+          <tr><td>北极研究</td><td>UAF 全球领先 · 气候变化 · 永久冻土</td></tr>
+          <tr><td>远程医疗</td><td>偏远社区医疗服务 · 全美先锋</td></tr>
+          <tr><td>无人机系统</td><td>FAA 无人机测试场 · 北极环境应用</td></tr>
+          <tr><td>卫星通信</td><td>高纬度覆盖 · 地球观测</td></tr>
+          <tr><td>数据中心</td><td>自然冷却优势 · 低成本能源</td></tr>
+          <tr><td>石油技术</td><td>北极钻井 · 管道监测</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">创新生态</div>
+        <div class="detail-text">
+          阿拉斯加科技生态以<strong>北极研究和远程通信</strong>为特色。阿拉斯加大学费尔班克斯分校（UAF）的<strong>地球物理研究所</strong>（Geophysical Institute）为全球北极研究重镇，运营 Poker Flat 研究靶场（火箭发射与极光研究）和 HAARP 设施。阿拉斯加为 FAA 指定的<strong>无人机系统测试场</strong>之一，在北极环境下测试无人机。远程医疗技术（telehealth）在阿拉斯加发展领先全美，为偏远社区提供专科会诊。数据中心利用自然冷却和低成本能源（水电/天然气）吸引投资。
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p><strong>阿拉斯加州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · WalletHub · Alaska Department of Labor · Alaska Permanent Fund Corporation · Fortune</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">
+    SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved
+  </div>
+</footer>
+
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg>
+</div>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon(next);
+  }
+
+  function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    } else {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
+  }
+
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeIcon(saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      updateThemeIcon('dark');
+    }
+  })();
+
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('visible', window.scrollY > 600);
+  }, { passive: true });
+
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const offset = 60;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
