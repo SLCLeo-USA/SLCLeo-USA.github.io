@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — SLC.Leo</title>
+<meta name="description" content="Project directory of the FDR series">
+<meta name="theme-color" content="#fbfbfd">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="https://slcleo-usa.github.io/fdr">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"San Francisco","Segoe UI","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
+  background:#fbfbfd;
+  color:#1d1d1f;
+  min-height:100vh;
+  padding:64px 24px 80px;
+  transition:background 0.5s ease, color 0.5s ease;
+}
+
+.container{
+  max-width:760px;
+  margin:0 auto;
+  position:relative;
+}
+
+/* ── 返回链接 ── */
+.back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.95rem;
+  color:#6e6e73;
+  text-decoration:none;
+  margin-bottom:48px;
+  transition:color 0.2s ease, gap 0.2s ease;
+}
+.back-link:hover{
+  color:#007aff;
+  gap:12px;
+}
+
+/* ── 标题区 ── */
+.page-header{
+  margin-bottom:56px;
+}
+.page-header h1{
+  font-size:clamp(2rem,5vw,3rem);
+  font-weight:500;
+  letter-spacing:-0.02em;
+  margin-bottom:14px;
+  color:#1d1d1f;
+}
+.page-header p{
+  font-size:1.05rem;
+  color:#6e6e73;
+  line-height:1.7;
+}
+
+/* ── 目录 ── */
+.directory-title{
+  font-size:0.8rem;
+  font-weight:500;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:#86868b;
+  margin-bottom:20px;
+}
+.directory{
+  display:grid;
+  gap:16px;
+}
+.directory-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:26px 30px;
+  border-radius:20px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.06);
+  text-decoration:none;
+  transition:transform 0.3s ease, box-shadow 0.3s ease;
+}
+.directory-item:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.08);
+}
+.directory-item-text{
+  text-align:left;
+}
+.directory-item-title{
+  display:block;
+  font-size:1.2rem;
+  font-weight:500;
+  color:#1d1d1f;
+  margin-bottom:6px;
+}
+.directory-item-desc{
+  display:block;
+  font-size:0.95rem;
+  color:#6e6e73;
+  line-height:1.6;
+}
+.directory-item-arrow{
+  font-size:1.2rem;
+  color:#007aff;
+  flex-shrink:0;
+  transition:transform 0.25s ease;
+}
+.directory-item:hover .directory-item-arrow{
+  transform:translateX(4px);
+}
+
+footer{
+  margin-top:100px;
+  font-size:0.875rem;
+  color:#86868b;
+  text-align:center;
+}
+
+/* ── 动画 ── */
+@keyframes softFade{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.page-header,
+.directory-title,
+.directory-item{
+  animation:softFade 0.8s ease-out both;
+}
+
+/* ── 焦点可见 ── */
+:focus-visible{
+  outline:3px solid rgba(0,102,204,0.45);
+  outline-offset:3px;
+  border-radius:20px;
+}
+
+/* ── 减少动画 ── */
+@media (prefers-reduced-motion: reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+}
+
+/* ── 深色模式 ── */
+@media (prefers-color-scheme: dark){
+  body{background:#121214;color:#f5f5f7;}
+  .back-link{color:#a1a1a6;}
+  .back-link:hover{color:#2997ff;}
+  .page-header h1{color:#f5f5f7;}
+  .page-header p{color:#a1a1a6;}
+  .directory-title{color:#86868b;}
+  .directory-item{background:#1e1e22;border-color:rgba(255,255,255,0.08);}
+  .directory-item-title{color:#f5f5f7;}
+  .directory-item-desc{color:#a1a1a6;}
+  .directory-item-arrow{color:#2997ff;}
+  footer{color:#86868b;}
+}
+
+/* ── 移动端 ── */
+@media (max-width:640px){
+  body{padding:24px 16px 48px;}
+  .directory-item{padding:22px 24px;border-radius:16px;}
+  .directory-item-title{font-size:1.1rem;}
+  .directory-item-desc{font-size:0.9rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <a class="back-link" href="https://slcleo-usa.github.io/">← Back</a>
+
+  <header class="page-header">
+    <h1>Projects</h1>
+    <p>A directory of all projects under SLC.Leo.</p>
+  </header>
+
+  <p class="directory-title">Directory, maybe.</p>
+
+  <div class="directory">
+
+    <a class="directory-item" href="https://slcleo-usa.github.io/geo-fs-lnfdr-transfer" style="animation-delay:0.05s">
+      <span class="directory-item-text">
+        <span class="directory-item-title">geo-fs-LNFDR transfer</span>
+        <span class="directory-item-desc">come here and transfer your geo-fs flight data to fdr</span>
+      </span>
+      <span class="directory-item-arrow">→</span>
+    </a>
+
+    <a class="directory-item" href="https://slcleo-usa.github.io/fdr-edit" style="animation-delay:0.12s">
+      <span class="directory-item-text">
+        <span class="directory-item-title">edit your fdr program</span>
+        <span class="directory-item-desc">Edit it , save it or make it a png.</span>
+      </span>
+      <span class="directory-item-arrow">→</span>
+    </a>
+
+    <a class="directory-item" href="https://slcleo-usa.github.io/fdr-reader" style="animation-delay:0.19s">
+      <span class="directory-item-text">
+        <span class="directory-item-title">FDR 3D READER</span>
+        <span class="directory-item-desc"></span>
+      </span>
+      <span class="directory-item-arrow">→</span>
+    </a>
+
+  </div>
+
+  <footer>© SLC.Leo 2026. All rights reserved.</footer>
+</div>
+
+</body>
+</html>
