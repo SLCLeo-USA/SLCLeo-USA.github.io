@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GA</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --peach: #ad1457;
+  }
+  [data-theme="dark"] {
+    --ground: #000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #2a0a18 0%, #3d1025 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --peach: #f48fb1;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--peach); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--peach); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s ease; padding: 0 24px; background: var(--surface-secondary); }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s ease; }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>佐治亚州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#ga-overview">概览</a><a href="#ga-pop">人口</a><a href="#ga-econ">经济就业</a>
+      <a href="#ga-biz">企业与产业</a><a href="#ga-health">医疗</a><a href="#ga-safety">公共安全</a>
+      <a href="#ga-tax">税收财政</a><a href="#ga-trans">交通</a><a href="#ga-housing">住房</a>
+      <a href="#ga-climate">气候</a><a href="#ga-politics">政治政府</a><a href="#ga-edu">教育</a>
+      <a href="#ga-sports">体育</a><a href="#ga-media">媒体</a><a href="#ga-tourism">旅游</a>
+      <a href="#ga-energy">能源</a><a href="#ga-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()"><svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🍑</div>
+  <h1>佐治亚州<br><em>Georgia</em></h1>
+  <p class="subtitle">桃子之州 · 全美最佳经商州 · 17家Fortune 500 · 亚特兰大枢纽</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>11,302,748</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$700B+</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>3.5%</strong><span>失业率 (2025.5)</span></div>
+    <div class="hero-stat"><strong>#1</strong><span>经商环境全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 个税 <b>5.19%</b> 持续下调至4.99%</span>
+    <span class="hero-badge orange">🔫 <b>枪支法律全美第46</b>（最弱之一）</span>
+    <span class="hero-badge red">📚 教育 <b>全美第36</b></span>
+    <span class="hero-badge">🏢 <b>17家Fortune 500</b> 总部</span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="ga-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1788年1月2日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">亚特兰大</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">亚特兰大</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">153,910 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">褐鸫</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">切罗基玫瑰</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">桃子之州（The Peach State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Wisdom, Justice, Moderation"</span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">Greater Appalachia</span><span class="tag">桃子之州</span><span class="tag">经商第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">佐治亚位于美国东南部，北接田纳西和北卡罗来纳，东临南卡罗来纳和大西洋，南界佛罗里达，西邻亚拉巴马。在 Colin Woodard 的文化分区中，佐治亚北部属于 <strong>Greater Appalachia</strong>，南部和中部属于 <strong>Deep South</strong>。地形从蓝岭山脉（北部）到海岸平原和沼泽地（南部）。亚特兰大为东南部最大都市区。全州拥有 <strong>104 个</strong>公共机场和近 <strong>5,000 英里</strong>铁路线。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1733年詹姆斯·奥格尔索普建立萨凡纳，为英国在北美最后的殖民地之一。1788年1月2日成为美国第 <strong>4 个州</strong>。1861年脱离联邦加入邦联。20世纪60年代，马丁·路德·金在亚特兰大领导民权运动。1996年亚特兰大举办奥运会。2025年GDP突破 <strong>$7,000 亿</strong>，连续多年被《Area Development》评为全美最佳经商州。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="ga-pop" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">11,302,748</span></div>
+        <div class="data-item"><span class="data-label">2020-2025 增长</span><span class="data-value green">+5.5%</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~37 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$78,900</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">12.5%</span></div>
+        <div class="data-item"><span class="data-label">劳动力</span><span class="data-value">530 万+</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 49.6% · 黑人 32.1% · 西语裔 11.1% · 亚裔 4.9%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">亚特兰大 498,715 · 哥伦布 · 奥古斯塔 · 萨凡纳</span></div>
+      <div class="tags"><span class="tag">人口增长全美前列</span><span class="tag">黑人占比高</span><span class="tag">亚特兰大都会区</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2025)</td><td><strong>11,302,748</strong>（全美第8）</td></tr>
+        <tr><td>2020-2025 增长</td><td><strong>+5.5%</strong>（全美 3.1%）</td></tr>
+        <tr><td>黑人占比</td><td>32.1%</td></tr>
+        <tr><td>西语裔占比</td><td>11.1%</td></tr>
+        <tr><td>18岁以下</td><td>23.0%</td></tr>
+        <tr><td>65岁以上</td><td>15.4%</td></tr>
+        <tr><td>劳动力</td><td>530 万+</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$78,900</strong>，人均收入 <strong>$41,055</strong>。贫困率 <strong>12.5%</strong>，高于全美平均。亚特兰大都会区中位收入 <strong>$95,371</strong>（Fulton County）。<strong>44%</strong> 劳动力年龄在25-45岁之间，为全美最年轻、最多元的劳动力之一。人口自2020年以来增长 <strong>5.5%</strong>，为全美增长最快的州之一，主要驱动因素为亚特兰大都会区的就业机会和相对低的生活成本。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="ga-econ" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value green">$700B+</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长</span><span class="data-value">+0.1% (Q1)</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">3.5%</span></div>
+        <div class="data-item"><span class="data-label">CNBC 综合</span><span class="data-value">全美第7</span></div>
+        <div class="data-item"><span class="data-label">经商环境</span><span class="data-value green">全美第1</span></div>
+        <div class="data-item"><span class="data-label">信用评级</span><span class="data-value green">AAA</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">物流 · 汽车 · 航空航天 · 影视 · 农业 · 金融科技</span></div>
+      <div class="info-row"><span class="label">外资企业</span><span class="value"><strong>3,000+</strong> 家 · 奔驰、现代、Nestlé、川崎</span></div>
+      <div class="tags"><span class="tag">经商全美第1</span><span class="tag">GDP $7000亿+</span><span class="tag">失业率3.5%</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现</div><table class="mini-table">
+        <tr><td>GDP (2025)</td><td><strong>$7,000 亿+</strong>（全美第8）</td></tr>
+        <tr><td>GDP 增速 (Q1 2025)</td><td>+0.1%</td></tr>
+        <tr><td>失业率 (May 2025)</td><td><strong>3.5%</strong>（全美 4.3%）</td></tr>
+        <tr><td>信用评级 (Fitch)</td><td><strong>AAA</strong></td></tr>
+        <tr><td>外资企业</td><td>3,000+ 家</td></tr>
+        <tr><td>劳动力</td><td>530 万+</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">佐治亚经济<strong>多元化且增长强劲</strong>。亚特兰大为东南部经济中心——<strong>17 家</strong>Fortune 500 总部，<strong>26 家</strong>在亚特兰大都会区。<strong>物流业</strong>为标志性产业：Hartsfield-Jackson 机场为全球最繁忙机场，Savannah 港为全美增长最快的港口。<strong>汽车制造</strong>（奔驰、现代、起亚）为重要支柱。<strong>影视产业</strong>“南方好莱坞”为全美制作量最大的州之一。<strong>金融科技</strong>（杰克逊维尔）和<strong>农业</strong>（花生、山核桃、棉花）为传统产业。佐治亚被《Area Development》连续多年评为<strong>全美最佳经商州</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="ga-biz" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">17 家</span></div>
+        <div class="data-item"><span class="data-label">亚特兰大都会区</span><span class="data-value">26 家</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Home Depot</span></div>
+        <div class="data-item"><span class="data-label">最大雇主</span><span class="data-value">Delta Air Lines (31,237)</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级企业</span><span class="value">Home Depot · UPS · Coca-Cola · Delta · Southern Co</span></div>
+      <div class="info-row"><span class="label">雇主排名</span><span class="value">Delta 31,237 · Emory 29,937 · Walmart 20,532 · Home Depot 20,000</span></div>
+      <div class="tags"><span class="tag">17家Fortune 500</span><span class="tag">Home Depot $159B</span><span class="tag">Coca-Cola全球</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500 总部（2025）</div><table class="mini-table">
+        <tr><td>Home Depot</td><td>亚特兰大 · $159B 营收</td></tr>
+        <tr><td>United Parcel Service (UPS)</td><td>亚特兰大 · $91B</td></tr>
+        <tr><td>Delta Air Lines</td><td>亚特兰大 · $61B</td></tr>
+        <tr><td>The Coca-Cola Company</td><td>亚特兰大 · $47B</td></tr>
+        <tr><td>Southern Company</td><td>亚特兰大 · 公用事业</td></tr>
+        <tr><td>Aflac</td><td>哥伦布 · 保险</td></tr>
+        <tr><td>AGCO</td><td>杜鲁斯 · 农业机械</td></tr>
+        <tr><td>Intercontinental Exchange (ICE)</td><td>亚特兰大 · 金融交易所</td></tr>
+        <tr><td>Global Payments</td><td>亚特兰大 · 支付技术</td></tr>
+        <tr><td>Graphic Packaging</td><td>亚特兰大 · 包装</td></tr>
+        <tr><td>Mohawk Industries</td><td>卡尔霍恩 · 地板</td></tr>
+        <tr><td>NCR Voyix</td><td>亚特兰大 · 科技</td></tr>
+        <tr><td>Newell Brands</td><td>亚特兰大 · 消费品</td></tr>
+        <tr><td>PulteGroup</td><td>亚特兰大 · 住宅建筑</td></tr>
+        <tr><td>Asbury Automotive Group</td><td>杜鲁斯 · 汽车零售</td></tr>
+        <tr><td>Assurant</td><td>亚特兰大 · 保险</td></tr>
+        <tr><td>Veritiv</td><td>亚特兰大 · 包装分销</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">产业集聚</div><div class="detail-text"><strong>物流与航空：</strong>Delta Air Lines 为亚特兰大最大雇主（<strong>31,237 人</strong>），Hartsfield-Jackson 机场为全球最繁忙机场，Savannah 港为全美增长最快港口。<strong>汽车制造：</strong>奔驰（万斯）、现代（蒙哥马利）、起亚（西点）在佐治亚设有大型工厂。<strong>影视产业：</strong>亚特兰大为“南方好莱坞”，影视制作量全美领先。<strong>金融科技：</strong>亚特兰大为东南部金融科技中心，ICE、Global Payments 等企业聚集。<strong>外资：</strong>超过 <strong>3,000 家</strong>外资企业在佐治亚运营，包括奔驰、现代、Nestlé、川崎重工。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="ga-health" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">Emory University Hospital</span></div>
+        <div class="data-item"><span class="data-label">连续第1</span><span class="data-value green">14 年</span></div>
+        <div class="data-item"><span class="data-label">全州第2</span><span class="data-value">Emory St. Joseph's</span></div>
+        <div class="data-item"><span class="data-label">全州第3</span><span class="data-value">Northeast Georgia MC</span></div>
+        <div class="data-item"><span class="data-label">儿童医院</span><span class="data-value green">全美Top 20</span></div>
+        <div class="data-item"><span class="data-label">全美荣誉榜</span><span class="data-value red">0 家</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">Emory University Hospital · 14年全州第1</span></div>
+      <div class="info-row"><span class="label">专科领先</span><span class="value">老年医学 · 神经外科 · 泌尿科 · 癌症</span></div>
+      <div class="tags"><span class="tag">Emory 14年全州第1</span><span class="tag">Children's全美Top 20</span><span class="tag">无全美荣誉榜医院</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. Emory University Hospital</td><td>亚特兰大 · 连续14年全州第1 · 老年第42、神经第33、泌尿第41</td></tr>
+        <tr><td>2. Emory Saint Joseph's Hospital</td><td>亚特兰大 · 连续10年全州第2</td></tr>
+        <tr><td>3. Northeast Georgia Medical Center</td><td>盖恩斯维尔 · 全州第3</td></tr>
+        <tr><td>4. Piedmont Atlanta Hospital</td><td>亚特兰大 · 全州第4</td></tr>
+        <tr><td>5. Emory University Hospital Midtown</td><td>亚特兰大 · 全州第5</td></tr>
+        <tr><td>6. Wellstar Kennestone Hospital</td><td>玛丽埃塔 · 全州第6</td></tr>
+        <tr><td>7. Northside Hospital Cherokee</td><td>坎顿 · 全州第7</td></tr>
+        <tr><td>8. Piedmont Athens Regional</td><td>雅典 · 全州第7</td></tr>
+        <tr><td>9. Northside Hospital Forsyth</td><td>全州第9</td></tr>
+        <tr><td>10. Piedmont Fayette Hospital</td><td>费耶特维尔 · 全州第9</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">儿童医院与专科</div><div class="detail-text"><strong>Children's Healthcare of Atlanta</strong> 被 U.S. News 评为东南部最佳儿童医院，在<strong>10 个</strong>儿童专科中位列全美前50：新生儿科第19、儿科癌症第12、儿科心脏第12、儿科胃肠第13、儿科肾脏第13、儿科神经第14、儿科骨科第8、儿科泌尿第14。Emory University Hospital 在老年医学、神经外科和泌尿科获全美排名，并在癌症、心脏和血管外科获“高绩效”评级。佐治亚<strong>无医院进入全美荣誉榜</strong>（20家）。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="ga-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">枪支法律评分</span><span class="data-value red">F</span></div>
+        <div class="data-item"><span class="data-label">全美枪支法律</span><span class="data-value red">第46（最弱）</span></div>
+        <div class="data-item"><span class="data-label">枪支死亡率</span><span class="data-value red">高于全美35%</span></div>
+        <div class="data-item"><span class="data-label">年均枪支死亡</span><span class="data-value red">2,005 人</span></div>
+        <div class="data-item"><span class="data-label">枪支暴力成本</span><span class="data-value red">$239亿/年</span></div>
+        <div class="data-item"><span class="data-label">纳税人负担</span><span class="data-value red">$5.978亿</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>无普遍背景审查</strong> · 无持枪许可 · 无红旗法 · 无攻击性武器限制</span></div>
+      <div class="info-row"><span class="label">2025事件</span><span class="value">Fort Stewart 枪击 · CDC 总部枪击（200发子弹）</span></div>
+      <div class="tags"><span class="tag">枪支法律F级</span><span class="tag">枪支死亡率高35%</span><span class="tag">无红旗法</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">枪支法规与现状</div><div class="detail-text">佐治亚枪支法律获 Giffords <strong>F</strong> 级评分，在全美枪支法律薄弱排名中位列<strong>第13</strong>（最弱），Everytown 排名<strong>第46</strong>。枪支死亡率高于全美平均 <strong>35%</strong>，年均 <strong>2,005 人</strong>死于枪支暴力（平均每4小时1人）。枪支暴力的年均成本为 <strong>$239 亿</strong>，其中纳税人承担 <strong>$5.978 亿</strong>。佐治亚<strong>缺失</strong>的关键枪支法规包括：普遍背景审查、持枪许可、极端风险保护令（红旗法）、家暴枪支法、攻击性武器限制、大容量弹匣禁令、等待期、隐蔽携枪许可、社区暴力干预资金。2025年8月，Fort Stewart 军事基地发生枪击（5人受伤），CDC 总部外发生枪击（200发子弹，1名警察死亡）。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="ga-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value green">5.19% 统一</span></div>
+        <div class="data-item"><span class="data-label">目标税率</span><span class="data-value green">4.99% (2028)</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value green">5.19%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value green">4.0%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value">7.42%</span></div>
+        <div class="data-item"><span class="data-label">遗产税</span><span class="data-value green">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">税收竞争力</span><span class="value">全美第22 · 企业税第12 · 个税第31</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">HB 111 将个税从 5.39% 降至 <strong>5.19%</strong></span></div>
+      <div class="tags"><span class="tag">个税5.19%降至4.99%</span><span class="tag">销售税4%</span><span class="tag">无遗产税</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>5.19%</strong> 统一（HB 111 从 5.39% 下调，目标2028年 4.99%）</td></tr>
+        <tr><td>企业所得税</td><td>5.19%（与个税对齐）</td></tr>
+        <tr><td>州销售税</td><td><strong>4.0%</strong>（全美最低之一）</td></tr>
+        <tr><td>综合销售税</td><td>7.42%（地方平均附加 3.42%）</td></tr>
+        <tr><td>房产税</td><td>全美第34（较高）</td></tr>
+        <tr><td>遗产税</td><td><strong>无</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">佐治亚税收竞争力全美<strong>第22</strong>——企业税第12、个税第31、销售税第23、房产税第34。个人所得税已转为统一税率并从 5.39% 降至 <strong>5.19%</strong>（2025年7月1日生效），计划2028年降至 <strong>4.99%</strong>。州销售税基础税率仅 <strong>4.0%</strong>，但地方附加后合计 <strong>7.42%</strong>，高于全美平均。佐治亚<strong>无遗产、继承或赠与税</strong>。但企业面临资本投资首年费用化限制和最高 <strong>$5,000/年</strong>的股本税。与邻州竞争压力大——佛罗里达和田纳西无个税，亚拉巴马和北卡罗来纳税率更低。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="ga-trans" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全球最忙机场</span><span class="data-value green">ATL</span></div>
+        <div class="data-item"><span class="data-label">公共机场</span><span class="data-value">104 个</span></div>
+        <div class="data-item"><span class="data-label">铁路网络</span><span class="data-value">~5,000 英里</span></div>
+        <div class="data-item"><span class="data-label">公共交通系统</span><span class="data-value">128 个</span></div>
+        <div class="data-item"><span class="data-label">港口</span><span class="data-value green">Savannah 增长最快</span></div>
+        <div class="data-item"><span class="data-label">BRT 项目</span><span class="data-value">Rapid Southlake</span></div>
+      </div>
+      <div class="info-row"><span class="label">航空枢纽</span><span class="value"><strong>Hartsfield-Jackson</strong> 连续17年全球最高效机场</span></div>
+      <div class="info-row"><span class="label">铁路</span><span class="value">近 5,000 英里 · 可增加客运容量</span></div>
+      <div class="tags"><span class="tag">ATL全球最忙</span><span class="tag">Savannah港口</span><span class="tag">MARTA地铁</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>Hartsfield-Jackson Atlanta International Airport（ATL）</strong>为全球最繁忙机场，连续<strong>17 年</strong>被评为全球最高效机场。每天平均 <strong>2,700 架次</strong>航班起降，飞往全美各地和 <strong>78 个</strong>国际目的地。佐治亚共有 <strong>104 个</strong>公共机场（30个一级、32个二级等）。</div></div>
+      <div class="detail-section"><div class="detail-label">铁路、港口与公共交通</div><div class="detail-text"><strong>铁路：</strong>全州近 <strong>5,000 英里</strong>铁路线，许多可增加客运和货运容量。MARTA 重轨系统服务亚特兰大都会区，与机场直接连接。<strong>港口：</strong>Savannah 港为全美增长最快的港口，Pooler 和 Savannah 国际机场有铁路服务潜力。<strong>公共交通：</strong>14个城市系统和114个农村系统。<strong>BRT：</strong>MARTA 的 <strong>Rapid Southlake</strong> 项目为13.6英里快速公交线，连接机场与 Morrow 的 Southlake Mall，设有高架导引段。亚特兰大通勤铁路规划连接 Athens 至 Griffin，服务 Emory 和机场。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="ga-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025)</span><span class="data-value">$360,000</span></div>
+        <div class="data-item"><span class="data-label">年变化</span><span class="data-value">0.0%</span></div>
+        <div class="data-item"><span class="data-label">平均售价</span><span class="data-value">$448,554 (+2.0%)</span></div>
+        <div class="data-item"><span class="data-label">亚特兰大中位价</span><span class="data-value">$430,000</span></div>
+        <div class="data-item"><span class="data-label">活跃挂牌</span><span class="data-value">40,189 (+13.1%)</span></div>
+        <div class="data-item"><span class="data-label">新挂牌</span><span class="data-value">211,349 (+7.8%)</span></div>
+      </div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">市场趋稳 · 库存上升 · 买家议价空间增加</span></div>
+      <div class="info-row"><span class="label">新建筑</span><span class="value">2025年10月创5年新高 · 1,864单元</span></div>
+      <div class="tags"><span class="tag">中位价$360K</span><span class="tag">库存+13.1%</span><span class="tag">新建筑5年新高</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025年佐治亚中位销售价格 <strong>$360,000</strong>，与上年持平。平均销售价格 <strong>$448,554</strong>，同比上涨 <strong>2.0%</strong>。Greater Atlanta 地区中位价 <strong>$430,000</strong>（同比 -1.1%）。2025年成交量 <strong>123,440 套</strong>（同比 -1.1%），待售量 <strong>123,212</strong>（-1.4%）。活跃挂牌 <strong>40,189</strong>（+13.1%），新挂牌 <strong>211,349</strong>（+7.8%）。卖家平均收到原始挂牌价的 <strong>95.4%</strong>（同比下降1.0%）。新建筑开工2025年10月创5年新高（<strong>1,864 单元</strong>），新建筑获得挂牌价的 <strong>98.0%</strong>，高于市场平均。专家预测2026年市场将稳定恢复，抵押贷款利率维持在 <strong>6%</strong> 区间。</div></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="ga-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">湿润亚热带</span></div>
+        <div class="data-item"><span class="data-label">2025年排名</span><span class="data-value">第19暖年</span></div>
+        <div class="data-item"><span class="data-label">7月均温</span><span class="data-value red">82.8°F</span></div>
+        <div class="data-item"><span class="data-label">7月排名</span><span class="data-value red">第5暖</span></div>
+        <div class="data-item"><span class="data-label">年均温范围</span><span class="data-value">54°F–68°F</span></div>
+        <div class="data-item"><span class="data-label">4月均温</span><span class="data-value red">67.5°F (+4.5°F)</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">第19暖年 · 7月第5暖（82.8°F）· 4月第4暖</span></div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">飓风 · 龙卷风 · 雷暴 · 洪水</span></div>
+      <div class="tags"><span class="tag">2025年第19暖</span><span class="tag">7月第5暖</span><span class="tag">湿润亚热带</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">2025年气候</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润亚热带</td></tr>
+        <tr><td>2025年排名</td><td><strong>第19暖年</strong>（1895年以来记录）</td></tr>
+        <tr><td>7月均温</td><td><strong>82.8°F</strong> · 第5暖7月</td></tr>
+        <tr><td>4月均温</td><td><strong>67.5°F</strong>（+4.5°F）· 第4暖4月</td></tr>
+        <tr><td>2月均温</td><td>54.0°F（+5.4°F）· 第12暖2月</td></tr>
+        <tr><td>年均温范围</td><td>54°F（东北山区）至 68°F（南部）</td></tr>
+        <tr><td>2月降水</td><td>3.18 英寸（低于正常 1.33 英寸）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">气温趋势与极端天气</div><div class="detail-text">佐治亚2025年为<strong>第19暖年</strong>（1895年以来），7月为<strong>第5暖7月</strong>（82.8°F），4月为<strong>第4暖4月</strong>（67.5°F，+4.5°F），2月为<strong>第12暖2月</strong>（54.0°F，+5.4°F）。夏季均温从东北山区的约72°F到南部的近82°F，冬季均温从北部的39°F到南部的约55°F。亚特兰大年均温 <strong>62.6°F</strong>。极端天气包括飓风（沿海）、龙卷风、雷暴和洪水。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="ga-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Brian Kemp (R)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">共和党控制</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名 · 民主党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">14 席 · 共和党多数</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value orange">摇摆州</span></div>
+        <div class="data-item"><span class="data-label">2026州长</span><span class="data-value">开放选举</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">350+ 法案签署 · 7 项否决 · 侵权改革（SB 68）</span></div>
+      <div class="info-row"><span class="label">2026议题</span><span class="value">州长开放选举 · 选区重划 · 所得税取消讨论</span></div>
+      <div class="tags"><span class="tag">摇摆州</span><span class="tag">Kemp退休</span><span class="tag">侵权改革</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">佐治亚为<strong>摇摆州</strong>——共和党控制州长办公室和州议会，但两名联邦参议员均为民主党。州长 <strong>Brian Kemp</strong>（共和党）即将完成任期，2026年州长选举为<strong>开放选举</strong>。联邦层面，众议院14席中共和党占多数。2025年立法会议签署超过 <strong>350 项</strong>法案，否决 <strong>7 项</strong>。Kemp 的标志性优先事项为<strong>侵权改革（SB 68）</strong>，最终通过。2026年立法会议预计聚焦<strong>逐步取消州所得税</strong>（副州长 Jones 推动）和选区重划（共和党在2026年6月放弃了当前计划，担心适得其反）。</div></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="ga-edu" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公校系统</span><span class="data-value orange">全美第36</span></div>
+        <div class="data-item"><span class="data-label">教育自由度</span><span class="data-value orange">全美第14</span></div>
+        <div class="data-item"><span class="data-label">数学增长</span><span class="data-value">全美第34/38</span></div>
+        <div class="data-item"><span class="data-label">阅读增长</span><span class="data-value">全美第21/35</span></div>
+        <div class="data-item"><span class="data-label">本科及以上</span><span class="data-value">33.6%</span></div>
+        <div class="data-item"><span class="data-label">全美Top 100高中</span><span class="data-value green">2 所</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>Georgia Tech</strong> · UGA · Emory</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Gwinnett School of Math · Wheeler High</span></div>
+      <div class="tags"><span class="tag">Georgia Tech全美顶尖</span><span class="tag">公校全美第36</span><span class="tag">教育自由下降5位</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">佐治亚公校系统在 WalletHub 排名中位列<strong>全美第36</strong>。教育自由度全美<strong>第14</strong>，较2024年下降5位，因为其他州扩大了普遍择校计划。学术透明度全美第17，公民教育全美第35。数学学术增长全美<strong>第34</strong>（38州中），阅读增长<strong>第21</strong>（35州中）。2所佐治亚高中进入 U.S. News 全美前100。<strong>Gwinnett School of Mathematics, Science and Technology</strong> 和 <strong>Wheeler High School</strong>（Marietta）为全州顶尖。AP通过率超过全美平均，位列全美前三分之一。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>Georgia Institute of Technology</td><td>亚特兰大 · 全美顶尖理工 · 工程与计算机强</td></tr>
+        <tr><td>University of Georgia</td><td>雅典 · 旗舰公立 · 全美百强</td></tr>
+        <tr><td>Emory University</td><td>亚特兰大 · 全美顶尖私立 · 医学与法学强</td></tr>
+        <tr><td>Georgia State University</td><td>亚特兰大 · 城市研究型大学</td></tr>
+        <tr><td>Morehouse College</td><td>亚特兰大 · HBCU · 马丁·路德·金母校</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="ga-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">NFL</span><span class="data-value">Atlanta Falcons</span></div>
+        <div class="data-item"><span class="data-label">NBA</span><span class="data-value">Atlanta Hawks</span></div>
+        <div class="data-item"><span class="data-label">MLB</span><span class="data-value">Atlanta Braves</span></div>
+        <div class="data-item"><span class="data-label">MLS</span><span class="data-value">Atlanta United</span></div>
+        <div class="data-item"><span class="data-label">WNBA</span><span class="data-value">Atlanta Dream</span></div>
+        <div class="data-item"><span class="data-label">大学体育</span><span class="data-value">UGA Bulldogs · SEC</span></div>
+      </div>
+      <div class="info-row"><span class="label">UGA Bulldogs</span><span class="value">2021/2022 全国冠军 · 橄榄球王朝</span></div>
+      <div class="info-row"><span class="label">2025亮点</span><span class="value">UGA 三大球全部进入锦标赛 · Directors' Cup 前10</span></div>
+      <div class="tags"><span class="tag">UGA全国冠军</span><span class="tag">Braves世界大赛</span><span class="tag">Atlanta United</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><table class="mini-table">
+        <tr><td>Atlanta Falcons</td><td>NFL</td></tr>
+        <tr><td>Atlanta Hawks</td><td>NBA</td></tr>
+        <tr><td>Atlanta Braves</td><td>MLB · 2021年世界大赛冠军</td></tr>
+        <tr><td>Atlanta United</td><td>MLS · 2018年MLS杯冠军</td></tr>
+        <tr><td>Atlanta Dream</td><td>WNBA</td></tr>
+        <tr><td>Georgia Swarm</td><td>室内长曲棍球</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text">佐治亚大学 <strong>Bulldogs</strong> 为 SEC 顶级强队，橄榄球队赢得 <strong>2021和2022年</strong>全国冠军。2025年，UGA 成为全美仅有的两个同时拥有 College Football Playoff 球队、College World Series 球队和男女 NCAA 锦标赛篮球队的项目之一（另一个为亚拉巴马）。UGA 在 Learfield Directors' Cup 中创历史前10，20支 NCAA 运动队中有9支获得积分。Georgia Tech Yellow Jackets 参加 ACC，拥有17支校队。</div></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="ga-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">AJC</span></div>
+        <div class="data-item"><span class="data-label">电视旗舰</span><span class="data-value">WSB-TV</span></div>
+        <div class="data-item"><span class="data-label">公共广播</span><span class="data-value">GPB Media</span></div>
+        <div class="data-item"><span class="data-label">第三大日报</span><span class="data-value">Macon Telegraph</span></div>
+        <div class="data-item"><span class="data-label">萨凡纳</span><span class="data-value">Savannah Morning News</span></div>
+        <div class="data-item"><span class="data-label">其他</span><span class="data-value">Ledger-Enquirer</span></div>
+      </div>
+      <div class="info-row"><span class="label">特点</span><span class="value">AJC 为亚特兰大唯一主要日报 · 与 WSB-TV 同属一家</span></div>
+      <div class="info-row"><span class="label">历史</span><span class="value">Savannah Morning News 创刊于1850年</span></div>
+      <div class="tags"><span class="tag">AJC最大</span><span class="tag">WSB-TV旗舰</span><span class="tag">GPB公共广播</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Atlanta Journal-Constitution (AJC)</td><td>亚特兰大唯一主要日报 · 与 WSB-TV 和6家电台同属一家</td></tr>
+        <tr><td>WSB-TV</td><td>亚特兰大电视旗舰 · ABC 附属</td></tr>
+        <tr><td>Macon Telegraph</td><td>佐治亚第三大日报（1826年创刊）</td></tr>
+        <tr><td>Savannah Morning News</td><td>萨凡纳主要报纸（1850年创刊）</td></tr>
+        <tr><td>Ledger-Enquirer</td><td>哥伦布主要日报 · 数字优先</td></tr>
+        <tr><td>Athens Banner-Herald</td><td>雅典主要报纸</td></tr>
+        <tr><td>GPB Media</td><td>公共广播 · PBS + NPR · 全州覆盖</td></tr>
+        <tr><td>WSAV / WTOC / WJCL</td><td>萨凡纳三大电视网络附属</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">亚特兰大媒体市场以 <strong>Atlanta Journal-Constitution（AJC）</strong>为核心——这是亚特兰大都会区唯一的主要日报，与电视旗舰 <strong>WSB-TV</strong> 和六家电台同属一家公司。Macon Telegraph（1826年创刊）为佐治亚第三大日报。Savannah Morning News 创刊于 <strong>1850年</strong>，为佐治亚历史最悠久的报纸之一。GPB Media 为全州公共广播，提供 PBS 电视和 NPR 广播服务。亚特兰大新闻第一（Atlanta News First）与 Gray Media 合作举办参议院辩论等重大政治活动。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="ga-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏖️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">顶级景点</span><span class="data-value">Stone Mountain</span></div>
+        <div class="data-item"><span class="data-label">历史遗址</span><span class="data-value">MLK 国家历史公园</span></div>
+        <div class="data-item"><span class="data-label">历史街区</span><span class="data-value">Savannah Historic</span></div>
+        <div class="data-item"><span class="data-label">国家野生动物保护区</span><span class="data-value">Okefenokee</span></div>
+        <div class="data-item"><span class="data-label">州立公园</span><span class="data-value">Tallulah Gorge</span></div>
+        <div class="data-item"><span class="data-label">城市</span><span class="data-value">Athens · Augusta</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">Stone Mountain · MLK 国家历史公园 · Savannah 历史区</span></div>
+      <div class="info-row"><span class="label">自然</span><span class="value">Okefenokee 沼泽 · Tallulah Gorge · Cloudland Canyon</span></div>
+      <div class="tags"><span class="tag">Stone Mountain</span><span class="tag">Savannah历史区</span><span class="tag">MLK国家公园</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>Stone Mountain Park</strong> 为佐治亚最受欢迎景点，拥有全球最大花岗岩浮雕和徒步步道（Overlook Trail、Waterfalls Trail、West Rim Loop Trail）。<strong>Martin Luther King Jr. National Historical Park</strong>（亚特兰大）包括金的出生地和Ebenezer 浸信会教堂。<strong>Savannah Historic District</strong> 为全美最大历史地标区之一，以鹅卵石街道和殖民建筑闻名。<strong>Okefenokee National Wildlife Refuge</strong> 为全美最大黑水沼泽之一。<strong>Tallulah Gorge State Park</strong> 以深峡谷和瀑布闻名。<strong>Cloudland Canyon State Park</strong> 位于 Lookout Mountain，以峡谷景观著称。<strong>Amicalola Falls State Park</strong> 拥有佐治亚最高瀑布。<strong>Wormsloe Historic Site</strong>（萨凡纳）以橡树大道闻名。<strong>Centennial Olympic Park</strong>（亚特兰大）为1996年奥运会遗产。<strong>Georgia Aquarium</strong> 为全美最大水族馆之一。<strong>Rock City Gardens</strong>（Lookout Mountain）以岩石花园和俯瞰七州景观闻名。雅典（Athens）为音乐之城，奥古斯塔（Augusta）为高尔夫圣地（大师赛）。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="ga-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">可再生占比</span><span class="data-value green">75% 装机</span></div>
+        <div class="data-item"><span class="data-label">水电潜力</span><span class="data-value">15 GW</span></div>
+        <div class="data-item"><span class="data-label">已开发水电</span><span class="data-value">~25%</span></div>
+        <div class="data-item"><span class="data-label">风电潜力</span><span class="data-value">4 GW</span></div>
+        <div class="data-item"><span class="data-label">太阳能潜力</span><span class="data-value">4.5 GW</span></div>
+        <div class="data-item"><span class="data-label">2030目标</span><span class="data-value green">27.4%</span></div>
+      </div>
+      <div class="info-row"><span class="label">可再生</span><span class="value">75% 装机容量为可再生 · 水电为主</span></div>
+      <div class="info-row"><span class="label">潜力</span><span class="value">87 GW 太阳能 + 5.4 GW 陆上风电（理论）</span></div>
+      <div class="tags"><span class="tag">75%可再生装机</span><span class="tag">水电主导</span><span class="tag">2030年27.4%目标</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">可再生能源</div><div class="table-container"><table class="mini-table">
+        <tr><td>可再生装机占比</td><td><strong>75%</strong></td></tr>
+        <tr><td>水电潜力</td><td>15 GW（已开发不足1/4）</td></tr>
+        <tr><td>风电潜力</td><td>约 4 GW</td></tr>
+        <tr><td>太阳能潜力</td><td>约 4.5 GW（理论最大87 GW）</td></tr>
+        <tr><td>2030年目标</td><td>可再生能源占最终能源消费 <strong>27.4%</strong></td></tr>
+        <tr><td>2025年新增</td><td>2座水电站（11.8 MW）+ 6座太阳能电站（10.8 MW）</td></tr>
+        <tr><td>风电在建</td><td>125 MW · $1.95亿投资</td></tr>
+      </table></div></div>
+      <div class="detail-section"><div class="detail-label">能源结构</div><div class="detail-text">佐治亚能源结构以<strong>水电</strong>为传统基础——拥有数千年河流资源和百年水电经验。<strong>75%</strong> 的装机容量为可再生能源。太阳能正在快速增长——33个太阳能项目已安装 <strong>232.4 MW</strong>。2025年新增2座水电站（11.8 MW）和6座太阳能电站（10.8 MW）。在建风电项目 <strong>125 MW</strong>（$1.95亿投资）。IRENA 评估显示，佐治亚拥有 <strong>15 GW</strong> 水电潜力（仅开发不到1/4）、约 <strong>4 GW</strong> 风电和 <strong>4.5 GW</strong> 太阳能光伏潜力。目标2030年可再生能源占最终能源消费 <strong>27.4%</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="ga-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">创业公司</span><span class="data-value">~130 家</span></div>
+        <div class="data-item"><span class="data-label">创新机构</span><span class="data-value">GITA</span></div>
+        <div class="data-item"><span class="data-label">ATDC</span><span class="data-value green">全美首个大学孵化器</span></div>
+        <div class="data-item"><span class="data-label">创业税收</span><span class="data-value green">0%（3年）</span></div>
+        <div class="data-item"><span class="data-label">FabLabs</span><span class="data-value">20+</span></div>
+        <div class="data-item"><span class="data-label">AI 工具使用</span><span class="data-value green">71% 社交媒体用户</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">金融科技 · 教育科技 · 物流 · 游戏 · AI</span></div>
+      <div class="info-row"><span class="label">旗舰项目</span><span class="value">Kutaisi 科技中心 · 全国最大数字经济项目</span></div>
+      <div class="tags"><span class="tag">ATDC全美首个</span><span class="tag">创业0%税3年</span><span class="tag">Kutaisi科技中心</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">创新生态</div><div class="detail-text">佐治亚拥有约 <strong>130 家</strong>活跃创业公司，重点领域包括金融科技、休闲经济、教育科技、物流和游戏。<strong>ATDC（Advanced Technology Development Center）</strong>为全美首个大学主导的孵化器，也是佐治亚领先的科技孵化器。<strong>Georgia Innovation and Technology Agency（GITA）</strong>于2026年1月启动“创新创业加速计划”，完全由GITA资助，合作方包括 Plug and Play 和 Startupbootcamp。政府为创新创业公司建立了<strong>前所未有的税收制度</strong>——前 <strong>3 年 0% 税率</strong>。全国有 <strong>20 多个</strong> FabLabs（数字制造工坊）。<strong>Kutaisi 科技中心</strong>为全国最大数字经济项目，包括可容纳 <strong>1,000 名学生</strong>的国际IT学校，以及电子、机器人和无人机实验室。2025年联合国贸发会议前沿技术就绪指数中，佐治亚在170个经济体中排名<strong>第79</strong>。71% 社交媒体用户使用 AI 工具。2025年全球创新指数中，佐治亚在劳动生产率增长方面排名<strong>第1</strong>。</div></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>佐治亚州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · Georgia.org · Giffords · Georgia Realtors · Fitch Ratings</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
