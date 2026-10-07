@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --prairie: #283593;
+  }
+  [data-theme="dark"] {
+    --ground: #000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #0f1030 0%, #1a1c45 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --prairie: #7986cb;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--prairie); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--prairie); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s ease; padding: 0 24px; background: var(--surface-secondary); }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s ease; }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>伊利诺伊州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#il-overview">概览</a><a href="#il-pop">人口</a><a href="#il-econ">经济就业</a>
+      <a href="#il-biz">企业与产业</a><a href="#il-health">医疗</a><a href="#il-safety">公共安全</a>
+      <a href="#il-tax">税收财政</a><a href="#il-trans">交通</a><a href="#il-housing">住房</a>
+      <a href="#il-climate">气候</a><a href="#il-politics">政治政府</a><a href="#il-edu">教育</a>
+      <a href="#il-sports">体育</a><a href="#il-media">媒体</a><a href="#il-tourism">旅游</a>
+      <a href="#il-energy">能源</a><a href="#il-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()"><svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌆</div>
+  <h1>伊利诺伊州<br><em>Illinois</em></h1>
+  <p class="subtitle">草原之州 · 芝加哥枢纽 · 全美教育第3 · 量子科技前沿</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>12,710,158</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$1.23T</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>4.8%</strong><span>失业率 (2025.5)</span></div>
+    <div class="hero-stat"><strong>#13</strong><span>CNBC 综合排名</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 个税 <b>4.95% 统一</b></span>
+    <span class="hero-badge orange">🔫 <b>需隐蔽携枪许可</b> · 严格管制</span>
+    <span class="hero-badge red">📚 教育 <b>全美第3</b></span>
+    <span class="hero-badge">🔬 <b>量子科技全美领先</b></span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="il-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1818年12月3日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">斯普林菲尔德</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">芝加哥</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">149,997 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">北美红雀</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">蓝紫罗兰</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">草原之州（The Prairie State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"State Sovereignty, National Union"</span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Great Lakes</span><span class="tag">草原之州</span><span class="tag">量子科技</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">伊利诺伊位于美国中西部，北接威斯康星，东邻印第安纳和肯塔基，南界密苏里和肯塔基，西临艾奥瓦和密苏里。在 Colin Woodard 的文化分区中属于 <strong>Midlands</strong>——贵格会宽容、中庸、多元的中间地带。芝加哥为美国中西部经济、金融与交通之都。南部伊利诺伊带更多南方文化色彩。全州地势平坦，密西西比河和俄亥俄河为西部和南部边界，伊利诺伊水道连接五大湖与密西西比河。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1673 年法国探险家若利埃和马尔凯特抵达。1763 年归英国。1783 年归美国。1818 年 12 月 3 日成为美国第 <strong>21 个州</strong>。林肯在伊利诺伊开启政治生涯。1871 年芝加哥大火后重建为现代摩天大楼发源地。20 世纪，芝加哥成为全美交通、金融和制造业枢纽。2025 年，伊利诺伊在量子计算和半导体领域取得重大突破。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="il-pop" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">12,710,158</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~39 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$78,304</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$51,195</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">12.1%</span></div>
+        <div class="data-item"><span class="data-label">外国出生</span><span class="data-value">14.1%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 58.3% · 西语裔 18.2% · 黑人 13.9% · 亚裔 6.0%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">芝加哥 2,665,039 · 奥罗拉 · 内珀维尔</span></div>
+      <div class="tags"><span class="tag">人口全美第6</span><span class="tag">芝加哥都会区</span><span class="tag">人口外流</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2025)</td><td><strong>12,710,158</strong>（全美第6）</td></tr>
+        <tr><td>芝加哥人口</td><td>2,665,039（全美第3大城市）</td></tr>
+        <tr><td>白人占比</td><td>58.3%</td></tr>
+        <tr><td>西语裔占比</td><td>18.2%</td></tr>
+        <tr><td>黑人占比</td><td>13.9%</td></tr>
+        <tr><td>亚裔占比</td><td>6.0%</td></tr>
+        <tr><td>外国出生</td><td>14.1%</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$78,304</strong>，高于全美中位数 $74,753。人均收入 <strong>$51,195</strong>。贫困率 <strong>12.1%</strong>。芝加哥都会区集中全州约 <strong>65%</strong> 人口。但伊利诺伊面临<strong>人口持续外流</strong>——2010-2025 年人口减少约 <strong>30 万</strong>，居民迁往佛罗里达、得克萨斯和印第安纳等低税州。高房产税和州养老金负债为人口外流的重要因素。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="il-econ" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$1.23T</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长 (Q1)</span><span class="data-value red">-2.2%</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value orange">4.8%</span></div>
+        <div class="data-item"><span class="data-label">CNBC 综合</span><span class="data-value">第13</span></div>
+        <div class="data-item"><span class="data-label">经济评级</span><span class="data-value red">D- (第44)</span></div>
+        <div class="data-item"><span class="data-label">基础设施</span><span class="data-value green">B+ (第8)</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">金融 · 制造业 · 农业 · 科技 · 物流</span></div>
+      <div class="info-row"><span class="label">优势</span><span class="value">基础设施第8 · 教育第3 · 科技第6</span></div>
+      <div class="tags"><span class="tag">GDP全美第5</span><span class="tag">经济评级D-</span><span class="tag">基础设施第8</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现 (CNBC 2025)</div><table class="mini-table">
+        <tr><td>GDP (2025)</td><td><strong>$1.23 万亿</strong>（全美第5）</td></tr>
+        <tr><td>GDP 增速 (Q1 2025)</td><td><strong>-2.2%</strong></td></tr>
+        <tr><td>失业率 (May 2025)</td><td><strong>4.8%</strong>（全美 4.3%）</td></tr>
+        <tr><td>CNBC 综合排名</td><td><strong>第13</strong></td></tr>
+        <tr><td>经济评级</td><td><strong>D-</strong>（第44）</td></tr>
+        <tr><td>基础设施</td><td><strong>B+</strong>（第8）</td></tr>
+        <tr><td>教育</td><td><strong>A</strong>（第3）</td></tr>
+        <tr><td>科技与创新</td><td><strong>B+</strong>（第6）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">伊利诺伊 GDP 约 <strong>$1.23 万亿</strong>，为全美第 5 大州经济体。芝加哥为美国第二大金融中心（芝加哥期权交易所 CBOE、芝加哥商品交易所 CME）。制造业、农业（玉米、大豆）、物流和科技为支柱产业。但 CNBC 经济评级仅 <strong>D-</strong>（第 44），GDP 增速 <strong>-2.2%</strong>，失业率 <strong>4.8%</strong> 高于全美平均。高税负、养老金负债和人口外流构成长期结构性挑战。亮点在基础设施（第 8）、教育（第 3）和科技（第 6）。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="il-biz" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">37 家</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Boeing</span></div>
+        <div class="data-item"><span class="data-label">金融中心</span><span class="data-value">芝加哥</span></div>
+        <div class="data-item"><span class="data-label">最大雇主</span><span class="data-value">Advocate Health (31,761)</span></div>
+        <div class="data-item"><span class="data-label">量子园区</span><span class="data-value green">IQMP</span></div>
+        <div class="data-item"><span class="data-label">科技巨头</span><span class="data-value">Amazon (32,000)</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级企业</span><span class="value">Boeing · Caterpillar · Walgreens · Abbott · AbbVie</span></div>
+      <div class="info-row"><span class="label">量子</span><span class="value">IBM · DARPA · Pasqal · Infleqtion · Diraq</span></div>
+      <div class="tags"><span class="tag">37家Fortune 500</span><span class="tag">Boeing总部</span><span class="tag">IQMP量子园区</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500 概况</div><div class="detail-text">伊利诺伊拥有 <strong>37 家</strong> Fortune 500 总部（全美第 4，仅次于加州、得克萨斯和纽约），包括 <strong>Boeing</strong>（#34）、<strong>Caterpillar</strong>（#44）、<strong>Walgreens Boots Alliance</strong>（#25）、<strong>Abbott Laboratories</strong>（#107）、<strong>AbbVie</strong>（#77）、<strong>State Farm</strong>、<strong>Mondelez International</strong>、<strong>Illinois Tool Works</strong> 等。芝加哥为全美第二大金融中心，聚集 CME Group、CBOE 和联邦储备银行第七区。2025 年，伊利诺伊在<strong>量子计算</strong>领域取得重大突破——Pasqal（法国量子计算先驱）在芝加哥设立美国总部，IBM、DARPA、Infleqtion 和 Diraq 入驻 Illinois Quantum and Microelectronics Park（IQMP）。</div></div>
+      <div class="detail-section"><div class="detail-label">主要雇主（Cook 县）</div><table class="mini-table">
+        <tr><td>US Government</td><td>55,138 员工</td></tr>
+        <tr><td>Chicago Public Schools</td><td>46,244 员工</td></tr>
+        <tr><td>City of Chicago</td><td>32,349 员工</td></tr>
+        <tr><td>Amazon.com</td><td>32,000 员工</td></tr>
+        <tr><td>Advocate Health Care</td><td>31,761 员工</td></tr>
+        <tr><td>Northwestern Medicine</td><td>31,615 员工</td></tr>
+        <tr><td>University of Chicago</td><td>23,044 员工</td></tr>
+        <tr><td>Endeavor Health</td><td>21,808 员工</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="il-health" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州并列第1</span><span class="data-value">Northwestern · Rush</span></div>
+        <div class="data-item"><span class="data-label">全州第3</span><span class="data-value">UChicago Medicine</span></div>
+        <div class="data-item"><span class="data-label">全州第4</span><span class="data-value">Advocate Christ</span></div>
+        <div class="data-item"><span class="data-label">全州第5</span><span class="data-value">Endeavor Evanston</span></div>
+        <div class="data-item"><span class="data-label">全州第6</span><span class="data-value">Advocate Lutheran</span></div>
+        <div class="data-item"><span class="data-label">癌症全州第1</span><span class="data-value green">UChicago (3年)</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">Northwestern · Rush · UChicago · Advocate Christ</span></div>
+      <div class="info-row"><span class="label">癌症</span><span class="value">UChicago Medicine 癌症项目连续 3 年全州第1</span></div>
+      <div class="tags"><span class="tag">Northwestern/Rush并列第1</span><span class="tag">UChicago癌症第1</span><span class="tag">Advocate最多</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. Northwestern Memorial Hospital</td><td>芝加哥 · 并列全州第1</td></tr>
+        <tr><td>1. Rush University Medical Center</td><td>芝加哥 · 并列全州第1</td></tr>
+        <tr><td>3. University of Chicago Medical Center</td><td>芝加哥 · 全州第3 · 癌症全州第1（3年）</td></tr>
+        <tr><td>4. Advocate Christ Medical Center</td><td>Oak Lawn · 全州第4</td></tr>
+        <tr><td>5. Endeavor Health Evanston Hospital</td><td>Evanston · 全州第5</td></tr>
+        <tr><td>6. Advocate Lutheran General Hospital</td><td>Park Ridge · 全州第6</td></tr>
+        <tr><td>11. Advocate Good Shepherd Hospital</td><td>Barrington · 全州第11</td></tr>
+        <tr><td>17. Advocate Trinity Hospital</td><td>芝加哥 · 全州第17</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text"><strong>Northwestern Memorial</strong> 和 <strong>Rush University Medical Center</strong> 并列全州第 1。<strong>UChicago Medicine</strong> 位列全州第 3，其癌症项目连续 <strong>3 年</strong>全州第 1。<strong>Advocate Health Care</strong> 有 <strong>4 家</strong>医院进入全州前 17，为全州最多。UChicago Medicine Ingalls Memorial（Harvey）在充血性心力衰竭、COPD、糖尿病和肾衰竭方面获“高绩效”评级。伊利诺伊医疗体系以芝加哥为中心，拥有全美最集中的顶级医疗资源之一。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="il-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">持枪法规</span><span class="data-value">隐蔽携枪许可</span></div>
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value">约 28.3%</span></div>
+        <div class="data-item"><span class="data-label">攻击性武器</span><span class="data-value green">禁令</span></div>
+        <div class="data-item"><span class="data-label">红旗法</span><span class="data-value green">有</span></div>
+        <div class="data-item"><span class="data-label">全美枪支法律</span><span class="data-value">第8严格</span></div>
+        <div class="data-item"><span class="data-label">芝加哥暴力犯罪</span><span class="data-value orange">高于全美</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value">2023年《保护伊利诺伊社区法》· 攻击性武器禁令 · 红旗法</span></div>
+      <div class="info-row"><span class="label">效果</span><span class="value">枪支管制全美第8严格 · 但芝加哥枪支暴力仍突出</span></div>
+      <div class="tags"><span class="tag">攻击性武器禁令</span><span class="tag">红旗法</span><span class="tag">芝加哥暴力犯罪</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">枪支法规</div><div class="detail-text">伊利诺伊为<strong>枪支管制较严格的州</strong>，全美枪支法律排名<strong>第 8</strong>。2013 年通过《枪支隐蔽携带法》，需申请许可证并完成 16 小时培训。2023 年通过《保护伊利诺伊社区法》（Protect Illinois Communities Act），<strong>禁止攻击性武器销售</strong>，并实施<strong>红旗法</strong>（极端风险保护令）。持枪率约 <strong>28.3%</strong>，低于全美平均。但芝加哥部分南区/西区暴力犯罪率突出，为全美枪支暴力问题最严重的城市之一。库克县枪支暴力主要集中在特定社区，与贫困和帮派活动相关。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="il-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value green">4.95% 统一</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value red">9.5%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">6.25%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value red">10.25%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value red">~2.07%</span></div>
+        <div class="data-item"><span class="data-label">汽油税</span><span class="data-value">84.5¢/加仑</span></div>
+      </div>
+      <div class="info-row"><span class="label">税负特征</span><span class="value">房产税全美第2高 · 企业所得税全美第3高 · 个税统一低</span></div>
+      <div class="info-row"><span class="label">2025动态</span><span class="value">医疗债务减免 $4.3亿 · 基础设施 $506亿计划</span></div>
+      <div class="tags"><span class="tag">房产税全美第2高</span><span class="tag">企业税全美第3高</span><span class="tag">个税4.95%</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>4.95%</strong> 统一（州宪法限制统一税率）</td></tr>
+        <tr><td>企业所得税</td><td><strong>9.5%</strong>（7.0% 标准 + 2.5% 替代税）</td></tr>
+        <tr><td>州销售税</td><td>6.25%（芝加哥合计 <strong>10.25%</strong>）</td></tr>
+        <tr><td>房产税</td><td><strong>有效税率约 2.07%</strong>（全美第2高）</td></tr>
+        <tr><td>汽油税</td><td>84.5 美分/加仑（全美最高之一）</td></tr>
+        <tr><td>遗产税</td><td>有（$400 万以上）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">伊利诺伊税负全美<strong>第 1</strong>（人均税收和税收占个人收入比例均为 peer 州最高）。企业所得税 <strong>9.5%</strong> 为全美第 3 高，房产税有效税率 <strong>2.07%</strong> 为全美第 2 高。个人所得税 <strong>4.95%</strong> 统一税率相对较低，但州宪法限制累进税制。税收体系<strong>累退性</strong>显著——低收入居民税负占收入比例更高。州养老金负债全美最严重之一（未备资金负债超 <strong>$1,400 亿</strong>）。2025 年州长 Pritzker 推动医疗债务减免（首年 <strong>$4.3 亿</strong>）和 <strong>$506 亿</strong>六年基础设施计划。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="il-trans" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">基础设施</span><span class="data-value green">全美第8</span></div>
+        <div class="data-item"><span class="data-label">六年计划</span><span class="data-value green">$506亿</span></div>
+        <div class="data-item"><span class="data-label">公共交通</span><span class="data-value">$138亿</span></div>
+        <div class="data-item"><span class="data-label">铁路</span><span class="data-value">$29亿</span></div>
+        <div class="data-item"><span class="data-label">航空</span><span class="data-value">$12亿</span></div>
+        <div class="data-item"><span class="data-label">最大机场</span><span class="data-value">ORD</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要机场</span><span class="value">芝加哥奥黑尔（ORD）全球起降架次最多</span></div>
+      <div class="info-row"><span class="label">铁路</span><span class="value">芝加哥为 Amtrak 全国铁路网中心</span></div>
+      <div class="tags"><span class="tag">ORD全球最忙</span><span class="tag">Amtrak枢纽</span><span class="tag">$506亿基建</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>芝加哥奥黑尔国际机场（ORD）</strong>为全球起降架次最多的机场之一，联合航空与美航枢纽。中途国际机场（MDW）为西南航空重点机场。2025 年 IDOT 将 Rockford 国际机场评为年度初级机场。全州有 <strong>6 个</strong>机场获年度机场奖。航空基础设施获 <strong>$12 亿</strong>六年投资。</div></div>
+      <div class="detail-section"><div class="detail-label">铁路与公共交通</div><div class="detail-text"><strong>铁路：</strong>芝加哥为 Amtrak 全国铁路网中心——California Zephyr、Empire Builder、Southwest Chief、Texas Eagle 等长距离线路均以此为起点。Borealis（圣保罗-芝加哥，2024年开通）两年内载客超 <strong>50 万</strong>。<strong>基础设施计划：</strong>IDOT 公布 <strong>$506 亿</strong>六年基础设施计划，其中 <strong>$138 亿</strong>用于公共交通，<strong>$29 亿</strong>用于 29 个铁路项目，<strong>$12 亿</strong>用于航空。芝加哥 CTA 地铁（“L”）+ Metra 通勤铁路 + Pace 公交覆盖都会区。通勤时间中位数约 <strong>34 分钟</strong>，全美前列。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="il-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位销售价</span><span class="data-value">$302,600</span></div>
+        <div class="data-item"><span class="data-label">年变化</span><span class="data-value orange">+3.4%</span></div>
+        <div class="data-item"><span class="data-label">芝加哥中位价</span><span class="data-value">$360,000</span></div>
+        <div class="data-item"><span class="data-label">Q2中位价</span><span class="data-value">$318,000 (+5.3%)</span></div>
+        <div class="data-item"><span class="data-label">10月中位价</span><span class="data-value">$301,000 (+5.6%)</span></div>
+        <div class="data-item"><span class="data-label">7月中位价</span><span class="data-value">$319,900 (+3.9%)</span></div>
+      </div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">房价持续上涨 · 库存同比下降 · 可负担性为关键关切</span></div>
+      <div class="info-row"><span class="label">可负担性</span><span class="value">中位价低于全美平均 · 但房产税高企</span></div>
+      <div class="tags"><span class="tag">房价低于全美</span><span class="tag">芝加哥$360K</span><span class="tag">库存下降</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025 年伊利诺伊中位销售价约 <strong>$302,600</strong>（Redfin），年涨幅约 <strong>3.4%</strong>。Q2 中位价 <strong>$318,000</strong>（同比 +5.3%）。10 月中位价 <strong>$301,000</strong>（+5.6%），7 月 <strong>$319,900</strong>（+3.9%）。芝加哥都会区中位价 <strong>$360,000</strong>（10月），芝加哥市 <strong>$369,000</strong>。房价持续上涨但库存同比下降，可负担性为市场关键关切。伊利诺伊房价低于全美中位数（约 $433,000），但高房产税（2.07%）显著增加住房持有成本。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>中位销售价 (2025)</td><td>$302,600</td></tr>
+        <tr><td>Q2 中位价</td><td>$318,000（+5.3%）</td></tr>
+        <tr><td>10 月中位价</td><td>$301,000（+5.6%）</td></tr>
+        <tr><td>芝加哥都会区中位价</td><td>$360,000</td></tr>
+        <tr><td>芝加哥市中位价</td><td>$369,000</td></tr>
+        <tr><td>库存趋势</td><td>同比下降</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="il-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">2025年温度排名</span><span class="data-value">第18暖</span></div>
+        <div class="data-item"><span class="data-label">年均温</span><span class="data-value">53.6°F (+1.0°F)</span></div>
+        <div class="data-item"><span class="data-label">2025年降水排名</span><span class="data-value red">第23干</span></div>
+        <div class="data-item"><span class="data-label">年降水</span><span class="data-value red">32.94" (-7.8")</span></div>
+        <div class="data-item"><span class="data-label">秋季温度</span><span class="data-value">+1-3°F</span></div>
+        <div class="data-item"><span class="data-label">11月记录</span><span class="data-value red">78°F</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">第18暖 · 第23干 · 降水偏低7.8英寸</span></div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">暴雪 · 龙卷风 · 洪水 · 极端寒冷</span></div>
+      <div class="tags"><span class="tag">2025年第18暖</span><span class="tag">第23干</span><span class="tag">降水偏低7.8"</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">2025年气候</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润大陆性</td></tr>
+        <tr><td>2025年温度排名</td><td><strong>第18暖年</strong>（1895年以来记录）</td></tr>
+        <tr><td>年均温 (2025)</td><td><strong>53.6°F</strong>（+1.0°F）</td></tr>
+        <tr><td>2025年降水排名</td><td><strong>第23干年</strong></td></tr>
+        <tr><td>年降水 (2025)</td><td><strong>32.94 英寸</strong>（偏低 7.8 英寸）</td></tr>
+        <tr><td>秋季温度</td><td>中部偏高 <strong>1-3°F</strong></td></tr>
+        <tr><td>11月记录</td><td>中部某地 11/14 创 <strong>78°F</strong> 高温记录</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">气候特征与极端天气</div><div class="detail-text">伊利诺伊 2025 年为<strong>第 18 暖年</strong>（1895 年以来），年均温 <strong>53.6°F</strong>（+1.0°F），降水 <strong>32.94 英寸</strong>（偏低 <strong>7.8 英寸</strong>），为第 <strong>23 干年</strong>。夏季温度偏高 1-3°F（6 月和 7 月尤为明显）。11 月中旬中部某地创 <strong>78°F</strong> 高温记录。冬季可出现 -10°F 至 -15°F 的极端寒冷（I-55 西北）。极端天气包括<strong>暴雪、龙卷风、洪水和极端寒冷</strong>。伊利诺伊位于龙卷风走廊东段，春季和秋季龙卷风活动频繁。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="il-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">JB Pritzker (D)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">民主党控制</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名民主党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">17 席 · 民主党多数</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">蓝州</span></div>
+        <div class="data-item"><span class="data-label">2025会期</span><span class="data-value">104届议会</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">能源负担法案（SB 25）· 医疗债务减免 · 交通改革</span></div>
+      <div class="info-row"><span class="label">当前议题</span><span class="value">能源成本 · 医疗债务 · 公共交通 · 问责改革</span></div>
+      <div class="tags"><span class="tag">蓝州</span><span class="tag">Pritzker进步主义</span><span class="tag">SB 25能源法案</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">伊利诺伊为<strong>蓝州</strong>，民主党在州长办公室、州参议院和州众议院均占多数。州长 <strong>JB Pritzker</strong>（民主党）自 2019 年上任，2025 年推动多项进步主义立法。联邦层面，两名参议员均为民主党，众议院 17 席中民主党占多数。2025 年为第 104 届议会（2025-2026）。</div></div>
+      <div class="detail-section"><div class="detail-label">2025 年关键议题</div><table class="mini-table">
+        <tr><td>能源负担</td><td>SB 25 降低家庭能源账单 · 清洁能源投资</td></tr>
+        <tr><td>医疗债务</td><td>首年减免 $4.3 亿 · 全美最大规模之一</td></tr>
+        <tr><td>公共交通</td><td>可负担公交 · 改革治理结构</td></tr>
+        <tr><td>问责改革</td><td>伊利诺伊问责委员会新领导层</td></tr>
+        <tr><td>高等教育</td><td>公立大学入学率达十年最高</td></tr>
+        <tr><td>正当程序</td><td>保护居民免受无令搜查</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="il-edu" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">CNBC 教育</span><span class="data-value green">A (第3)</span></div>
+        <div class="data-item"><span class="data-label">Pre-K-12</span><span class="data-value green">全美第4</span></div>
+        <div class="data-item"><span class="data-label">大学准备</span><span class="data-value green">全美第5</span></div>
+        <div class="data-item"><span class="data-label">NAEP 阅读</span><span class="data-value green">全美第7</span></div>
+        <div class="data-item"><span class="data-label">高中毕业率</span><span class="data-value green">89%</span></div>
+        <div class="data-item"><span class="data-label">全美Top 100高中</span><span class="data-value green">3 所</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>UChicago (#6)</strong> · <strong>Northwestern (#7)</strong> · <strong>UIUC (#36)</strong></span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Payton College Prep (#32) · Northside Prep (#40)</span></div>
+      <div class="tags"><span class="tag">UChicago全美第6</span><span class="tag">Northwestern第7</span><span class="tag">Payton全美第32</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">伊利诺伊教育获 CNBC <strong>A</strong> 评级，全美<strong>第 3</strong>。U.S. News 排名 Pre-K-12 <strong>第 4</strong>，大学准备 <strong>第 5</strong>，NAEP 阅读 <strong>第 7</strong>，学前教育入学 <strong>第 9</strong>。高中毕业率 <strong>89%</strong>（2024-25），较 2024 年提升 <strong>6.2%</strong>，自 2021 年以来提升 <strong>8.6%</strong>。<strong>Payton College Preparatory</strong>（芝加哥）全美第 <strong>32</strong>，<strong>Northside College Preparatory</strong> 全美第 <strong>40</strong>，<strong>Lane Technical</strong> 全美第 <strong>72</strong>。Naperville Central 和 Naperville North 位列全州前 30。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Chicago</td><td>全美第6 · 全球顶尖研究型大学</td></tr>
+        <tr><td>Northwestern University</td><td>全美第7 · 顶尖私立</td></tr>
+        <tr><td>University of Illinois Urbana-Champaign</td><td>全美第36 · 旗舰公立</td></tr>
+        <tr><td>University of Illinois Chicago</td><td>全美第84 · 城市研究型</td></tr>
+        <tr><td>Illinois Institute of Technology</td><td>全美第171 · 工程强</td></tr>
+        <tr><td>Loyola University Chicago</td><td>私立 · 芝加哥</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="il-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">NFL</span><span class="data-value">Chicago Bears</span></div>
+        <div class="data-item"><span class="data-label">NBA</span><span class="data-value">Chicago Bulls</span></div>
+        <div class="data-item"><span class="data-label">MLB</span><span class="data-value">Cubs · White Sox</span></div>
+        <div class="data-item"><span class="data-label">NHL</span><span class="data-value">Chicago Blackhawks</span></div>
+        <div class="data-item"><span class="data-label">大学体育</span><span class="data-value">Illinois Fighting Illini</span></div>
+        <div class="data-item"><span class="data-label">2025橄榄球</span><span class="data-value green">8-4 · 碗赛</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025亮点</span><span class="value">Illini 橄榄球 8-4 · 篮球全美第17</span></div>
+      <div class="info-row"><span class="label">高中体育</span><span class="value">Mount Carmel 4连冠 · Brother Rice 44年首冠</span></div>
+      <div class="tags"><span class="tag">Bears/Bulls/Cubs</span><span class="tag">Illini 8-4</span><span class="tag">Mount Carmel 4连冠</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><table class="mini-table">
+        <tr><td>Chicago Bears</td><td>NFL · 1985年超级碗冠军</td></tr>
+        <tr><td>Chicago Bulls</td><td>NBA · 6次总冠军（1990年代）</td></tr>
+        <tr><td>Chicago Cubs</td><td>MLB · 2016年世界大赛冠军</td></tr>
+        <tr><td>Chicago White Sox</td><td>MLB · 2005年世界大赛冠军</td></tr>
+        <tr><td>Chicago Blackhawks</td><td>NHL · 6次斯坦利杯冠军</td></tr>
+        <tr><td>Chicago Fire</td><td>MLS 足球</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">大学体育与高中体育</div><div class="detail-text"><strong>Illinois Fighting Illini</strong> 橄榄球队 2025 年取得 <strong>8-4</strong> 赛季，连续第二年赢得 8+ 比赛（自 1990 年以来首次），并签署近二十年来最佳招募班。男子篮球队排名全美第 <strong>14-17</strong>，2025 年 12 月击败田纳西。女子篮球队经历 25 年来最成功赛季。<strong>Northwestern Wildcats</strong> 同样获得碗赛资格。高中橄榄球方面，<strong>Chicago Mount Carmel</strong> 赢得<strong>4 连冠</strong>，<strong>Brother Rice</strong> 赢得 44 年来首个州冠军。</div></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="il-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最佳日报</span><span class="data-value">Chicago Sun-Times</span></div>
+        <div class="data-item"><span class="data-label">亚军</span><span class="data-value">Chicago Tribune</span></div>
+        <div class="data-item"><span class="data-label">第三</span><span class="data-value">Daily Herald</span></div>
+        <div class="data-item"><span class="data-label">中型日报</span><span class="data-value">News-Gazette</span></div>
+        <div class="data-item"><span class="data-label">新闻荒漠</span><span class="data-value red">47县</span></div>
+        <div class="data-item"><span class="data-label">州税收抵免</span><span class="data-value green">$400万</span></div>
+      </div>
+      <div class="info-row"><span class="label">挑战</span><span class="value">Paddock 关闭 13 家报纸 · 新闻荒漠扩大</span></div>
+      <div class="info-row"><span class="label">支持</span><span class="value">40 家新闻机构获 $400 万税收抵免</span></div>
+      <div class="tags"><span class="tag">Sun-Times最佳</span><span class="tag">Tribune亚军</span><span class="tag">47县新闻荒漠</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Chicago Sun-Times</td><td>最佳大型日报（Stuart R. Trophy）</td></tr>
+        <tr><td>Chicago Tribune</td><td>亚军 · Alden Global Capital 旗下</td></tr>
+        <tr><td>Daily Herald</td><td>第三 · Arlington Heights</td></tr>
+        <tr><td>The News-Gazette</td><td>最佳中型日报 · Champaign</td></tr>
+        <tr><td>Dispatch-Argus</td><td>中型日报亚军 · Moline</td></tr>
+        <tr><td>Belleville News-Democrat</td><td>中型日报第4</td></tr>
+        <tr><td>WBEZ / Chicago Public Media</td><td>公共广播 · NPR 附属</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">伊利诺伊媒体面临<strong>新闻荒漠化</strong>危机——<strong>47 个县</strong>仅有一个或没有本地新闻来源。Paddock Publications 于 2025 年关闭至少 <strong>13 家</strong>伊利诺伊报纸，Gannett 和 Alden Global Capital 旗下报纸亦大幅缩减。作为应对，伊利诺伊州通过新法律，向 <strong>40 家</strong>本地新闻机构提供 <strong>$400 万</strong>税收抵免，鼓励记者留任和招聘。但 Gannett（11 家日报）和 Alden（Chicago Tribune）未获抵免。Chicago Sun-Times 获最佳大型日报奖，Chicago Tribune 为亚军。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="il-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏙️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客 (2025)</span><span class="data-value green">1.15亿</span></div>
+        <div class="data-item"><span class="data-label">旅游支出</span><span class="data-value green">$502亿</span></div>
+        <div class="data-item"><span class="data-label">支出变化</span><span class="data-value green">+3.5%</span></div>
+        <div class="data-item"><span class="data-label">经济影响</span><span class="data-value green">$880亿</span></div>
+        <div class="data-item"><span class="data-label">顶级景点</span><span class="data-value">芝加哥</span></div>
+        <div class="data-item"><span class="data-label">历史遗产</span><span class="data-value">Route 66</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">芝加哥 · 千禧公园 · 艺术博物馆 · 66号公路</span></div>
+      <div class="info-row"><span class="label">2025里程碑</span><span class="value">旅游支出首破 <strong>$500 亿</strong> · 经济影响 <strong>$880 亿</strong></span></div>
+      <div class="tags"><span class="tag">芝加哥千禧公园</span><span class="tag">66号公路起点</span><span class="tag">旅游$502亿</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济（2025）</div><table class="mini-table">
+        <tr><td>游客总数</td><td><strong>1.15 亿</strong>（国内+国际）</td></tr>
+        <tr><td>旅游支出</td><td><strong>$502 亿</strong>（+3.5%）</td></tr>
+        <tr><td>经济影响</td><td><strong>$880 亿</strong></td></tr>
+        <tr><td>历史里程碑</td><td>旅游支出<strong>首次突破 $500 亿</strong></td></tr>
+        <tr><td>“Middle of Everything”</td><td>新增 278 万次旅行 · $9.04 亿增量</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>芝加哥</strong>（千禧公园“豆子”、威利斯大厦、艺术博物馆、深盘披萨）为美国中西部文化之都，年游客超 <strong>5,000 万</strong>。<strong>66 号公路</strong>起点位于芝加哥，是公路旅行文化圣地。<strong>肖尼国家森林</strong>（约 1,100 km²）位于南部。<strong>Starved Rock 州立公园</strong>以峡谷和瀑布闻名。<strong>Galena</strong> 为历史小镇和尤利西斯·格兰特故居。<strong>Shawnee Hills 葡萄酒小径</strong>为品酒胜地。伊利诺伊 2025 年旅游支出首破 <strong>$500 亿</strong>，经济影响达 <strong>$880 亿</strong>，“Middle of Everything”营销活动新增 <strong>278 万次</strong>旅行和 <strong>$9.04 亿</strong>增量支出。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="il-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">可再生占比</span><span class="data-value green">16.47%</span></div>
+        <div class="data-item"><span class="data-label">可再生发电量</span><span class="data-value">31.85M MWh</span></div>
+        <div class="data-item"><span class="data-label">风电增长</span><span class="data-value green">2.3倍 (vs 2016)</span></div>
+        <div class="data-item"><span class="data-label">太阳能排名</span><span class="data-value green">中西部第1</span></div>
+        <div class="data-item"><span class="data-label">新增可再生</span><span class="data-value green">1.58 GW</span></div>
+        <div class="data-item"><span class="data-label">储能目标</span><span class="data-value green">3 GW</span></div>
+      </div>
+      <div class="info-row"><span class="label">可再生占比</span><span class="value">2025年达 <strong>16.47%</strong>（31.85M MWh / 193M MWh）</span></div>
+      <div class="info-row"><span class="label">清洁能源</span><span class="value">SB 25 法案 · 873 MW 新太阳能 · 3 GW 储能</span></div>
+      <div class="tags"><span class="tag">可再生16.47%</span><span class="tag">太阳能中西部第1</span><span class="tag">3GW储能目标</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">可再生能源</div><table class="mini-table">
+        <tr><td>可再生占比 (2025)</td><td><strong>16.47%</strong>（31.85M MWh / 193M MWh）</td></tr>
+        <tr><td>风电增长</td><td><strong>2.3 倍</strong>（vs 2016）· 可供电 <strong>231 万户</strong></td></tr>
+        <tr><td>太阳能排名</td><td><strong>全美第10</strong> · 中西部第1</td></tr>
+        <tr><td>新增可再生</td><td><strong>1.58 GW</strong>（4 个风电项目 + 太阳能）</td></tr>
+        <tr><td>ComEd RECs</td><td>突破 <strong>$100 亿</strong> · 2025 年新增 1.05 亿 RECs</td></tr>
+        <tr><td>储能目标</td><td><strong>3 GW</strong>（SB 25）</td></tr>
+        <tr><td>2025-26 新增太阳能</td><td><strong>873 MW</strong>（Illinois Shines）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">能源转型</div><div class="detail-text">伊利诺伊可再生能源占比从 2016 年的约 <strong>7%</strong> 增至 2025 年的 <strong>16.47%</strong>，总可再生发电量达 <strong>31.85M MWh</strong>。风电较 2016 年增长 <strong>2.3 倍</strong>，可供电 <strong>231 万户</strong>。太阳能全美第 <strong>10</strong>，中西部第 <strong>1</strong>。2025 年伊利诺伊商业委员会批准 <strong>1.58 GW</strong> 新可再生项目（4 个风电 + 太阳能）。ComEd 的 REC 合同突破 <strong>$100 亿</strong>里程碑。2025 年 10 月通过的 <strong>SB 25</strong>（清洁与可靠电网可负担性法案）扩展 <strong>873 MW</strong> 太阳能，设定 <strong>3 GW</strong> 储能目标，并推出首个社区太阳能+储能项目（Ducks Solar，7.72 MW + 6.8 MWh）。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="il-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">CNBC 科技</span><span class="data-value green">B+ (第6)</span></div>
+        <div class="data-item"><span class="data-label">量子园区</span><span class="data-value green">IQMP</span></div>
+        <div class="data-item"><span class="data-label">量子企业</span><span class="data-value">IBM · DARPA · Pasqal</span></div>
+        <div class="data-item"><span class="data-label">科技总部</span><span class="data-value">Amazon 32,000</span></div>
+        <div class="data-item"><span class="data-label">清洁能源</span><span class="data-value">Richardson $200M</span></div>
+        <div class="data-item"><span class="data-label">农业机器人</span><span class="data-value">EarthSense</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">量子计算 · AI · 网络安全 · 农业科技 · 清洁能源</span></div>
+      <div class="info-row"><span class="label">旗舰项目</span><span class="value"><strong>IQMP</strong> · 全美量子科技中心</span></div>
+      <div class="tags"><span class="tag">IQMP量子园区</span><span class="tag">Amazon 32,000</span><span class="tag">EarthSense农业AI</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">量子科技</div><div class="detail-text">伊利诺伊为<strong>全美量子科技领先州</strong>——<strong>Illinois Quantum and Microelectronics Park（IQMP）</strong>位于芝加哥南侧，为全美量子计算核心园区。2025 年，法国量子计算先驱 <strong>Pasqal</strong> 在芝加哥设立美国总部。IQMP 租户包括 <strong>IBM</strong>、<strong>DARPA</strong>、<strong>Infleqtion</strong>（科罗拉多）和 <strong>Diraq</strong>（澳大利亚）。伊利诺伊在 <strong>FY25</strong> 巩固了全球量子计算领导地位。CNBC 将伊利诺伊科技与创新评为 <strong>B+</strong>（第 6）。</div></div>
+      <div class="detail-section"><div class="detail-label">科技生态</div><table class="mini-table">
+        <tr><td>Amazon</td><td>芝加哥 · 32,000 员工 · 科技与电信</td></tr>
+        <tr><td>IQMP</td><td>芝加哥 · 量子与微电子园区</td></tr>
+        <tr><td>IBM</td><td>IQMP 租户 · 量子计算</td></tr>
+        <tr><td>DARPA</td><td>IQMP 租户 · 国防高级研究</td></tr>
+        <tr><td>Pasqal</td><td>美国总部 · 量子计算</td></tr>
+        <tr><td>EarthSense</td><td>Champaign · 农业机器人 · AI 自主解决方案</td></tr>
+        <tr><td>Network Perception</td><td>芝加哥 · 网络安全</td></tr>
+        <tr><td>Richardson Electronics</td><td>LaFox · 电池储能 · $2 亿扩张</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>伊利诺伊州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · CNBC · Tax Foundation · IDOT · Illinois Realtors · ComEd · IPA</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
