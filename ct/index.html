@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CT</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-hover: #0077ed; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --constitution: #283593;
+  }
+  [data-theme="dark"] {
+    --ground: #000000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-hover: #409cff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #0f1030 0%, #1a1c45 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --constitution: #7986cb;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--constitution); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--constitution); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); letter-spacing: 0.01em; }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s cubic-bezier(0.25,0.1,0.25,1); padding: 0 24px; background: var(--surface-secondary); transition: background 0.4s ease, max-height 0.55s ease, padding 0.55s ease; }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; } .detail-section:last-child { margin-bottom: 0; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; letter-spacing: -0.005em; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; letter-spacing: -0.005em; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1); }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s, background 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; transition: stroke 0.2s; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; gap: 6px; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>康涅狄格州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#sec-overview">概览</a><a href="#sec-population">人口</a><a href="#sec-economy">经济就业</a>
+      <a href="#sec-business">企业与产业</a><a href="#sec-healthcare">医疗</a><a href="#sec-safety">公共安全</a>
+      <a href="#sec-tax">税收财政</a><a href="#sec-transport">交通</a><a href="#sec-housing">住房</a>
+      <a href="#sec-climate">气候</a><a href="#sec-politics">政治政府</a><a href="#sec-education">教育</a>
+      <a href="#sec-sports">体育</a><a href="#sec-media">媒体</a><a href="#sec-tourism">旅游</a>
+      <a href="#sec-energy">能源</a><a href="#sec-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🏛️</div>
+  <h1>康涅狄格州<br><em>Connecticut</em></h1>
+  <p class="subtitle">宪法之州 · 保险之都 · 耶鲁大学 · 人均收入全美最高</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>3,675,069</strong><span>人口 (2024)</span></div>
+    <div class="hero-stat"><strong>$376.1B</strong><span>GDP (2025 Q1)</span></div>
+    <div class="hero-stat"><strong>4.8%</strong><span>失业率 (2025.10)</span></div>
+    <div class="hero-stat"><strong>#1</strong><span>人均收入全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 人均收入 <b>$98,879</b> 全美第1</span>
+    <span class="hero-badge orange">🏥 <b>全美最安全州第6</b></span>
+    <span class="hero-badge red">🔫 <b>严格管制州</b>（桑迪胡克后）</span>
+    <span class="hero-badge">🏢 <b>15家Fortune 500</b> 保险之都</span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="sec-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1788年1月9日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">哈特福德</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">布里奇波特</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">14,357 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">美洲知更鸟</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">山月桂</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">宪法之州（The Constitution State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Qui Transtulit Sustinet"（移植者必存活）</span></div>
+      <div class="tags"><span class="tag">Yankeedom</span><span class="tag">宪法之州</span><span class="tag">保险之都</span><span class="tag">耶鲁</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">康涅狄格位于新英格兰南部，北接马萨诸塞，东邻罗得岛，西临纽约，南滨长岛海湾。在 Colin Woodard 的文化分区中，康涅狄格属于 <strong>Yankeedom</strong>——清教徒教育传统、社区自治和制造业伦理深厚。费尔菲尔德县为纽约通勤富区，哈特福德为保险业中心，纽黑文为耶鲁大学学术城。全州面积仅 <strong>14,357 km²</strong>，为全美第 3 小的州。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1636年托马斯·胡克建立哈特福德。1639年《康涅狄格基本法》为美国第一部成文宪法，确立“宪法之州”称号。1788年1月9日成为美国第 <strong>5 个州</strong>。18-19世纪为制造业与保险业中心。1911年，康涅狄格州议会通过了第一部《工人赔偿法》，是美国最早的劳工保护立法之一。2012年桑迪胡克小学枪击案后通过全美最严格的枪支管制法案之一。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="sec-population" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2024)</span><span class="data-value">3,675,069</span></div>
+        <div class="data-item"><span class="data-label">2020-2024 增长</span><span class="data-value green">+0.9%</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~41 岁</span></div>
+        <div class="data-item"><span class="data-label">65岁以上</span><span class="data-value">18.4%</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$86,069</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value">10.0%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 63.5% · 西语裔 18.7% · 黑人 11.4% · 亚裔 5.4%</span></div>
+      <div class="info-row"><span class="label">家庭</span><span class="value">户均 2.50 人 · 自有住房率 66.5%</span></div>
+      <div class="tags"><span class="tag">人均收入全美第1</span><span class="tag">收入不平等突出</span><span class="tag">人口增长停滞</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2024)</td><td><strong>3,675,069</strong>（全美第29）</td></tr>
+        <tr><td>人均收入</td><td><strong>$98,879</strong>（全美第1）</td></tr>
+        <tr><td>西语裔占比</td><td>18.7%</td></tr>
+        <tr><td>外国出生</td><td>14.9%</td></tr>
+        <tr><td>布里奇波特人口</td><td>148,000+（最大城市）</td></tr>
+        <tr><td>无医保（65岁以下）</td><td>6.5%（全美最低之一）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">康涅狄格<strong>人均收入 $98,879</strong>（2025年），为<strong>全美最高</strong>，但收入不平等同样突出——费尔菲尔德县（格林尼治）为全美最富地区之一，而布里奇波特、哈特福德和纽黑文的贫困率较高。中位家庭收入 <strong>$86,069</strong>。人口自2020年以来仅增长 <strong>0.9%</strong>，为全美人口增长最慢的州之一。2025年州议会通过 <strong>$3.6 亿</strong>税收减免方案，但高房产税和生活成本仍为人口外流因素。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="sec-economy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025 Q1)</span><span class="data-value">$376.1B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长</span><span class="data-value green">+3.0%</span></div>
+        <div class="data-item"><span class="data-label">总就业</span><span class="data-value">~1.7M</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value orange">4.8%</span></div>
+        <div class="data-item"><span class="data-label">劳动参与率</span><span class="data-value">64.8%</span></div>
+        <div class="data-item"><span class="data-label">人均GDP</span><span class="data-value">$102,341</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">保险 · 航空航天 · 金融 · 生物科技 · 医疗</span></div>
+      <div class="info-row"><span class="label">就业排名</span><span class="value">U.S. News 就业全美 <strong>第30</strong></span></div>
+      <div class="tags"><span class="tag">人均GDP全美前列</span><span class="tag">保险业全球中心</span><span class="tag">普惠航空发动机</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现</div><table class="mini-table">
+        <tr><td>Gross State Product (2025 Q1)</td><td><strong>$376.1B</strong>（全美第21）</td></tr>
+        <tr><td>GDP 增速 (2025 Q1)</td><td>+3.0%（全美 2.5%）</td></tr>
+        <tr><td>失业率 (2025.10)</td><td><strong>4.8%</strong>（全美 4.4%）</td></tr>
+        <tr><td>人均GDP</td><td>$102,341（全美第4）</td></tr>
+        <tr><td>人均收入</td><td><strong>$98,879</strong>（全美第1）</td></tr>
+        <tr><td>家庭收入中位</td><td>$86,069（全美第6）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">康涅狄格经济以<strong>保险业</strong>为绝对核心——哈特福德为“世界保险之都”，<strong>Aetna</strong>（CVS Health 旗下）、<strong>The Hartford</strong>、<strong>Travelers</strong> 等保险巨头总部或主要运营中心均在此。<strong>航空航天</strong>为高端制造支柱：<strong>普惠（Pratt & Whitney）</strong>和<strong>西科斯基（Sikorsky，洛克希德·马丁旗下）</strong>总部位于康涅狄格，生产全球最先进的航空发动机和直升机。<strong>金融服务业</strong>（对冲基金、资产管理）在费尔菲尔德县集中。<strong>生物科技</strong>（Boehringer Ingelheim、Alexion）和<strong>医疗健康</strong>为新兴支柱。2025年经济增长 <strong>+3.0%</strong>，为全美表现最好的州之一。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="sec-business" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">15 家</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Cigna</span></div>
+        <div class="data-item"><span class="data-label">保险巨头</span><span class="data-value">Aetna · Travelers · Hartford</span></div>
+        <div class="data-item"><span class="data-label">航空航天</span><span class="data-value">Pratt & Whitney · Sikorsky</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级产业</span><span class="value">保险 · 航空航天 · 金融 · 生物科技 · 医疗</span></div>
+      <div class="info-row"><span class="label">主要雇主</span><span class="value">Cigna 15,000 · Pratt & Whitney 10,000 · Yale 15,000</span></div>
+      <div class="tags"><span class="tag">15家Fortune 500</span><span class="tag">世界保险之都</span><span class="tag">普惠航空发动机</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500（2025）</div><table class="mini-table">
+        <tr><td>1. Cigna (#13)</td><td>布卢姆菲尔德 · 健康保险 · $2,470 亿</td></tr>
+        <tr><td>2. Charter Communications (#70)</td><td>斯坦福 · 电信 · $550 亿</td></tr>
+        <tr><td>3. Booking Holdings (#149)</td><td>诺沃克 · 在线旅游 · $230 亿</td></tr>
+        <tr><td>4. Travelers (#106)</td><td>哈特福德 · 财产保险 · $460 亿</td></tr>
+        <tr><td>5. Hartford Financial (#185)</td><td>哈特福德 · 保险 · $260 亿</td></tr>
+        <tr><td>6. Synchrony Financial (#172)</td><td>斯坦福 · 消费金融 · $280 亿</td></tr>
+        <tr><td>7. Xerox (#463)</td><td>诺沃克 · 办公设备 · $68 亿</td></tr>
+        <tr><td>8. Praxair (Linde) (#316)</td><td>丹伯里 · 工业气体 · $130 亿</td></tr>
+        <tr><td>9. Frontier Communications</td><td>诺沃克 · 电信</td></tr>
+        <tr><td>10. Emcor Group (#267)</td><td>诺沃克 · 建筑服务 · $145 亿</td></tr>
+        <tr><td>11. W.R. Berkley (#327)</td><td>格林尼治 · 保险 · $128 亿</td></tr>
+        <tr><td>12. Stanley Black & Decker (#357)</td><td>新不列颠 · 工具 · $120 亿</td></tr>
+        <tr><td>13. Hubbell (#565)</td><td>谢尔顿 · 电气设备 · $56 亿</td></tr>
+        <tr><td>14. Amphenol (#399)</td><td>沃灵福德 · 电子元件 · $110 亿</td></tr>
+        <tr><td>15. Hexcel (#900)</td><td>斯坦福 · 复合材料 · $18 亿</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">产业集聚</div><div class="detail-text"><strong>保险业：</strong>哈特福德为全球保险业中心，Aetna、Travelers、The Hartford 三大保险巨头齐聚，全球保险业就业密度全美第一。<strong>航空航天：</strong>Pratt & Whitney（东哈特福德）为全球三大航空发动机制造商之一，Sikorsky（斯特拉特福）为美国军用直升机主要供应商。<strong>金融服务业：</strong>费尔菲尔德县（格林尼治、斯坦福）为对冲基金和资产管理中心——Bridgewater Associates（全球最大对冲基金）总部在韦斯特波特。<strong>生物科技：</strong>Boehringer Ingelheim（里奇菲尔德）和 Alexion（纽黑文）为领先企业。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="sec-healthcare" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">Yale New Haven Hospital</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value">全美荣誉榜</span></div>
+        <div class="data-item"><span class="data-label">全州第2</span><span class="data-value">Hartford Hospital</span></div>
+        <div class="data-item"><span class="data-label">全州第3</span><span class="data-value">St. Francis Hospital</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">Yale New Haven 全美荣誉榜 · 全州第1</span></div>
+      <div class="info-row"><span class="label">特色</span><span class="value">耶鲁医学院 · 全美领先研究型医疗</span></div>
+      <div class="tags"><span class="tag">Yale全美荣誉榜</span><span class="tag">耶鲁医学院</span><span class="tag">全美最安全州第6</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. Yale New Haven Hospital</td><td>纽黑文 · 全州第1 · 全美荣誉榜</td></tr>
+        <tr><td>2. Hartford Hospital</td><td>哈特福德 · 全州第2</td></tr>
+        <tr><td>3. St. Francis Hospital</td><td>哈特福德 · 全州第3</td></tr>
+        <tr><td>4. Bridgeport Hospital</td><td>布里奇波特 · 全州第4</td></tr>
+        <tr><td>5. Stamford Hospital</td><td>斯坦福 · 全州第5</td></tr>
+        <tr><td>Connecticut Children's</td><td>哈特福德 · 全美顶级儿童医院</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text">康涅狄格拥有<strong>全美最优质的医疗资源之一</strong>——Yale New Haven Hospital 为全美荣誉榜医院（约 20 家之一），在<strong>10 个</strong>成人专科中获评全美前50。耶鲁医学院为全球顶尖研究型医学院，在癌症、神经科学和免疫学领域领先。Connecticut Children's 在<strong>6 个</strong>儿童专科中位列全美前50。全州无医保率仅 <strong>6.5%</strong>（65岁以下），为全美最低之一。WalletHub 2025 将康涅狄格列为<strong>全美最安全州第 6</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="sec-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">持枪法规</span><span class="data-value green">严格管制州</span></div>
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value green">约 23.6%</span></div>
+        <div class="data-item"><span class="data-label">全美安全排名</span><span class="data-value green">第6</span></div>
+        <div class="data-item"><span class="data-label">凶杀率</span><span class="data-value green">低</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value">2013年《枪支安全法》· 攻击性武器禁令 · 大容量弹匣限制</span></div>
+      <div class="info-row"><span class="label">背景</span><span class="value">2012年桑迪胡克小学枪击案后全面加强管制</span></div>
+      <div class="tags"><span class="tag">全美最安全第6</span><span class="tag">桑迪胡克后严格管制</span><span class="tag">持枪率全美最低之一</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">犯罪与安全指标</div><table class="mini-table">
+        <tr><td>WalletHub 2025 安全排名</td><td><strong>全美第6</strong></td></tr>
+        <tr><td>暴力犯罪率</td><td>约 200 / 10万（全美 359）</td></tr>
+        <tr><td>财产犯罪率</td><td>约 1,700 / 10万（全美 1,954）</td></tr>
+        <tr><td>凶杀率</td><td>约 3.5 / 10万（全美 6.1）</td></tr>
+        <tr><td>持枪率</td><td><strong>约 23.6%</strong>（全美最低之一）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">持枪法规</div><div class="detail-text">康涅狄格为全美<strong>枪支管制最严格的州之一</strong>。2012年桑迪胡克小学枪击案（26人死亡，包括20名儿童）后，州议会通过全美最严格的枪支管制法案之一——<strong>攻击性武器禁令</strong>、<strong>大容量弹匣限制（10发）</strong>、<strong>普遍背景审查</strong>和<strong>枪支许可要求</strong>。2019年通过“红旗法”扩展。持枪率约 <strong>23.6%</strong>，为全美最低之一。低持枪率与全美第6的安全排名之间的相关性在康涅狄格尤为显著。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="sec-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value red">3%–6.99%</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">7.5% + 10% 附加</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">6.35%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value red">~2.07%</span></div>
+        <div class="data-item"><span class="data-label">全美房产税</span><span class="data-value red">最高之一</span></div>
+        <div class="data-item"><span class="data-label">2025减税</span><span class="data-value green">$3.6亿</span></div>
+      </div>
+      <div class="info-row"><span class="label">税负特征</span><span class="value">房产税全美最高之一 · 个税累进 · 无遗产税</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">$3.6亿中产减税 · 儿童税收抵免 · 房产税减免</span></div>
+      <div class="tags"><span class="tag">房产税全美最高</span><span class="tag">个税累进</span><span class="tag">2025减税方案</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td>3%–6.99% 累进</td></tr>
+        <tr><td>企业所得税</td><td>7.5% + 10% 附加税（合计约 8.25%）</td></tr>
+        <tr><td>州销售税</td><td>6.35%（食品和处方药免征）</td></tr>
+        <tr><td>房产税</td><td><strong>有效税率约 2.07%</strong>（全美最高之一）</td></tr>
+        <tr><td>遗产税</td><td><strong>无</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">康涅狄格房产税 <strong>2.07%</strong> 为<strong>全美最高之一</strong>，对房主压力显著。州财政长期面临养老金负债和预算赤字挑战。但2025年州议会通过 <strong>$3.6 亿</strong>减税方案，包括：中产阶级减税、儿童税收抵免扩展、房产税减免和退休收入免税扩展。康涅狄格无遗产税。高税负是人口和企业外流的重要因素之一，但优质的教育和医疗资源仍吸引高收入家庭定居。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="sec-transport" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大机场</span><span class="data-value">Bradley (BDL)</span></div>
+        <div class="data-item"><span class="data-label">年旅客</span><span class="data-value">约 700 万</span></div>
+        <div class="data-item"><span class="data-label">州际公路</span><span class="data-value">I-95 / I-84 / I-91</span></div>
+        <div class="data-item"><span class="data-label">通勤铁路</span><span class="data-value">Metro-North</span></div>
+        <div class="data-item"><span class="data-label">机场投资</span><span class="data-value green">$2.1亿</span></div>
+        <div class="data-item"><span class="data-label">新航站楼</span><span class="data-value">2026年开业</span></div>
+      </div>
+      <div class="info-row"><span class="label">通勤</span><span class="value">大量居民通勤至纽约市（Metro-North 约 1 小时）</span></div>
+      <div class="info-row"><span class="label">铁路</span><span class="value">CTrail Hartford Line · Amtrak Northeast Regional</span></div>
+      <div class="tags"><span class="tag">Bradley机场扩建</span><span class="tag">Metro-North通勤纽约</span><span class="tag">CTrail Hartford Line</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>布拉德利国际机场（BDL）</strong>为康涅狄格最大机场，年旅客约 <strong>700 万</strong>，服务哈特福德-斯普林菲尔德区域。2025年州长宣布 <strong>$2.1 亿</strong>投资用于机场改善，包括新航站楼（2026年开业）和跑道升级。纽黑文 Tweed 机场（HVN）为区域机场。费尔菲尔德县居民多使用纽约拉瓜迪亚（LGA）和肯尼迪（JFK）机场。</div></div>
+      <div class="detail-section"><div class="detail-label">公路与铁路</div><div class="detail-text"><strong>公路：</strong>I-95 沿海南北纵贯（格林尼治-纽黑文-新伦敦），I-84 连接哈特福德与纽约/波士顿，I-91 沿康涅狄格河连接纽黑文与哈特福德/斯普林菲尔德。<strong>铁路：</strong>Metro-North Railroad（纽黑文线）为纽约通勤核心——斯坦福至中央车站约 <strong>50 分钟</strong>，纽黑文约 <strong>1 小时 40 分钟</strong>。Amtrak Northeast Regional 和 Acela 经停纽黑文、哈特福德和斯坦福。CTrail Hartford Line 连接纽黑文-哈特福德-斯普林菲尔德，2025年客流量持续增长。<strong>通勤：</strong>大量费尔菲尔德县居民通勤至纽约市（约 <strong>10 万人</strong>）。哈特福德 CTtransit 公交覆盖都会区。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="sec-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025)</span><span class="data-value">$440,000</span></div>
+        <div class="data-item"><span class="data-label">年涨幅</span><span class="data-value orange">+3.8%</span></div>
+        <div class="data-item"><span class="data-label">自有住房率</span><span class="data-value">66.5%</span></div>
+        <div class="data-item"><span class="data-label">中位月租</span><span class="data-value">$1,450</span></div>
+        <div class="data-item"><span class="data-label">有贷款月供</span><span class="data-value">$2,300</span></div>
+        <div class="data-item"><span class="data-label">Fairfield县</span><span class="data-value red">$650,000</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房成本</span><span class="value">高于全美平均 · Fairfield县最贵</span></div>
+      <div class="info-row"><span class="label">特点</span><span class="value">纽约通勤带 · 高端住房市场 · 房产税高</span></div>
+      <div class="tags"><span class="tag">Fairfield全州最贵</span><span class="tag">纽约通勤带</span><span class="tag">房产税高</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025年康涅狄格中位房价约 <strong>$440,000</strong>，高于全美中位数（约 $413,000）。费尔菲尔德县（格林尼治、斯坦福、韦斯特波特）为全州最贵，中位价约 <strong>$650,000</strong>，格林尼治中位价超 <strong>$1,000,000</strong>。哈特福德和纽黑文相对可负担（中位价 $300,000–$350,000）。2025年市场保持稳定，年涨幅约 <strong>3.8%</strong>。高房产税（2.07%）为购房者的重要考量因素。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>中位房价 (2025)</td><td>$440,000</td></tr>
+        <tr><td>Fairfield 县中位价</td><td>$650,000</td></tr>
+        <tr><td>Greenwich 中位价</td><td>$1,000,000+</td></tr>
+        <tr><td>Hartford 中位价</td><td>$320,000</td></tr>
+        <tr><td>New Haven 中位价</td><td>$300,000</td></tr>
+        <tr><td>自有住房率</td><td>66.5%</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="sec-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">湿润大陆性</span></div>
+        <div class="data-item"><span class="data-label">年均温</span><span class="data-value">50°F (10°C)</span></div>
+        <div class="data-item"><span class="data-label">年降雪</span><span class="data-value">30–45 英寸</span></div>
+        <div class="data-item"><span class="data-label">年降水</span><span class="data-value">45–50 英寸</span></div>
+        <div class="data-item"><span class="data-label">夏季均温</span><span class="data-value">72°F (22°C)</span></div>
+        <div class="data-item"><span class="data-label">冬季均温</span><span class="data-value">30°F (-1°C)</span></div>
+      </div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">暴风雪 · 飓风（沿海）· 洪水</span></div>
+      <div class="info-row"><span class="label">气候特征</span><span class="value">四季分明 · 秋季红叶 · 冬季降雪</span></div>
+      <div class="tags"><span class="tag">四季分明</span><span class="tag">秋季红叶</span><span class="tag">沿海飓风风险</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">气温与降水</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润大陆性（内陆）/ 湿润亚热带（沿海）</td></tr>
+        <tr><td>年均温</td><td>50°F (10°C)</td></tr>
+        <tr><td>夏季均温</td><td>72°F (22°C)</td></tr>
+        <tr><td>冬季均温</td><td>30°F (-1°C)</td></tr>
+        <tr><td>年降雪</td><td>30–45 英寸（内陆更多）</td></tr>
+        <tr><td>年降水</td><td>45–50 英寸</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">极端天气</div><div class="detail-text">康涅狄格气候<strong>四季分明</strong>——夏季温暖湿润，冬季寒冷多雪，春秋温和。秋季红叶为全美最壮观之一（尤其是利奇菲尔德丘陵和西北部）。沿海地区（布里奇波特、纽黑文、新伦敦）面临<strong>飓风</strong>风险——2011年飓风艾琳和2012年飓风桑迪造成重大损失。内陆地区冬季暴风雪频发，2013年暴风雪 Nemo 带来 30+ 英寸降雪。春季洪水为低洼地区风险。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="sec-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Ned Lamont (D)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">民主党控制</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名民主党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">5 席 · 全民主党</span></div>
+        <div class="data-item"><span class="data-label">2024大选</span><span class="data-value">哈里斯 +14</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">蓝州</span></div>
+      </div>
+      <div class="info-row"><span class="label">当前议题</span><span class="value">减税 · 教育拨款 · 交通投资 · 气候</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">$3.6亿减税 · 教师投资 · 儿童税收抵免</span></div>
+      <div class="tags"><span class="tag">蓝州</span><span class="tag">Lamont温和派</span><span class="tag">预算盈余</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">康涅狄格为<strong>蓝州</strong>，民主党在州长办公室、州参议院和州众议院均占多数。州长 <strong>Ned Lamont</strong>（民主党）自2019年上任，为温和派民主党人，聚焦财政纪律和经济发展。联邦层面，两名参议员均为民主党，众议院5席全部为民主党。2024年大选哈里斯以 <strong>+14</strong> 优势赢得康涅狄格。</div></div>
+      <div class="detail-section"><div class="detail-label">2025年关键议题</div><table class="mini-table">
+        <tr><td>减税</td><td>$3.6 亿方案 · 中产阶级和家庭受益</td></tr>
+        <tr><td>教育</td><td>教师投资 · 儿童税收抵免扩展</td></tr>
+        <tr><td>房产税</td><td>减免方案 · 减轻房主负担</td></tr>
+        <tr><td>交通</td><td>Bradley 机场 $2.1 亿投资</td></tr>
+        <tr><td>气候</td><td>可再生能源目标 · 沿海韧性</td></tr>
+        <tr><td>退休收入</td><td>免税扩展 · 吸引退休人口</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="sec-education" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公立教育</span><span class="data-value green">全美第3</span></div>
+        <div class="data-item"><span class="data-label">高等教育</span><span class="data-value green">全美第4</span></div>
+        <div class="data-item"><span class="data-label">全美Top高中</span><span class="data-value">多所</span></div>
+        <div class="data-item"><span class="data-label">旗舰大学</span><span class="data-value">Yale · UConn</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>Yale University</strong> · UConn · Wesleyan</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Greenwich · Darien · New Canaan · Weston</span></div>
+      <div class="tags"><span class="tag">Yale常春藤</span><span class="tag">公校全美第3</span><span class="tag">Fairfield县顶尖学区</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>Yale University</td><td>纽黑文 · 常春藤盟校 · 全球顶尖</td></tr>
+        <tr><td>University of Connecticut (UConn)</td><td>斯托斯 · 旗舰公立 · 全美百强</td></tr>
+        <tr><td>Wesleyan University</td><td>米德尔敦 · 顶尖文理学院</td></tr>
+        <tr><td>Trinity College</td><td>哈特福德 · 文理学院</td></tr>
+        <tr><td>Connecticut College</td><td>新伦敦 · 文理学院</td></tr>
+        <tr><td>Fairfield University</td><td>费尔菲尔德 · 私立天主教大学</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">康涅狄格<strong>公立教育全美第 3</strong>，高等教育全美第 4。费尔菲尔德县（格林尼治、达里恩、新迦南、韦斯顿）拥有全美顶尖学区。Greenwich High School、Darien High School 和 New Canaan High School 常年位列全美前列。U.S. News 全美最佳高中排名中，康涅狄格有多所学校进入前 <strong>500</strong>。耶鲁大学为全球顶尖研究型大学，法学院、医学院和管理学院均为全美前三。UConn 为旗舰公立大学，在农业、工程和商科领域表现突出。</div></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="sec-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">WNBA</span><span class="data-value">Connecticut Sun</span></div>
+        <div class="data-item"><span class="data-label">大学体育</span><span class="data-value">UConn Huskies</span></div>
+        <div class="data-item"><span class="data-label">NCAA篮球冠军</span><span class="data-value green">UConn 男子 6 次</span></div>
+        <div class="data-item"><span class="data-label">女子篮球冠军</span><span class="data-value green">UConn 11 次</span></div>
+      </div>
+      <div class="info-row"><span class="label">标志</span><span class="value">UConn 篮球王朝 · 康涅狄格太阳</span></div>
+      <div class="info-row"><span class="label">冰球</span><span class="value">Hartford Wolf Pack (AHL) · Bridgeport Islanders</span></div>
+      <div class="tags"><span class="tag">UConn篮球王朝</span><span class="tag">女子篮球11冠</span><span class="tag">太阳WNBA</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text"><strong>UConn Huskies</strong> 为康涅狄格最著名的体育品牌——<strong>女子篮球队</strong>赢得 <strong>11 次</strong>NCAA全国冠军（包括多次不败赛季），为全美大学体育史上最具统治力的项目之一。<strong>男子篮球队</strong>赢得 <strong>6 次</strong>NCAA全国冠军（最近2023和2024年背靠背）。UConn 还拥有强大的足球、冰球和棒球项目。Yale 与 Harvard 的橄榄球 rivalry 为全美最古老的大学体育对抗之一（1875年首次）。</div></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><table class="mini-table">
+        <tr><td>Connecticut Sun</td><td>WNBA · 2004年成立 · 主场安卡斯维尔</td></tr>
+        <tr><td>Hartford Wolf Pack</td><td>AHL 冰球 · 纽约游骑兵附属</td></tr>
+        <tr><td>Bridgeport Islanders</td><td>AHL 冰球 · 纽约岛人附属</td></tr>
+        <tr><td>Hartford Athletic</td><td>USL 足球</td></tr>
+        <tr><td>CT Sun</td><td>WNBA 2025年表现强劲</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="sec-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">Hartford Courant</span></div>
+        <div class="data-item"><span class="data-label">电视市场</span><span class="data-value">哈特福德-纽黑文</span></div>
+        <div class="data-item"><span class="data-label">公共广播</span><span class="data-value">Connecticut Public</span></div>
+        <div class="data-item"><span class="data-label">体育媒体</span><span class="data-value">NBC Connecticut</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要媒体</span><span class="value">Hartford Courant · New Haven Register · CT Mirror</span></div>
+      <div class="info-row"><span class="label">媒体特点</span><span class="value">纽约媒体市场溢出 · 地方新闻竞争</span></div>
+      <div class="tags"><span class="tag">Hartford Courant最老</span><span class="tag">CT Mirror非营利</span><span class="tag">纽约媒体影响</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Hartford Courant</td><td>全美最古老持续出版报纸（1764年）</td></tr>
+        <tr><td>New Haven Register</td><td>纽黑文主要报纸</td></tr>
+        <tr><td>Connecticut Post</td><td>布里奇波特主要报纸</td></tr>
+        <tr><td>CT Mirror</td><td>非营利数字新闻 · 州政治调查</td></tr>
+        <tr><td>Connecticut Public</td><td>公共广播 · CPTV + WNPR</td></tr>
+        <tr><td>NBC Connecticut</td><td>体育转播 · UConn 和 Sun</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">康涅狄格媒体市场受<strong>纽约媒体强烈溢出影响</strong>——Fairfield 县居民多消费纽约媒体（NYT、WCBS、WABC）。Hartford Courant 为全美最古老持续出版报纸（1764年创刊），但近年大幅缩减。New Haven Register 和 Connecticut Post 为地方主要报纸。CT Mirror 为非营利数字新闻机构，聚焦州政治调查报道。Connecticut Public（CPTV + WNPR）为公共广播核心。NBC Connecticut 为 UConn 篮球和康涅狄格太阳的主要转播平台。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="sec-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏖️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客</span><span class="data-value">~15M</span></div>
+        <div class="data-item"><span class="data-label">旅游支出</span><span class="data-value">$5.2B</span></div>
+        <div class="data-item"><span class="data-label">旅游就业</span><span class="data-value">80,000+</span></div>
+        <div class="data-item"><span class="data-label">顶级景点</span><span class="data-value">纽波特豪宅 · 神秘海港</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">纽波特豪宅 · 神秘海港 · 耶鲁 · 利奇菲尔德丘陵</span></div>
+      <div class="info-row"><span class="label">标志体验</span><span class="value">秋季红叶 · 沿海小镇 · 历史遗产</span></div>
+      <div class="tags"><span class="tag">纽波特豪宅</span><span class="tag">神秘海港</span><span class="tag">秋季红叶</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济</div><table class="mini-table">
+        <tr><td>年游客</td><td><strong>约 1,500 万</strong></td></tr>
+        <tr><td>旅游支出</td><td><strong>$52 亿</strong></td></tr>
+        <tr><td>旅游就业</td><td>80,000+</td></tr>
+        <tr><td>税收贡献</td><td>$8 亿+</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>纽波特</strong>（Rhode Island 边界）虽属罗德岛但康涅狄格居民常访——镀金时代豪宅群（The Breakers、Marble House）和帆船文化。<strong>神秘海港</strong>（Mystic Seaport）为美国最大海事博物馆。<strong>耶鲁大学</strong>（纽黑文）的哥特式校园和博物馆为文化地标。<strong>利奇菲尔德丘陵</strong>为秋季红叶和古董店胜地。<strong>康涅狄格海岸线</strong>（从格林尼治到斯托宁顿）为纽约通勤富区的海滩度假地。<strong>哈特福德</strong>的马克·吐温故居和沃兹沃思雅典娜艺术博物馆为文学与艺术遗产。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="sec-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">天然气</span><span class="data-value">~55%</span></div>
+        <div class="data-item"><span class="data-label">核能</span><span class="data-value">~35%</span></div>
+        <div class="data-item"><span class="data-label">可再生能源</span><span class="data-value green">~10%</span></div>
+        <div class="data-item"><span class="data-label">目标</span><span class="data-value green">2040 100%清洁</span></div>
+        <div class="data-item"><span class="data-label">太阳能</span><span class="data-value">快速增长</span></div>
+        <div class="data-item"><span class="data-label">能效</span><span class="data-value green">全美前列</span></div>
+      </div>
+      <div class="info-row"><span class="label">核能</span><span class="value">Millstone 核电站供应全州约 35% 电力</span></div>
+      <div class="info-row"><span class="label">清洁目标</span><span class="value">2040年 100% 清洁电力 · 能效全美领先</span></div>
+      <div class="tags"><span class="tag">Millstone核电</span><span class="tag">2040清洁目标</span><span class="tag">能效全美前列</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">电力结构</div><table class="mini-table">
+        <tr><td>天然气</td><td>约 55%（主要发电来源）</td></tr>
+        <tr><td>核能</td><td>约 35%（Millstone 核电站）</td></tr>
+        <tr><td>可再生能源</td><td>约 10%（太阳能、风电、水电）</td></tr>
+        <tr><td>煤炭</td><td>~0%（已淘汰）</td></tr>
+        <tr><td>目标</td><td><strong>2040 年 100% 清洁电力</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">能源转型</div><div class="detail-text">康涅狄格<strong>无煤炭发电</strong>，电力结构以天然气（约55%）和核能（约35%）为主。Millstone 核电站为全州最大发电设施，供应约 <strong>35%</strong> 电力。州法律要求到 <strong>2040 年</strong>实现 <strong>100% 清洁电力</strong>。太阳能和海上风电为增长重点。康涅狄格在<strong>能源效率</strong>方面全美领先——能效项目覆盖全州，为低收入家庭提供免费能效改造。但康涅狄格电价全美最高之一，为居民和企业带来成本压力。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="sec-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">重点领域</span><span class="data-value">生物科技 · 金融科技</span></div>
+        <div class="data-item"><span class="data-label">航空航天</span><span class="data-value">Pratt & Whitney · Sikorsky</span></div>
+        <div class="data-item"><span class="data-label">耶鲁创新</span><span class="data-value green">纽黑文生物科技</span></div>
+        <div class="data-item"><span class="data-label">金融科技</span><span class="data-value">斯坦福 · 格林尼治</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">生物科技 · 金融科技 · 航空航天 · 保险科技</span></div>
+      <div class="info-row"><span class="label">创新生态</span><span class="value">耶鲁医学院 · UConn Tech Park · 金融科技</span></div>
+      <div class="tags"><span class="tag">耶鲁生物科技</span><span class="tag">航空航天制造</span><span class="tag">保险科技</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">科技优势领域</div><table class="mini-table">
+        <tr><td>生物科技</td><td>耶鲁医学院 · Boehringer Ingelheim · Alexion</td></tr>
+        <tr><td>航空航天</td><td>Pratt & Whitney · Sikorsky · 先进制造</td></tr>
+        <tr><td>金融科技</td><td>费尔菲尔德县对冲基金 · 保险科技</td></tr>
+        <tr><td>保险科技</td><td>哈特福德 · InsurTech 初创生态</td></tr>
+        <tr><td>UConn Tech Park</td><td>斯托斯 · 先进制造与材料研究</td></tr>
+        <tr><td>耶鲁创新</td><td>纽黑文 · 生物科技孵化器 · 风险投资</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">创新生态</div><div class="detail-text">康涅狄格科技生态以<strong>生物科技</strong>和<strong>金融科技</strong>为特色。耶鲁医学院及其附属研究机构推动了纽黑文的生物科技集群——Alexion（罕见病药物）、Arvinas（蛋白降解）和 Biohaven（神经科学）等企业在此孵化。哈特福德为<strong>保险科技（InsurTech）</strong>中心——Aetna、Travelers 和 The Hartford 与初创企业合作推动保险创新。费尔菲尔德县（格林尼治、斯坦福）为对冲基金和金融科技中心。UConn Tech Park 聚焦先进制造和材料研究。Pratt & Whitney 和 Sikorsky 在航空航天制造领域持续创新。</div></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>康涅狄格州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · CT DECD · WalletHub · Fortune</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
