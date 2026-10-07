@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CO</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-hover: #0077ed; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --rocky: #1565c0;
+  }
+  [data-theme="dark"] {
+    --ground: #000000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-hover: #409cff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #0a1628 0%, #102040 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --rocky: #4a9eff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--rocky); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--rocky); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); letter-spacing: 0.01em; }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s cubic-bezier(0.25,0.1,0.25,1); padding: 0 24px; background: var(--surface-secondary); transition: background 0.4s ease, max-height 0.55s ease, padding 0.55s ease; }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; } .detail-section:last-child { margin-bottom: 0; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; letter-spacing: -0.005em; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; letter-spacing: -0.005em; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1); }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s, background 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; transition: stroke 0.2s; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; gap: 6px; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>科罗拉多州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#sec-overview">概览</a><a href="#sec-population">人口</a><a href="#sec-economy">经济就业</a>
+      <a href="#sec-business">企业与产业</a><a href="#sec-healthcare">医疗</a><a href="#sec-safety">公共安全</a>
+      <a href="#sec-tax">税收财政</a><a href="#sec-transport">交通</a><a href="#sec-housing">住房</a>
+      <a href="#sec-climate">气候</a><a href="#sec-politics">政治政府</a><a href="#sec-education">教育</a>
+      <a href="#sec-sports">体育</a><a href="#sec-media">媒体</a><a href="#sec-tourism">旅游</a>
+      <a href="#sec-energy">能源</a><a href="#sec-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🏔️</div>
+  <h1>科罗拉多州<br><em>Colorado</em></h1>
+  <p class="subtitle">百年之州 · 落基山脉 · 户外天堂 · 量子科技前沿</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>5,957,493</strong><span>人口 (2024)</span></div>
+    <div class="hero-stat"><strong>$553.2B</strong><span>GDP (2024)</span></div>
+    <div class="hero-stat"><strong>4.3%</strong><span>失业率 (2025.9)</span></div>
+    <div class="hero-stat"><strong>#1</strong><span>受教育程度全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 个税 <b>4.40% 统一</b></span>
+    <span class="hero-badge orange">🏥 全美最健康州之一</span>
+    <span class="hero-badge red">🔫 <b>需背景审查 + 红旗法</b></span>
+    <span class="hero-badge">🧬 <b>量子科技中心</b></span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="sec-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1876年8月1日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">丹佛</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">丹佛</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">269,837 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">云雀鹀</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">落基山耧斗菜</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">百年之州（The Centennial State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Nil Sine Numine"（无天意则无事）</span></div>
+      <div class="tags"><span class="tag">Far West</span><span class="tag">Rocky Mountains</span><span class="tag">百年之州</span><span class="tag">量子前沿</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">科罗拉多位于美国西部，北接怀俄明，东邻内布拉斯加和堪萨斯，南界俄克拉荷马和新墨西哥，西临犹他。在 Colin Woodard 的文化分区中，科罗拉多属于 <strong>Far West</strong>——矿业与农牧业塑造的个人主义传统，但丹佛-博尔德走廊已发展为进步主义科技文化中心。全州平均海拔 <strong>2,070 米</strong>，为全美最高。落基山脉纵贯西部，东部为高平原，拥有 <strong>4 座</strong>国家公园和 <strong>58 座</strong>十四峰（海拔超 4,267 米）。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1803年作为路易斯安那购地一部分归美国。1859年派克峰淘金热吸引大量移民。1876年8月1日成为美国第 <strong>38 个州</strong>（比美国建国百年早一个月，故称“百年之州”）。20世纪后期，丹佛-博尔德走廊崛起为科技与航天中心。2025年，科罗拉多被指定为<strong>全美两个量子科技中心之一</strong>（Elevate Quantum），获得联邦 <strong>$4100 万</strong>拨款。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="sec-population" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2024)</span><span class="data-value">5,957,493</span></div>
+        <div class="data-item"><span class="data-label">2020-2024 增长</span><span class="data-value green">+1.8%</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~37.5 岁</span></div>
+        <div class="data-item"><span class="data-label">65岁以上</span><span class="data-value">15.7%</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$98,000</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value green">9.4%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 66.5% · 西语裔 22.3% · 黑人 4.9% · 亚裔 3.9%</span></div>
+      <div class="info-row"><span class="label">家庭</span><span class="value">户均 2.51 人 · 自有住房率 66.8%</span></div>
+      <div class="tags"><span class="tag">受教育程度全美第1</span><span class="tag">贫困率低于全美</span><span class="tag">人口增长放缓</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2024)</td><td><strong>5,957,493</strong>（全美第21）</td></tr>
+        <tr><td>本科及以上学历</td><td><strong>44.1%</strong>（全美第1）</td></tr>
+        <tr><td>西语裔占比</td><td>22.3%</td></tr>
+        <tr><td>外国出生</td><td>9.8%</td></tr>
+        <tr><td>丹佛都会区人口</td><td>约 300 万（全州 50%）</td></tr>
+        <tr><td>无医保（65岁以下）</td><td>8.5%</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$98,000</strong>（2024年），比全美中位数高约 <strong>18%</strong>。贫困率 <strong>9.4%</strong>，低于全美平均 11.1%。本科及以上学历占比 <strong>44.1%</strong>，为<strong>全美受教育程度最高的州</strong>。但2020-2024年人口增长仅 <strong>1.8%</strong>，较2010年代显著放缓——高房价和生活成本使净迁入减少。丹佛都会区集中全州约 <strong>50%</strong> 人口。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="sec-economy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2024)</span><span class="data-value">$553.2B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长</span><span class="data-value green">+1.5%</span></div>
+        <div class="data-item"><span class="data-label">总就业</span><span class="data-value">~2.9M</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">4.3%</span></div>
+        <div class="data-item"><span class="data-label">劳动参与率</span><span class="data-value">67.8%</span></div>
+        <div class="data-item"><span class="data-label">人均GDP</span><span class="data-value">$92,860</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">航空航天 · 科技 · 能源 · 旅游 · 农业</span></div>
+      <div class="info-row"><span class="label">就业排名</span><span class="value">U.S. News 全美 <strong>第11</strong></span></div>
+      <div class="tags"><span class="tag">人均GDP全美前列</span><span class="tag">航空航天集群</span><span class="tag">量子科技中心</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现</div><table class="mini-table">
+        <tr><td>Gross State Product (2024)</td><td><strong>$553.2B</strong>（全美第17）</td></tr>
+        <tr><td>GDP 增速 (2024)</td><td>+1.5%</td></tr>
+        <tr><td>失业率 (2025.9)</td><td><strong>4.3%</strong>（全美 4.3%）</td></tr>
+        <tr><td>人均GDP</td><td>$92,860（全美第9）</td></tr>
+        <tr><td>劳动参与率</td><td>67.8%（全美第5）</td></tr>
+        <tr><td>家庭收入中位</td><td>$98,000（全美第8）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">科罗拉多经济以<strong>航空航天和国防</strong>为标志性产业——洛克希德·马丁、Ball Aerospace（现属BAE Systems）、Sierra Space 等企业集中在丹佛-博尔德走廊，是美国太空军太空作战司令部所在地。<strong>量子科技</strong>为新兴增长极：Elevate Quantum 获联邦指定科技中心（全美仅两个）。<strong>科技产业</strong>（软件、云计算、网络安全）为第三支柱。<strong>能源</strong>（可再生能源、天然气）和<strong>旅游业</strong>（滑雪、国家公园）为传统支柱。农业（牛、玉米、小麦）为高平原地区基础。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="sec-business" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">10 家</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Arrow Electronics</span></div>
+        <div class="data-item"><span class="data-label">航空航天企业</span><span class="data-value">250+ 家</span></div>
+        <div class="data-item"><span class="data-label">量子初创</span><span class="data-value">50+ 家</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级产业</span><span class="value">航空航天 · 量子 · 科技 · 能源 · 旅游</span></div>
+      <div class="info-row"><span class="label">主要雇主</span><span class="value">Lockheed Martin · Ball · Charles Schwab · DaVita</span></div>
+      <div class="tags"><span class="tag">10家Fortune 500</span><span class="tag">太空军司令部</span><span class="tag">Elevate Quantum</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500（2025）</div><table class="mini-table">
+        <tr><td>1. Arrow Electronics (#154)</td><td>百年城 · 电子元件分销 · $301 亿</td></tr>
+        <tr><td>2. Newmont (#225)</td><td>丹佛 · 全球最大金矿公司 · $172 亿</td></tr>
+        <tr><td>3. DaVita (#331)</td><td>丹佛 · 透析服务 · $128 亿</td></tr>
+        <tr><td>4. Ball Corp (#349)</td><td>威斯敏斯特 · 铝罐包装 · $122 亿</td></tr>
+        <tr><td>5. DISH Network (#450)</td><td>恩格尔伍德 · 卫星电视 · $85 亿</td></tr>
+        <tr><td>6. Liberty Media (#202)</td><td>恩格尔伍德 · 媒体 · $160 亿</td></tr>
+        <tr><td>7. Western Union (#460)</td><td>丹佛 · 汇款服务 · $82 亿</td></tr>
+        <tr><td>8. Cencora (#10)</td><td>注册地宾州 · 丹佛大型运营</td></tr>
+        <tr><td>9. Ball Corporation</td><td>威斯敏斯特 · 包装</td></tr>
+        <tr><td>10. Molson Coors (#428)</td><td>戈尔登 · 啤酒 · $89 亿</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">航空航天与量子科技</div><div class="detail-text">科罗拉多拥有全美<strong>第2大航空航天经济体</strong>（仅次于加州），<strong>250+ 家</strong>航空航天企业，雇佣约 <strong>25 万</strong>人。洛克希德·马丁太空系统总部在利特尔顿，Ball Aerospace 在博尔德，Sierra Space 在路易斯维尔。<strong>美国太空军太空作战司令部</strong>位于科罗拉多斯普林斯。<strong>Elevate Quantum</strong> 为全美两个量子科技中心之一，获联邦 <strong>$4100 万</strong>拨款，聚集 <strong>50+ 家</strong>量子初创企业和 3 个国家实验室。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="sec-healthcare" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">UCHealth University of Colorado</span></div>
+        <div class="data-item"><span class="data-label">全州第2</span><span class="data-value">Porter Adventist</span></div>
+        <div class="data-item"><span class="data-label">全州第3</span><span class="data-value">Swedish Medical</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value">多专科全美前50</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">UCHealth · Children's Hospital Colorado</span></div>
+      <div class="info-row"><span class="label">特色</span><span class="value">全美最健康州之一 · 户外运动医学强</span></div>
+      <div class="tags"><span class="tag">UCHealth全州第1</span><span class="tag">儿童医院全美Top</span><span class="tag">运动医学领先</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. UCHealth University of Colorado Hospital</td><td>奥罗拉 · 全州第1 · 多专科全美前50</td></tr>
+        <tr><td>2. Porter Adventist Hospital</td><td>丹佛 · 全州第2</td></tr>
+        <tr><td>3. Swedish Medical Center</td><td>恩格尔伍德 · 全州第3</td></tr>
+        <tr><td>4. St. Anthony Hospital</td><td>莱克伍德 · 全州第4</td></tr>
+        <tr><td>5. Medical Center of the Rockies</td><td>拉夫兰 · 全州第5</td></tr>
+        <tr><td>Children's Hospital Colorado</td><td>奥罗拉 · 全美顶级儿童医院</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text">科罗拉多拥有<strong>全美最健康的居民之一</strong>——肥胖率全美最低之一，户外运动参与率全美最高。UCHealth University of Colorado Hospital 在<strong>12 个</strong>成人专科中获评“高绩效”，为全州最多。Children's Hospital Colorado 在<strong>10 个</strong>儿童专科中位列全美前50。<strong>运动医学</strong>为科罗拉多特色——Steadman Clinic（韦尔）为全球顶级骨科和运动医学中心，服务奥运选手和职业运动员。科罗拉多大学医学院为全美领先研究型医学院。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="sec-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">持枪法规</span><span class="data-value">背景审查 + 红旗法</span></div>
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value">约 34%</span></div>
+        <div class="data-item"><span class="data-label">丹佛警力</span><span class="data-value">约 1,500 人</span></div>
+        <div class="data-item"><span class="data-label">公路死亡</span><span class="data-value red">700+ 人/年</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>需背景审查 + 安全培训</strong> · 红旗法 · 2025年弹匣限制</span></div>
+      <div class="info-row"><span class="label">公共安全</span><span class="value">U.S. News 公共安全全美 <strong>第44</strong>（偏低）</span></div>
+      <div class="tags"><span class="tag">红旗法</span><span class="tag">背景审查</span><span class="tag">公路安全挑战</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">犯罪与安全指标</div><table class="mini-table">
+        <tr><td>暴力犯罪率</td><td>约 400 / 10万（全美 359）</td></tr>
+        <tr><td>财产犯罪率</td><td>约 2,800 / 10万（全美 1,954）</td></tr>
+        <tr><td>公共安全排名</td><td>全美第44</td></tr>
+        <tr><td>公路死亡 (2024)</td><td>700+ 人</td></tr>
+        <tr><td>丹佛机动车盗窃</td><td>全美前列（近年下降）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">持枪法规</div><div class="detail-text">科罗拉多为<strong>需背景审查 + 安全培训州</strong>，购枪需通过州和联邦背景审查。2019年通过<strong>红旗法</strong>（极端风险保护令），2023年将购枪年龄提高至21岁，2025年通过弹匣容量限制（15发）。持枪率约 <strong>34%</strong>，接近全国平均。丹佛、奥罗拉和科罗拉多斯普林斯的部分区域犯罪率较高，但全州农村地区安全水平中等。科罗拉多公路死亡人数持续上升，I-70 滑雪交通和山地公路为高风险路段。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="sec-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value green">4.40% 统一</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value green">4.40% 统一</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value green">2.9%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value">2.9%–11.2%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value green">~0.51%</span></div>
+        <div class="data-item"><span class="data-label">TABOR</span><span class="data-value">纳税人权利法案</span></div>
+      </div>
+      <div class="info-row"><span class="label">税改趋势</span><span class="value">个税从 4.55% 降至 <strong>4.40%</strong>（2025年）</span></div>
+      <div class="info-row"><span class="label">财政约束</span><span class="value">TABOR 限制政府支出增长 · 退税机制</span></div>
+      <div class="tags"><span class="tag">统一低税率</span><span class="tag">TABOR约束</span><span class="tag">销售税全美最低之一</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>4.40% 统一</strong>（2025年从 4.55% 下调）</td></tr>
+        <tr><td>企业所得税</td><td><strong>4.40% 统一</strong></td></tr>
+        <tr><td>州销售税</td><td><strong>2.9%</strong>（全美最低之一）</td></tr>
+        <tr><td>综合销售税</td><td>2.9%–11.2%（丹佛约 8.81%）</td></tr>
+        <tr><td>房产税</td><td>有效税率约 <strong>0.51%</strong>（全美最低之一）</td></tr>
+        <tr><td>遗产税</td><td><strong>无</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">科罗拉多实行<strong>统一低税率</strong>——个人所得税和企业所得税均为 <strong>4.40%</strong>，为全美税率最低的州之一。销售税基础税率 <strong>2.9%</strong> 同样为全美最低。房产税有效税率约 <strong>0.51%</strong>，为全美最低之一。<strong>TABOR（纳税人权利法案）</strong>限制政府支出增长不超过通胀+人口增长，超出部分需退税，为全美独特的财政约束制度。2025年州长签署 <strong>$2.7 亿</strong>减税方案。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="sec-transport" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大机场</span><span class="data-value">丹佛国际 (DEN)</span></div>
+        <div class="data-item"><span class="data-label">全美面积</span><span class="data-value green">最大机场</span></div>
+        <div class="data-item"><span class="data-label">年旅客</span><span class="data-value">7,700万+</span></div>
+        <div class="data-item"><span class="data-label">州际公路</span><span class="data-value">I-25 / I-70 / I-76</span></div>
+        <div class="data-item"><span class="data-label">铁路</span><span class="data-value">Amtrak California Zephyr</span></div>
+        <div class="data-item"><span class="data-label">轻轨</span><span class="data-value">RTD 丹佛</span></div>
+      </div>
+      <div class="info-row"><span class="label">航空枢纽</span><span class="value">丹佛国际机场（DEN）为全美面积最大机场（135 km²）</span></div>
+      <div class="info-row"><span class="label">滑雪交通</span><span class="value">I-70 冬季拥堵为文化现象</span></div>
+      <div class="tags"><span class="tag">DEN全美最大</span><span class="tag">I-70滑雪走廊</span><span class="tag">RTD轻轨+通勤铁路</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>丹佛国际机场（DEN）</strong>为全美面积最大的机场（约 <strong>135 km²</strong>），联合航空枢纽，年旅客超 <strong>7,700 万</strong>。科罗拉多斯普林斯机场（COS）为大都会区第二机场。阿斯彭、韦尔、特柳赖德和斯廷博特斯普林斯有区域机场服务滑雪旅游。</div></div>
+      <div class="detail-section"><div class="detail-label">公路与铁路</div><div class="detail-text"><strong>公路：</strong>I-25 纵贯落基山前线（丹佛-科罗拉多斯普林斯-普韦布洛），I-70 横穿东西（丹佛-韦尔-大章克申-犹他），I-76 连接丹佛与内布拉斯加。I-70 冬季滑雪交通拥堵为文化现象，州政府投资 <strong>$7 亿</strong>改善 Floyd Hill 路段。<strong>铁路：</strong>Amtrak California Zephyr 每日经停丹佛、冬季公园、格伦伍德斯普林斯和大章克申。丹佛联合车站为历史地标。<strong>通勤：</strong>丹佛 RTD 轻轨（A/B/C/D/E/H/L/W 线）+ 通勤铁路（A 线直达机场），票价 $3.00。Bustang 州际长途巴士连接全州主要城市。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="sec-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025)</span><span class="data-value">$585,000</span></div>
+        <div class="data-item"><span class="data-label">全美中位价</span><span class="data-value">$413,000</span></div>
+        <div class="data-item"><span class="data-label">年涨幅</span><span class="data-value orange">+2.5%</span></div>
+        <div class="data-item"><span class="data-label">自有住房率</span><span class="data-value">66.8%</span></div>
+        <div class="data-item"><span class="data-label">丹佛中位价</span><span class="data-value">$580,000</span></div>
+        <div class="data-item"><span class="data-label">Boulder中位价</span><span class="data-value red">$850,000</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房成本</span><span class="value">高于全美平均 · 丹佛和博尔德最贵</span></div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">2025年市场降温 · 待售库存增加</span></div>
+      <div class="tags"><span class="tag">房价高于全美</span><span class="tag">Boulder全州最贵</span><span class="tag">市场降温</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025年科罗拉多中位房价约 <strong>$585,000</strong>，为全美中位价的 <strong>1.4 倍</strong>。丹佛都会区中位价约 <strong>$580,000</strong>，博尔德约 <strong>$850,000</strong>（全州最贵）。2025年市场明显降温——待售库存增加，部分卖家降价。科罗拉多斯普林斯和普韦布洛相对可负担（中位价 $450,000–$350,000）。高房价为人口增长放缓的重要因素之一。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>中位房价 (2025)</td><td>$585,000</td></tr>
+        <tr><td>丹佛中位价</td><td>$580,000</td></tr>
+        <tr><td>博尔德中位价</td><td>$850,000</td></tr>
+        <tr><td>科罗拉多斯普林斯</td><td>$450,000</td></tr>
+        <tr><td>普韦布洛</td><td>$350,000</td></tr>
+        <tr><td>自有住房率</td><td>66.8%</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="sec-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">半干旱 / 高山</span></div>
+        <div class="data-item"><span class="data-label">丹佛年均温</span><span class="data-value">50°F (10°C)</span></div>
+        <div class="data-item"><span class="data-label">年降雪</span><span class="data-value">57 英寸</span></div>
+        <div class="data-item"><span class="data-label">年降水</span><span class="data-value">15–20 英寸</span></div>
+        <div class="data-item"><span class="data-label">日照天数</span><span class="data-value green">300+ 天</span></div>
+        <div class="data-item"><span class="data-label">极端天气</span><span class="data-value">暴雪 · 冰雹 · 龙卷风</span></div>
+      </div>
+      <div class="info-row"><span class="label">气候特征</span><span class="value">高海拔 · 干燥 · 昼夜温差大</span></div>
+      <div class="info-row"><span class="label">滑雪季</span><span class="value">11月–4月 · 阿斯彭/韦尔全球闻名</span></div>
+      <div class="tags"><span class="tag">300天日照</span><span class="tag">滑雪天堂</span><span class="tag">昼夜温差大</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">气温与降水</div><table class="mini-table">
+        <tr><td>气候类型</td><td>半干旱（东部平原）/ 高山（落基山脉）</td></tr>
+        <tr><td>丹佛年均温</td><td>50°F (10°C)</td></tr>
+        <tr><td>丹佛年降雪</td><td>57 英寸</td></tr>
+        <tr><td>丹佛年降水</td><td>约 15–20 英寸</td></tr>
+        <tr><td>日照天数</td><td><strong>300+ 天</strong>（全美前列）</td></tr>
+        <tr><td>滑雪季</td><td>11月–4月（阿斯彭、韦尔、布雷肯里奇）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">极端天气</div><div class="detail-text">科罗拉多气候以<strong>高海拔、干燥和昼夜温差大</strong>为特征。丹佛年均 <strong>300+ 天</strong>日照，但冬季可遭遇暴雪——2019年“炸弹气旋”带来 30+ 英寸降雪。春季和夏季冰雹频发，为全美冰雹损失最严重的州之一。东平原偶有龙卷风。山区天气变化迅速，徒步和滑雪需注意安全。气候变化导致西部野火风险上升，2020年 Cameron Peak 野火为州史上最大。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="sec-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Jared Polis (D)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">民主党控制</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名民主党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">8 席 · 5D / 3R</span></div>
+        <div class="data-item"><span class="data-label">2024大选</span><span class="data-value">哈里斯 +11</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">蓝州</span></div>
+      </div>
+      <div class="info-row"><span class="label">当前议题</span><span class="value">住房 · 气候 · 量子科技 · 交通 · 枪支管制</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">$2.7亿减税 · 住房 $5000万 · 量子投资</span></div>
+      <div class="tags"><span class="tag">蓝州</span><span class="tag">Polis进步主义</span><span class="tag">TABOR约束</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">科罗拉多为<strong>蓝州</strong>，民主党在州长办公室、州参议院和州众议院均占多数。州长 <strong>Jared Polis</strong>（民主党）自2019年上任，为全美首位公开同性恋身份当选的州长。联邦层面，两名参议员均为民主党，众议院8席中民主党5席、共和党3席。2024年大选哈里斯以 <strong>+11</strong> 优势赢得科罗拉多。</div></div>
+      <div class="detail-section"><div class="detail-label">2025年关键议题</div><table class="mini-table">
+        <tr><td>住房</td><td>州长签署 $5000 万可负担住房法案</td></tr>
+        <tr><td>量子科技</td><td>“Elevate Quantum”获联邦指定 · $4100万拨款</td></tr>
+        <tr><td>减税</td><td>$2.7 亿减税方案 · 个税降至 4.40%</td></tr>
+        <tr><td>枪支管制</td><td>弹匣限制 15 发 · 购枪年龄 21 岁</td></tr>
+        <tr><td>气候</td><td>可再生能源目标 · 石油天然气监管</td></tr>
+        <tr><td>TABOR</td><td>纳税人权利法案持续限制政府支出</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="sec-education" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">受教育程度</span><span class="data-value green">全美第1</span></div>
+        <div class="data-item"><span class="data-label">本科及以上</span><span class="data-value">44.1%</span></div>
+        <div class="data-item"><span class="data-label">公立教育</span><span class="data-value orange">第22</span></div>
+        <div class="data-item"><span class="data-label">高等教育</span><span class="data-value">第5</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value">CU Boulder · Colorado School of Mines · CSU</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">DSST 系统 · Cherry Creek · Boulder</span></div>
+      <div class="tags"><span class="tag">受教育程度全美第1</span><span class="tag">Mines工程顶尖</span><span class="tag">CU Boulder旗舰</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Colorado Boulder</td><td>旗舰 · 全美百强公立 · 航天工程强</td></tr>
+        <tr><td>Colorado School of Mines</td><td>全美顶尖工程 · 矿业与地球科学</td></tr>
+        <tr><td>Colorado State University</td><td>Fort Collins · 兽医与农业强</td></tr>
+        <tr><td>University of Denver</td><td>私立 · 国际关系与商科</td></tr>
+        <tr><td>Air Force Academy</td><td>科罗拉多斯普林斯 · 军校</td></tr>
+        <tr><td>Colorado College</td><td>文理学院 · 全美前列</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">科罗拉多<strong>受教育程度全美第1</strong>——本科及以上学历占比 <strong>44.1%</strong>。公立教育全美第 <strong>22</strong>，高等教育第 <strong>5</strong>。DSST 公立学校系统（丹佛）为全美领先的特许学校网络。Cherry Creek 和 Boulder Valley 学区为州内顶尖。科罗拉多大学博尔德分校为全美百强公立大学，航天工程与大气科学全球领先。Colorado School of Mines 为全美顶尖工程院校，矿业和地球科学专业全美第1。</div></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="sec-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">NFL</span><span class="data-value">Denver Broncos</span></div>
+        <div class="data-item"><span class="data-label">NBA</span><span class="data-value">Denver Nuggets</span></div>
+        <div class="data-item"><span class="data-label">MLB</span><span class="data-value">Colorado Rockies</span></div>
+        <div class="data-item"><span class="data-label">NHL</span><span class="data-value">Colorado Avalanche</span></div>
+        <div class="data-item"><span class="data-label">MLS</span><span class="data-value">Colorado Rapids</span></div>
+        <div class="data-item"><span class="data-label">WNBA</span><span class="data-value">待定</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025亮点</span><span class="value">Nuggets 争冠 · Avalanche 争冠 · Broncos 复兴</span></div>
+      <div class="info-row"><span class="label">大学体育</span><span class="value">CU Boulder · CSU · Air Force</span></div>
+      <div class="tags"><span class="tag">四大联盟齐全</span><span class="tag">Nuggets 2023冠军</span><span class="tag">Avalanche 2022冠军</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><table class="mini-table">
+        <tr><td>Denver Broncos</td><td>NFL · 3次超级碗冠军（1998, 1999, 2016）</td></tr>
+        <tr><td>Denver Nuggets</td><td>NBA · 2023年总冠军</td></tr>
+        <tr><td>Colorado Avalanche</td><td>NHL · 2022年斯坦利杯冠军</td></tr>
+        <tr><td>Colorado Rockies</td><td>MLB · 2007年国联冠军</td></tr>
+        <tr><td>Colorado Rapids</td><td>MLS · 2010年MLS杯冠军</td></tr>
+        <tr><td>Colorado Mammoth</td><td>NLL · 2022年冠军</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">大学体育与户外运动</div><div class="detail-text">科罗拉多大学博尔德分校（CU Boulder）的 Buffaloes 参加 Big 12 联盟，橄榄球和滑雪为传统强项。科罗拉多学院和丹佛大学在冰球领域表现突出。科罗拉多是<strong>户外运动天堂</strong>——滑雪、徒步、攀岩、山地自行车、漂流和钓鱼为生活方式核心。阿斯彭和韦尔为全球顶级滑雪度假地。科罗拉多还拥有全美最高的<strong>户外运动参与率</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="sec-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">Denver Post</span></div>
+        <div class="data-item"><span class="data-label">公共广播</span><span class="data-value">Colorado Public Radio</span></div>
+        <div class="data-item"><span class="data-label">电视市场</span><span class="data-value">丹佛 · 科罗拉多斯普林斯</span></div>
+        <div class="data-item"><span class="data-label">体育媒体</span><span class="data-value">Altitude Sports</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要媒体</span><span class="value">Denver Post · 5280 Magazine · CPR</span></div>
+      <div class="info-row"><span class="label">媒体变动</span><span class="value">Denver Post 持续缩减 · 数字媒体崛起</span></div>
+      <div class="tags"><span class="tag">Denver Post最大</span><span class="tag">CPR公共广播</span><span class="tag">Altitude Sports</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Denver Post</td><td>全州最大报纸 · 丹佛</td></tr>
+        <tr><td>Colorado Springs Gazette</td><td>科罗拉多斯普林斯主要报纸</td></tr>
+        <tr><td>Boulder Daily Camera</td><td>博尔德主要报纸</td></tr>
+        <tr><td>Colorado Public Radio (CPR)</td><td>公共广播 · 全州覆盖</td></tr>
+        <tr><td>5280 Magazine</td><td>丹佛城市杂志</td></tr>
+        <tr><td>Altitude Sports</td><td>Nuggets/Avalanche 地区体育转播</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">科罗拉多媒体市场以<strong>丹佛</strong>为中心，Denver Post 为全州最大报纸，但近年持续缩减。Colorado Public Radio（CPR）为公共广播核心，覆盖全州大部分地区。5280 Magazine 为丹佛城市生活杂志。Altitude Sports 为 Nuggets 和 Avalanche 的地区体育转播网络。数字媒体崛起——Colorado Sun（记者合作社模式）和 Denverite（Axios 旗下）为新兴非营利/数字新闻机构。丹佛都会区为全美第 <strong>17 大</strong>电视市场。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="sec-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏔️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客</span><span class="data-value">90M+</span></div>
+        <div class="data-item"><span class="data-label">旅游支出</span><span class="data-value">$28.7B</span></div>
+        <div class="data-item"><span class="data-label">旅游就业</span><span class="data-value">180,000+</span></div>
+        <div class="data-item"><span class="data-label">国家公园</span><span class="data-value">4 座</span></div>
+        <div class="data-item"><span class="data-label">十四峰</span><span class="data-value">58 座</span></div>
+        <div class="data-item"><span class="data-label">滑雪度假村</span><span class="data-value">30+ 个</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">落基山 · 梅萨维德 · 大沙丘 · 阿斯彭</span></div>
+      <div class="info-row"><span class="label">标志体验</span><span class="value">滑雪 · 徒步 · 漂流 · 观星</span></div>
+      <div class="tags"><span class="tag">落基山国家公园</span><span class="tag">阿斯彭/韦尔滑雪</span><span class="tag">梅萨维德悬崖宫殿</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济</div><table class="mini-table">
+        <tr><td>年游客</td><td><strong>9000 万+</strong></td></tr>
+        <tr><td>旅游支出</td><td><strong>$287 亿</strong></td></tr>
+        <tr><td>旅游就业</td><td>180,000+</td></tr>
+        <tr><td>税收贡献</td><td>$15 亿+</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>落基山国家公园</strong>（年游客约 450 万）以高山公路和野生动物闻名。<strong>梅萨维德国家公园</strong>为 UNESCO 世界遗产，保存普韦布洛祖先悬崖宫殿。<strong>大沙丘国家公园</strong>为北美最高沙丘。<strong>黑峡谷国家公园</strong>以陡峭峡谷和甘尼森黑峡谷闻名。<strong>阿斯彭</strong>、<strong>韦尔</strong>、<strong>布雷肯里奇</strong>和<strong>特柳赖德</strong>为全球顶级滑雪度假地。<strong>派克峰</strong>（4,302米）可驾车登顶。<strong>大章克申</strong>为葡萄酒产区。科罗拉多拥有 <strong>58 座</strong>十四峰（海拔超 4,267 米），为全美最多。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="sec-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">天然气</span><span class="data-value">~35%</span></div>
+        <div class="data-item"><span class="data-label">煤炭</span><span class="data-value">~30%</span></div>
+        <div class="data-item"><span class="data-label">可再生能源</span><span class="data-value green">~35%</span></div>
+        <div class="data-item"><span class="data-label">风电</span><span class="data-value">全美前列</span></div>
+        <div class="data-item"><span class="data-label">太阳能</span><span class="data-value">快速增长</span></div>
+        <div class="data-item"><span class="data-label">目标</span><span class="data-value green">2040 100%清洁</span></div>
+      </div>
+      <div class="info-row"><span class="label">可再生能源</span><span class="value">风电 + 太阳能快速扩张 · 2040年100%清洁电力目标</span></div>
+      <div class="info-row"><span class="label">石油天然气</span><span class="value">丹佛-朱尔斯堡盆地为重要产区</span></div>
+      <div class="tags"><span class="tag">风电全美前列</span><span class="tag">2040清洁目标</span><span class="tag">油气产区</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">电力结构</div><table class="mini-table">
+        <tr><td>天然气</td><td>约 35%</td></tr>
+        <tr><td>煤炭</td><td>约 30%（持续下降）</td></tr>
+        <tr><td>风电</td><td>约 25%（全美前列）</td></tr>
+        <tr><td>太阳能</td><td>约 8%（快速增长）</td></tr>
+        <tr><td>水电</td><td>约 2%</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">能源转型</div><div class="detail-text">科罗拉多正经历<strong>快速能源转型</strong>——风电装机容量全美前列，太阳能快速增长。州法律要求到 <strong>2040 年</strong>实现 <strong>100% 清洁电力</strong>。煤炭发电持续下降，Xcel Energy 计划关闭所有燃煤电厂。丹佛-朱尔斯堡盆地为重要石油天然气产区，但面临更严格的甲烷排放监管。科罗拉多为全美<strong>可再生能源就业增长最快的州之一</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="sec-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">量子科技中心</span><span class="data-value green">全美 2 个之一</span></div>
+        <div class="data-item"><span class="data-label">联邦拨款</span><span class="data-value">$4100 万</span></div>
+        <div class="data-item"><span class="data-label">量子初创</span><span class="data-value">50+ 家</span></div>
+        <div class="data-item"><span class="data-label">科技就业</span><span class="data-value">~200,000</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">量子 · 航空航天 · 网络安全 · 清洁能源 · 生物科技</span></div>
+      <div class="info-row"><span class="label">重大倡议</span><span class="value">Elevate Quantum · 联邦科技中心</span></div>
+      <div class="tags"><span class="tag">Elevate Quantum</span><span class="tag">全美量子中心</span><span class="tag">NIST/NOAA</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">量子科技</div><div class="detail-text">科罗拉多为<strong>全美两个量子科技中心之一</strong>——Elevate Quantum 获联邦指定科技中心（Tech Hub），获得 <strong>$4100 万</strong>拨款。博尔德为全球量子研究中心，聚集 <strong>50+ 家</strong>量子初创企业、<strong>3 个国家实验室</strong>（NIST、NOAA、NREL）和科罗拉多大学博尔德分校。量子计算、量子传感和量子网络为三大重点方向。预计未来10年创造 <strong>10,000+</strong> 高薪岗位。</div></div>
+      <div class="detail-section"><div class="detail-label">航空航天与科技生态</div><table class="mini-table">
+        <tr><td>Lockheed Martin</td><td>利特尔顿 · 太空系统总部</td></tr>
+        <tr><td>Ball Aerospace (BAE)</td><td>博尔德 · 航天器与仪器</td></tr>
+        <tr><td>Sierra Space</td><td>路易斯维尔 · 商业航天</td></tr>
+        <tr><td>NIST</td><td>博尔德 · 国家标准与技术研究院</td></tr>
+        <tr><td>NOAA</td><td>博尔德 · 海洋与大气研究</td></tr>
+        <tr><td>NREL</td><td>戈尔登 · 国家可再生能源实验室</td></tr>
+        <tr><td>US Space Command</td><td>科罗拉多斯普林斯 · 太空军司令部</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>科罗拉多州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · Colorado EDC · Elevate Quantum</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
