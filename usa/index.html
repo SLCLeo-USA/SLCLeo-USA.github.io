@@ -1,246 +1,2219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>USA GEO — SLC.Leo</title>
-<meta name="description" content="GEOGRAPY OF USA">
-<meta name="theme-color" content="#fbfbfd">
-<meta name="color-scheme" content="light dark">
-<link rel="canonical" href="https://slcleo-usa.github.io/usa/">
+<title>美国五十州 · 全域图鉴 | SLC.LEO & PHOTAXIS LAB</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"San Francisco","Segoe UI","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
-  background:#fbfbfd;
-  color:#1d1d1f;
-  min-height:100vh;
-  padding:64px 24px 80px;
-  transition:background 0.5s ease, color 0.5s ease;
-}
-
-.container{
-  max-width:760px;
-  margin:0 auto;
-  position:relative;
-}
-
-/* ── 返回链接 ── */
-.back-link{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:0.95rem;
-  color:#6e6e73;
-  text-decoration:none;
-  margin-bottom:48px;
-  transition:color 0.2s ease, gap 0.2s ease;
-}
-.back-link:hover{
-  color:#007aff;
-  gap:12px;
-}
-
-/* ── 标题区 ── */
-.page-header{
-  margin-bottom:56px;
-}
-.page-header h1{
-  font-size:clamp(2rem,5vw,3rem);
-  font-weight:500;
-  letter-spacing:-0.02em;
-  margin-bottom:14px;
-  color:#1d1d1f;
-}
-.page-header p{
-  font-size:1.05rem;
-  color:#6e6e73;
-  line-height:1.7;
-}
-
-/* ── 目录 ── */
-.directory-title{
-  font-size:0.8rem;
-  font-weight:500;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  color:#86868b;
-  margin-bottom:20px;
-}
-.directory{
-  display:grid;
-  gap:16px;
-}
-.directory-item{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-  padding:26px 30px;
-  border-radius:20px;
-  background:#fff;
-  border:1px solid rgba(0,0,0,0.06);
-  text-decoration:none;
-  transition:transform 0.3s ease, box-shadow 0.3s ease;
-}
-.directory-item:hover{
-  transform:translateY(-6px);
-  box-shadow:0 12px 40px rgba(0,0,0,0.08);
-}
-.directory-item-text{
-  text-align:left;
-}
-.directory-item-title{
-  display:block;
-  font-size:1.2rem;
-  font-weight:500;
-  color:#1d1d1f;
-  margin-bottom:6px;
-}
-.directory-item-desc{
-  display:block;
-  font-size:0.95rem;
-  color:#6e6e73;
-  line-height:1.6;
-}
-.directory-item-arrow{
-  font-size:1.2rem;
-  color:#007aff;
-  flex-shrink:0;
-  transition:transform 0.25s ease;
-}
-.directory-item:hover .directory-item-arrow{
-  transform:translateX(4px);
-}
-
-footer{
-  margin-top:100px;
-  font-size:0.875rem;
-  color:#86868b;
-  text-align:center;
-}
-
-/* ── 动画 ── */
-@keyframes softFade{
-  from{opacity:0;transform:translateY(18px);}
-  to{opacity:1;transform:translateY(0);}
-}
-.page-header,
-.directory-title,
-.directory-item{
-  animation:softFade 0.8s ease-out both;
-}
-
-/* ── 焦点可见 ── */
-:focus-visible{
-  outline:3px solid rgba(0,102,204,0.45);
-  outline-offset:3px;
-  border-radius:20px;
-}
-
-/* ── 减少动画 ── */
-@media (prefers-reduced-motion: reduce){
-  *,
-  *::before,
-  *::after{
-    animation-duration:0.01ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:0.01ms !important;
+  :root {
+    --ground: #f5f5f7;
+    --surface: #ffffff;
+    --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed;
+    --radius-card: 18px;
+    --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #f5f5f7 0%, #e8ecf1 100%);
+    --table-stripe: #fafafa;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --link-color: #0071e3;
   }
-}
 
-/* ── 深色模式 ── */
-@media (prefers-color-scheme: dark){
-  body{background:#121214;color:#f5f5f7;}
-  .back-link{color:#a1a1a6;}
-  .back-link:hover{color:#2997ff;}
-  .page-header h1{color:#f5f5f7;}
-  .page-header p{color:#a1a1a6;}
-  .directory-title{color:#86868b;}
-  .directory-item{background:#1e1e22;border-color:rgba(255,255,255,0.08);}
-  .directory-item-title{color:#f5f5f7;}
-  .directory-item-desc{color:#a1a1a6;}
-  .directory-item-arrow{color:#2997ff;}
-  footer{color:#86868b;}
-}
+  [data-theme="dark"] {
+    --ground: #000000;
+    --surface: #1c1c1e;
+    --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-tertiary: #636366;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.3);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8);
+    --hero-gradient: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+    --table-stripe: #2c2c2e;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+    --link-color: #0a84ff;
+  }
 
-/* ── 移动端 ── */
-@media (max-width:640px){
-  body{padding:24px 16px 48px;}
-  .directory-item{padding:22px 24px;border-radius:16px;}
-  .directory-item-title{font-size:1.1rem;}
-  .directory-item-desc{font-size:0.9rem;}
-}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-stack);
+    background: var(--ground);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  /* ===== 导航 ===== */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: var(--nav-bg);
+    border-bottom: 0.5px solid var(--divider);
+    transition: background 0.4s ease;
+  }
+  .nav-inner {
+    max-width: 1280px; margin: 0 auto; padding: 0 22px;
+    height: 52px; display: flex; align-items: center;
+    justify-content: space-between; gap: 10px;
+  }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--accent); }
+  .nav-links { display: flex; gap: 3px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    font-size: 11.5px; font-weight: 500; color: var(--text-secondary);
+    text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill);
+    white-space: nowrap; transition: background 0.2s, color 0.2s;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .nav-links a.active { background: var(--accent); color: #fff; }
+
+  .theme-toggle {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 0.5px solid var(--divider); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all 0.25s ease;
+  }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+
+  /* ===== Hero ===== */
+  .hero {
+    text-align: center; padding: 80px 22px 56px;
+    max-width: 920px; margin: 0 auto;
+    background: var(--hero-gradient); border-radius: 0 0 32px 32px;
+    transition: background 0.4s ease;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 58px); font-weight: 700;
+    letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 18px;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p {
+    font-size: clamp(15px, 2vw, 19px); color: var(--text-secondary);
+    max-width: 680px; margin: 0 auto 32px; line-height: 1.6;
+  }
+  .hero-stats { display: flex; justify-content: center; gap: 44px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong {
+    display: block; font-size: 30px; font-weight: 700;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .hero-stat span {
+    font-size: 11px; color: var(--text-tertiary); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* ===== 区域标题 ===== */
+  .section-header {
+    max-width: 1280px; margin: 0 auto; padding: 64px 22px 8px;
+  }
+  .section-header h2 {
+    font-size: clamp(22px, 3vw, 30px); font-weight: 700;
+    letter-spacing: -0.022em; margin-bottom: 4px;
+  }
+  .section-header p { font-size: 14px; color: var(--text-tertiary); }
+
+  /* ===== 卡片网格 ===== */
+  .grid {
+    max-width: 1280px; margin: 0 auto; padding: 16px 22px 48px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+    gap: 18px;
+  }
+
+  /* ===== 卡片 ===== */
+  .card {
+    background: var(--surface); border-radius: var(--radius-card);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                background 0.4s ease;
+    cursor: pointer; position: relative;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+
+  .card-head {
+    padding: 24px 24px 0; display: flex;
+    align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .card-name { font-size: 20px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px;
+  }
+  .card-abbr {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 11px;
+    border-radius: var(--radius-pill); letter-spacing: 0.04em;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  .card-body { padding: 12px 24px 24px; }
+
+  .symbols { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+  .symbol-chip {
+    font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); border: 0.5px solid var(--divider);
+    padding: 4px 9px; border-radius: 6px; white-space: nowrap; line-height: 1.4;
+    transition: background 0.3s ease;
+  }
+  .symbol-chip b { font-weight: 600; color: var(--text-primary); }
+
+  .data-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 7px 14px; margin-bottom: 12px;
+  }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-tertiary);
+  }
+  .data-value {
+    font-size: 13.5px; font-weight: 600; color: var(--text-primary);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .data-value.green { color: var(--green); }
+  .data-value.orange { color: var(--orange); }
+  .data-value.red { color: var(--red); }
+
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 48px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+
+  .tags {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 0.5px solid var(--divider);
+  }
+  .tag {
+    font-size: 10.5px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); padding: 3px 9px;
+    border-radius: var(--radius-pill); letter-spacing: 0.01em;
+    transition: background 0.3s ease;
+  }
+
+  /* ===== 展开详情 ===== */
+  .card-detail {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.25,0.1,0.25,1),
+                padding 0.5s cubic-bezier(0.25,0.1,0.25,1);
+    padding: 0 24px; background: var(--surface-secondary);
+    transition: background 0.4s ease, max-height 0.5s ease, padding 0.5s ease;
+  }
+  .card.expanded .card-detail { max-height: 1600px; padding: 18px 24px 22px; }
+
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+
+  .detail-section { margin-bottom: 13px; }
+  .detail-section:last-child { margin-bottom: 0; }
+  .detail-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px;
+  }
+  .detail-text {
+    font-size: 12.5px; color: var(--text-secondary);
+    line-height: 1.62; letter-spacing: -0.005em;
+  }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+
+  .mini-table {
+    width: 100%; border-collapse: collapse; margin-top: 4px;
+    font-size: 12px; letter-spacing: -0.005em;
+  }
+  .mini-table td {
+    padding: 5px 7px; border-bottom: 0.5px solid var(--divider);
+    color: var(--text-secondary); vertical-align: top;
+  }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child {
+    color: var(--text-tertiary); font-weight: 500;
+    white-space: nowrap; width: 42%;
+  }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+
+  /* ===== 详情链接按钮 ===== */
+  .detail-link-wrap {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 0.5px solid var(--divider);
+  }
+  .detail-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600;
+    color: var(--link-color);
+    text-decoration: none;
+    padding: 8px 18px;
+    border: 1px solid var(--link-color);
+    border-radius: var(--radius-pill);
+    transition: all 0.25s ease;
+    letter-spacing: -0.01em;
+  }
+  .detail-link:hover {
+    background: var(--link-color);
+    color: #fff;
+    transform: translateX(2px);
+  }
+  .detail-link svg {
+    width: 14px; height: 14px;
+    stroke: currentColor; fill: none; stroke-width: 2;
+    transition: transform 0.25s ease;
+  }
+  .detail-link:hover svg { transform: translateX(3px); }
+
+  /* ===== 展开提示 ===== */
+  .expand-hint {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; padding: 9px 0 14px;
+    font-size: 11px; color: var(--text-tertiary);
+    font-weight: 500; transition: color 0.2s;
+  }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg {
+    width: 10px; height: 10px;
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+
+  /* ===== 回到顶部 ===== */
+  .to-top {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 0.5px solid var(--divider);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    z-index: 200;
+  }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg {
+    width: 16px; height: 16px; stroke: var(--text-secondary);
+    stroke-width: 2.2; fill: none; transition: stroke 0.2s;
+  }
+
+  /* ===== 页脚 ===== */
+  .footer {
+    text-align: center; padding: 48px 22px 72px;
+    font-size: 12px; color: var(--text-tertiary); line-height: 1.9;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer .copyright {
+    margin-top: 20px; padding-top: 16px;
+    border-top: 0.5px solid var(--divider);
+    font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; }
+    .card-head { padding: 20px 20px 0; }
+    .card-body { padding: 10px 20px 20px; }
+    .card-detail { padding: 0 20px; }
+    .card.expanded .card-detail { padding: 16px 20px 18px; }
+    .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; }
+    .hero-stats { gap: 24px; }
+    .data-grid { grid-template-columns: 1fr; gap: 5px; }
+    .nav-links a { font-size: 10.5px; padding: 4px 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
 </style>
 </head>
 <body>
 
-<div class="container">
+<!-- ==================== 导航 ==================== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 美国五十州<span> · 全域图鉴</span></div>
+    <div class="nav-links">
+      <a href="#region-southwest">西南部</a>
+      <a href="#region-west">西部</a>
+      <a href="#region-pacific">太平洋</a>
+      <a href="#region-midwest">中西部</a>
+      <a href="#region-northeast">东北部</a>
+      <a href="#region-south">南部</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</nav>
 
-  <a class="back-link" href="https://slcleo-usa.github.io/list/">← Back to SLC.Leo list</a>
+<!-- ==================== Hero ==================== -->
+<header class="hero">
+  <h1>美国<em>五十州</em><br>全域深度图鉴</h1>
+  <p>地理 · 文化 · 生活 · 交通 · 经济 · 安全 · 州鸟州花</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>50</strong><span>州</span></div>
+    <div class="hero-stat"><strong>6</strong><span>文化区域</span></div>
+    <div class="hero-stat"><strong>9.8M</strong><span>km² 面积</span></div>
+    <div class="hero-stat"><strong>341M</strong><span>总人口</span></div>
+  </div>
+</header>
 
-  <header class="page-header">
-    <h1>USAGEO</h1>
-    <p>USA geography</p>
-  </header>
+<!-- ================================================================
+     西南部
+     ================================================================ -->
+<div class="section-header" id="region-southwest">
+  <h2>西南部</h2>
+  <p>Southwest — 沙漠 · 高原 · El Norte · 摩门走廊</p>
+</div>
+<div class="grid">
 
-  <p class="directory-title">start with which part?</p>
-
-  <div class="directory">
-
-    <a class="directory-item" href="https://slcleo-usa.github.io/northeast" style="animation-delay:0.05s">
-      <span class="directory-item-text">
-        <span class="directory-item-title">Northeast</span>
-        <span class="directory-item-desc"></span>
-      </span>
-      <span class="directory-item-arrow">→</span>
-    </a>
-
-    <a class="directory-item" href="https://slcleo-usa.github.io/west" style="animation-delay:0.12s">
-      <span class="directory-item-text">
-        <span class="directory-item-title">west</span>
-        <span class="directory-item-desc"></span>
-      </span>
-      <span class="directory-item-arrow">→</span>
-    </a>
-
-    <a class="directory-item" href="https://slcleo-usa.github.io/southwest" style="animation-delay:0.19s">
-      <span class="directory-item-text">
-        <span class="directory-item-title">southwest</span>
-        <span class="directory-item-desc"></span>
-      </span>
-      <span class="directory-item-arrow">→</span>
-    </a>
-
-    <a class="directory-item" href="https://slcleo-usa.github.io/south" style="animation-delay:0.26s">
-      <span class="directory-item-text">
-        <span class="directory-item-title">south</span>
-        <span class="directory-item-desc"></span>
-      </span>
-      <span class="directory-item-arrow">→</span>
-    </a>
-
-    <a class="directory-item" href="https://slcleo-usa.github.io/midwest" style="animation-delay:0.33s">
-      <span class="directory-item-text">
-        <span class="directory-item-title">midwest</span>
-        <span class="directory-item-desc"></span>
-      </span>
-      <span class="directory-item-arrow">→</span>
-    </a>
-
-    <a class="directory-item" href="https://slcleo-usa.github.io/pacific" style="animation-delay:0.40s">
-      <span class="directory-item-text">
-        <span class="directory-item-title">Pacific</span>
-        <span class="directory-item-desc"></span>
-      </span>
-      <span class="directory-item-arrow">→</span>
-    </a>
-
+  <!-- 亚利桑那 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">亚利桑那州<small>Arizona</small></div><div class="card-abbr">AZ</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>仙人掌鹪鹩</b></span>
+        <span class="symbol-chip">🌸 <b>巨人柱仙人掌花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~7,500,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$84,500</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$550B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">2.5% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>32%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 36 位</strong></span></div>
+      <div class="tags"><span class="tag">El Norte</span><span class="tag">Southwest</span><span class="tag">大峡谷之州</span><span class="tag">半导体新枢纽</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">台积电凤凰城投资超 <strong>$650 亿</strong>，英特尔钱德勒扩建，凤凰城为美国最大半导体制造基地之一。矿业（Freeport-McMoRan 铜矿）、航空航天（Honeywell 航空总部）为传统支柱。9 家 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>2.5% 统一</td></tr><tr><td>企业所得税</td><td>4.9%</td></tr><tr><td>州销售税</td><td>5.6% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">大峡谷国家公园（年游客约 600 万）、羚羊峡谷、塞多纳红岩、纪念碑谷、萨瓜罗国家公园。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>凤凰城天港国际机场（PHX）年旅客超 4,800 万。<strong>公路：</strong>I-10 横贯，I-17 连接大峡谷，I-40 沿旧 Route 66。<strong>铁路：</strong>Amtrak Sunset Limited 经停图森。<strong>通勤：</strong>Valley Metro 轻轨覆盖凤凰城-坦佩-梅萨。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/az" target="_blank" rel="noopener">
+          查看亚利桑那州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
   </div>
 
-  <footer>© SLC.Leo 2026. All rights reserved.</footer>
+  <!-- 科罗拉多 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科罗拉多州<small>Colorado</small></div><div class="card-abbr">CO</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>云雀鹀</b></span>
+        <span class="symbol-chip">🌸 <b>落基山耧斗菜</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~6,010,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$95,470</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$553B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.40% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>34%</strong> · 需背景审查</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 44 位</strong></span></div>
+      <div class="tags"><span class="tag">Far West</span><span class="tag">Rocky Mountains</span><span class="tag">百年之州</span><span class="tag">量子科技前沿</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">航空航天（洛克希德·马丁、Ball Aerospace）、量子科技（博尔德为全球量子研究中心）、清洁能源、生物科学。丹佛-博尔德走廊为科技走廊，约 10 家 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>4.40% 统一</td></tr><tr><td>企业所得税</td><td>4.40%</td></tr><tr><td>州销售税</td><td>2.9% + 地方</td></tr></table><div class="detail-text" style="margin-top:6px;">TABOR 法案限制政府支出增长并规定退税机制。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">落基山国家公园、梅萨维德国家公园、大沙丘国家公园、黑峡谷国家公园。阿斯彭、韦尔、布雷肯里奇为全球顶级滑雪度假地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>丹佛国际机场（DEN）为全美面积最大机场。<strong>公路：</strong>I-25 纵贯落基山前线，I-70 穿越艾森豪威尔隧道。<strong>铁路：</strong>Amtrak California Zephyr 经丹佛。<strong>通勤：</strong>丹佛 RTD 轻轨 + 通勤铁路（A 线至机场）。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/co" target="_blank" rel="noopener">
+          查看科罗拉多州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内华达 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">内华达州<small>Nevada</small></div><div class="card-abbr">NV</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>山蓝鸲</b></span>
+        <span class="symbol-chip">🌸 <b>鼠尾草</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~3,280,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$78,260</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$250B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>35%</strong> · 需背景审查</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 30 位</strong></span></div>
+      <div class="tags"><span class="tag">Far West</span><span class="tag">Great Basin</span><span class="tag">银之州</span><span class="tag">无税天堂</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">博彩与旅游为绝对核心（拉斯维加斯贡献州财政约 40%）。锂电池（Lithium Americas）、生物科技为新兴增长极。特斯拉 Gigafactory 位于斯帕克斯。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td><strong>无</strong></td></tr><tr><td>企业所得税</td><td><strong>无</strong></td></tr><tr><td>州销售税</td><td>6.85% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">拉斯维加斯大道、大峡谷西缘、胡佛大坝、火焰谷州立公园、太浩湖、死亡谷国家公园。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>哈里·里德国际机场（LAS）年旅客超 5,000 万。<strong>公路：</strong>I-15 连接洛杉矶/盐湖城，I-80 横穿东西。<strong>铁路：</strong>Amtrak California Zephyr 经停里诺。<strong>通勤：</strong>拉斯维加斯以汽车为主，RTC 公交覆盖有限。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/nv" target="_blank" rel="noopener">
+          查看内华达州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新墨西哥 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">新墨西哥州<small>New Mexico</small></div><div class="card-abbr">NM</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>走鹃</b></span>
+        <span class="symbol-chip">🌸 <b>丝兰花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~2,125,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$64,059</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$130B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value orange">1.7%–5.9%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>36%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 49 位</strong></span></div>
+      <div class="tags"><span class="tag">El Norte</span><span class="tag">Southwest</span><span class="tag">迷人之地</span><span class="tag">国家实验室集群</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">洛斯阿拉莫斯国家实验室（LANL）和桑迪亚国家实验室（SNL）为核武器与国家安全研究核心。英特尔里奥兰乔芯片封装厂。无 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>1.7%–5.9% 累进</td></tr><tr><td>企业所得税</td><td>4.8%–5.9%</td></tr><tr><td>总收入税（GRT）</td><td>州级 4.875% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">白沙国家公园、卡尔斯巴德洞穴国家公园、陶斯普韦布洛（UNESCO 世界遗产）、圣菲（美国最古老州府）、阿尔伯克基国际热气球节。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>阿尔伯克基国际太阳港（ABQ）年旅客约 550 万。<strong>公路：</strong>I-25 纵贯，I-40 横穿（旧 Route 66）。<strong>铁路：</strong>Amtrak Southwest Chief 每日经停阿尔伯克基。<strong>通勤：</strong>Rail Runner 通勤铁路连接阿尔伯克基与圣菲。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/nm" target="_blank" rel="noopener">
+          查看新墨西哥州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 犹他 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">犹他州<small>Utah</small></div><div class="card-abbr">UT</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>海鸥（加州鸥）</b></span>
+        <span class="symbol-chip">🌸 <b>Sego 百合</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~3,400,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$95,801</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$280B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.50% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>32%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 5 位</strong></span></div>
+      <div class="tags"><span class="tag">Mormon Corridor</span><span class="tag">Far West</span><span class="tag">蜂巢之州</span><span class="tag">硅坡</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">科技（“硅坡”Silicon Slopes）为增长引擎，Qualtrics、Pluralsight、Domo 等本土科技公司聚集。金融科技蓬勃发展。航空航天与国防供应链约 944 家企业。连续 10 年无 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>4.50% 统一</td></tr><tr><td>企业所得税</td><td>4.50%</td></tr><tr><td>州销售税</td><td>6.1% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">文化深读</div><div class="detail-text">犹他是耶稣基督后期圣徒教会（LDS，摩门教）全球总部，约 60% 州民为 LDS 成员。州鸟海鸥源于 1848 年海鸥吞食蝗虫拯救拓荒者庄稼的传说。州徽蜂巢象征“Industry”（勤勉），州花 Sego 百合在早期粮食短缺时被拓荒者食用。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">五大国家公园（“Mighty 5”）：锡安、布莱斯峡谷、拱门、峡谷地、圆顶礁。大盐湖为西半球最大咸水湖。帕克城为 2002 年冬奥会举办地、圣丹斯电影节所在地。盐湖城圣殿广场为摩门教全球总部。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>盐湖城国际机场（SLC）为达美航空枢纽，年旅客超 2,600 万。<strong>公路：</strong>I-15 纵贯，I-80 横穿。<strong>铁路：</strong>Amtrak California Zephyr 每日经停盐湖城，FrontRunner 通勤铁路连接奥格登-盐湖城-普罗沃。<strong>通勤：</strong>盐湖城 TRAX 轻轨系统（蓝/红/绿三线）覆盖都会区，绿线直达机场，票价 $2.50。通勤时间中位数约 23 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ut" target="_blank" rel="noopener">
+          查看犹他州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<!-- ================================================================
+     西部
+     ================================================================ -->
+<div class="section-header" id="region-west">
+  <h2>西部</h2>
+  <p>West — 阿拉斯加 · 夏威夷 · 爱达荷 · 蒙大拿 · 怀俄明</p>
+</div>
+<div class="grid">
+
+  <!-- 阿拉斯加 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">阿拉斯加州<small>Alaska</small></div><div class="card-abbr">AK</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>柳雷鸟</b></span>
+        <span class="symbol-chip">🌸 <b>勿忘我</b></span>
+        <span class="symbol-chip">🫎 <b>驼鹿</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~740,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$89,336</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$55B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>64.5%</strong> · 全美第三 · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 29 位</strong></span></div>
+      <div class="tags"><span class="tag">First Nation</span><span class="tag">Far West</span><span class="tag">最后边疆</span><span class="tag">石油基金分红</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">石油天然气为绝对核心，石油收入注入永久基金（Permanent Fund），每年向居民发放分红（PFD）。渔业（三文鱼、帝王蟹）、旅游业为第二、第三大产业。无 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td><strong>无</strong></td></tr><tr><td>企业所得税</td><td>1%–9.4% 累进</td></tr><tr><td>州销售税</td><td><strong>无州级</strong></td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">德纳利国家公园（北美最高峰 6,190 米）、冰川湾国家公园、基奈峡湾国家公园、北极圈极光观赏（8月–4月）、卡特迈国家公园棕熊捕鱼。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>安克雷奇泰德·史蒂文斯国际机场（ANC）为全球货运最繁忙机场之一。<strong>公路：</strong>阿拉斯加公路连接加拿大育空地区。<strong>铁路：</strong>阿拉斯加铁路连接苏厄德-安克雷奇-费尔班克斯。<strong>通勤：</strong>许多社区不通公路，依赖小型飞机和渡轮。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ak" target="_blank" rel="noopener">
+          查看阿拉斯加州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 夏威夷 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">夏威夷州<small>Hawaii</small></div><div class="card-abbr">HI</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>夏威夷雁（Nene）</b></span>
+        <span class="symbol-chip">🌸 <b>木槿花</b></span>
+        <span class="symbol-chip">🦭 <b>夏威夷僧海豹</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~1,450,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$153,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$110B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value red">1.4%–11%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>14.9%</strong> · 全美最低之一 · 严格许可制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 7 位</strong></span></div>
+      <div class="tags"><span class="tag">First Nation</span><span class="tag">Pacific</span><span class="tag">阿罗哈之州</span><span class="tag">高税高福利</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">旅游业为绝对支柱，2023 年游客达 964.5 万，旅游收入超 190 亿美元。军事基地（珍珠港-希卡姆联合基地）为第二大贡献者。农业以菠萝、科纳咖啡、夏威夷果为主。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>1.4%–11% 累进（全美最高档之一）</td></tr><tr><td>企业所得税</td><td>4.4%–6.4%</td></tr><tr><td>一般消费税（GET）</td><td>4.0% + 县附加</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">威基基海滩、珍珠港、钻石山、夏威夷火山国家公园、哈纳公路、纳帕利海岸、波利尼西亚文化中心。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>檀香山丹尼尔·井上国际机场（HNL）为太平洋枢纽。<strong>公路：</strong>H-1、H-2、H-3 州际公路仅位于欧胡岛。<strong>铁路：</strong>檀香山 Skyline 轻轨（2023 年开通首段）。<strong>通勤：</strong>欧胡岛 TheBus 公交系统覆盖全岛，票价 $3。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/hi" target="_blank" rel="noopener">
+          查看夏威夷州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 爱达荷 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">爱达荷州<small>Idaho</small></div><div class="card-abbr">ID</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>山蓝鸲</b></span>
+        <span class="symbol-chip">🌸 <b>丁香</b></span>
+        <span class="symbol-chip">🥔 <b>土豆</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~2,030,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$77,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$111B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">5.695% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>60.1%</strong> · 全美第四 · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 18 位</strong></span></div>
+      <div class="tags"><span class="tag">Far West</span><span class="tag">Rocky Mountains</span><span class="tag">宝石之州</span><span class="tag">半导体重镇</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">美光科技（Micron Technology）总部位于博伊西，2025 年《财富》世界 500 强第 438 位，营收 $373.8 亿。爱达荷拥有 4 家 Fortune 500 总部：美光、Albertsons、Boise Cascade、Lamb Weston。农业以土豆（全美三分之一产量）为主。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>5.695% 统一</td></tr><tr><td>企业所得税</td><td>5.695%</td></tr><tr><td>州销售税</td><td>6% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">太阳谷为美国最早的滑雪度假地之一。科达伦湖、肖肖尼瀑布（比尼亚加拉瀑布更高）、月球火山口国家保护区。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>博伊西机场（BOI）年旅客约 400 万。<strong>公路：</strong>I-84 沿蛇河横穿南部，I-90 横穿北部狭长地带。<strong>铁路：</strong>Amtrak Empire Builder 经停北部 Sandpoint。<strong>通勤：</strong>博伊西以汽车为主，Valley Regional Transit 公交覆盖有限。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/id" target="_blank" rel="noopener">
+          查看爱达荷州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 蒙大拿 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">蒙大拿州<small>Montana</small></div><div class="card-abbr">MT</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>苦根花</b></span>
+        <span class="symbol-chip">🐻 <b>灰熊</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~1,145,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$69,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$70B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.7%–5.9%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>66.3%</strong> · 全美第一 · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 41 位</strong></span></div>
+      <div class="tags"><span class="tag">Far West</span><span class="tag">Northern Great Plains</span><span class="tag">宝藏之州</span><span class="tag">全美持枪率第一</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">农业（牛、小麦）、矿业（铜、金、煤炭）、旅游业（黄石、冰川国家公园）为支柱。Snowflake Inc.（云计算数据仓库）2021 年迁至博兹曼。无 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>4.7%–5.9% 累进</td></tr><tr><td>企业所得税</td><td>6.75%</td></tr><tr><td>州销售税</td><td><strong>无州级</strong></td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">黄石国家公园（全球第一座国家公园，1872 年）大部分位于蒙大拿。冰川国家公园（“大陆之冠”）以冰川湖和 Going-to-the-Sun Road 闻名。弗拉特黑德湖为美国西部最大淡水湖。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>比灵斯洛根国际机场（BIL）为最大机场。<strong>公路：</strong>I-90 横穿东西，I-15 纵贯南北。<strong>铁路：</strong>Amtrak Empire Builder 每日经停蒙大拿多个城市。<strong>通勤：</strong>无大型城市，通勤以汽车为主。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/mt" target="_blank" rel="noopener">
+          查看蒙大拿州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 怀俄明 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">怀俄明州<small>Wyoming</small></div><div class="card-abbr">WY</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>印第安画笔花</b></span>
+        <span class="symbol-chip">🦬 <b>美洲野牛</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~589,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$72,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$47B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>66.2%</strong> · 全美第二 · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 10 位</strong></span></div>
+      <div class="tags"><span class="tag">Far West</span><span class="tag">Rocky Mountains</span><span class="tag">平等之州</span><span class="tag">无税天堂</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">矿业为绝对核心——煤炭、天然气、石油、铀和纯碱（怀俄明供应全球约 90% 纯碱）。矿业贡献州财政 50%–60%。旅游业（黄石、大提顿）为第二大产业。无 Fortune 500 总部，但以无企业所得税和个人所得税吸引大量企业注册。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td><strong>无</strong></td></tr><tr><td>企业所得税</td><td><strong>无</strong></td></tr><tr><td>州销售税</td><td>4% + 地方</td></tr></table><div class="detail-text" style="margin-top:6px;">Tax Foundation 2025 年州税竞争力指数全美第一。同时无个人所得税和企业所得税且不征收总收入税。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">黄石国家公园（1872 年）绝大部分位于怀俄明。大提顿国家公园以雪山倒影和杰克逊霍尔为门户。魔鬼塔国家纪念区（1906 年）为地质奇观。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>9 座主要商业机场，包括夏延（CYS）、杰克逊霍尔（JAC）。<strong>公路：</strong>3 条州际高速公路穿过：I-80、I-25、I-90。<strong>铁路：</strong>2 条一级铁路穿过：联合太平洋和 BNSF。<strong>通勤：</strong>无大型都市区，通勤以汽车为主。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/wy" target="_blank" rel="noopener">
+          查看怀俄明州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     太平洋
+     ================================================================ -->
+<div class="section-header" id="region-pacific">
+  <h2>太平洋沿岸</h2>
+  <p>Pacific — 加利福尼亚 · 俄勒冈 · 华盛顿</p>
+</div>
+<div class="grid">
+
+  <!-- 加利福尼亚 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">加利福尼亚州<small>California</small></div><div class="card-abbr">CA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>加州鹌鹑</b></span>
+        <span class="symbol-chip">🌸 <b>加州罂粟</b></span>
+        <span class="symbol-chip">🐻 <b>加州灰熊</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~39,431,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$91,905</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$4.1T</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value red">1%–13.3%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>28.3%</strong> · 全美最低之一 · 严格管制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 33 位</strong></span></div>
+      <div class="tags"><span class="tag">Left Coast</span><span class="tag">SoCal / NorCal</span><span class="tag">金州</span><span class="tag">全球第五大经济体</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">GDP 约 $4.1 万亿，为全球第五大经济体。全美最多的 Fortune 500 总部（约 57 家），包括 Apple、Alphabet/Google、Chevron、Meta、Wells Fargo、Disney、Nvidia、Intel。科技（硅谷）、娱乐（好莱坞）、农业（中央谷地）、国际贸易（洛杉矶/长滩港）为五大支柱。硅谷风险投资占全美约 40%。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>1%–13.3% 累进（全美最高档）</td></tr><tr><td>企业所得税</td><td>8.84%</td></tr><tr><td>州销售税</td><td>7.25% + 地方（最高 10.75%）</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">优胜美地国家公园、约书亚树国家公园、死亡谷国家公园、金门大桥、好莱坞、迪士尼乐园、圣迭戈动物园、纳帕谷、大苏尔（1 号公路）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>洛杉矶国际机场（LAX）年旅客超 8,000 万。<strong>公路：</strong>I-5 纵贯南北，I-80 连接旧金山与内华达。<strong>铁路：</strong>Amtrak California Zephyr、Coast Starlight、Pacific Surfliner。加州高铁（在建）。<strong>通勤：</strong>洛杉矶地铁、旧金山湾区捷运（BART）。通勤时间中位数约 30 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ca" target="_blank" rel="noopener">
+          查看加利福尼亚州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 俄勒冈 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">俄勒冈州<small>Oregon</small></div><div class="card-abbr">OR</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>俄勒冈葡萄</b></span>
+        <span class="symbol-chip">🦫 <b>海狸</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~4,270,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$80,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$320B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.75%–9.9%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>41.6%</strong> · 需背景审查</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 35 位</strong></span></div>
+      <div class="tags"><span class="tag">Left Coast</span><span class="tag">Cascadia</span><span class="tag">海狸之州</span><span class="tag">无销售税</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">科技（英特尔希尔斯伯勒全球最大园区之一）、林业、农业（黑莓、榛子、圣诞树、葡萄酒）和户外旅游为支柱。2 家 Fortune 500 总部：Nike（#88）和 Lithia Motors（#150）。Precision Castparts（航空航天零部件）为重要制造企业。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>4.75%–9.9% 累进</td></tr><tr><td>企业所得税</td><td>6.6%–7.6%</td></tr><tr><td>州销售税</td><td><strong>无</strong></td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">火山口湖国家公园（美国最深湖泊 594 米）、胡德山、哥伦比亚河峡谷（Multnomah 瀑布）、俄勒冈海岸、波特兰（“Keep Portland Weird”）、本德户外运动中心、威拉米特谷葡萄酒产区。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>波特兰国际机场（PDX）年旅客约 2,000 万。<strong>公路：</strong>I-5 纵贯南北，I-84 沿哥伦比亚河。<strong>铁路：</strong>Amtrak Cascades（温哥华-西雅图-波特兰-尤金）。<strong>通勤：</strong>波特兰 TriMet 公交系统（MAX 轻轨 + 公交 + WES 通勤铁路）。自行车基础设施全美领先。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/or" target="_blank" rel="noopener">
+          查看俄勒冈州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 华盛顿 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">华盛顿州<small>Washington</small></div><div class="card-abbr">WA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>美洲金翅雀</b></span>
+        <span class="symbol-chip">🌸 <b>杜鹃花</b></span>
+        <span class="symbol-chip">🐟 <b>钢头鳟</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~7,960,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$90,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$800B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无（7% 资本利得税）</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>34.5%</strong> · 需背景审查 + 安全培训</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 22 位</strong></span></div>
+      <div class="tags"><span class="tag">Left Coast</span><span class="tag">Cascadia</span><span class="tag">常青之州</span><span class="tag">科技双巨头总部</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">Microsoft（雷德蒙德）和 Amazon（西雅图）为全球市值前五的公司。7 家 Fortune 500 总部：Amazon（#2）、Microsoft（#3）、Costco（#11）、Starbucks（#120）、Nordstrom（#275）、Expedia（#350）、Paccar（#160）。航空航天（波音埃弗雷特和伦顿工厂）、农业（苹果、樱桃、葡萄酒）、国际贸易（西雅图-塔科马港）为传统支柱。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td><strong>无</strong>（7% 资本利得税）</td></tr><tr><td>企业所得税</td><td>B&O 税（总收入税 0.13%–1.75%）</td></tr><tr><td>州销售税</td><td>6.5% + 地方（西雅图合计约 10.25%）</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">雷尼尔山国家公园（4,392 米）、奥林匹克国家公园（UNESCO 世界遗产）、北喀斯喀特国家公园、西雅图（太空针塔、派克市场）、圣胡安群岛、莱文沃思巴伐利亚风格小镇。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>西雅图-塔科马国际机场（SEA）年旅客超 5,000 万。<strong>公路：</strong>I-5 纵贯南北，I-90 横穿东西。<strong>铁路：</strong>Amtrak Cascades、Coast Starlight、Empire Builder。Sounder 通勤铁路。<strong>通勤：</strong>西雅图 Link 轻轨（1 号线、2 号线延伸中）。华盛顿州渡轮系统为全美最大渡轮网络。通勤时间中位数约 28 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/wa" target="_blank" rel="noopener">
+          查看华盛顿州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     中西部
+     ================================================================ -->
+<div class="section-header" id="region-midwest">
+  <h2>中西部</h2>
+  <p>Midwest — 五大湖 · 上中西部 · 俄亥俄河谷 · 北林地区</p>
+</div>
+<div class="grid">
+
+  <!-- 伊利诺伊 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">伊利诺伊州<small>Illinois</small></div><div class="card-abbr">IL</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>蓝紫罗兰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~12,710,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$81,702</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$1.23T</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.95% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>28.3%</strong> · 严格管制州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 24 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Great Lakes</span><span class="tag">草原之州</span><span class="tag">32 家 Fortune 500</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">中西部经济总量最大的州，2025 年 GDP 达 $1.23 万亿。全州拥有 32 家 Fortune 500 总部，芝加哥独占 24 家，包括 Boeing（#34）、Caterpillar（#44）、UnitedHealth Group、State Farm、CDW、Mondelez International、Illinois Tool Works。芝加哥为美国第二大金融中心（CBOE、CME），联邦储备银行第七区总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>4.95% 统一</td></tr><tr><td>企业所得税</td><td>9.5%（全美最高之一）</td></tr><tr><td>州销售税</td><td>6.25%（芝加哥合计约 10.25%）</td></tr><tr><td>房产税</td><td>有效税率约 2.07%，全美第二高</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">芝加哥（千禧公园“豆子”、威利斯大厦、艺术博物馆、深盘披萨）为中西部文化之都。肖尼国家森林（伊利诺伊州最大国家森林）、Starved Rock 州立公园、66 号公路起点。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>芝加哥奥黑尔国际机场（ORD）为全球起降架次最多的机场之一。<strong>公路：</strong>I-90/94/55/57 在芝加哥交汇。<strong>铁路：</strong>芝加哥为 Amtrak 全国铁路网中心。Borealis（圣保罗-芝加哥，2024 年开通）两年内载客超 50 万。<strong>通勤：</strong>芝加哥 CTA 地铁（“L”）+ Metra 通勤铁路。通勤时间中位数约 34 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/il" target="_blank" rel="noopener">
+          查看伊利诺伊州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 印第安纳 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">印第安纳州<small>Indiana</small></div><div class="card-abbr">IN</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>牡丹</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~6,870,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$70,051</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$510B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3.05% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>44.8%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 11 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Lower Midwest</span><span class="tag">胡希尔之州</span><span class="tag">赛车文化</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">制造业为绝对核心——汽车零部件、制药（Eli Lilly）、医疗器械、航空发动机（Rolls-Royce 美国总部）。Elevance Health（印第安纳波利斯）为 Fortune 500 第 51 位。约 6 家 Fortune 500 总部。农业（玉米、大豆、生猪）和物流（印第安纳波利斯为全美卡车运输枢纽）。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>3.05% 统一</td></tr><tr><td>企业所得税</td><td>4.9%</td></tr><tr><td>州销售税</td><td>7.0%（中西部最高）</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">印第安纳沙丘国家公园（沿密歇根湖岸 15 英里）、印第安纳波利斯赛车场（Indy 500 举办地）、圣玛丽亚教堂、假日世界与飞溅水道。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>印第安纳波利斯国际机场（IND）为联邦快递第二大货运枢纽。<strong>公路：</strong>I-65 纵贯，I-70 横穿。<strong>铁路：</strong>Amtrak Cardinal（纽约-芝加哥）每周三班。<strong>通勤：</strong>IndyGo 公交，Red Line BRT。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/in" target="_blank" rel="noopener">
+          查看印第安纳州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 密歇根 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">密歇根州<small>Michigan</small></div><div class="card-abbr">MI</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>美洲知更鸟</b></span>
+        <span class="symbol-chip">🌸 <b>苹果花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~10,040,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$71,149</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$700B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.25% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>42.0%</strong> · 需背景审查 + 登记</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 25 位</strong></span></div>
+      <div class="tags"><span class="tag">Great Lakes</span><span class="tag">Northwoods</span><span class="tag">汽车之州</span><span class="tag">五大湖海岸线最长</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">全球汽车工业的诞生地——福特 T 型车在底特律下线，通用汽车（Detroit）、福特（Dearborn）、Stellantis 北美总部均在密歇根。电动汽车与电池转型加速。19 家 Fortune 500 总部，包括通用汽车（#17）、福特（#19）、Dow（#82）、Whirlpool（#179）。医疗设备（Stryker）、农业（樱桃、蓝莓）、旅游业（五大湖、上半岛）。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>4.25% 统一</td></tr><tr><td>企业所得税</td><td>6.0%</td></tr><tr><td>州销售税</td><td>6.0%</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">睡熊沙丘国家湖岸（密歇根湖岸巨型沙丘）、麦基诺岛（禁止机动车）、上半岛（苏必利尔湖、彩岩国家湖岸）、底特律汽车城复兴。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>底特律都会韦恩县机场（DTW）为达美航空枢纽。<strong>公路：</strong>I-75 纵贯，I-94 连接芝加哥。<strong>铁路：</strong>Amtrak Wolverine（底特律-安娜堡-芝加哥）。密歇根获 $1.45 亿联邦资金用于客运铁路改善。<strong>通勤：</strong>底特律 QLINE 有轨电车。通勤以汽车为主导。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/mi" target="_blank" rel="noopener">
+          查看密歇根州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 俄亥俄 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">俄亥俄州<small>Ohio</small></div><div class="card-abbr">OH</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>猩红康乃馨</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~11,880,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$69,680</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$920B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2.75%–3.5%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>32.4%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 26 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Lower Midwest</span><span class="tag">七叶树之州</span><span class="tag">大选风向标</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">制造业为传统支柱——汽车（本田）、航空（GE Aerospace 辛辛那提）、钢铁和化工。医疗健康产业突出：Cleveland Clinic 为全球顶级医疗机构，Cardinal Health（都柏林）为 Fortune 500 第 14 位。约 25 家 Fortune 500 总部，包括 Procter & Gamble（#42）、Kroger（#25）、Nationwide、Progressive。俄亥俄是美国政治的风向标州。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>2.75%–3.5% 累进</td></tr><tr><td>企业所得税</td><td><strong>无传统企业所得税</strong>，商业活动税（CAT 0.26%）</td></tr><tr><td>州销售税</td><td>5.75% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">Cuyahoga Valley 国家公园（克利夫兰-阿克伦之间）、Hocking Hills 州立公园（砂岩峡谷和瀑布）、摇滚名人堂（克利夫兰）、职业橄榄球名人堂（坎顿）、美国空军国家博物馆（代顿）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>克利夫兰霍普金斯（CLE）、哥伦布约翰·格伦（CMH）、辛辛那提/北肯塔基（CVG）为三大枢纽。<strong>公路：</strong>I-70 横穿，I-75 纵贯，I-71 连接克利夫兰、哥伦布与辛辛那提。<strong>铁路：</strong>Amtrak Cardinal、Lake Shore Limited。<strong>通勤：</strong>克利夫兰 RTA 轻轨、辛辛那提 Metro 公交、哥伦布 COTA 公交。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/oh" target="_blank" rel="noopener">
+          查看俄亥俄州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 威斯康星 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">威斯康星州<small>Wisconsin</small></div><div class="card-abbr">WI</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>美洲知更鸟</b></span>
+        <span class="symbol-chip">🌸 <b>林地紫罗兰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~5,950,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$75,670</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$420B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3.54%–7.65%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>44.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 18 位</strong></span></div>
+      <div class="tags"><span class="tag">Northwoods</span><span class="tag">Upper Midwest</span><span class="tag">獾之州</span><span class="tag">奶酪与啤酒之乡</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">制造业（工业机械、食品加工、纸制品）和农业（乳制品——全美第一奶酪产量、啤酒花、蔓越莓）为传统支柱。保险业：Northwestern Mutual（密尔沃基）为 Fortune 500 第 109 位。医疗健康：Epic Systems（维罗纳）为全球最大电子病历系统供应商。约 9 家 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>3.54%–7.65% 累进</td></tr><tr><td>企业所得税</td><td>7.9%</td></tr><tr><td>州销售税</td><td>5.0% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">Apostle Islands 国家湖岸（苏必利尔湖海蚀洞和灯塔）、门县（密歇根湖畔度假半岛，樱桃园和艺术社区）、圣克罗伊国家风景河流、密尔沃基（哈雷戴维森博物馆、啤酒厂之旅、Summerfest）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>密尔沃基米切尔国际机场（MKE）。<strong>公路：</strong>I-94 连接密尔沃基与芝加哥/麦迪逊/明尼阿波利斯。<strong>铁路：</strong>Amtrak Hiawatha（密尔沃基-芝加哥）、Empire Builder、Borealis。<strong>通勤：</strong>密尔沃基 The Hop 有轨电车。麦迪逊为全美自行车友好城市之一。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/wi" target="_blank" rel="noopener">
+          查看威斯康星州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 艾奥瓦 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">艾奥瓦州<small>Iowa</small></div><div class="card-abbr">IA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>东部金翅雀</b></span>
+        <span class="symbol-chip">🌸 <b>野玫瑰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~3,240,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$73,147</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$277B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3.8%–6.0%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>42.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 12 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Upper Midwest</span><span class="tag">鹰眼之州</span><span class="tag">总统初选第一州</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">农业为绝对核心——玉米（全美第一）、大豆、猪肉（全美第一）、鸡蛋和乙醇生产。农业机械（John Deere）和食品加工（Kellogg's、Cargill、Tyson）。保险业：Principal Financial Group（得梅因）为 Fortune 500 第 236 位。得梅因为全美保险业中心之一，联合太平洋铁路总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>3.8%–6.0% 累进</td></tr><tr><td>企业所得税</td><td>5.5%–8.4%</td></tr><tr><td>州销售税</td><td>6.0% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">麦迪逊县廊桥（《廊桥遗梦》原型）、得梅因艺术中心、密西西比河沿岸历史城镇、艾奥瓦州博览会（黄油雕塑）、Loess Hills（黄土丘陵）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>得梅因国际机场（DSM）。<strong>公路：</strong>I-80 横穿东西，I-35 纵贯南北。<strong>铁路：</strong>Amtrak California Zephyr 每日经停奥塔姆瓦、奥斯卡卢萨、克雷斯顿。<strong>通勤：</strong>得梅因 DART 公交，以汽车为主导。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ia" target="_blank" rel="noopener">
+          查看艾奥瓦州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 堪萨斯 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">堪萨斯州<small>Kansas</small></div><div class="card-abbr">KS</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>野生向日葵</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~2,970,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$72,639</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$230B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3.1%–5.7%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>40.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 32 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Southern Great Plains</span><span class="tag">向日葵之州</span><span class="tag">航空制造之都</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">航空航天制造为标志性产业——威奇托被誉为“世界航空之都”，塞斯纳、比奇、庞巴迪 Learjet 和 Spirit AeroSystems 均在此设厂。农业（小麦——全美第一、牛、高粱）和石油天然气为传统支柱。Garmin（奥拉西，GPS 导航设备）为州内最大科技企业。约 4 家 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>3.1%–5.7% 累进</td></tr><tr><td>企业所得税</td><td>4.0% + 3.0% 附加税</td></tr><tr><td>州销售税</td><td>6.5% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">威奇托航空博物馆、弗林特丘陵（北美现存最大原生高草草原）、道奇城（西部牛仔文化圣地）、纪念碑岩（白垩纪地质奇观）、堪萨斯城（烧烤和赛车）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>威奇托艾森豪威尔国家机场（ICT）。<strong>公路：</strong>I-70 横穿，I-35 纵贯。<strong>铁路：</strong>Amtrak Southwest Chief 每日经停托皮卡、牛顿、哈钦森、道奇城和加登城。<strong>通勤：</strong>威奇托公交覆盖有限，以汽车为主导。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ks" target="_blank" rel="noopener">
+          查看堪萨斯州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 明尼苏达 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">明尼苏达州<small>Minnesota</small></div><div class="card-abbr">MN</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>普通潜鸟</b></span>
+        <span class="symbol-chip">🌸 <b>凤仙花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~5,800,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$87,556</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$480B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value red">5.35%–9.85%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>40.0%</strong> · 需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 8 位</strong></span></div>
+      <div class="tags"><span class="tag">Northwoods</span><span class="tag">Upper Midwest</span><span class="tag">北星之州</span><span class="tag">15 家 Fortune 500</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">医疗健康产业全球领先：UnitedHealth Group（Minnetonka，Fortune 500 第 5 位，营收超 $4,000 亿）、Mayo Clinic（罗切斯特）、Medtronic。零售业：Target（#33）、Best Buy（#78）。15 家 Fortune 500 总部，与亚特兰大并列全美都会区第 8 位。明尼阿波利斯-圣保罗“双城”为 Upper Midwest 文化、金融与交通中心。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>5.35%–9.85% 累进（全美较高）</td></tr><tr><td>企业所得税</td><td>9.8%（全美最高之一）</td></tr><tr><td>州销售税</td><td>6.875% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">探险家国家公园（Voyageurs National Park）、边界水域独木舟区（全美最受欢迎荒野保护区之一）、双城（Guthrie 剧院、沃克艺术中心、First Avenue 音乐俱乐部）、德卢斯（苏必利尔湖畔）、罗切斯特 Mayo Clinic。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>明尼阿波利斯-圣保罗国际机场（MSP）为达美航空枢纽，年旅客超 3,800 万。<strong>公路：</strong>I-35 纵贯，I-94 连接芝加哥/法戈。<strong>铁路：</strong>Amtrak Empire Builder 每日经停双城和圣克劳德。Borealis（圣保罗-芝加哥）两年内载客超 50 万。<strong>通勤：</strong>双城 Metro Transit 公交 + 轻轨（蓝线、绿线）。通勤时间中位数约 24 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/mn" target="_blank" rel="noopener">
+          查看明尼苏达州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 密苏里 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">密苏里州<small>Missouri</small></div><div class="card-abbr">MO</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>东蓝鸲</b></span>
+        <span class="symbol-chip">🌸 <b>山楂花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~6,200,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$68,920</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$430B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2.0%–4.95%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>48.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 38 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Ozarks</span><span class="tag">索证之州</span><span class="tag">8 家 Fortune 500</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">航空航天（圣路易斯为波音防务、SpaceX 和 Blue Origin 的重要制造基地）、汽车制造（堪萨斯城和圣路易斯的通用汽车和福特工厂）、农业（大豆、玉米、牛）和医疗健康为支柱。8 家 Fortune 500 总部，包括 Centene（#26，圣路易斯）、Emerson Electric（#181）、Reinsurance Group of America（#245）、Post Holdings（#477）。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>2.0%–4.95% 累进</td></tr><tr><td>企业所得税</td><td>4.0%</td></tr><tr><td>州销售税</td><td>4.225% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">Gateway Arch 国家公园（圣路易斯，美国最高国家纪念碑 630 英尺）、欧扎克国家风景河流、Ste. Genevieve 国家历史公园（密苏里首个永久欧洲定居点）、布兰森（乡村音乐表演之都）、堪萨斯城（烧烤和爵士乐）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>圣路易斯兰伯特国际机场（STL）、堪萨斯城国际机场（MCI）。<strong>公路：</strong>I-70 横穿，I-44 连接圣路易斯与塔尔萨，I-55 连接芝加哥/孟菲斯。<strong>铁路：</strong>Amtrak Missouri River Runner（圣路易斯-堪萨斯城）、Texas Eagle、Southwest Chief。<strong>通勤：</strong>圣路易斯 MetroLink 轻轨（46 英里），堪萨斯城 KC Streetcar（2.2 英里）。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/mo" target="_blank" rel="noopener">
+          查看密苏里州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内布拉斯加 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">内布拉斯加州<small>Nebraska</small></div><div class="card-abbr">NE</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>秋麒麟草</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~2,000,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$74,985</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$170B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2.46%–5.84%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>38.6%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 15 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Southern Great Plains</span><span class="tag">玉米壳之州</span><span class="tag">伯克希尔总部</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">农业为绝对核心——玉米、牛、大豆、猪肉。铁路与保险为奥马哈的支柱：Berkshire Hathaway（沃伦·巴菲特总部，Fortune 500 第 5 位，营收超 $3,700 亿）、Union Pacific（全美最大铁路公司，Fortune 500 第 138 位）、Kiewit（建筑与工程，Fortune 500 第 232 位）。约 5 家 Fortune 500 总部，奥马哈人均 Fortune 500 总部密度全美领先。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>2.46%–5.84% 累进</td></tr><tr><td>企业所得税</td><td>5.58%–5.84%</td></tr><tr><td>州销售税</td><td>5.5% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">奥马哈亨利·多利动物园（全球顶级动物园之一）、沙丘地区（Sandhills，北美最大原生草原之一）、Scotts Bluff 国家纪念区（俄勒冈小径地标）、Niobrara 国家风景河流、卡尼 Archway 纪念碑。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>奥马哈埃普利机场（OMA）。<strong>公路：</strong>I-80 横穿，I-29 沿密苏里河。<strong>铁路：</strong>Amtrak California Zephyr 每日经停奥马哈、林肯、黑斯廷斯和麦库克。联合太平洋铁路总部在奥马哈。<strong>通勤：</strong>奥马哈 Metro 公交覆盖有限，以汽车为主导。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ne" target="_blank" rel="noopener">
+          查看内布拉斯加州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 北达科他 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">北达科他州<small>North Dakota</small></div><div class="card-abbr">ND</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>西部野云雀</b></span>
+        <span class="symbol-chip">🌸 <b>野草原玫瑰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~800,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$75,949</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$75B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">1.95%–2.5%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>47.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 14 位</strong></span></div>
+      <div class="tags"><span class="tag">Northwoods</span><span class="tag">Northern Great Plains</span><span class="tag">和平花园之州</span><span class="tag">巴肯页岩油</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">石油为新兴支柱——巴肯页岩开发使北达科他成为全美第二大产油州。农业（小麦、向日葵、大麦、牛）和农业合作社（全美最密集）为传统支柱。法戈为最大城市和经济增长极，俾斯麦为州首府。州内人口密度极低（每平方公里不到 5 人）。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td>1.95%–2.5% 累进</td></tr><tr><td>企业所得税</td><td>1.41%–4.31% 累进（全美最低之一）</td></tr><tr><td>州销售税</td><td>5.0% + 地方</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">西奥多·罗斯福国家公园（恶地彩色岩层和野牛群，总面积 285 平方千米）、彩绘峡谷（Painted Canyon）、法戈 Plains Art Museum 和 Bonanzaville、国际和平花园（与加拿大交界）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>法戈赫克托国际机场（FAR）、俾斯麦市机场（BIS）。<strong>公路：</strong>I-94 横穿，I-29 纵贯。<strong>铁路：</strong>Amtrak Empire Builder 每日经停法戈、大福克斯、德弗尔斯莱克和威利斯顿。<strong>通勤：</strong>法戈 MATBUS 公交覆盖有限，以汽车为主导。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/nd" target="_blank" rel="noopener">
+          查看北达科他州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 南达科他 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">南达科他州<small>South Dakota</small></div><div class="card-abbr">SD</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>项环雉</b></span>
+        <span class="symbol-chip">🌸 <b>白头翁花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~920,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$72,421</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$70B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>47.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 排名 <strong>第 20 位</strong></span></div>
+      <div class="tags"><span class="tag">Northern Great Plains</span><span class="tag">Frontier</span><span class="tag">拉什莫尔</span><span class="tag">无税天堂</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">金融服务业为独特支柱——花旗银行（Citibank）在苏福尔斯设有大型信用卡运营中心，富国银行（Wells Fargo）亦在苏福尔斯有重要业务。南达科他无高利贷上限，吸引信用卡和金融科技公司注册。农业（玉米、大豆、牛、猪肉）和旅游业（拉什莫尔山、恶地国家公园）为传统支柱。</div></div>
+      <div class="detail-section"><div class="detail-label">税收与财政</div><table class="mini-table"><tr><td>个人所得税</td><td><strong>无</strong></td></tr><tr><td>企业所得税</td><td><strong>无</strong></td></tr><tr><td>州销售税</td><td>4.2% + 地方（对 152 种服务征税）</td></tr></table></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">拉什莫尔山国家纪念区（总统山）、恶地国家公园（彩色岩层、化石和星空）、疯马纪念山（仍在雕刻中的巨型原住民英雄雕像）、黑山（苏族神圣之地）、苏福尔斯瀑布公园。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>苏福尔斯地区机场（FSD）、拉皮德城地区机场（RAP）。<strong>公路：</strong>I-90 横穿，I-29 纵贯东部。<strong>铁路：</strong>Amtrak Empire Builder 每日经停南达科他北部。<strong>通勤：</strong>苏福尔斯公交覆盖有限，以汽车为主导。冬季 I-90 和 I-29 因风雪频繁关闭。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/sd" target="_blank" rel="noopener">
+          查看南达科他州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     东北部
+     ================================================================ -->
+<div class="section-header" id="region-northeast">
+  <h2>东北部</h2>
+  <p>Northeast — 新英格兰 · 纽约大都会 · 中大西洋 · 阿巴拉契亚</p>
+</div>
+<div class="grid">
+
+  <!-- 缅因 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">缅因州<small>Maine</small></div><div class="card-abbr">ME</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>黑顶山雀</b></span>
+        <span class="symbol-chip">🌲 <b>白松</b></span>
+        <span class="symbol-chip">🫎 <b>驼鹿</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~1,400,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$73,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$99B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">5.8%–7.15%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>45.0%</strong> · 需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 4 位</strong>（全美最安全之一）</span></div>
+      <div class="tags"><span class="tag">Yankeedom</span><span class="tag">新英格兰</span><span class="tag">龙虾之州</span><span class="tag">全美最安全第4</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">龙虾捕捞（全美第一，年产值超 $7 亿）、蓝莓（全美最大产地）、造船（巴斯钢铁厂为美国海军驱逐舰主要建造商）和旅游业为支柱。无 Fortune 500 总部，最大企业为 IDEXX Laboratories（韦斯特布鲁克，兽医诊断全球领先）。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">阿卡迪亚国家公园（年游客约 400 万）为密西西比河以东最受欢迎的国家公园，以凯迪拉克山（美国大西洋海岸最高峰）和崎岖海岸线闻名。波特兰为美食与啤酒之都。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>波特兰国际喷气机机场（PWM）。<strong>公路：</strong>I-95 纵贯全州。<strong>铁路：</strong>Amtrak Downeaster（不伦瑞克-波特兰-波士顿）每日多班。<strong>通勤：</strong>波特兰 METRO 公交覆盖都会区。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/me" target="_blank" rel="noopener">
+          查看缅因州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新罕布什尔 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">新罕布什尔州<small>New Hampshire</small></div><div class="card-abbr">NH</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>紫红雀</b></span>
+        <span class="symbol-chip">🌸 <b>紫丁香</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~1,410,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$96,838</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$105B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无（工资）</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>41.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 3 位</strong>（全美前三）</span></div>
+      <div class="tags"><span class="tag">Yankeedom</span><span class="tag">花岗岩州</span><span class="tag">无税天堂</span><span class="tag">全美最安全第3</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">高科技制造（医疗设备、电子元件、航空航天零部件）和金融服务为支柱。约 3 家 Fortune 500 总部，包括 C&S Wholesale Grocers（基恩）、PC Connection（梅里马克）。无州所得税和销售税，以房产税和商业税为主要财政来源。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">白山山脉（White Mountains）为东北部最高峰华盛顿山（1,917 米）所在地，秋季红叶为全美最壮观之一。华盛顿山齿轨铁路为历史工程奇观。湖区（Lakes Region）为夏季度假胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>曼彻斯特-波士顿地区机场（MHT）。<strong>公路：</strong>I-93 连接波士顿与白山地区，I-89 连接康科德与佛蒙特。<strong>铁路：</strong>Amtrak Downeaster 经停埃克塞特和达勒姆。<strong>通勤：</strong>大量居民通勤至波士顿。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/nh" target="_blank" rel="noopener">
+          查看新罕布什尔州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 佛蒙特 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">佛蒙特州<small>Vermont</small></div><div class="card-abbr">VT</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>隐士夜鸫</b></span>
+        <span class="symbol-chip">🌸 <b>红三叶草</b></span>
+        <span class="symbol-chip">🍁 <b>糖枫</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~645,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$74,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$47B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3.35%–8.75%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>42.0%</strong> · 无需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 1 位</strong>（全美最安全）</span></div>
+      <div class="tags"><span class="tag">Yankeedom</span><span class="tag">绿山之州</span><span class="tag">枫糖之乡</span><span class="tag">全美最安全第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">经济规模为全美最小的州，GDP 约 $47 亿。主要产业为乳品业（Ben & Jerry's 总部）和观光业（秋季红叶、滑雪）。枫糖浆产量全美第一。绿色制造业和手工食品/精酿啤酒为新兴增长点。无 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">绿山山脉（Green Mountains）为全州脊梁，秋季红叶为全美最壮观之一。斯托（Stowe）为东海岸滑雪之都。伯灵顿（佛蒙特最大城市）位于尚普兰湖畔。Ben & Jerry's 工厂（沃特伯里）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>伯灵顿国际机场（BTV）。<strong>公路：</strong>I-89 纵贯南北，I-91 沿康涅狄格河。<strong>铁路：</strong>Amtrak Vermonter（圣奥尔本斯-伯灵顿-纽约）、Ethan Allen Express（伯灵顿-纽约）。<strong>通勤：</strong>无大型城市，通勤以汽车为主。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/vt" target="_blank" rel="noopener">
+          查看佛蒙特州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 马萨诸塞 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">马萨诸塞州<small>Massachusetts</small></div><div class="card-abbr">MA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>黑顶山雀</b></span>
+        <span class="symbol-chip">🌸 <b>五月花</b></span>
+        <span class="symbol-chip">🌳 <b>美国榆</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~7,154,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$104,828</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$820B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value red">5% + 4% 百万附加税</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>14.7%</strong> · 全美最低 · 严格管制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 2 位</strong>（全美第二安全）</span></div>
+      <div class="tags"><span class="tag">Yankeedom</span><span class="tag">新英格兰</span><span class="tag">教育之州</span><span class="tag">全美最安全第2</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">教育与医疗健康之都——哈佛大学、麻省理工学院（MIT）等全球顶尖学府所在地。生物科技产业集群（Kendall Square 为全球密度最高的生物科技园区）。医疗健康产业全球领先：Mass General Brigham、Boston Scientific。11 家 Fortune 500 总部，包括 Liberty Mutual（#68）、State Street（#247）、Thermo Fisher Scientific（#96）。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">波士顿（自由之路、法尼尔厅、波士顿茶党船博物馆）为美国独立战争历史核心。科德角（Cape Cod）为夏季海滨度假胜地。玛莎葡萄园岛和楠塔基特岛为精英度假岛屿。伯克希尔丘陵（Berkshires）为音乐与艺术之乡。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>波士顿洛根国际机场（BOS）为新英格兰最大航空枢纽，年旅客超 4,000 万。<strong>公路：</strong>I-90 马萨诸塞收费公路横贯东西。<strong>铁路：</strong>MBTA 通勤铁路（紫线）、Amtrak Northeast Regional 和 Acela。<strong>通勤：</strong>波士顿 MBTA 地铁为全美最古老地铁系统（1897 年）。通勤时间中位数约 30 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ma" target="_blank" rel="noopener">
+          查看马萨诸塞州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 罗得岛 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">罗得岛州<small>Rhode Island</small></div><div class="card-abbr">RI</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>罗得岛红鸡</b></span>
+        <span class="symbol-chip">🌸 <b>紫罗兰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~1,112,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$81,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$82.5B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3.75%–5.99%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>14.8%</strong> · 全美最低之一 · 需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 9 位</strong>（全美前十）</span></div>
+      <div class="tags"><span class="tag">Yankeedom</span><span class="tag">海洋之州</span><span class="tag">最小州</span><span class="tag">全美最安全第9</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">医疗健康（Lifespan 和 Care New England 医院系统为最大雇主）、高等教育（布朗大学、罗德岛设计学院）和海洋经济（造船、水产、海洋科技）为支柱。珠宝制造（普罗维登斯为历史中心）和旅游（纽波特豪宅）为传统产业。无 Fortune 500 总部，最大企业为 CVS Health（总部设于文索基特，Fortune 500 第 6 位）。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">纽波特（Newport）以镀金时代豪宅（The Breakers、Marble House）和帆船文化闻名。普罗维登斯（Providence）以水火节（WaterFire）和意大利联邦山美食闻名。纳拉甘西特海滩为最受欢迎海滩。布洛克岛为避暑胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>T.F. 格林国际机场（PVD）。<strong>公路：</strong>I-95 穿越全州。<strong>铁路：</strong>MBTA 通勤铁路、Amtrak Northeast Regional 和 Acela。<strong>通勤：</strong>普罗维登斯 RIPTA 公交覆盖全州。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ri" target="_blank" rel="noopener">
+          查看罗得岛州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 康涅狄格 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">康涅狄格州<small>Connecticut</small></div><div class="card-abbr">CT</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>美洲知更鸟</b></span>
+        <span class="symbol-chip">🌸 <b>山月桂</b></span>
+        <span class="symbol-chip">🐋 <b>抹香鲸</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~3,688,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$86,069</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$376B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3%–6.99%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>23.6%</strong> · 全美较低 · 严格管制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 6 位</strong>（全美前十）</span></div>
+      <div class="tags"><span class="tag">Yankeedom</span><span class="tag">宪法之州</span><span class="tag">保险之都</span><span class="tag">全美最安全第6</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">保险业为绝对核心——哈特福德为“世界保险之都”，Aetna（CVS Health 旗下）、The Hartford、Travelers 等保险巨头总部或主要运营中心均在此。航空航天为高端制造支柱：普惠（Pratt & Whitney）和西科斯基（Sikorsky，洛克希德·马丁旗下）总部位于康涅狄格。约 15 家 Fortune 500 总部，包括 Cigna（#13）、Charter Communications（#70）、Booking Holdings（#149）。人均收入 $98,879（2025 年），全美排名第 1。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">纽黑文（New Haven）为耶鲁大学所在地，以披萨（Frank Pepe's、Sally's Apizza）闻名。神秘海港（Mystic Seaport）为美国最大海事博物馆。哈特福德马克·吐温故居和沃兹沃思雅典娜艺术博物馆。利奇菲尔德丘陵（Litchfield Hills）为秋季红叶和古董店胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>布拉德利国际机场（BDL）。<strong>公路：</strong>I-95 沿海南北纵贯，I-84 连接哈特福德与纽约/波士顿。<strong>铁路：</strong>Metro-North Railroad（纽黑文线）为纽约通勤核心，Amtrak Northeast Regional 和 Acela。CTrail Hartford Line。<strong>通勤：</strong>纽黑文和斯坦福大量居民通勤至纽约市。通勤时间中位数约 27 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ct" target="_blank" rel="noopener">
+          查看康涅狄格州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 纽约 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">纽约州<small>New York</small></div><div class="card-abbr">NY</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>东蓝鸲</b></span>
+        <span class="symbol-chip">🌸 <b>玫瑰</b></span>
+        <span class="symbol-chip">🦫 <b>海狸</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~20,002,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$75,200</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$2,053B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value red">4%–10.9%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>23.6%</strong> · 全美较低 · 严格管制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 17 位</strong>（全美前二十）</span></div>
+      <div class="tags"><span class="tag">New Netherland</span><span class="tag">Yankeedom</span><span class="tag">帝国州</span><span class="tag">全球金融之都</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">GDP 约 $2.05 万亿，为全美第三大州经济体。纽约市为全球金融中心——华尔街、纽约证券交易所（NYSE）、纳斯达克（NASDAQ）。约 55 家 Fortune 500 总部，包括 JPMorgan Chase（#12）、Citigroup（#20）、Goldman Sachs（#57）、Pfizer（#43）、IBM（#69）、Verizon（#21）。科技（硅巷）、媒体、房地产和医疗健康为多元化支柱。上州经济以农业（乳制品、苹果）、高等教育（康奈尔、罗切斯特、雪城）和制造业为传统。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">纽约市（自由女神像、时代广场、中央公园、大都会艺术博物馆、百老汇）为全球旅游之都，年游客超 6,000 万。尼亚加拉大瀑布（与加拿大交界）。阿迪朗达克山脉为美国本土最大荒野公园（面积超黄石）。手指湖（Finger Lakes）为葡萄酒产区。千岛群岛（Thousand Islands）为圣劳伦斯河度假胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>约翰·F·肯尼迪国际机场（JFK）、纽瓦克自由国际机场（EWR）、拉瓜迪亚机场（LGA）。<strong>公路：</strong>I-87（纽约州收费公路）纵贯南北，I-90 横穿东西。<strong>铁路：</strong>Amtrak Northeast Regional 和 Acela。Metro-North Railroad、长岛铁路（LIRR）、纽约地铁（MTA）为全球最大地铁系统之一（472 站）。<strong>通勤：</strong>纽约市通勤时间中位数约 36 分钟，全美最长。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ny" target="_blank" rel="noopener">
+          查看纽约州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新泽西 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">新泽西州<small>New Jersey</small></div><div class="card-abbr">NJ</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>东金翅雀</b></span>
+        <span class="symbol-chip">🌸 <b>紫罗兰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~9,548,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$97,126</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$887B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">1.4%–10.75%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>14.7%</strong> · 全美最低 · 严格管制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 16 位</strong>（全美前二十）</span></div>
+      <div class="tags"><span class="tag">New Netherland</span><span class="tag">花园之州</span><span class="tag">制药之都</span><span class="tag">全美持枪率最低</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">制药和生命科学为标志性产业——强生（Johnson & Johnson）（新不伦瑞克，Fortune 500 第 28 位）、默克（Merck）（拉威，Fortune 500 第 71 位）、Bristol-Myers Squibb（普林斯顿）。新泽西制药和生命科学行业就业密度全美第一。金融与物流为传统支柱——纽瓦克港为美东最繁忙港口，纽瓦克自由国际机场（EWR）可连接全球 100 个国际城市。约 15 家 Fortune 500 总部。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">泽西海岸（Jersey Shore）为大西洋沿岸度假带。大西洋城（Atlantic City）为东海岸博彩之都。开普梅（Cape May）为维多利亚式建筑保存最完好的海滨小镇。普林斯顿大学为常春藤名校校园。自由州立公园（Liberty State Park）可观赏自由女神像和曼哈顿天际线。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>纽瓦克自由国际机场（EWR）为纽约都会区第二大机场，年旅客超 4,500 万。<strong>公路：</strong>新泽西收费公路（Turnpike）为南北主干。<strong>铁路：</strong>NJ Transit 通勤铁路覆盖全州，PATH 地铁连接曼哈顿与新泽西。<strong>通勤：</strong>大量新泽西居民通勤至纽约市（约 40 万人）和费城。通勤时间中位数约 32 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/nj" target="_blank" rel="noopener">
+          查看新泽西州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 宾夕法尼亚 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">宾夕法尼亚州<small>Pennsylvania</small></div><div class="card-abbr">PA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>皱领松鸡</b></span>
+        <span class="symbol-chip">🌸 <b>山月桂</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~13,059,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$74,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$1,017B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">3.07% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>37.0%</strong> · 需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 21 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">贵格之州</span><span class="tag">独立摇篮</span><span class="tag">东北唯一经济增长州</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">GDP 约 $1,017 万亿，全美第 6，仅次于加州、得克萨斯、佛罗里达、纽约和伊利诺伊。医疗健康（UPMC 匹兹堡为全球最大医疗系统之一）、高等教育（宾夕法尼亚大学、卡内基梅隆大学）和制造业为支柱。约 24 家 Fortune 500 总部，包括 Comcast（#30，费城）、CVS Health（#6）、AmerisourceBergen（#10）、PNC Financial（#155）。宾夕法尼亚是东北部唯一经济增长的州——吸引近 $260 亿投资。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">费城（独立厅、自由钟、费城艺术博物馆台阶）为美国诞生地。匹兹堡（三河交汇、杜肯斜坡、安迪·沃霍尔博物馆）为工业城市复兴典范。葛底斯堡国家军事公园为南北战争转折点遗址。宾夕法尼亚荷兰裔乡村（兰开斯特县）为阿米什社区文化体验地。波科诺山脉（Poconos）为度假胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>费城国际机场（PHL）年旅客超 3,000 万，匹兹堡国际机场（PIT）。<strong>公路：</strong>I-76（宾夕法尼亚收费公路）横贯东西，I-95 沿东海岸。<strong>铁路：</strong>Amtrak Keystone Service（纽约-费城-哈里斯堡）为高频通勤线，Amtrak Pennsylvanian（纽约-费城-匹兹堡）。SEPTA 区域铁路覆盖费城都会区。宾夕法尼亚获 $1.437 亿联邦资金用于铁路改善。<strong>通勤：</strong>费城 SEPTA 地铁 + 公交 + 区域铁路。费城通勤时间中位数约 33 分钟，大量居民通勤至纽约（约 1 小时 Amtrak）。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/pa" target="_blank" rel="noopener">
+          查看宾夕法尼亚州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     南部
+     ================================================================ -->
+<div class="section-header" id="region-south">
+  <h2>南部</h2>
+  <p>South — 深南部 · 上南部 · 阿卡迪亚纳 · 墨西哥湾沿岸 · 佛罗里达</p>
+</div>
+<div class="grid">
+
+  <!-- 得克萨斯 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">得克萨斯州<small>Texas</small></div><div class="card-abbr">TX</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>嘲鸫</b></span>
+        <span class="symbol-chip">🌸 <b>蓝帽花</b></span>
+        <span class="symbol-chip">🦇 <b>墨西哥无尾蝠</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~31,290,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$73,620</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">$2.7T（全美第2）</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>45.7%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>倒数第 3</strong></span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">Texas</span><span class="tag">El Norte</span><span class="tag">孤星之州</span><span class="tag">全球第8大经济体</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">GDP 约 $2.7 万亿（2025 年），若独立为国家则位列全球第 8 大经济体。约 55 家 Fortune 500 总部，包括 ExxonMobil（#7）、AT&T（#32）、Dell Technologies（#48）、Tesla（#40）、Oracle（#89，总部从加州迁至奥斯汀）。石油天然气、科技（奥斯汀“硅丘”）、航空航天（休斯顿 NASA 约翰逊航天中心）、农业（牛、棉花）和国际贸易（休斯顿港）。三星在泰勒市投资 $440 亿建设半导体工厂。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">圣安东尼奥河滨步道（River Walk）为美国最受欢迎的都市旅游景点之一。阿拉莫（Alamo）为得克萨斯独立战争圣地。大弯国家公园（Big Bend National Park）为荒野探险胜地。奥斯汀为“世界现场音乐之都”（SXSW、ACL 音乐节）。休斯顿太空中心为 NASA 载人航天任务控制中心。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>达拉斯/沃斯堡国际机场（DFW）为全球最繁忙机场之一，休斯顿乔治·布什洲际机场（IAH）。<strong>公路：</strong>I-35 纵贯，I-10 横穿，I-45 连接休斯顿与达拉斯。得克萨斯拥有全美最长的公共道路里程（超过 31 万英里）。<strong>铁路：</strong>Amtrak Texas Eagle、Sunset Limited。<strong>通勤：</strong>休斯顿 METRO 公交 + 轻轨，达拉斯 DART 轻轨 + 通勤铁路。通勤以汽车为主导。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/tx" target="_blank" rel="noopener">
+          查看得克萨斯州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 佛罗里达 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">佛罗里达州<small>Florida</small></div><div class="card-abbr">FL</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>嘲鸫</b></span>
+        <span class="symbol-chip">🌸 <b>橙花</b></span>
+        <span class="symbol-chip">🐆 <b>佛罗里达豹</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~23,750,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$77,735</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">$1.85T（全美第4）</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>28.1%</strong> · 全美较低 · 需背景审查</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>倒数第 4</strong></span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">New Netherland 影响</span><span class="tag">阳光之州</span><span class="tag">全美人口第3</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">GDP 约 $1.85 万亿（2025 年 Q3），为全美第四大州经济体。人口约 2,375 万（2025 年），为全美第三大州，预计到 2035 年将增长至 2,600 万。约 20 家 Fortune 500 总部，包括 Publix Super Markets（#92）、AutoNation（#165）、Lennar（#119）、NextEra Energy（#126）。旅游业为绝对支柱（迪士尼世界、环球影城、迈阿密海滩），航空航天（肯尼迪航天中心、SpaceX）为新兴增长极。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">华特迪士尼世界（奥兰多）为全球最大主题公园度假区，年游客超 5,800 万。环球影城（奥兰多）的哈利波特魔法世界为全球主题公园标杆。迈阿密海滩和南海滩为拉美文化与装饰艺术建筑中心。大沼泽地国家公园为 UNESCO 世界遗产。肯尼迪航天中心为 NASA 载人航天发射场。基韦斯特为海明威故居和日落庆典胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>迈阿密国际机场（MIA）为拉美航线枢纽，奥兰多国际机场（MCO）为全球最繁忙旅游机场之一。<strong>公路：</strong>I-95 沿东海岸，I-75 横穿半岛，I-4 连接坦帕与奥兰多。<strong>铁路：</strong>Amtrak Silver Service、Brightline 高铁（迈阿密-劳德代尔堡-西棕榈滩-奥兰多）。<strong>通勤：</strong>迈阿密 Metrorail 地铁 + Metromover，奥兰多 SunRail 通勤铁路。通勤以汽车为主。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/fl" target="_blank" rel="noopener">
+          查看佛罗里达州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 佐治亚 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">佐治亚州<small>Georgia</small></div><div class="card-abbr">GA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>褐鸫</b></span>
+        <span class="symbol-chip">🌸 <b>切罗基玫瑰</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~11,180,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$74,632</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$880B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">5.19% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>40.3%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 40 位</strong></span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">Greater Appalachia</span><span class="tag">桃子之州</span><span class="tag">亚特兰大都会区</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">亚特兰大都会区为核心引擎——亚特兰大为美国东南部最大都市区，拥有约 18 家 Fortune 500 总部，包括 United Parcel Service（#41）、Home Depot（#23）、Coca-Cola（#93）、Delta Air Lines（#75）。亚特兰大哈茨菲尔德-杰克逊国际机场（ATL）为全球最繁忙客运机场。电影产业（“南方好莱坞”）为新兴支柱。农业（花生、山核桃、棉花）和汽车制造（起亚在韦斯特角设有大型工厂）。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">亚特兰大（可口可乐世界、CNN 中心、民权与人权中心、百年奥林匹克公园）为东南部文化与历史中心。萨凡纳为美国保存最完好的殖民城市之一，以历史街区和福赛斯公园闻名。大雾山国家公园（与北卡罗来纳共享）为全美访问量最大的国家公园。黄金群岛（圣西蒙斯岛、杰基尔岛）为海岸度假胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>哈茨菲尔德-杰克逊亚特兰大国际机场（ATL）为全球最繁忙客运机场，年旅客超 1 亿。<strong>公路：</strong>I-75 纵贯，I-85 连接亚特兰大与夏洛特/蒙哥马利，I-20 横穿。<strong>铁路：</strong>Amtrak Crescent（纽约-新奥尔良）每日经停亚特兰大。<strong>通勤：</strong>亚特兰大 MARTA 地铁 + 公交。通勤时间中位数约 31 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ga" target="_blank" rel="noopener">
+          查看佐治亚州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弗吉尼亚 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">弗吉尼亚州<small>Virginia</small></div><div class="card-abbr">VA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>山茱萸</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~8,811,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$92,090</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$798B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2%–5.75%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>35.0%</strong> · 需背景审查 · 无许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 14 位</strong>（全美前列）</span></div>
+      <div class="tags"><span class="tag">Tidewater</span><span class="tag">Greater Appalachia</span><span class="tag">老自治领</span><span class="tag">劳登县全美最富</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">联邦政府合同为绝对核心——北弗吉尼亚（NoVA）为五角大楼、中央情报局（CIA）和大量国防承包商的所在地。约 10 家 Fortune 500 总部，包括 Freddie Mac（#47）、General Dynamics（#89）、Northrop Grumman（#102）、Capital One（#100）。劳登县中位家庭收入 $178,282（2025 年），为全美最富的县。科技产业（数据中心走廊，全美最大数据中心集群）为增长引擎。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">谢南多厄国家公园（Shenandoah National Park）以蓝岭山脉天际线公路（Skyline Drive）闻名。蓝岭公路（Blue Ridge Parkway）为美国最风景优美的公路之一。殖民地威廉斯堡（Colonial Williamsburg）为美国最大历史活态博物馆。蒙蒂塞洛（杰斐逊故居）和弗农山庄（华盛顿故居）为总统历史圣地。弗吉尼亚海滩为东海岸度假胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>华盛顿杜勒斯国际机场（IAD）、里根华盛顿国家机场（DCA）。<strong>公路：</strong>I-95 纵贯东海岸，I-81 沿谢南多厄河谷，I-64 横穿。<strong>铁路：</strong>Amtrak Northeast Regional 和 Acela、VRE（弗吉尼亚铁路快线）。<strong>通勤：</strong>华盛顿地铁（WMATA）延伸至北弗吉尼亚。大量居民通勤至华盛顿特区（约 30 万人）。通勤时间中位数约 33 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/va" target="_blank" rel="noopener">
+          查看弗吉尼亚州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 北卡罗来纳 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">北卡罗来纳州<small>North Carolina</small></div><div class="card-abbr">NC</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>山茱萸</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~11,213,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$74,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">$788B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.25% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>36.0%</strong> · 需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 34 位</strong></span></div>
+      <div class="tags"><span class="tag">Tidewater</span><span class="tag">Greater Appalachia</span><span class="tag">焦油脚跟</span><span class="tag">研究三角园</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">研究三角园（Research Triangle Park, RTP）为核心科技引擎——RTP 为全美最大科技园区之一，聚集了 IBM、Cisco、SAS Institute（全球最大私营软件公司）。约 12 家 Fortune 500 总部，包括 Bank of America（#34）、Honeywell（#72）、Lowe's（#44）、Duke Energy（#177）。夏洛特为美国第二大金融中心。企业所得税 2.25%（2025 年）为全美最低之一。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">大雾山国家公园（与田纳西共享）为全美访问量最大的国家公园（年游客超 1,200 万）。外滩群岛（Outer Banks）为莱特兄弟首次动力飞行地。阿什维尔（Asheville）的比特摩尔庄园（Biltmore Estate）为美国最大私人住宅。夏洛特的 NASCAR 名人堂为赛车文化圣地。蓝岭公路（Blue Ridge Parkway）为风景驾车路线。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>夏洛特道格拉斯国际机场（CLT）为美国航空枢纽，年旅客超 5,000 万；罗利-达勒姆国际机场（RDU）。<strong>公路：</strong>I-95 纵贯东海岸，I-40 横穿，I-85 连接夏洛特与亚特兰大/里士满。<strong>铁路：</strong>Amtrak Carolinian、Crescent、Piedmont。<strong>通勤：</strong>夏洛特 Lynx 轻轨，罗利 GoRaleigh 公交。通勤以汽车为主。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/nc" target="_blank" rel="noopener">
+          查看北卡罗来纳州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 南卡罗来纳 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">南卡罗来纳州<small>South Carolina</small></div><div class="card-abbr">SC</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>卡罗来纳鹪鹩</b></span>
+        <span class="symbol-chip">🌸 <b>黄素馨</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~5,570,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$69,324</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$379B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">3.0%–6.4%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>44.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 37 位</strong></span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">Lowcountry</span><span class="tag">棕榈之州</span><span class="tag">宝马北美总部</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">汽车制造为标志性产业——宝马（BMW）在斯帕坦堡设有全球最大工厂（年产超 40 万辆），为州内最大制造业雇主。波音在北查尔斯顿设有 787 梦想飞机总装线。米其林、沃尔沃（查尔斯顿）和奔驰（查尔斯顿）亦在南卡设厂。约 3 家 Fortune 500 总部，包括 Duke Energy、Sonoco Products。查尔斯顿港为东海岸重要集装箱港。旅游业（默特尔比奇、查尔斯顿）为第二大产业。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">查尔斯顿为美国保存最完好的殖民城市之一，以历史街区、彩虹街和 Lowcountry 美食闻名。默特尔比奇（Myrtle Beach）为东海岸最受欢迎的家庭海滩度假地之一。希尔顿黑德岛为高端度假岛屿。康加里国家公园为美国东部最大原生硬木森林。萨姆特堡为南北战争第一枪打响地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>查尔斯顿国际机场（CHS）、哥伦比亚大都会机场（CAE）。<strong>公路：</strong>I-95 纵贯东海岸，I-20 连接哥伦比亚与亚特兰大，I-26 连接查尔斯顿与哥伦比亚/阿什维尔。<strong>铁路：</strong>Amtrak Silver Service、Crescent。<strong>通勤：</strong>查尔斯顿 CARTA 公交覆盖有限，哥伦比亚 COMET 公交覆盖都会区。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/sc" target="_blank" rel="noopener">
+          查看南卡罗来纳州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 田纳西 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">田纳西州<small>Tennessee</small></div><div class="card-abbr">TN</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>嘲鸫</b></span>
+        <span class="symbol-chip">🌸 <b>鸢尾花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~7,228,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$71,997</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">$549.7B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无（仅利息股息税）</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>48.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 31 位</strong></span></div>
+      <div class="tags"><span class="tag">Greater Appalachia</span><span class="tag">Deep South</span><span class="tag">志愿者之州</span><span class="tag">乡村音乐之都</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">汽车制造（日产士麦那、大众查塔努加、通用斯普林希尔设有大型工厂）和医疗健康（HCA Healthcare，纳什维尔，Fortune 500 #66，美国最大营利性医院运营商）为支柱。约 7 家 Fortune 500 总部，包括 FedEx（#43，孟菲斯，全球最大快递公司）、HCA Healthcare（#66）、Dollar General（#106）、AutoZone（#141）。音乐产业（纳什维尔乡村音乐、孟菲斯蓝调与摇滚）为文化经济核心。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">大雾山国家公园（与北卡罗来纳共享）为全美访问量最大的国家公园。纳什维尔的乡村音乐名人堂、大奥普里（Grand Ole Opry）和百老汇音乐街为音乐文化圣地。孟菲斯的 Graceland（猫王故居）、Beale Street 和 Stax 博物馆为蓝调与摇滚文化核心。查塔努加的卢考特山（Lookout Mountain）为内战历史遗址。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>纳什维尔国际机场（BNA）年旅客超 2,000 万，孟菲斯国际机场（MEM）为联邦快递全球超级枢纽。<strong>公路：</strong>I-40 横穿，I-65 纵贯，I-24 连接纳什维尔与查塔努加/亚特兰大。<strong>铁路：</strong>Amtrak City of New Orleans（芝加哥-新奥尔良）每日经停孟菲斯。<strong>通勤：</strong>纳什维尔 WeGo 公交，孟菲斯 MATA 公交 + 有轨电车。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/tn" target="_blank" rel="noopener">
+          查看田纳西州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 亚拉巴马 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">亚拉巴马州<small>Alabama</small></div><div class="card-abbr">AL</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>黄轴啄木鸟</b></span>
+        <span class="symbol-chip">🌸 <b>山茶花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~5,190,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$63,999</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$341B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2%–5%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>55.5%</strong> · 全美第2 · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 43 位</strong></span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">迪克西之心</span><span class="tag">民权之路</span><span class="tag">火箭城</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">航空航天（亨茨维尔为 NASA 马歇尔太空飞行中心所在地，被称为“火箭城”）、汽车制造（奔驰万斯、本田林肯、现代蒙哥马利设有大型工厂）和钢铁（伯明翰为南部钢铁之都）为支柱。约 2 家 Fortune 500 总部，包括 Regions Financial（#435）和 Vulcan Materials（#584）。中位家庭收入 $63,999，比全国中位数低约 21%。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">亨茨维尔的美国太空与火箭中心（U.S. Space & Rocket Center）为 NASA 马歇尔太空飞行中心官方博物馆。蒙哥马利的民权纪念碑和国家和平与正义纪念馆为美国民权运动圣地。伯明翰的民权研究所和 16 街浸信会教堂为历史地标。墨西哥湾海岸（Gulf Shores）为海滩度假胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>伯明翰-沙特尔斯沃思国际机场（BHM）、亨茨维尔国际机场（HSV）。<strong>公路：</strong>I-65 纵贯，I-20 横穿，I-85 连接蒙哥马利与亚特兰大。<strong>铁路：</strong>Amtrak Crescent（纽约-新奥尔良）每日经停伯明翰、安尼斯顿和塔斯卡卢萨。<strong>通勤：</strong>伯明翰 MAX 公交覆盖都会区。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/al" target="_blank" rel="noopener">
+          查看亚拉巴马州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 密西西比 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">密西西比州<small>Mississippi</small></div><div class="card-abbr">MS</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>嘲鸫</b></span>
+        <span class="symbol-chip">🌸 <b>木兰花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~2,946,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$59,127</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$165B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value green">无（2023年起逐步取消）</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>55.8%</strong> · 全美第1 · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>倒数第 2</strong></span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">三角洲</span><span class="tag">蓝调之乡</span><span class="tag">全美持枪率第一</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">农业（棉花、大豆、家禽）、制造业（汽车零部件、家具）和渔业为传统支柱。密西西比拥有约 1 家 Fortune 500 总部（Entergy）。中位家庭收入 $59,127，比全国中位数低约 30%，为全美最低。贫困率约 18.9%，为全美最高之一。无个人所得税（2023 年起逐步取消），企业税 4.0% 为全美最低之一。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">密西西比三角洲（Mississippi Delta）为蓝调音乐诞生地——克拉克斯代尔的十字路口传说（罗伯特·约翰逊“与魔鬼交易”）和 Dockery 种植园为蓝调文化圣地。维克斯堡国家军事公园为南北战争决定性战役遗址。墨西哥湾海岸（比洛克西、格尔夫波特）为度假和博彩目的地。纳奇兹（Natchez）为南北战争前豪宅保存最完好的城市之一。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>杰克逊-埃弗斯国际机场（JAN）、格尔夫波特-比洛克西国际机场（GPT）。<strong>公路：</strong>I-55 纵贯，I-20 横穿，I-10 沿墨西哥湾海岸。<strong>铁路：</strong>Amtrak City of New Orleans 每日经停格林伍德、亚祖城和杰克逊。<strong>通勤：</strong>杰克逊 JATRAN 公交覆盖有限。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ms" target="_blank" rel="noopener">
+          查看密西西比州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 路易斯安那 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">路易斯安那州<small>Louisiana</small></div><div class="card-abbr">LA</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>褐鹈鹕</b></span>
+        <span class="symbol-chip">🌸 <b>木兰花</b></span>
+        <span class="symbol-chip">🐻 <b>路易斯安那黑熊</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~4,598,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$60,756</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$258B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">1.85%–4.25%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>46.8%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>全美倒数第 1</strong></span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">Acadiana</span><span class="tag">卡津之乡</span><span class="tag">全美最不安全</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">石油天然气（墨西哥湾离岸开采和炼油）和石化为绝对核心。新奥尔良为密西西比河重要港口。卡津（Cajun）和克里奥尔（Creole）文化（美食、音乐、狂欢节）为独特文化经济资产。约 1 家 Fortune 500 总部（Entergy，#447，新奥尔良）。中位家庭收入 $60,756，比全国中位数低约 25%。2025 年 Q1 实际 GDP 下降 1.7%。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">新奥尔良（法国区、波旁街、爵士乐、Mardi Gras 狂欢节）为美国最独特的文化城市之一。橡树巷种植园（Oak Alley Plantation）为南北战争前庄园代表。巴吞鲁日的州议会大厦为美国最高州议会大厦。拉法叶为卡津文化中心。沼泽之旅（Swamp Tour）为鳄鱼和湿地生态体验。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>新奥尔良路易斯·阿姆斯特朗国际机场（MSY）。<strong>公路：</strong>I-10 横穿南部，I-49 连接拉法叶与什里夫波特，I-55 连接新奥尔良与杰克逊。<strong>铁路：</strong>Amtrak City of New Orleans、Sunset Limited。<strong>通勤：</strong>新奥尔良 RTA 公交 + 有轨电车（St. Charles、Canal 线）。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/la" target="_blank" rel="noopener">
+          查看路易斯安那州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 肯塔基 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">肯塔基州<small>Kentucky</small></div><div class="card-abbr">KY</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>秋麒麟草</b></span>
+        <span class="symbol-chip">🐎 <b>纯血马</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~4,607,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$64,526</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$307B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">4.0% 统一</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>48.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 39 位</strong></span></div>
+      <div class="tags"><span class="tag">Greater Appalachia</span><span class="tag">蓝草之州</span><span class="tag">波本之乡</span><span class="tag">赛马文化</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">汽车制造（丰田乔治敦设有全球最大工厂之一，福特路易斯维尔设有大型卡车工厂）和波本威士忌（全美 95% 波本产量）为标志性产业。约 2 家 Fortune 500 总部，包括 Yum! Brands（#489，路易斯维尔，肯德基、必胜客、塔可钟母公司）和 Humana（#56，路易斯维尔，健康保险）。赛马产业（丘吉尔唐斯、肯塔基德比）为文化经济核心。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">肯塔基德比（Churchill Downs，路易斯维尔）为美国最著名的赛马赛事（每年 5 月第一个周六）。波本小径（Bourbon Trail）串联全州主要威士忌酒厂。猛犸洞国家公园为世界最长洞穴系统（已探明超 400 英里）。红河峡谷（Red River Gorge）为攀岩和徒步胜地。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>路易斯维尔穆罕默德·阿里国际机场（SDF），辛辛那提/北肯塔基国际机场（CVG）服务北部。<strong>公路：</strong>I-65 纵贯，I-75 纵贯东部，I-64 横穿。<strong>铁路：</strong>Amtrak Cardinal（纽约-芝加哥）每周三班经停阿什兰、莫尔黑德和路易斯维尔。<strong>通勤：</strong>路易斯维尔 TARC 公交，列克星敦 LexTran 公交。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ky" target="_blank" rel="noopener">
+          查看肯塔基州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 阿肯色 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">阿肯色州<small>Arkansas</small></div><div class="card-abbr">AR</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>嘲鸫</b></span>
+        <span class="symbol-chip">🌸 <b>苹果花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~3,049,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$60,773</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$188B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2.0%–3.9%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>44.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>倒数第 5</strong></span></div>
+      <div class="tags"><span class="tag">Greater Appalachia</span><span class="tag">Ozarks</span><span class="tag">自然之州</span><span class="tag">沃尔玛故乡</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">零售业为标志性产业——Walmart（本顿维尔）为全球最大零售商，Fortune 500 第 1 位，营收超 $6,480 亿。约 5 家 Fortune 500 总部，包括 Walmart（#1）、J.B. Hunt Transport（#303，洛厄尔，货运）、Tyson Foods（#83，斯普林代尔，全球最大肉类加工商）、Murphy USA（#172，埃尔多拉多）。农业（水稻、家禽、大豆）和林业为传统产业。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">温泉国家公园（Hot Springs National Park）为阿肯色唯一国家公园，以历史温泉浴场闻名。欧扎克国家森林（Ozark National Forest）为徒步、露营和漂流胜地。布法罗国家河流（Buffalo National River）为美国第一条国家河流。小石城的克林顿总统图书馆和中央高中（民权运动地标）。水晶桥美国艺术博物馆（本顿维尔，沃尔玛创始人家族捐赠）。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>小石城克林顿国家机场（LIT），西北阿肯色国家机场（XNA）。<strong>公路：</strong>I-40 横穿，I-30 连接小石城与达拉斯，I-55 沿密西西比河。<strong>铁路：</strong>Amtrak Texas Eagle 每日经停小石城、马尔文和特克萨卡纳。<strong>通勤：</strong>小石城 Rock Region Metro 公交覆盖都会区。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ar" target="_blank" rel="noopener">
+          查看阿肯色州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 俄克拉荷马 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">俄克拉何马州<small>Oklahoma</small></div><div class="card-abbr">OK</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>剪尾王霸鹟</b></span>
+        <span class="symbol-chip">🌸 <b>槲寄生</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~4,100,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$61,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$210B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">0.25%–4.75%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>45.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 42 位</strong></span></div>
+      <div class="tags"><span class="tag">Greater Appalachia</span><span class="tag">Southern Great Plains</span><span class="tag">抢先之州</span><span class="tag">原住民文化</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">石油天然气（全美主要产油州之一）、航空航天（塔尔萨为美国航空维修中心）和农业（小麦、牛）为支柱。约 2 家 Fortune 500 总部，包括 Devon Energy（#216，俄克拉荷马城，油气）和 ONE Gas（#733，塔尔萨，公用事业）。俄克拉荷马拥有 39 个联邦认可的原住民部落，为原住民文化最集中的州之一。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">俄克拉荷马城国家纪念博物馆为 1995 年联邦大楼爆炸案遗址。塔尔萨的“黑色华尔街”历史区（Greenwood）为 1921 年种族屠杀遗址，近年复兴为文化区。威奇托山（Wichita Mountains）为野牛和长角牛保护区。特纳瀑布（Turner Falls）为州内最受欢迎游泳和露营目的地。66 号公路穿越俄克拉荷马。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>俄克拉荷马城威尔·罗杰斯世界机场（OKC），塔尔萨国际机场（TUL）。<strong>公路：</strong>I-35 纵贯，I-40 横穿，I-44（收费公路）连接俄克拉荷马城与塔尔萨。<strong>铁路：</strong>Amtrak Heartland Flyer（俄克拉荷马城-沃斯堡）每日一班。<strong>通勤：</strong>俄克拉荷马城 EMBARK 公交，塔尔萨 MTTA 公交。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/ok" target="_blank" rel="noopener">
+          查看俄克拉何马州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 西弗吉尼亚 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">西弗吉尼亚州<small>West Virginia</small></div><div class="card-abbr">WV</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>北美红雀</b></span>
+        <span class="symbol-chip">🌸 <b>杜鹃花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~1,770,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$55,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$80B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2.36%–4.82%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>48.0%</strong> · 宪法携带州</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 27 位</strong></span></div>
+      <div class="tags"><span class="tag">Greater Appalachia</span><span class="tag">山地之州</span><span class="tag">煤矿之乡</span><span class="tag">新河峡</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">煤炭（阿巴拉契亚煤田，但产量持续下降）和天然气为传统支柱。户外旅游（新河峡国家公园、滑雪）为新兴增长极。无 Fortune 500 总部，最大企业为 WVU Medicine 和 CAMC Health System。中位家庭收入约 $55,000，为全美最低之一，贫困率约 17.9%。人口自 2010 年以来持续下降，老龄化问题突出。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">新河峡国家公园（New River Gorge National Park）为美国最新国家公园（2020 年确立），以峡谷和白水漂流闻名。新河峡大桥为美国最长单跨拱桥之一，每年“大桥日”跳伞活动为标志性事件。雪鞋山（Snowshoe Mountain）为东南部顶级滑雪度假地。哈珀斯费里（Harpers Ferry）为南北战争历史地标。格林班克望远镜为全球最大可操纵射电望远镜。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>查尔斯顿耶格尔机场（CRW），摩根敦市机场（MGW）。<strong>公路：</strong>I-79 纵贯，I-77 纵贯，I-64 横穿，I-81 穿越东部狭长地带。<strong>铁路：</strong>Amtrak Cardinal 每周三班经停查尔斯顿、亨廷顿和怀特萨尔弗斯普林斯。Amtrak Capitol Limited 经停哈珀斯费里和马丁斯堡。<strong>通勤：</strong>查尔斯顿 KRT 公交，摩根敦 Mountain Line 公交。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/wv" target="_blank" rel="noopener">
+          查看西弗吉尼亚州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 马里兰 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">马里兰州<small>Maryland</small></div><div class="card-abbr">MD</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>巴尔的摩黄鹂</b></span>
+        <span class="symbol-chip">🌸 <b>黑眼苏珊</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~6,200,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$91,431</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$520B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2%–5.75%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>30.0%</strong> · 需许可携带 · 严格管制</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 13 位</strong>（全美前列）</span></div>
+      <div class="tags"><span class="tag">Tidewater</span><span class="tag">Midlands</span><span class="tag">切萨皮克</span><span class="tag">联邦通勤带</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">联邦政府合同和生物医学研究为绝对核心——美国国立卫生研究院（NIH）位于贝塞斯达，为全球最大生物医学研究机构。约翰霍普金斯大学（巴尔的摩）为全球顶级研究型大学，其应用物理实验室（APL）为国防和太空研究核心。约 4 家 Fortune 500 总部，包括 Lockheed Martin（#60，贝塞斯达，全球最大国防承包商）、Marriott International（#42，贝塞斯达，酒店）、Discovery（#294，银泉）。巴尔的摩港为东海岸重要汽车和煤炭出口港。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">巴尔的摩内港（Inner Harbor）为国家水族馆和历史战舰（星座号）所在地。安纳波利斯为美国最古老州首府之一，美国海军学院所在地。切萨皮克湾为蓝蟹捕捞和帆船运动胜地。阿萨蒂格岛国家海滨（Assateague Island）为野马和海滩露营目的地。大洋城（Ocean City）为东海岸热门海滩度假地。安提顿国家战场为南北战争血腥战役遗址。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>巴尔的摩/华盛顿国际机场（BWI）为最大机场，西南航空重点机场，年旅客超 2,700 万。<strong>公路：</strong>I-95 纵贯，I-495（首都环线）围绕华盛顿，I-70 横穿。<strong>铁路：</strong>Amtrak Northeast Regional 和 Acela、MARC 通勤铁路（宾州线、坎登线、不伦瑞克线）。华盛顿地铁（WMATA）延伸至蒙哥马利县和乔治王子县。<strong>通勤：</strong>大量居民通勤至华盛顿特区（约 40 万人）和巴尔的摩。通勤时间中位数约 33 分钟。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/md" target="_blank" rel="noopener">
+          查看马里兰州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 特拉华 -->
+  <div class="card" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">特拉华州<small>Delaware</small></div><div class="card-abbr">DE</div></div>
+    <div class="card-body">
+      <div class="symbols">
+        <span class="symbol-chip">🐦 <b>蓝鸡</b></span>
+        <span class="symbol-chip">🌸 <b>桃花</b></span>
+      </div>
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口</span><span class="data-value">~1,050,000</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$82,000</span></div>
+        <div class="data-item"><span class="data-label">GDP</span><span class="data-value">~$95B</span></div>
+        <div class="data-item"><span class="data-label">州所得税</span><span class="data-value">2.2%–6.6%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>34.4%</strong> · 需许可携带</span></div>
+      <div class="info-row"><span class="label">安全</span><span class="value">WalletHub 2025 <strong>第 28 位</strong></span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">第一州</span><span class="tag">公司天堂</span><span class="tag">无销售税</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济与企业</div><div class="detail-text">公司注册为独特支柱——超过 100 万家企业在此注册（包括超过 60% 的 Fortune 500 公司），特拉华衡平法院（Court of Chancery）为美国公司法的事实标准。杜邦（DuPont）家族在威尔明顿的百年总部塑造了州的经济和文化。化工（杜邦）、金融（银行和信用卡运营中心）和农业（家禽、大豆）为传统产业。</div></div>
+      <div class="detail-section"><div class="detail-label">旅游与景点</div><div class="detail-text">里霍博斯海滩（Rehoboth Beach）和杜威海滩（Dewey Beach）为华盛顿-巴尔的摩都会区的“夏季首都”。刘易斯（Lewes）为特拉华湾历史小镇。威尔明顿的杜邦故居（Hagley Museum）和内穆尔庄园（Nemours Estate）为工业贵族遗产。多佛为州首府，以 NASCAR 赛车（多佛国际赛道）闻名。特拉华纪念大桥为工程地标。</div></div>
+      <div class="detail-section"><div class="detail-label">交通与通勤</div><div class="detail-text"><strong>航空：</strong>费城国际机场（PHL）、巴尔的摩/华盛顿国际机场（BWI）为区域枢纽。威尔明顿机场（ILG）为通用航空。<strong>公路：</strong>I-95 穿越威尔明顿，US-13 纵贯南北。<strong>铁路：</strong>Amtrak Northeast Regional 和 Acela 经停威尔明顿，SEPTA 区域铁路（威尔明顿/纽瓦克线）连接费城。DART First State 公交覆盖全州。<strong>通勤：</strong>大量居民通勤至费城、巴尔的摩和华盛顿。通勤以汽车为主。</div></div>
+      <div class="detail-link-wrap">
+        <a class="detail-link" href="https://slcleo-usa.github.io/de" target="_blank" rel="noopener">
+          查看特拉华州具体详情
+          <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== 页脚 ==================== -->
+<footer class="footer">
+  <p>美国五十州 · 全域深度图鉴 · 地理 · 文化 · 生活 · 交通 · 经济 · 安全</p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · WalletHub · Tax Foundation · Fortune · Amtrak</p>
+  <p>文化分区参考 Colin Woodard《American Nations》及 Inzitarie 分区方案</p>
+  <div class="copyright">
+    SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved
+  </div>
+</footer>
+
+<!-- ==================== 回到顶部 ==================== -->
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg>
+</div>
+
+<script>
+  // 深色模式
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon(next);
+  }
+
+  function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    } else {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
+  }
+
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeIcon(saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      updateThemeIcon('dark');
+    }
+  })();
+
+  // 卡片展开
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  // 回到顶部
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('visible', window.scrollY > 600);
+  }, { passive: true });
+
+  // 平滑滚动导航
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const offset = 64;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
