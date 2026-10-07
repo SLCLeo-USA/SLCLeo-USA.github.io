@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HI</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --aloha: #00695c;
+  }
+  [data-theme="dark"] {
+    --ground: #000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #0a1f1c 0%, #0f302a 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --aloha: #4db6ac;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--aloha); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--aloha); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s ease; padding: 0 24px; background: var(--surface-secondary); }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s ease; }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>夏威夷州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#hi-overview">概览</a><a href="#hi-pop">人口</a><a href="#hi-econ">经济就业</a>
+      <a href="#hi-biz">企业与产业</a><a href="#hi-health">医疗</a><a href="#hi-safety">公共安全</a>
+      <a href="#hi-tax">税收财政</a><a href="#hi-trans">交通</a><a href="#hi-housing">住房</a>
+      <a href="#hi-climate">气候</a><a href="#hi-politics">政治政府</a><a href="#hi-edu">教育</a>
+      <a href="#hi-sports">体育</a><a href="#hi-media">媒体</a><a href="#hi-tourism">旅游</a>
+      <a href="#hi-energy">能源</a><a href="#hi-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()"><svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌺</div>
+  <h1>夏威夷州<br><em>Hawaii</em></h1>
+  <p class="subtitle">阿罗哈之州 · 太平洋天堂 · 全美最安全州之一 · 多元文化熔炉</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>1,446,146</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$110.3B</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>2.8%</strong><span>失业率 (2025.5)</span></div>
+    <div class="hero-stat"><strong>#6</strong><span>生活质量全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 最高个税 <b>11%</b></span>
+    <span class="hero-badge orange">🔫 <b>持枪率全美最低</b> · 严格管制</span>
+    <span class="hero-badge red">📚 教育全美 <b>第42</b></span>
+    <span class="hero-badge">🏝️ <b>旅游 = GDP 23%</b></span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="hi-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1959年8月21日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">檀香山</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">檀香山</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">28,311 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">夏威夷雁（Nene）</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">木槿花</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">阿罗哈之州（The Aloha State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Ua Mau ke Ea o ka ʻĀina i ka Pono"</span></div>
+      <div class="tags"><span class="tag">First Nation</span><span class="tag">Pacific</span><span class="tag">阿罗哈之州</span><span class="tag">多元文化</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">夏威夷是美国唯一以<strong>原住民文化</strong>为主体的州，位于太平洋中部，由 <strong>8 个</strong>主要岛屿和 <strong>137 个</strong>小岛组成。在 Colin Woodard 的文化分区中属于 <strong>First Nation</strong> 文化区。波利尼西亚原住民文化、亚洲移民文化和美国本土文化在此融合，形成独特的“Local”文化。州内拥有 <strong>2 座</strong>国家公园（夏威夷火山、哈雷阿卡拉）和 <strong>50 个</strong>州立公园。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">约公元 400-800 年波利尼西亚人定居夏威夷。1810 年卡美哈美哈一世统一群岛，建立夏威夷王国。1893 年夏威夷王国被美国商人推翻，1898 年被美国吞并。<strong>1959 年 8 月 21 日</strong>成为美国第 <strong>50 个州</strong>。1993 年美国国会通过“道歉决议”，承认推翻夏威夷王国为非法。原住民主权运动至今活跃。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="hi-pop" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">1,446,146</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~41 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$94,814</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$65,151</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">10.9%</span></div>
+        <div class="data-item"><span class="data-label">外国出生</span><span class="data-value">18.4%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">亚裔 37.6% · 白人 24.7% · 混血 23.8% · 西语裔 10.7%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">檀香山 345,064 · 东檀香山 · 珍珠城</span></div>
+      <div class="tags"><span class="tag">亚裔占比全美最高</span><span class="tag">多元种族融合</span><span class="tag">人口外流</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2025)</td><td><strong>1,446,146</strong>（全美第40）</td></tr>
+        <tr><td>亚裔占比</td><td><strong>37.6%</strong>（全美最高）</td></tr>
+        <tr><td>混血占比</td><td>23.8%</td></tr>
+        <tr><td>夏威夷原住民</td><td>约 10.5%</td></tr>
+        <tr><td>外国出生</td><td>18.4%</td></tr>
+        <tr><td>军人和家属</td><td>约 9% 人口</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$94,814</strong>，为全美最高之一。但生活成本同样极高——<strong>49%</strong> 家庭难以负担基本生活需求。人口自 2020 年以来呈<strong>净流出</strong>趋势，居民迁往内陆州寻求更低生活成本。檀香山都会区集中全州约 <strong>70%</strong> 人口。原住民社区面临住房、健康和教育方面的显著差距。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="hi-econ" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$110.3B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长 (Q1)</span><span class="data-value red">-0.3%</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">2.8%</span></div>
+        <div class="data-item"><span class="data-label">CNBC 综合</span><span class="data-value red">全美第49</span></div>
+        <div class="data-item"><span class="data-label">经济评级</span><span class="data-value red">D+</span></div>
+        <div class="data-item"><span class="data-label">旅游/GDP</span><span class="data-value">23%</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">旅游 · 军事 · 农业 · 科技</span></div>
+      <div class="info-row"><span class="label">政府/军事</span><span class="value">占 GDP <strong>18.9%</strong>（全美 4.0%）</span></div>
+      <div class="tags"><span class="tag">旅游占GDP23%</span><span class="tag">太平洋司令部</span><span class="tag">经济评级D+</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现 (CNBC 2025)</div><table class="mini-table">
+        <tr><td>GDP (2025)</td><td><strong>$110.3B</strong>（全美第41）</td></tr>
+        <tr><td>GDP 增速 (Q1 2025)</td><td><strong>-0.3%</strong></td></tr>
+        <tr><td>失业率 (May 2025)</td><td><strong>2.8%</strong>（全美 4.3%）</td></tr>
+        <tr><td>CNBC 综合排名</td><td><strong>第49</strong>（全美倒数第2）</td></tr>
+        <tr><td>经济评级</td><td>D+（第39）</td></tr>
+        <tr><td>生活质量</td><td><strong>第6</strong>（B）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">夏威夷经济由<strong>旅游</strong>和<strong>军事</strong>双引擎驱动——旅游占 GDP 约 <strong>23%</strong>，政府/军事占 <strong>18.9%</strong>（全美平均仅 4%）。美国太平洋司令部总部位于欧胡岛，军人和家属约占人口 <strong>9%</strong>。农业以咖啡（科纳）、夏威夷果、菠萝和甘蔗为主。科技产业（海洋工程、天文、AI）为新兴增长极。但经济多元化程度低、生活成本极高、营商环境全美倒数，构成长期结构性挑战。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="hi-biz" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value red">0</span></div>
+        <div class="data-item"><span class="data-label">最大私营雇主</span><span class="data-value">Hawaii Pacific Health</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Hawaiian Electric</span></div>
+        <div class="data-item"><span class="data-label">银行</span><span class="data-value">Bank of Hawaii · First Hawaiian</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要雇主</span><span class="value">Hawaii Pacific Health · Kaiser Permanente · Queen's Health</span></div>
+      <div class="info-row"><span class="label">军工</span><span class="value">Pearl Harbor · Hickam · Schofield Barracks</span></div>
+      <div class="tags"><span class="tag">无Fortune 500</span><span class="tag">医疗系统为最大雇主</span><span class="tag">军工经济</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要雇主</div><table class="mini-table">
+        <tr><td>Hawaii Pacific Health</td><td>医疗系统 · 全州最大私营雇主</td></tr>
+        <tr><td>Kaiser Permanente Hawaii</td><td>医疗系统 · 综合医疗服务</td></tr>
+        <tr><td>The Queen's Health Systems</td><td>医疗系统 · 全州历史最悠久</td></tr>
+        <tr><td>Hawaiian Electric Industries</td><td>公用事业 · 全州电力供应</td></tr>
+        <tr><td>Bank of Hawaii</td><td>金融 · 全州最大银行</td></tr>
+        <tr><td>First Hawaiian Bank</td><td>金融 · 全州第二大银行</td></tr>
+        <tr><td>Kamehameha Schools</td><td>教育 · 原住民信托基金</td></tr>
+        <tr><td>Altres Industrial</td><td>人力资源与商业服务</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">产业特点</div><div class="detail-text">夏威夷<strong>无 Fortune 500 总部</strong>，经济以中小企业和分支机构为主导。医疗系统为最大私营雇主部门——Hawaii Pacific Health、Kaiser Permanente 和 Queen's Health Systems 三家合计雇佣数万人。<strong>军工经济</strong>极为重要：珍珠港-希卡姆联合基地、Schofield 兵营和太平洋司令部带来大量联邦支出和就业。农业以<strong>科纳咖啡</strong>（全球知名）、夏威夷果和菠萝为特色。科技产业以<strong>海洋工程</strong>（Makai Ocean Engineering）、<strong>天文</strong>（Mauna Kea 观测站）和<strong>AI</strong>（Jumpstart AI）为新兴方向。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="hi-health" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">Queen's Medical Center</span></div>
+        <div class="data-item"><span class="data-label">连续第1</span><span class="data-value green">13 年</span></div>
+        <div class="data-item"><span class="data-label">全美专科排名</span><span class="data-value">2 个专科</span></div>
+        <div class="data-item"><span class="data-label">Becker's 100</span><span class="data-value green">全州唯一</span></div>
+        <div class="data-item"><span class="data-label">Kaiser Moanalua</span><span class="data-value">全州前列</span></div>
+        <div class="data-item"><span class="data-label">无医保率</span><span class="data-value green">全美最低之一</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">Queen's Medical Center 连续 13 年全州第1</span></div>
+      <div class="info-row"><span class="label">全美排名</span><span class="value">2 个成人专科全美排名 · 4 个高绩效专科</span></div>
+      <div class="tags"><span class="tag">Queen's 13年全州第1</span><span class="tag">Becker's 100</span><span class="tag">Kaiser Moanalua前列</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. The Queen's Medical Center</td><td>檀香山 · 连续 13 年全州第1 · Becker's 100</td></tr>
+        <tr><td>2. Kaiser Permanente Moanalua Medical Center</td><td>檀香山 · COPD/心衰/肾衰高绩效</td></tr>
+        <tr><td>3. Straub Medical Center</td><td>檀香山 · 全州前列</td></tr>
+        <tr><td>4. Adventist Health Castle</td><td>凯卢阿 · 全州前列</td></tr>
+        <tr><td>5. Maui Memorial Medical Center</td><td>卡胡卢伊 · 茂宜岛主要医院</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text"><strong>Queen's Medical Center</strong> 连续 <strong>13 年</strong>被 U.S. News 评为全州最佳医院，在 <strong>2 个</strong>成人专科中获全美排名，<strong>4 个</strong>专科获“高绩效”评级，并入选 Becker's <strong>2025 年“全美 100 家伟大医院”</strong>。Kaiser Permanente Moanalua 在 COPD、充血性心力衰竭和肾衰竭方面获高绩效评级。夏威夷<strong>无医保率全美最低之一</strong>，得益于《夏威夷预付医疗法案》（1974 年），要求雇主为员工提供医疗保险。但岛屿地理导致专科医疗资源集中在欧胡岛，外岛居民需转诊至檀香山。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="hi-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value green">~14.9%</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value green">最低之一</span></div>
+        <div class="data-item"><span class="data-label">枪支死亡率</span><span class="data-value green">全美最低</span></div>
+        <div class="data-item"><span class="data-label">年均枪支死亡</span><span class="data-value green">63 人</span></div>
+        <div class="data-item"><span class="data-label">枪支暴力成本</span><span class="data-value green">$637/人</span></div>
+        <div class="data-item"><span class="data-label">LTC 持证者</span><span class="data-value">3,764 人</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>严格许可制</strong> · 隐蔽携枪需县警局批准 · 2025年放宽后申请激增</span></div>
+      <div class="info-row"><span class="label">效果</span><span class="value">全美枪支暴力率最低 · 凶杀率全美最低之一</span></div>
+      <div class="tags"><span class="tag">持枪率全美最低</span><span class="tag">枪支死亡率最低</span><span class="tag">严格许可制</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">枪支法规与现状</div><div class="detail-text">夏威夷拥有<strong>全美最严格的枪支管制法律之一</strong>。隐蔽携枪需向县警局申请许可证，2025 年全州仅 <strong>3,764 人</strong>持有有效隐蔽携枪证（LTC），占 21 岁以上人口的 <strong>0.34%</strong>。持枪率约 <strong>14.9%</strong>，为全美最低之一。年均 <strong>63 人</strong>死于枪支（其中约 60% 为自杀），枪支暴力社会成本 <strong>$637/人</strong>，为全美第 4 低。2025 年 LTC 签发量较 2024 年增长 <strong>70.5%</strong>，反映最高法院 Bruen 判决后的放宽趋势，但整体管制仍为全美最严。夏威夷凶杀率和暴力犯罪率均处于全美最低水平。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="hi-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value red">1.4%–11%</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">4.4%–6.4%</span></div>
+        <div class="data-item"><span class="data-label">州销售税 (GET)</span><span class="data-value">4.0%</span></div>
+        <div class="data-item"><span class="data-label">综合 GET</span><span class="data-value">4.712%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value green">~0.32%</span></div>
+        <div class="data-item"><span class="data-label">汽油税</span><span class="data-value">36.5¢/加仑</span></div>
+      </div>
+      <div class="info-row"><span class="label">税负特征</span><span class="value">高个税 · 低房产税 · 高生活成本</span></div>
+      <div class="info-row"><span class="label">税收结构</span><span class="value">个税最高档 <strong>11%</strong> · 全美前列</span></div>
+      <div class="tags"><span class="tag">个税11%全美最高之一</span><span class="tag">房产税0.32%全美最低</span><span class="tag">GET 4.712%</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>1.4%–11%</strong> 累进（全美最高档之一）</td></tr>
+        <tr><td>企业所得税</td><td>4.4%–6.4% 累进</td></tr>
+        <tr><td>一般消费税（GET）</td><td>4.0%（县附加后合计约 4.712%）</td></tr>
+        <tr><td>房产税</td><td>有效税率约 <strong>0.32%</strong>（全美最低之一）</td></tr>
+        <tr><td>汽油税</td><td>36.50 美分/加仑</td></tr>
+        <tr><td>遗产税</td><td>有（$500 万以上）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">夏威夷以<strong>高税负、高生活成本</strong>为特征。个人所得税最高档 <strong>11%</strong> 为全美前列。GET 对几乎所有商品和服务交易征收，包括医疗和食品。但房产税有效税率仅 <strong>0.32%</strong>，为全美最低之一——尽管房价极高，名义税负相对较低。夏威夷是<strong>全美唯一征收遗产税</strong>的州之一（$500 万以上）。CNBC 将夏威夷的生活成本列为<strong>全美第 49</strong>（倒数第 2），营商环境<strong>第 50</strong>（倒数第 1）。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="hi-trans" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大机场</span><span class="data-value">HNL</span></div>
+        <div class="data-item"><span class="data-label">年旅客</span><span class="data-value">2,000万+</span></div>
+        <div class="data-item"><span class="data-label">轻轨 Skyline</span><span class="data-value green">2025年延伸至机场</span></div>
+        <div class="data-item"><span class="data-label">公交 TheBus</span><span class="data-value">9,000人/日</span></div>
+        <div class="data-item"><span class="data-label">州际公路</span><span class="data-value">H-1 · H-2 · H-3</span></div>
+        <div class="data-item"><span class="data-label">岛屿间</span><span class="data-value">航空 + 渡轮</span></div>
+      </div>
+      <div class="info-row"><span class="label">轻轨扩展</span><span class="value">2025年10月 Skyline 二期开通 · 新增4站连接机场</span></div>
+      <div class="info-row"><span class="label">通勤</span><span class="value">TheBus 日均服务约 9,000 人 · 轻轨客流增长中</span></div>
+      <div class="tags"><span class="tag">HNL太平洋枢纽</span><span class="tag">Skyline二期开通</span><span class="tag">岛屿间航空</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>丹尼尔·井上国际机场（HNL）</strong>为夏威夷最大航空枢纽，年旅客超 <strong>2,000 万</strong>，为太平洋航线重要中转站。夏威夷航空（现属阿拉斯加航空集团）为区域主导。岛屿间依赖航空，航程约 <strong>30 分钟</strong>。卡胡卢伊（OGG）、科纳（KOA）和利胡埃（LIH）为外岛主要机场。</div></div>
+      <div class="detail-section"><div class="detail-label">轻轨与公共交通</div><div class="detail-text"><strong>Skyline</strong> 轻轨系统于 2023 年开通首段，<strong>2025 年 10 月 16 日</strong>二期延伸段正式开通，新增 <strong>4 个</strong>车站：Makalapa（珍珠港-希卡姆联合基地）、Lelepaua（丹尼尔·井上国际机场）、Ahua（Lagoon Drive）和 Kahauiki（Kalihi 交通中心）。延伸段长 <strong>5.2 英里</strong>，运营时间延长至早 <strong>4:00</strong> 至晚 <strong>10:30</strong>。轻轨客流已增至约 <strong>11,000 人/日</strong>，TheBus 公交日均服务约 <strong>9,000 人</strong>。外岛公交系统有限，汽车为主要交通工具。<strong>H-1、H-2、H-3</strong> 州际公路仅位于欧胡岛，为全美唯一不在大陆的州际公路系统。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="hi-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">单户住宅中位价</span><span class="data-value red">$950,000</span></div>
+        <div class="data-item"><span class="data-label">年变化</span><span class="data-value">+1.0%</span></div>
+        <div class="data-item"><span class="data-label">公寓中位价</span><span class="data-value">$600,000</span></div>
+        <div class="data-item"><span class="data-label">公寓年变化</span><span class="data-value green">-2.0%</span></div>
+        <div class="data-item"><span class="data-label">可负担家庭</span><span class="data-value red">仅 20%</span></div>
+        <div class="data-item"><span class="data-label">Oahu 单户中位价</span><span class="data-value red">$1,150,000</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房危机</span><span class="value">全美最不可负担市场之一 · 仅 1/5 家庭可负担中位价住房</span></div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">房价趋稳 · 公寓价格下降 · 库存紧张</span></div>
+      <div class="tags"><span class="tag">房价全美最高</span><span class="tag">仅20%可负担</span><span class="tag">公寓价格下降</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025 年夏威夷<strong>单户住宅中位价 $950,000</strong>，同比上涨约 1%。<strong>公寓中位价 $600,000</strong>，同比下降 2%（2023 年以来持续下降）。欧胡岛单户住宅中位价达 <strong>$1,150,000</strong>（2025 上半年，同比 +6%），公寓中位价 <strong>$507,000</strong>（同比 -0.5%）。可负担性极低——负担中位价住房需要超过州中位收入 <strong>180%</strong> 的收入，仅约 <strong>1/5</strong> 家庭可负担。UHERO 2026 年住房报告指出，房价已趋于平稳但仍“极高”，风险正在上升。科纳地区中位价达 <strong>$120 万</strong>，而其他地区中位价低至不足 $50 万。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>单户住宅中位价 (2025)</td><td><strong>$950,000</strong></td></tr>
+        <tr><td>公寓中位价</td><td>$600,000</td></tr>
+        <tr><td>Oahu 单户住宅中位价</td><td>$1,150,000</td></tr>
+        <tr><td>Oahu 公寓中位价</td><td>$507,000</td></tr>
+        <tr><td>可负担家庭比例</td><td><strong>仅 20%</strong></td></tr>
+        <tr><td>新挂牌数量</td><td>同比下降</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="hi-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">2025年排名</span><span class="data-value red">第6暖年</span></div>
+        <div class="data-item"><span class="data-label">2025年降水排名</span><span class="data-value red">第2干年</span></div>
+        <div class="data-item"><span class="data-label">年均温</span><span class="data-value">67.2°F (+0.8°F)</span></div>
+        <div class="data-item"><span class="data-label">年降水</span><span class="data-value red">42 英寸</span></div>
+        <div class="data-item"><span class="data-label">30年均降水</span><span class="data-value">62 英寸</span></div>
+        <div class="data-item"><span class="data-label">干旱</span><span class="data-value red">全州约50%</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">第6暖年 · 第2干年（106年记录）· 降水偏低20英寸</span></div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">干旱 · 野火 · 飓风 · 洪水</span></div>
+      <div class="tags"><span class="tag">2025年第2干年</span><span class="tag">第6暖年</span><span class="tag">干旱加剧</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">2025年气候</div><table class="mini-table">
+        <tr><td>气候类型</td><td>热带海洋性（全年温暖湿润，信风调节）</td></tr>
+        <tr><td>2025年温度排名</td><td><strong>第6暖年</strong>（1990年以来）</td></tr>
+        <tr><td>2025年降水排名</td><td><strong>第2干年</strong>（106年记录）</td></tr>
+        <tr><td>年均温 (2025)</td><td>67.2°F（+0.8°F）</td></tr>
+        <tr><td>年降水 (2025)</td><td><strong>42 英寸</strong>（30年均 62 英寸）</td></tr>
+        <tr><td>降水偏低</td><td><strong>20 英寸</strong></td></tr>
+        <tr><td>干旱覆盖</td><td>全州约 <strong>50%</strong> 经历某种程度干旱</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">气候特征与极端天气</div><div class="detail-text">夏威夷 2025 年为<strong>第 6 暖年</strong>（1990 年以来）和<strong>第 2 干年</strong>（106 年记录）。全州年均降水仅 <strong>42 英寸</strong>，较 30 年平均（62 英寸）偏低 <strong>20 英寸</strong>。约 <strong>50%</strong> 的州域经历某种程度干旱，茂宜岛和考艾岛尤为严重。夏季（6-8 月）檀香山降水仅 0.15 英寸（正常值的 8%），利胡埃为 3.46 英寸（正常值的 59%）。8 月异常湿润（受季风雷暴影响），但 6 月极端干燥。夏威夷面临<strong>干旱、野火</strong>（2023 年茂宜岛野火为全美百年来最致命）、飓风和洪水等多重气候风险。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="hi-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Josh Green (D)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">民主党绝对多数</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名民主党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">2 席 · 全民主党</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">深蓝州</span></div>
+        <div class="data-item"><span class="data-label">2025立法</span><span class="data-value green">313 项法案签署</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025会期</span><span class="value">313 项法案签署 · 8 项否决 · 气候/住房/医疗为重点</span></div>
+      <div class="info-row"><span class="label">当前议题</span><span class="value">可负担住房 · 清洁能源 · 野火防备 · 原住民事务</span></div>
+      <div class="tags"><span class="tag">深蓝州</span><span class="tag">民主党三权</span><span class="tag">313项法案签署</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">夏威夷为<strong>深蓝州</strong>，民主党在州长办公室、州参议院和州众议院均占绝对多数。州长 <strong>Josh Green</strong>（民主党）自 2022 年上任，2025 年发布政策报告“Results For Our People”，聚焦可负担住房、医疗扩展和气候行动。联邦层面，两名参议员和两名众议员均为民主党。</div></div>
+      <div class="detail-section"><div class="detail-label">2025 年立法重点</div><table class="mini-table">
+        <tr><td>气候行动</td><td>野火防备 · 清洁能源加速</td></tr>
+        <tr><td>可负担住房</td><td>州最高法院支持州长紧急权力用于住房建设</td></tr>
+        <tr><td>医疗扩展</td><td>免费学校午餐（SB 1300 / Act 139）</td></tr>
+        <tr><td>原住民事务</td><td>减少夏威夷家园土地等待名单</td></tr>
+        <tr><td>清洁能源</td><td>联邦“One Big Beautiful Bill”致 $6.51 亿项目面临风险</td></tr>
+        <tr><td>法案总数</td><td><strong>313 项</strong>签署 · <strong>8 项</strong>否决</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="hi-edu" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公校系统排名</span><span class="data-value red">第42</span></div>
+        <div class="data-item"><span class="data-label">教育质量排名</span><span class="data-value red">第29</span></div>
+        <div class="data-item"><span class="data-label">学校安全</span><span class="data-value red">第40</span></div>
+        <div class="data-item"><span class="data-label">数学恢复</span><span class="data-value green">第4/38州</span></div>
+        <div class="data-item"><span class="data-label">阅读恢复</span><span class="data-value green">第2/35州</span></div>
+        <div class="data-item"><span class="data-label">早期教育</span><span class="data-value red">第43/51</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>University of Hawaii</strong> 系统 · 社区大学可负担性全美第1</span></div>
+      <div class="info-row"><span class="label">亮点</span><span class="value">学术恢复速度全美领先 · 社区大学负担性第1</span></div>
+      <div class="tags"><span class="tag">数学恢复第4</span><span class="tag">阅读恢复第2</span><span class="tag">社区大学可负担第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">夏威夷公校系统在全美排名<strong>第 42</strong>（51 个系统中），教育质量<strong>第 29</strong>，学校安全<strong>第 40</strong>。但夏威夷在<strong>疫情后学术恢复</strong>方面表现突出——数学恢复全美<strong>第 4</strong>，阅读恢复全美<strong>第 2</strong>（2019-2024 年数据）。早期教育排名<strong>第 43/51</strong>，教育创新排名<strong>第 44/50</strong>。夏威夷教育部是全美唯一<strong>全州单一学区</strong>系统，管理约 250 所学校。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Hawaii at Manoa</td><td>旗舰校区 · 海洋科学和天文全球领先</td></tr>
+        <tr><td>UH Community Colleges</td><td>2 年制 · 可负担性全美第1</td></tr>
+        <tr><td>BYU-Hawaii</td><td>私立 · 波利尼西亚文化中心</td></tr>
+        <tr><td>Chaminade University</td><td>私立 · 檀香山</td></tr>
+        <tr><td>Hawaii Pacific University</td><td>私立 · 商科和海洋科学</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="hi-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">大学橄榄球</span><span class="data-value">Hawaii Rainbow Warriors</span></div>
+        <div class="data-item"><span class="data-label">2025赛季</span><span class="data-value green">9-4 突破赛季</span></div>
+        <div class="data-item"><span class="data-label">排球</span><span class="data-value green">2次NCAA冠军</span></div>
+        <div class="data-item"><span class="data-label">高中体育</span><span class="data-value">Saint Louis · Punahou</span></div>
+        <div class="data-item"><span class="data-label">职业体育</span><span class="data-value red">无</span></div>
+        <div class="data-item"><span class="data-label">标志赛事</span><span class="data-value">Pro Bowl · 夏威夷碗</span></div>
+      </div>
+      <div class="info-row"><span class="label">大学体育</span><span class="value">UH 橄榄球 9-4 · 排球 2 次 NCAA 冠军</span></div>
+      <div class="info-row"><span class="label">特点</span><span class="value">无职业体育队 · 大学体育为本地焦点</span></div>
+      <div class="tags"><span class="tag">Rainbow Warriors</span><span class="tag">排球王朝</span><span class="tag">无职业球队</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text">夏威夷大学 <strong>Rainbow Warriors</strong> 为州内最受关注的体育品牌。2025 年橄榄球队在主教练 Timmy Chang 第四年取得 <strong>9-4</strong> 突破赛季。男子排球队赢得 <strong>2021 和 2022 年</strong>NCAA 全国冠军，2025 年排名全美第 4。女子排球、篮球和棒球同样拥有忠实粉丝。</div></div>
+      <div class="detail-section"><div class="detail-label">高中体育与职业赛事</div><div class="detail-text">高中体育竞争激烈——<strong>Saint Louis</strong>（橄榄球）、<strong>Punahou</strong>（综合体育）和 <strong>Kahuku</strong>（橄榄球）为传统强校。2025 年 Saint Louis 重回橄榄球州冠军宝座，Mililani 和 Kapaa 在垒球中卫冕。夏威夷<strong>无职业体育队</strong>（四大联盟均无），但曾是 NFL Pro Bowl 的长期举办地，并举办夏威夷碗（大学橄榄球碗赛）。</div></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="hi-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">Honolulu Star-Advertiser</span></div>
+        <div class="data-item"><span class="data-label">数字媒体</span><span class="data-value">Civil Beat</span></div>
+        <div class="data-item"><span class="data-label">公共广播</span><span class="data-value">Hawaii Public Radio</span></div>
+        <div class="data-item"><span class="data-label">族裔媒体</span><span class="data-value">Hawaii Herald</span></div>
+        <div class="data-item"><span class="data-label">电视</span><span class="data-value">KHON2 · KITV</span></div>
+        <div class="data-item"><span class="data-label">新锐媒体</span><span class="data-value">Aloha State Daily</span></div>
+      </div>
+      <div class="info-row"><span class="label">挑战</span><span class="value">新闻荒漠化 · 新闻编辑室缩减 · 族裔媒体重要性凸显</span></div>
+      <div class="info-row"><span class="label">特点</span><span class="value">Star-Advertiser 被 Carpenter Media 收购</span></div>
+      <div class="tags"><span class="tag">Star-Advertiser最大</span><span class="tag">Civil Beat数字</span><span class="tag">族裔媒体丰富</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Honolulu Star-Advertiser</td><td>全州最大报纸 · 2010年合并成立 · 2025年被 Carpenter Media 收购</td></tr>
+        <tr><td>Civil Beat</td><td>非营利数字新闻 · 调查报道</td></tr>
+        <tr><td>Hawaii Public Radio</td><td>NPR 附属 · 全州覆盖</td></tr>
+        <tr><td>The Maui News</td><td>茂宜岛主要报纸 · 印刷厂关闭</td></tr>
+        <tr><td>Hawaii Tribune-Herald</td><td>大岛主要报纸</td></tr>
+        <tr><td>The Garden Island</td><td>考艾岛主要报纸</td></tr>
+        <tr><td>Hawaii Herald</td><td>日裔美国人社区报纸</td></tr>
+        <tr><td>Aloha State Daily</td><td>新锐数字媒体（2024年成立）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">夏威夷面临<strong>新闻荒漠化</strong>危机——主要日报新闻编辑室大幅缩减，外岛报纸（Maui News、West Hawaii Today、Garden Island）挣扎求存。Honolulu Star-Advertiser 为唯一全州性日报，2025 年被 Carpenter Media Group 收购。<strong>Civil Beat</strong> 为非营利数字新闻先驱。<strong>族裔媒体</strong>在夏威夷尤为重要——Hawaii Herald（日裔）、Fil-Am Courier（菲裔）、Ka Wai Ola（原住民）等服务于多元社区。Aloha State Daily 于 2024 年成立，为新兴数字媒体。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="hi-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏖️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客 (2025)</span><span class="data-value">9,642,991</span></div>
+        <div class="data-item"><span class="data-label">年变化</span><span class="data-value red">-0.6%</span></div>
+        <div class="data-item"><span class="data-label">旅游支出</span><span class="data-value green">$217.5亿</span></div>
+        <div class="data-item"><span class="data-label">支出变化</span><span class="data-value green">+5.7%</span></div>
+        <div class="data-item"><span class="data-label">2019年峰值</span><span class="data-value">1,040万</span></div>
+        <div class="data-item"><span class="data-label">旅游/GDP</span><span class="data-value">23%</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">威基基 · 火山国家公园 · 纳帕利海岸 · 珍珠港</span></div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">游客支出增长但人数下降 · 仍未恢复至疫情前峰值</span></div>
+      <div class="tags"><span class="tag">威基基海滩</span><span class="tag">火山国家公园</span><span class="tag">珍珠港</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济（2025）</div><table class="mini-table">
+        <tr><td>游客总数</td><td><strong>9,642,991</strong>（-0.6% vs 2024）</td></tr>
+        <tr><td>旅游支出</td><td><strong>$217.5 亿</strong>（+5.7%）</td></tr>
+        <tr><td>2019年峰值</td><td>10,400,000</td></tr>
+        <tr><td>12月游客</td><td>868,894（-4.3%）</td></tr>
+        <tr><td>12月支出</td><td>$21.2 亿（+3.7%）</td></tr>
+        <tr><td>旅游占 GDP</td><td>约 <strong>23%</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>威基基海滩</strong>（欧胡岛）为全球最著名海滩之一。<strong>夏威夷火山国家公园</strong>（大岛）可观赏基拉韦厄活火山。<strong>纳帕利海岸</strong>（考艾岛）以悬崖海景闻名。<strong>珍珠港</strong>（欧胡岛）的亚利桑那号纪念馆为历史圣地。<strong>哈纳公路</strong>（茂宜岛）为全球最美公路之一。<strong>钻石山</strong>徒步可俯瞰檀香山全景。<strong>波利尼西亚文化中心</strong>为原住民文化展示地。2025 年游客支出增长 <strong>5.7%</strong> 至 <strong>$217.5 亿</strong>，但游客人数微降 <strong>0.6%</strong>，仍显著低于 2019 年峰值的 <strong>1,040 万</strong>。12 月游客下降 <strong>4.3%</strong>，但支出增长 <strong>3.7%</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="hi-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">可再生占比 (RPS)</span><span class="data-value green">37%</span></div>
+        <div class="data-item"><span class="data-label">2025年目标</span><span class="data-value green">30%</span></div>
+        <div class="data-item"><span class="data-label">2045年目标</span><span class="data-value green">100%</span></div>
+        <div class="data-item"><span class="data-label">太阳能新增</span><span class="data-value">120 MW+</span></div>
+        <div class="data-item"><span class="data-label">Hale Kuawehi</span><span class="data-value">30 MW (2025.3)</span></div>
+        <div class="data-item"><span class="data-label">Ho'ohana Solar</span><span class="data-value">52 MW (2025.7)</span></div>
+      </div>
+      <div class="info-row"><span class="label">可再生来源</span><span class="value">地热 · 生物质 · 水电 · 风电 · 太阳能</span></div>
+      <div class="info-row"><span class="label">目标</span><span class="value">2045年 <strong>100% 可再生</strong> · 加速至2035年</span></div>
+      <div class="tags"><span class="tag">37%可再生</span><span class="tag">2045年100%目标</span><span class="tag">太阳能快速增长</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">可再生能源进展</div><table class="mini-table">
+        <tr><td>2025年 RPS</td><td><strong>37%</strong>（Hawaiian Electric 五岛综合）</td></tr>
+        <tr><td>2025年目标</td><td>30% · 已超额完成</td></tr>
+        <tr><td>2030年目标</td><td>40%</td></tr>
+        <tr><td>2040年目标</td><td>70%</td></tr>
+        <tr><td>2045年目标</td><td><strong>100%</strong></td></tr>
+        <tr><td>可再生来源</td><td>地热、生物质、水电、风电、生物燃料、太阳能</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">2025 年重大进展</div><div class="detail-text">Hawaiian Electric 在 2025 年实现五岛 <strong>37%</strong> 可再生能源组合标准（RPS），超过 30% 的年度目标。<strong>Hale Kuawehi 太阳能</strong>（30 MW，大岛）于 2025 年 3 月 25 日投运，<strong>Ho'ohana Solar 1</strong>（52 MW，欧胡岛）于 7 月 11 日投运。州长 Green 签署行政令，加速可再生能源开发，并将<strong>全州目标从 2045 年提前至 2035 年</strong>，同时设定 <strong>50,000 个</strong>分布式可再生能源装置目标。地热勘探获州政府支持，更新大岛、茂宜岛和拉奈岛的资源地图。但联邦“One Big Beautiful Bill”致 <strong>$6.51 亿</strong>清洁能源项目面临风险。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="hi-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">HTDC 拨款</span><span class="data-value green">$350万</span></div>
+        <div class="data-item"><span class="data-label">获资助企业</span><span class="data-value">13 家</span></div>
+        <div class="data-item"><span class="data-label">重点领域</span><span class="data-value">AI · 海洋科技 · 国防</span></div>
+        <div class="data-item"><span class="data-label">Oceanit</span><span class="data-value">40 年历史</span></div>
+        <div class="data-item"><span class="data-label">SBIR 获奖</span><span class="data-value">多家企业</span></div>
+        <div class="data-item"><span class="data-label">CNBC 科技排名</span><span class="data-value red">第48</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">AI · 海洋工程 · 国防科技 · 天文 · 生物科技</span></div>
+      <div class="info-row"><span class="label">旗舰机构</span><span class="value">HTDC · Oceanit · Makai Ocean Engineering</span></div>
+      <div class="tags"><span class="tag">AI新兴</span><span class="tag">海洋科技全球领先</span><span class="tag">国防科技</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">科技创新生态</div><div class="detail-text">夏威夷科技产业以<strong>海洋工程、国防科技和天文</strong>为传统优势，<strong>AI</strong> 为新兴增长极。夏威夷技术发展公司（HTDC）2025 年向 <strong>13 家</strong>企业拨款 <strong>$350 万</strong>，支持本地创新和制造。获资助企业包括 <strong>Jumpstart AI</strong>（AI 咨询）、<strong>Zilarent</strong>（AI 租赁管理）、<strong>Cyberpuvite</strong>（国防网络安全）、<strong>Oceanit</strong>（40 年历史的工程创新公司）、<strong>Makai Ocean Engineering</strong>（海洋科技）、<strong>Nalu Scientific</strong>（NASA 资助的传感器）等。夏威夷大学在<strong>天文、海洋科学和地球科学</strong>领域全球领先，Mauna Kea 观测站为全球最重要的天文观测地之一。</div></div>
+      <div class="detail-section"><div class="detail-label">重点企业</div><table class="mini-table">
+        <tr><td>Oceanit</td><td>工程与科技创新 · 40 年历史 · “从思维到市场”</td></tr>
+        <tr><td>Makai Ocean Engineering</td><td>海洋科技 · 深海工程</td></tr>
+        <tr><td>Nalu Scientific</td><td>NASA 资助 · 先进传感器</td></tr>
+        <tr><td>Jumpstart AI</td><td>AI 咨询与解决方案</td></tr>
+        <tr><td>HNu Photonics</td><td>DARPA 资助 · 光子学</td></tr>
+        <tr><td>PacMar Technologies</td><td>NAVSEA 资助 · 海洋系统</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>夏威夷州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · CNBC · Hawaii Tourism Authority · UHERO · Hawaiian Electric · HTDC</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
