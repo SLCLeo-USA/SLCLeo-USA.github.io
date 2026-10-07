@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FL</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --sunshine: #e65100;
+  }
+  [data-theme="dark"] {
+    --ground: #000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #2a1a00 0%, #3d2800 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --sunshine: #ffb74d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--sunshine); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--sunshine); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s ease; padding: 0 24px; background: var(--surface-secondary); }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s ease; }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>佛罗里达州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#fl-overview">概览</a><a href="#fl-pop">人口</a><a href="#fl-econ">经济就业</a>
+      <a href="#fl-biz">企业与产业</a><a href="#fl-health">医疗</a><a href="#fl-safety">公共安全</a>
+      <a href="#fl-tax">税收财政</a><a href="#fl-trans">交通</a><a href="#fl-housing">住房</a>
+      <a href="#fl-climate">气候</a><a href="#fl-politics">政治政府</a><a href="#fl-edu">教育</a>
+      <a href="#fl-sports">体育</a><a href="#fl-media">媒体</a><a href="#fl-tourism">旅游</a>
+      <a href="#fl-energy">能源</a><a href="#fl-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()"><svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌴</div>
+  <h1>佛罗里达州<br><em>Florida</em></h1>
+  <p class="subtitle">阳光之州 · 无州所得税 · 全美经济增速第1 · 高等教育10连冠</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>23,400,000</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$1.85T</strong><span>GDP (Q3 2025)</span></div>
+    <div class="hero-stat"><strong>2.8%</strong><span>失业率</span></div>
+    <div class="hero-stat"><strong>#1</strong><span>经济增速全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 无州所得税 · 商业租金税已取消</span>
+    <span class="hero-badge green">🎓 高等教育 <b>全美第1</b>（10连冠）</span>
+    <span class="hero-badge orange">🔫 <b>公开携枪合法</b>（2025裁决）</span>
+    <span class="hero-badge">🏖️ <b>全球旅游之都</b></span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="fl-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1845年3月3日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">塔拉哈西</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">杰克逊维尔</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">170,312 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">嘲鸫</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">橙花</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">阳光之州（The Sunshine State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"In God We Trust"</span></div>
+      <div class="tags"><span class="tag">Deep South</span><span class="tag">阳光之州</span><span class="tag">无州所得税</span><span class="tag">旅游之都</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">佛罗里达位于美国东南部，为伸入大西洋和墨西哥湾之间的半岛。北接佐治亚和亚拉巴马，南临佛罗里达海峡。在 Colin Woodard 的文化分区中，佛罗里达北部属于 <strong>Deep South</strong>，南部（迈阿密）则受加勒比和拉美移民深刻影响，形成独特的文化飞地。全州地势低平，最高点仅约 105 米。大沼泽地（Everglades）为独特生态系统，拥有 <strong>1,300 英里</strong>海岸线和 <strong>4,510 平方英里</strong>水域。气候从亚热带（北部）到热带（南部）。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1513年西班牙探险家庞塞·德莱昂抵达。1565年西班牙建立圣奥古斯丁，为美国最古老城市。1763年归英国，1783年回归西班牙。1819年西班牙割让给美国。1845年3月3日成为美国第 <strong>27 个州</strong>。20世纪空调技术普及和退休社区兴起使佛罗里达人口暴增。1959年古巴革命后大量古巴移民涌入迈阿密。2018年飓风迈克尔造成重大损失。2025年经济增速全美第1。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="fl-pop" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">~23,400,000</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value">第3</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">42.6 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$71,711</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">8.9%</span></div>
+        <div class="data-item"><span class="data-label">净迁入</span><span class="data-value green">922 人/天</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 59.9% · 黑人 15.3% · 西语裔 26.5%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">杰克逊维尔 961,739 · 迈阿密 446,663 · 坦帕 393,389</span></div>
+      <div class="tags"><span class="tag">人口全美第3</span><span class="tag">净迁入全美第2</span><span class="tag">老龄化明显</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2025)</td><td><strong>~23,400,000</strong>（全美第3）</td></tr>
+        <tr><td>人口密度</td><td>409 人/平方英里</td></tr>
+        <tr><td>中位年龄</td><td>42.6 岁（高于全美中位 ~39）</td></tr>
+        <tr><td>西语裔占比</td><td>26.5%</td></tr>
+        <tr><td>黑人占比</td><td>15.3%</td></tr>
+        <tr><td>Miami-Dade 县人口</td><td>2,685,296（全州最大）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$71,711</strong>，人均收入 <strong>$41,055</strong>。贫困率 <strong>8.9%</strong>，低于全美平均。但佛罗里达收入不平等显著——Miami-Dade 和 Broward 县中位收入较高，但农村县贫困率突出。<strong>80%</strong> 佛罗里达人担忧住房可负担性，近 <strong>50%</strong> 表示可能因成本离开。人口2025年约 <strong>2,340 万</strong>，净迁入 <strong>922 人/天</strong>（全美第2），预计2035年增至 <strong>2,600 万</strong>。但净迁入速度预计将从每日922人降至689人（2035年），反映生活成本上升的影响。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="fl-econ" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (Q3 2025)</span><span class="data-value green">$1.85T</span></div>
+        <div class="data-item"><span class="data-label">GDP 增速</span><span class="data-value green">+3.0%</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">2.8%</span></div>
+        <div class="data-item"><span class="data-label">经济排名</span><span class="data-value green">全美第1</span></div>
+        <div class="data-item"><span class="data-label">个人收入增长</span><span class="data-value">全美第11</span></div>
+        <div class="data-item"><span class="data-label">CNBC 经济评级</span><span class="data-value green">A+</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">旅游 · 贸易 · 房地产 · 农业 · 航天</span></div>
+      <div class="info-row"><span class="label">经济增速</span><span class="value">Q3 2025 <strong>+3.0%</strong>（全美领先）</span></div>
+      <div class="tags"><span class="tag">经济增速全美第1</span><span class="tag">失业率2.8%</span><span class="tag">个人收入增长第11</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现</div><table class="mini-table">
+        <tr><td>GDP (Q3 2025)</td><td><strong>$1.85 万亿</strong>（全美第4）</td></tr>
+        <tr><td>GDP 增速 (Q3 2025)</td><td><strong>+3.0%</strong>（全美第1）</td></tr>
+        <tr><td>失业率</td><td><strong>2.8%</strong>（全美 4.3%）</td></tr>
+        <tr><td>个人收入增长排名</td><td>全美第11</td></tr>
+        <tr><td>人口预测 (2035)</td><td>2,600 万（从 2,340 万增长 260 万）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">佛罗里达经济以<strong>旅游业</strong>（全球旅游之都）、<strong>国际贸易</strong>（迈阿密为拉美门户）、<strong>房地产</strong>和<strong>农业</strong>为四大支柱。<strong>航天产业</strong>为新兴增长极——Space Florida 推动商业发射和航天科技创新。佛罗里达经济增速全美第1（Q3 2025 +3.0%），失业率仅 <strong>2.8%</strong>，为全美最低之一。但生活成本上升（住房、保险、飓风风险）正在减缓人口迁入速度。2025年州议会永久取消了商业租金税，进一步改善营商环境。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="fl-biz" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">20+ 家</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Publix (#72)</span></div>
+        <div class="data-item"><span class="data-label">金融科技</span><span class="data-value">杰克逊维尔中心</span></div>
+        <div class="data-item"><span class="data-label">航天产业</span><span class="data-value">Space Florida</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级企业</span><span class="value">Publix · Jabil · Lennar · NextEra · L3Harris · CSX</span></div>
+      <div class="info-row"><span class="label">金融科技</span><span class="value">杰克逊维尔为东南部金融科技中心 · FIS、Deutsche Bank</span></div>
+      <div class="tags"><span class="tag">20+ Fortune 500</span><span class="tag">Publix私营巨头</span><span class="tag">杰克逊维尔金融科技</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500（2025）</div><table class="mini-table">
+        <tr><td>Publix Super Markets (#72)</td><td>莱克兰 · 全美最大员工持股杂货连锁</td></tr>
+        <tr><td>Jabil (#125)</td><td>圣彼得堡 · 半导体与电子元件 · 25万员工</td></tr>
+        <tr><td>Lennar (#126)</td><td>迈阿密 · 住宅建筑</td></tr>
+        <tr><td>NextEra Energy (#152)</td><td>朱诺海滩 · 全美最大电力公用事业控股公司</td></tr>
+        <tr><td>AutoNation (#155)</td><td>劳德代尔堡 · 汽车零售 · 300+门店</td></tr>
+        <tr><td>Carrier Global (#184)</td><td>棕榈滩花园 · 空调与制冷</td></tr>
+        <tr><td>L3Harris Technologies (#209)</td><td>墨尔本 · 航空航天与国防</td></tr>
+        <tr><td>FIS (#288)</td><td>杰克逊维尔 · 金融科技</td></tr>
+        <tr><td>CSX (#290)</td><td>杰克逊维尔 · 铁路运输</td></tr>
+        <tr><td>Raymond James Financial (#312)</td><td>圣彼得堡 · 财富管理</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">产业集聚</div><div class="detail-text"><strong>金融科技：</strong>杰克逊维尔为东南部金融科技中心，聚集 FIS、Deutsche Bank、Black Knight、SoFi、Dun & Bradstreet 等。St. Petersburg 新增 Foot Locker 总部，成为该市第3家 Fortune 500。<strong>航天产业：</strong>Space Florida 推动商业发射和航天科技创新，佛罗里达为全球航天发射之都。<strong>旅游业：</strong>全球主题公园之都（迪士尼、环球影城）为最大产业。<strong>农业：</strong>柑橘（橙汁）、甘蔗、草莓为传统支柱。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="fl-health" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">AdventHealth Orlando</span></div>
+        <div class="data-item"><span class="data-label">全州第2</span><span class="data-value">Mayo Clinic JAX</span></div>
+        <div class="data-item"><span class="data-label">全州第3</span><span class="data-value">UF Health Shands</span></div>
+        <div class="data-item"><span class="data-label">全美Top 20</span><span class="data-value green">AdventHealth</span></div>
+        <div class="data-item"><span class="data-label">Forbes Top 100</span><span class="data-value green">29 家</span></div>
+        <div class="data-item"><span class="data-label">5星评级</span><span class="data-value green">11 家</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">AdventHealth Orlando · Mayo Clinic JAX · UF Health Shands</span></div>
+      <div class="info-row"><span class="label">排名变化</span><span class="value">AdventHealth 超越 Mayo 成为全州第1（2025-26）</span></div>
+      <div class="tags"><span class="tag">AdventHealth全州第1</span><span class="tag">Mayo Jacksonville第2</span><span class="tag">Forbes 29家Top100</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. AdventHealth Orlando</td><td>奥兰多 · 全州第1 · 全美Top 20</td></tr>
+        <tr><td>2. Mayo Clinic – Florida</td><td>杰克逊维尔 · 全州第2（曾多年第1）</td></tr>
+        <tr><td>3. UF Health Shands Hospital</td><td>盖恩斯维尔 · 学术医疗中心</td></tr>
+        <tr><td>4. Tampa General Hospital</td><td>坦帕 · 全州前列</td></tr>
+        <tr><td>5. Orlando Health – ORMC</td><td>奥兰多 · 全州前列</td></tr>
+        <tr><td>Lee Memorial Hospital</td><td>Fort Myers · 全州第12</td></tr>
+        <tr><td>Gulf Coast Medical Center</td><td>Fort Myers · 全州第18</td></tr>
+        <tr><td>NCH Baker Hospital</td><td>Naples · 全州第16</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text">佛罗里达拥有<strong>全美最集中的顶级医疗资源之一</strong>。2025-26 U.S. News 排名中，<strong>AdventHealth Orlando</strong> 超越 Mayo Clinic 成为全州第1，并进入全美Top 20。Mayo Clinic Jacksonville 虽降至第2，但在全州拥有<strong>最多</strong>的全美排名专科。在 Forbes 首届全美顶级医院榜单中，佛罗里达有 <strong>29 家</strong>医院入围全美前100，其中 <strong>11 家</strong>获五星评级。Children's Healthcare of Atlanta 在<strong>10 个</strong>儿童专科中位列全美前50。HCA Florida 有 <strong>14 家</strong>医院入选“美国最佳250家”。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="fl-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">枪支法规评分</span><span class="data-value orange">C-</span></div>
+        <div class="data-item"><span class="data-label">全美枪支法律排名</span><span class="data-value orange">第24</span></div>
+        <div class="data-item"><span class="data-label">公开携枪</span><span class="data-value red">2025合法</span></div>
+        <div class="data-item"><span class="data-label">Stand Your Ground</span><span class="data-value red">有</span></div>
+        <div class="data-item"><span class="data-label">枪支死亡率</span><span class="data-value orange">全美第24高</span></div>
+        <div class="data-item"><span class="data-label">大规模枪击</span><span class="data-value green">2025下降</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>公开携枪合法</strong>（2025年法院裁决）· Stand Your Ground 法</span></div>
+      <div class="info-row"><span class="label">研究</span><span class="value">Stand Your Ground 法后枪支凶杀率增 <strong>31.6%</strong></span></div>
+      <div class="tags"><span class="tag">公开携枪合法</span><span class="tag">Stand Your Ground</span><span class="tag">大规模枪击下降</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">枪支法规</div><div class="detail-text">佛罗里达枪支法规评分 <strong>C-</strong>（Giffords），全美排名第24。2025年9月，第一地区上诉法院裁定该州长期实施的<strong>公开携枪禁令违宪</strong>，使公开携枪合法化。佛罗里达还实施<strong>Stand Your Ground</strong> 法——RAND 研究发现此类法律使凶杀率增加 <strong>8%–11%</strong>；佛罗里达自2005年通过该法后，枪支凶杀率增加 <strong>31.6%</strong>。佛罗里达枪支死亡率全美第24高，2015-2024年增长 <strong>10%</strong>（全美增长18%）。<strong>大规模枪击事件在2025年大幅下降</strong>，Gun Violence Archive 数据显示较往年显著减少。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="fl-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value green">无</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">5.5%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">6.0%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value">6.0%–8.5%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value">~0.79%</span></div>
+        <div class="data-item"><span class="data-label">商业租金税</span><span class="data-value green">已取消</span></div>
+      </div>
+      <div class="info-row"><span class="label">税收特征</span><span class="value"><strong>无州个人所得税</strong> · 无遗产税 · 商业租金税已取消</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">永久取消商业租金税 · 扩大销售税免税范围</span></div>
+      <div class="tags"><span class="tag">无州所得税</span><span class="tag">商业租金税取消</span><span class="tag">房产税0.79%</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>无</strong></td></tr>
+        <tr><td>企业所得税</td><td>5.5%</td></tr>
+        <tr><td>州销售税</td><td>6.0%（县附加 0.5%–2.5%）</td></tr>
+        <tr><td>房产税</td><td>有效税率约 0.79%</td></tr>
+        <tr><td>商业租金税</td><td><strong>永久取消</strong>（2025年10月1日生效）</td></tr>
+        <tr><td>遗产税</td><td><strong>无</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">佛罗里达<strong>无州个人所得税</strong>，为全美仅有的几个无此税的州之一。企业所得税 <strong>5.5%</strong>。2025年立法永久取消了<strong>商业租金税</strong>（对商业房产租赁征收的销售税），这是一项长期受企业欢迎的政策。州销售税 <strong>6.0%</strong>，但包含大量豁免，2025年进一步缩小了税基并增加了销售税假日。房产税有效税率约 <strong>0.79%</strong>，因地区差异较大。佛罗里达考虑过将销售税从 6% 降至 5.25%，但未在2025年通过。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="fl-trans" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州交通预算</span><span class="data-value">$137亿</span></div>
+        <div class="data-item"><span class="data-label">改善车道</span><span class="data-value">2,652 英里</span></div>
+        <div class="data-item"><span class="data-label">高铁</span><span class="data-value green">Brightline</span></div>
+        <div class="data-item"><span class="data-label">通勤铁路</span><span class="data-value">Tri-Rail · SunRail</span></div>
+        <div class="data-item"><span class="data-label">主要机场</span><span class="data-value">MCO · MIA · MCO</span></div>
+        <div class="data-item"><span class="data-label">主要港口</span><span class="data-value">迈阿密 · 坦帕</span></div>
+      </div>
+      <div class="info-row"><span class="label">高铁</span><span class="value"><strong>Brightline</strong>连接迈阿密-奥兰多 · 235 英里 · 6 站</span></div>
+      <div class="info-row"><span class="label">通勤</span><span class="value">Sunshine Corridor 连接 MCO 机场与 SunRail</span></div>
+      <div class="tags"><span class="tag">Brightline高铁</span><span class="tag">$137亿交通预算</span><span class="tag">Sunshine Corridor</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>奥兰多国际机场（MCO）</strong>为佛罗里达最大机场。迈阿密国际机场（MIA）为拉美门户。坦帕国际机场（TPA）为西海岸枢纽。杰克逊维尔国际机场（JAX）为东北部枢纽。2025-26财年州交通预算 <strong>$137 亿</strong>，改善 <strong>2,652 英里</strong>车道。</div></div>
+      <div class="detail-section"><div class="detail-label">铁路与高铁</div><div class="detail-text"><strong>Brightline Florida</strong>为全美唯一私营城际客运高铁——运行 <strong>235 英里</strong>连接迈阿密和奥兰多，途经6个车站。2025年10月，Brightline 将奥兰多-迈阿密班次从16班减至10班以优化客流。<strong>Sunshine Corridor</strong> 项目将连接奥兰多国际机场、橙县会议中心和迪士尼泉与现有 SunRail 通勤铁路系统。<strong>Tri-Rail</strong> 通勤铁路连接南佛罗里达三大城市。Brightline 东-西连接段获 ASCE <strong>2025年杰出土木工程成就奖</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="fl-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025.12)</span><span class="data-value">$415,000</span></div>
+        <div class="data-item"><span class="data-label">年变化</span><span class="data-value">0.0%</span></div>
+        <div class="data-item"><span class="data-label">公寓中位价</span><span class="data-value">$310,000</span></div>
+        <div class="data-item"><span class="data-label">公寓年变化</span><span class="data-value red">-1.6%</span></div>
+        <div class="data-item"><span class="data-label">可负担性担忧</span><span class="data-value red">80%居民</span></div>
+        <div class="data-item"><span class="data-label">家庭年需求</span><span class="data-value">$74,000</span></div>
+      </div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">2025年单户住宅销量上升 · 库存和价格稳定</span></div>
+      <div class="info-row"><span class="label">挑战</span><span class="value">保险成本上升 · 房产税上涨 · 飓风风险</span></div>
+      <div class="tags"><span class="tag">房价稳定</span><span class="tag">公寓价格下降</span><span class="tag">80%担忧可负担性</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025年12月佛罗里达单户住宅中位价 <strong>$415,000</strong>，与上年持平。公寓-联排别墅中位价 <strong>$310,000</strong>，同比下降1.6%。2025年全年单户住宅中位价 <strong>$413,990</strong>，较2024年下降1.4%。佛罗里达中位单户住宅价格2025年上半年为 <strong>$401,000</strong>。<strong>80%</strong> 佛罗里达人担忧住房可负担性，近 <strong>50%</strong> 表示可能因成本离开。一个四口之家在佛罗里达需要约 <strong>$86,688</strong> 年收入才能满足基本家庭需求，而平均两成人两儿童家庭需要 <strong>$74,000</strong>。保险成本上升、房产税上涨和飓风风险为居民离开的主要原因。</div></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="fl-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">亚热带 / 热带</span></div>
+        <div class="data-item"><span class="data-label">2025年均温</span><span class="data-value red">72.3°F (+2.2°F)</span></div>
+        <div class="data-item"><span class="data-label">迈阿密2025年均温</span><span class="data-value red">78.3°F</span></div>
+        <div class="data-item"><span class="data-label">历史排名</span><span class="data-value">暖于20世纪均值</span></div>
+        <div class="data-item"><span class="data-label">飓风季</span><span class="data-value">6月–11月</span></div>
+        <div class="data-item"><span class="data-label">极端天气</span><span class="data-value">飓风 · 洪水 · 龙卷风</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">全州年均温 <strong>72.3°F</strong> · 较20世纪均值高 <strong>+2.2°F</strong></span></div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">变暖趋势明显 · 极端降水增加</span></div>
+      <div class="tags"><span class="tag">2025年显著偏暖</span><span class="tag">飓风风险</span><span class="tag">热带气候</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">2025年气候</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润亚热带（北部）/ 热带（南部）</td></tr>
+        <tr><td>全州年均温 (2025)</td><td><strong>72.3°F</strong>（较20世纪均值 70.1°F 高 <strong>+2.2°F</strong>）</td></tr>
+        <tr><td>迈阿密国际机场年均温</td><td>78.3°F (+0.5°F)</td></tr>
+        <tr><td>棕榈滩国际机场年均温</td><td>77.5°F</td></tr>
+        <tr><td>8月降水</td><td>Panhandle 和西佛罗里达接近至高于正常</td></tr>
+        <tr><td>6月温度</td><td>81.7°F（+1°F）· 第12暖</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">极端天气</div><div class="detail-text">佛罗里达为全美<strong>飓风风险最高</strong>的州，飓风季从6月持续至11月。2025年全州年均温 <strong>72.3°F</strong>，较20世纪均值高 <strong>+2.2°F</strong>，变暖趋势显著。迈阿密2025年均温 <strong>78.3°F</strong>。8月降水在 Panhandle 和西佛罗里达接近至高于正常。冬季偶有龙卷风，夏季雷暴频繁。沿海洪水风险随海平面上升而增加。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="fl-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Ron DeSantis (R)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">共和党控制</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名共和党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">28 席 · 共和党多数</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value red">红州</span></div>
+        <div class="data-item"><span class="data-label">任期状态</span><span class="data-value">DeSantis 最后一届</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025-26立法</span><span class="value">$1,145 亿预算 · 2,340/1,896 法案通过 · 紧张关系</span></div>
+      <div class="info-row"><span class="label">议题</span><span class="value">房产税改革 · 选区重划 · 移民 · AI · 疫苗</span></div>
+      <div class="tags"><span class="tag">红州</span><span class="tag">DeSantis最后一届</span><span class="tag">立法-行政紧张</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">佛罗里达为<strong>红州</strong>，共和党控制州长办公室和州议会两院。州长 <strong>Ron DeSantis</strong> 已进入<strong>最后一届任期</strong>（任期限制），2025-26立法会议标志着他立法议程的收官阶段。联邦层面，两名参议员均为共和党，众议院28席中共和党占多数。2025-26会期充满紧张——立法机构试图限制州长的行政权力（移民紧急状态、公开记录、应急权力），参众两院之间以及州长与立法机构之间的关系紧张。$1,145 亿预算在延迟后通过，DeSantis 持有逐项否决权。</div></div>
+      <div class="detail-section"><div class="detail-label">2025-26年关键议题</div><table class="mini-table">
+        <tr><td>房产税改革</td><td>DeSantis 推动取消宅基地房产税 · 2026年11月公投</td></tr>
+        <tr><td>选区重划</td><td>DeSantis 推动有利于共和党的国会选区地图</td></tr>
+        <tr><td>移民</td><td>2023年移民紧急状态持续 · 民主党寻求终止</td></tr>
+        <tr><td>AI</td><td>2026年特别会议议题</td></tr>
+        <tr><td>疫苗</td><td>DeSantis 推动疫苗豁免 · 2026年特别会议议题</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="fl-edu" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">高等教育</span><span class="data-value green">全美第1（10连冠）</span></div>
+        <div class="data-item"><span class="data-label">教育自由度</span><span class="data-value green">全美第1（4连冠）</span></div>
+        <div class="data-item"><span class="data-label">公校系统</span><span class="data-value green">全美第13</span></div>
+        <div class="data-item"><span class="data-label">全美Top 100公立</span><span class="data-value green">7 所</span></div>
+        <div class="data-item"><span class="data-label">UF 排名</span><span class="data-value green">全美第8（10年）</span></div>
+        <div class="data-item"><span class="data-label">FSU 排名</span><span class="data-value">全美第24</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>University of Florida (#8)</strong> · FSU (#24) · USF (#46)</span></div>
+      <div class="info-row"><span class="label">教育自由</span><span class="value">Heritage Foundation 排名 <strong>全美第1</strong>（4连冠）</span></div>
+      <div class="tags"><span class="tag">高等教育10连冠</span><span class="tag">UF全美第8</span><span class="tag">教育自由第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Florida</td><td>全美第8公立（10年连续Top 10）</td></tr>
+        <tr><td>Florida State University</td><td>全美第24</td></tr>
+        <tr><td>University of South Florida</td><td>全美第46（并列）</td></tr>
+        <tr><td>Florida International University</td><td>全美前列</td></tr>
+        <tr><td>University of Central Florida</td><td>全美第58</td></tr>
+        <tr><td>Florida A&M University</td><td>HBCU · 全美知名</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">佛罗里达<strong>高等教育连续10年全美第1</strong>（U.S. News）。<strong>教育自由度</strong>由 Heritage Foundation 连续4年排名全美第1，<strong>家长权力指数</strong>由 Center for Education Reform 连续4年排名第1。公校系统在 WalletHub 排名中位列<strong>全美第13</strong>，其中数字学习计划全美第1，辍学率和欺凌发生率均位列全美最低10州。佛罗里达有 <strong>7 所</strong>大学进入全美公立大学前100，创历史纪录。UF 连续10年位列全美公立前10。</div></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="fl-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">NFL</span><span class="data-value">3 支球队</span></div>
+        <div class="data-item"><span class="data-label">NBA</span><span class="data-value">2 支球队</span></div>
+        <div class="data-item"><span class="data-label">MLB</span><span class="data-value">2 支球队</span></div>
+        <div class="data-item"><span class="data-label">NHL</span><span class="data-value">2 支球队</span></div>
+        <div class="data-item"><span class="data-label">MLS</span><span class="data-value">2 支球队</span></div>
+        <div class="data-item"><span class="data-label">大学体育</span><span class="data-value">13 所 NCAA D-I</span></div>
+      </div>
+      <div class="info-row"><span class="label">职业球队</span><span class="value">Dolphins · Bucs · Jaguars · Heat · Magic · Marlins · Rays · Panthers · Lightning</span></div>
+      <div class="info-row"><span class="label">大学体育</span><span class="value">Florida Gators · FSU Seminoles · Miami Hurricanes</span></div>
+      <div class="tags"><span class="tag">四大联盟全覆盖</span><span class="tag">Gators SEC强队</span><span class="tag">Inter Miami梅西</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><table class="mini-table">
+        <tr><td>Miami Dolphins</td><td>NFL</td></tr>
+        <tr><td>Tampa Bay Buccaneers</td><td>NFL · 2次超级碗冠军</td></tr>
+        <tr><td>Jacksonville Jaguars</td><td>NFL</td></tr>
+        <tr><td>Miami Heat</td><td>NBA · 3次总冠军</td></tr>
+        <tr><td>Orlando Magic</td><td>NBA</td></tr>
+        <tr><td>Miami Marlins</td><td>MLB · 2次世界大赛冠军</td></tr>
+        <tr><td>Tampa Bay Rays</td><td>MLB</td></tr>
+        <tr><td>Florida Panthers</td><td>NHL · 2024年斯坦利杯冠军</td></tr>
+        <tr><td>Tampa Bay Lightning</td><td>NHL · 3次斯坦利杯冠军</td></tr>
+        <tr><td>Inter Miami CF</td><td>MLS · 梅西加盟</td></tr>
+        <tr><td>Orlando City SC</td><td>MLS</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text">佛罗里达大学 <strong>Gators</strong> 为 SEC 强队，在橄榄球、篮球、体操等项目中赢得 <strong>15 次</strong>NCAA全国冠军。2024-25学年，Gators 是 <strong>14 支</strong>同时进入橄榄球碗赛、NCAA男篮锦标赛和NCAA棒球锦标赛的球队之一。佛罗里达州立大学 <strong>Seminoles</strong> 和迈阿密大学 <strong>Hurricanes</strong> 同样为全美知名大学体育品牌。</div></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="fl-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">主要报纸</span><span class="data-value">Miami Herald</span></div>
+        <div class="data-item"><span class="data-label">主要报纸</span><span class="data-value">Tampa Bay Times</span></div>
+        <div class="data-item"><span class="data-label">主要报纸</span><span class="data-value">Orlando Sentinel</span></div>
+        <div class="data-item"><span class="data-label">公共广播</span><span class="data-value">WLRN · WUSF</span></div>
+        <div class="data-item"><span class="data-label">体育媒体</span><span class="data-value">Spectrum Sports</span></div>
+        <div class="data-item"><span class="data-label">数字媒体</span><span class="data-value">Florida Politics</span></div>
+      </div>
+      <div class="info-row"><span class="label">特点</span><span class="value">Miami Herald 为南佛罗里达主要新闻源 · 西语裔媒体丰富</span></div>
+      <div class="info-row"><span class="label">法律环境</span><span class="value">2025年诽谤法改革提案 · 媒体关注</span></div>
+      <div class="tags"><span class="tag">Miami Herald最大</span><span class="tag">西语裔媒体</span><span class="tag">诽谤法争议</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Miami Herald</td><td>南佛罗里达最大报纸 · 2025年10月推出3个Broward超本地刊物</td></tr>
+        <tr><td>Tampa Bay Times</td><td>坦帕湾主要报纸 · 普利策奖得主</td></tr>
+        <tr><td>Orlando Sentinel</td><td>奥兰多主要报纸</td></tr>
+        <tr><td>South Florida Sun Sentinel</td><td>Broward/Palm Beach 主要报纸</td></tr>
+        <tr><td>WLRN</td><td>迈阿密公共广播 · NPR 附属</td></tr>
+        <tr><td>WUSF</td><td>坦帕公共广播 · NPR 附属</td></tr>
+        <tr><td>Space Coast Daily</td><td>Brevard County 领先多媒体新闻源</td></tr>
+        <tr><td>Diario Las Américas</td><td>西语裔报纸 · 迈阿密</td></tr>
+        <tr><td>El Nuevo Herald</td><td>Miami Herald 西语版</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">佛罗里达媒体市场<strong>多元化且竞争激烈</strong>。Miami Herald 为南佛罗里达主要新闻源，2025年10月推出 <strong>3 个</strong> Broward 超本地出版物。西语裔媒体（Diario Las Américas、El Nuevo Herald）为迈阿密独特媒体景观。<strong>佛罗里达诽谤法改革</strong>为2025年争议焦点——州参议院小组推进了要求报纸和广播电台在接到通知后从网站删除虚假和诽谤性文章的法案，媒体组织强烈反对。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="fl-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏖️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客</span><span class="data-value">全球之最</span></div>
+        <div class="data-item"><span class="data-label">主题公园</span><span class="data-value">迪士尼 · 环球</span></div>
+        <div class="data-item"><span class="data-label">海滩</span><span class="data-value">Clearwater · 迈阿密</span></div>
+        <div class="data-item"><span class="data-label">国家公园</span><span class="data-value">大沼泽地 · 干龟</span></div>
+        <div class="data-item"><span class="data-label">泉</span><span class="data-value">Wekiwa · Rock Springs</span></div>
+        <div class="data-item"><span class="data-label">特色</span><span class="data-value">观海牛 · 生物荧光</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">迪士尼世界 · 环球影城 · 大沼泽地 · Clearwater海滩</span></div>
+      <div class="info-row"><span class="label">独特体验</span><span class="value">生物荧光皮划艇 · 海牛观赏 · 泉水漂流</span></div>
+      <div class="tags"><span class="tag">迪士尼世界</span><span class="tag">大沼泽地</span><span class="tag">生物荧光</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>迪士尼世界</strong>（奥兰多）为全球最大主题公园度假区。<strong>环球影城</strong>（奥兰多）的哈利波特魔法世界为全球标杆。<strong>大沼泽地国家公园</strong>为 UNESCO 世界遗产，可乘气垫船、皮划艇或徒步探索。<strong>Clearwater Beach</strong> 和 <strong>St. Pete-Clearwater</strong> 为墨西哥湾最佳海滩，可观赏海豚。<strong>John Pennekamp Coral Reef State Park</strong>（Key Largo）为全美首个水下公园，位列 TripAdvisor 全美第6景点。<strong>Stetson Mansion</strong>（DeLand）位列全美第1景点。<strong>Wekiwa Springs</strong> 和 <strong>Rock Springs Run</strong> 提供透明泉水皮划艇和漂流。<strong>Space Coast</strong> 提供生物荧光皮划艇夜间之旅。<strong>Ellie Schiller Homosassa Springs</strong> 为观赏海牛和佛罗里达豹的最佳地点。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="fl-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">太阳能增长</span><span class="data-value green">70倍 (vs 2016)</span></div>
+        <div class="data-item"><span class="data-label">太阳能供电家庭</span><span class="data-value green">279万</span></div>
+        <div class="data-item"><span class="data-label">Duke 太阳能站点</span><span class="data-value">~30 个</span></div>
+        <div class="data-item"><span class="data-label">Duke 太阳能容量</span><span class="data-value">1,700+ MW</span></div>
+        <div class="data-item"><span class="data-label">2025-27 新增</span><span class="data-value green">900 MW</span></div>
+        <div class="data-item"><span class="data-label">客户节省</span><span class="data-value green">$10亿+</span></div>
+      </div>
+      <div class="info-row"><span class="label">太阳能</span><span class="value">2025年发电量为2016年的 <strong>70倍</strong> · 可供电 <strong>279万户</strong></span></div>
+      <div class="info-row"><span class="label">Duke Energy</span><span class="value">2025年完成 Hernando/Sumter 太阳能站点 · 12站点计划</span></div>
+      <div class="tags"><span class="tag">太阳能70倍增长</span><span class="tag">Duke 30个太阳能站点</span><span class="tag">客户节省$10亿</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">太阳能革命</div><div class="detail-text">佛罗里达正经历<strong>太阳能革命</strong>——2025年太阳能发电量为2016年的 <strong>70 倍</strong>，足以为 <strong>2,792,236 户</strong>典型家庭供电。太阳能已成为佛罗里达<strong>第二大</strong>发电容量类别，预计将在10年规划期内超过天然气联合循环铭牌容量。Duke Energy Florida 在2025年底拥有约 <strong>30 个</strong>太阳能站点，贡献超过 <strong>1,700 MW</strong> 至电网。2025年12月，Duke 完成 Hernando 和 Sumter 县太阳能站点（各74.9 MW），为2025-2027年12站点计划的首阶段，预计为客户节省 <strong>$5 亿</strong>。Duke 2025年基础设施投资为客户节省超 <strong>$10 亿</strong>。佛罗里达2025年从太阳能、风能和地热产生的电力相当于其消费量的 <strong>12%</strong>（2016年仅0.2%）。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="fl-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">量子联盟</span><span class="data-value green">FAQT</span></div>
+        <div class="data-item"><span class="data-label">参与大学</span><span class="data-value">15 所</span></div>
+        <div class="data-item"><span class="data-label">半导体引擎</span><span class="data-value green">$45M NSF</span></div>
+        <div class="data-item"><span class="data-label">航天创新</span><span class="data-value">Space Florida</span></div>
+        <div class="data-item"><span class="data-label">USF 研究经费</span><span class="data-value green">$7.5亿</span></div>
+        <div class="data-item"><span class="data-label">AAM 计划</span><span class="data-value green">先进空中交通</span></div>
+      </div>
+      <div class="info-row"><span class="label">量子科技</span><span class="value"><strong>FAQT</strong> 联盟 · 15 所大学 · 全美量子中心</span></div>
+      <div class="info-row"><span class="label">半导体</span><span class="value">佛罗里达半导体引擎获 NSF <strong>$4,500万</strong>二期拨款</span></div>
+      <div class="tags"><span class="tag">FAQT量子联盟</span><span class="tag">$45M半导体拨款</span><span class="tag">Space Florida</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">量子科技</div><div class="detail-text">2025年10月，<strong>15 所</strong>佛罗里达大学签署谅解备忘录，成立 <strong>Florida Alliance for Quantum Technology（FAQT）</strong>，旨在使佛罗里达成为全美量子专业知识中心。FAQT 聚焦国防和工业创新。佛罗里达州立大学系统致力于通过新伙伴关系设定量子创新的国家标准。</div></div>
+      <div class="detail-section"><div class="detail-label">航天与半导体</div><div class="detail-text"><strong>Space Florida</strong> 推动商业发射和航天科技创新——2025年颁发 Northwest Florida Pitch Competition 创新奖，并与 Seraphim 合作加速 SpaceTech 初创企业投资就绪。州长 DeSantis 签署立法建立 <strong>International Aerospace Innovation Fund（IAIF）</strong>，推动先进空中交通（AAM）计划。佛罗里达半导体引擎获 NSF <strong>$4,500 万</strong>二期拨款，加速半导体商业化。USF 研究经费达创纪录的 <strong>$7.5 亿</strong>（2025财年），较2022年增长 <strong>37%</strong>。</div></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>佛罗里达州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · Florida TaxWatch · Florida Realtors · Giffords · Duke Energy</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
