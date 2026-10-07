@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DE</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --first: #283593;
+  }
+  [data-theme="dark"] {
+    --ground: #000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #0f1030 0%, #1a1c45 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --first: #7986cb;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--first); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--first); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s ease; padding: 0 24px; background: var(--surface-secondary); }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s ease; }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>特拉华州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#de-overview">概览</a><a href="#de-pop">人口</a><a href="#de-econ">经济就业</a>
+      <a href="#de-biz">企业与产业</a><a href="#de-health">医疗</a><a href="#de-safety">公共安全</a>
+      <a href="#de-tax">税收财政</a><a href="#de-trans">交通</a><a href="#de-housing">住房</a>
+      <a href="#de-climate">气候</a><a href="#de-politics">政治政府</a><a href="#de-edu">教育</a>
+      <a href="#de-sports">体育</a><a href="#de-media">媒体</a><a href="#de-tourism">旅游</a>
+      <a href="#de-energy">能源</a><a href="#de-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()"><svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🏛️</div>
+  <h1>特拉华州<br><em>Delaware</em></h1>
+  <p class="subtitle">第一州 · 公司天堂 · 免销售税 · 全美医院质量第2</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>1,051,917</strong><span>人口 (2024)</span></div>
+    <div class="hero-stat"><strong>$103.3B</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>4.0%</strong><span>失业率 (2025.5)</span></div>
+    <div class="hero-stat"><strong>$82,855</strong><span>中位家庭收入</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 无州销售税 · 无遗产税</span>
+    <span class="hero-badge green">🏥 全美医院质量 <b>第2</b></span>
+    <span class="hero-badge orange">🔫 <b>购枪许可法</b>（2025生效）</span>
+    <span class="hero-badge">🏢 <b>190万+</b> 企业注册</span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="de-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1787年12月7日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">多佛</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">威尔明顿</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">6,452 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">蓝鸡</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">桃花</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">第一州（The First State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Liberty and Independence"</span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">第一州</span><span class="tag">公司天堂</span><span class="tag">免销售税</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">特拉华位于美国中大西洋地区，北接宾夕法尼亚，东邻新泽西和特拉华湾，南界马里兰，西临马里兰。在 Colin Woodard 的文化分区中，特拉华属于 <strong>Midlands</strong>——贵格会宽容、中庸、多元的中间地带。全州地势低平，最高点仅约 136 米。特拉华河沿岸为工业与化工走廊，南部为农业区，沿海为海滩度假带。面积仅 <strong>6,452 km²</strong>，为全美第 2 小的州。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1638年瑞典人建立新瑞典殖民地。1664年归英国。1787年12月7日<strong>率先批准美国宪法</strong>，成为美国第 1 个州，故称“第一州”。1802年杜邦公司在威尔明顿创立，化工产业塑造了州经济。20世纪后期，特拉华衡平法院（Court of Chancery）的公司法体系使其成为全美企业注册首选地。2025年1月 Matt Meyer 就任州长。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="de-pop" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2024)</span><span class="data-value">1,051,917</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">41.0 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$82,855</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value green">7.3%</span></div>
+        <div class="data-item"><span class="data-label">本科及以上</span><span class="data-value">35.3%</span></div>
+        <div class="data-item"><span class="data-label">自有住房率</span><span class="data-value">72.3%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 59.0% · 黑人 21.9% · 西语裔 10.7% · 亚裔 4.1%</span></div>
+      <div class="info-row"><span class="label">人口增长</span><span class="value">2006年以来增长近 <strong>21%</strong> · 老龄化驱动</span></div>
+      <div class="tags"><span class="tag">贫困率低于全美</span><span class="tag">自有住房率高于全美</span><span class="tag">老龄化明显</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2024)</td><td><strong>1,051,917</strong>（全美第45）</td></tr>
+        <tr><td>中位年龄</td><td>41.0 岁</td></tr>
+        <tr><td>白人占比</td><td>59.0%</td></tr>
+        <tr><td>黑人占比</td><td>21.9%</td></tr>
+        <tr><td>西语裔占比</td><td>10.7%</td></tr>
+        <tr><td>本科及以上</td><td>35.3%</td></tr>
+        <tr><td>SNAP 受助率</td><td>10.9%</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$82,855</strong>（2023年），高于全美中位数。人均收入 <strong>$107,619</strong>，家庭收入中位数 <strong>$102,219</strong>。贫困率 <strong>7.3%</strong>，低于全美平均。但收入分布不均——<strong>11.5%</strong> 家庭年收入超 $200,000，<strong>12.4%</strong> 家庭低于 $25,000。人口自2006年以来增长近 <strong>21%</strong>，主要驱动因素为老龄化人口迁入和威尔明顿郊区化。自2019年以来，中位收入增长 <strong>21.3%</strong>，房价增长 <strong>30.1%</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="de-econ" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$103.3B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长</span><span class="data-value orange">0.0% (Q1)</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">4.0%</span></div>
+        <div class="data-item"><span class="data-label">就业增长</span><span class="data-value red">+0.6% (2023-24)</span></div>
+        <div class="data-item"><span class="data-label">CNBC 综合排名</span><span class="data-value">全美第29</span></div>
+        <div class="data-item"><span class="data-label">经济评级</span><span class="data-value green">A-</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">金融 · 化工 · 公司注册 · 物流 · 农业</span></div>
+      <div class="info-row"><span class="label">主要优势</span><span class="value">经济（第4）· 劳动力（第11）· 生活成本（第9）</span></div>
+      <div class="tags"><span class="tag">经济评级A-</span><span class="tag">经济全美第4</span><span class="tag">就业增长缓慢</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现（CNBC 2025）</div><table class="mini-table">
+        <tr><td>GDP (2025)</td><td><strong>$103.3B</strong></td></tr>
+        <tr><td>GDP 增速 (Q1 2025)</td><td>0.0%</td></tr>
+        <tr><td>失业率 (May 2025)</td><td><strong>4.0%</strong>（全美 4.3%）</td></tr>
+        <tr><td>就业增长 (2023-24)</td><td>+0.6%（全美最低之一）</td></tr>
+        <tr><td>CNBC 经济排名</td><td><strong>第4</strong>（A-）</td></tr>
+        <tr><td>CNBC 劳动力排名</td><td>第11（B）</td></tr>
+        <tr><td>CNBC 生活成本排名</td><td>第9（B-）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">特拉华经济以<strong>金融服务业</strong>为最大产业——金融活动占全州就业 <strong>11%</strong>，为全美比例最高的州，约为全国平均的两倍。威尔明顿为摩根大通、美国银行、Capital One 等金融巨头的信用卡运营中心。<strong>公司注册</strong>为独特支柱——超过 <strong>190 万</strong>家企业在此注册，包括超过 <strong>68%</strong> 的 Fortune 500 公司。特拉华衡平法院的公司法体系为全美企业法律标准。<strong>化工</strong>（杜邦遗留）、<strong>物流</strong>和<strong>农业</strong>（家禽、大豆）为传统产业。2025年Q1 GDP增长为零，就业增长仅0.6%，为全美最低之一。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="de-biz" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">注册企业</span><span class="data-value green">190万+</span></div>
+        <div class="data-item"><span class="data-label">Fortune 500 注册</span><span class="data-value green">68%+</span></div>
+        <div class="data-item"><span class="data-label">最大私营雇主</span><span class="data-value">ChristianaCare</span></div>
+        <div class="data-item"><span class="data-label">金融就业</span><span class="data-value">53,000+</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要雇主</span><span class="value">JPMorgan Chase (11,000) · ChristianaCare · DuPont · Amazon</span></div>
+      <div class="info-row"><span class="label">金融占比</span><span class="value">全州就业 <strong>11%</strong>（全美最高）</span></div>
+      <div class="tags"><span class="tag">68% Fortune 500注册</span><span class="tag">JPMorgan 11,000人</span><span class="tag">ChristianaCare最大雇主</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要雇主</div><table class="mini-table">
+        <tr><td>JPMorgan Chase</td><td>威尔明顿/纽瓦克 · 11,000+ 员工</td></tr>
+        <tr><td>ChristianaCare</td><td>医疗系统 · 全州最大私营雇主</td></tr>
+        <tr><td>DuPont</td><td>威尔明顿 · 化工 · 总部</td></tr>
+        <tr><td>Amazon</td><td>10,000+ 员工 · 物流中心</td></tr>
+        <tr><td>Bank of America</td><td>威尔明顿 · 金融运营</td></tr>
+        <tr><td>Capital One</td><td>威尔明顿 · 信用卡运营</td></tr>
+        <tr><td>W.L. Gore & Associates</td><td>纽瓦克 · 材料科技 · Forbes 最佳雇主第74</td></tr>
+        <tr><td>Corteva Agriscience</td><td>农业科技 · 杜邦拆分</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">金融服务业与公司注册</div><div class="detail-text">特拉华<strong>金融服务业</strong>为最大产业部门，雇佣超 <strong>53,000 人</strong>，占全州就业 <strong>11%</strong>（全美最高，约为全国平均的两倍）。1981年《金融中心发展法案》使特拉华一夜之间成为金融服务中心，摩根大通、美国银行、Capital One、花旗等巨头均在威尔明顿设有信用卡运营中心。<strong>公司注册</strong>体系由特拉华衡平法院支撑——该法院依赖指定的经验丰富的法官而非陪审团，为企业提供可预测的法律环境，超过 <strong>190 万</strong>家企业注册于此，包括 <strong>68% 以上</strong>的 Fortune 500 公司。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="de-health" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全美医院质量</span><span class="data-value green">第2</span></div>
+        <div class="data-item"><span class="data-label">全美医疗质量</span><span class="data-value green">第5</span></div>
+        <div class="data-item"><span class="data-label">全美分娩实践</span><span class="data-value green">第1</span></div>
+        <div class="data-item"><span class="data-label">医疗就业</span><span class="data-value">28,000</span></div>
+        <div class="data-item"><span class="data-label">经济贡献</span><span class="data-value">$80亿</span></div>
+        <div class="data-item"><span class="data-label">Leapfrog 安全</span><span class="data-value green">全美第8</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value"><strong>ChristianaCare</strong> · 全州第1 · 费城地区第3</span></div>
+      <div class="info-row"><span class="label">医院特点</span><span class="value">2家 CMS 5星 · 1家 Newsweek 全球最佳</span></div>
+      <div class="tags"><span class="tag">全美医院质量第2</span><span class="tag">分娩实践全美第1</span><span class="tag">ChristianaCare全州第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">全美排名</div><table class="mini-table">
+        <tr><td>医院质量 (U.S. News)</td><td><strong>全美第2</strong>（2025年降至第2，2024年第1）</td></tr>
+        <tr><td>医疗质量 (U.S. News)</td><td>全美第5（2024年第6）</td></tr>
+        <tr><td>分娩实践 (America's Health Rankings)</td><td><strong>全美第1</strong></td></tr>
+        <tr><td>Leapfrog 安全评级</td><td>全美第8（2025春，较2024秋的第26大幅提升）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级医院</div><div class="detail-text"><strong>ChristianaCare</strong>为全州第1医院，在费城地区（80+ 家医院）并列第3，为特拉华唯一获此殊荣的医院。其 Stanton 和 Wilmington 院区获 Leapfrog <strong>A</strong> 级评级。St. Francis Hospital（威尔明顿）获 <strong>B</strong> 级，在患者权利和医疗公平方面表现突出。TidalHealth Nanticoke（Seaford）被 Newsweek 评为全州第2，为特拉华唯一 CMS <strong>5星</strong>医院。<strong>医疗行业为特拉华最大私营雇主</strong>，提供 <strong>28,000 个</strong>岗位，年经济贡献 <strong>$80 亿</strong>，年社区福利支出近 <strong>$10 亿</strong>。挑战包括：全美第6老州、糖尿病发病率第9高、成人肥胖率第8高。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="de-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">购枪许可法</span><span class="data-value green">2025.11生效</span></div>
+        <div class="data-item"><span class="data-label">攻击性武器</span><span class="data-value">禁令</span></div>
+        <div class="data-item"><span class="data-label">大容量弹匣</span><span class="data-value">禁令</span></div>
+        <div class="data-item"><span class="data-label">枪支死亡趋势</span><span class="data-value green">下降中</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>购枪许可法</strong>（需培训+许可）· 攻击性武器禁令 · 大容量弹匣禁令</span></div>
+      <div class="info-row"><span class="label">效果</span><span class="value">购枪许可州枪支凶杀率低 <strong>25%</strong> · 枪支自杀率低 <strong>50%</strong></span></div>
+      <div class="tags"><span class="tag">购枪许可法</span><span class="tag">攻击性武器禁令</span><span class="tag">枪支死亡下降</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">枪支法规（2025）</div><div class="detail-text">特拉华于2025年11月16日实施<strong>购枪许可法</strong>——购买手枪需先获得免费许可并完成枪支培训。该法获得约 <strong>70%</strong> 特拉华居民支持，包括超过 <strong>60%</strong> 的枪支持有者。州总检察长 Jennings 强调，购枪许可法使枪支凶杀率降低 <strong>25%</strong>、枪支自杀率降低 <strong>50%</strong>、枪支贩运减少 <strong>75%</strong>。特拉华还实施了<strong>攻击性武器禁令</strong>和<strong>大容量弹匣禁令</strong>。2025年枪支相关犯罪指控 <strong>1,334 起</strong>，约占所有暴力犯罪指控的 <strong>39%</strong>。2025年枪支暴力事件持续下降——New Castle 县降至 <strong>185 起</strong>、Kent 县 <strong>57 起</strong>、Sussex 县 <strong>49 起</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="de-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value">2.2%–6.6%</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">8.7%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value green">无</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value green">~0.54%</span></div>
+        <div class="data-item"><span class="data-label">CNBC 生活成本</span><span class="data-value green">第9</span></div>
+        <div class="data-item"><span class="data-label">信用评级</span><span class="data-value green">Aaa/AAA</span></div>
+      </div>
+      <div class="info-row"><span class="label">税收特征</span><span class="value"><strong>无销售税</strong> · 无个人财产税 · 无机械/设备税 · 无州级房产税</span></div>
+      <div class="info-row"><span class="label">2025挑战</span><span class="value">联邦税收改革致 <strong>$4亿</strong> 收入缺口</span></div>
+      <div class="tags"><span class="tag">无销售税</span><span class="tag">房产税0.54%</span><span class="tag">信用评级AAA</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td>2.2%–6.6% 累进</td></tr>
+        <tr><td>企业所得税</td><td><strong>8.7%</strong></td></tr>
+        <tr><td>州销售税</td><td><strong>无</strong>（全美仅5州）</td></tr>
+        <tr><td>房产税</td><td>有效税率约 <strong>0.54%</strong>（全美最低之一）</td></tr>
+        <tr><td>房地产转让税</td><td>4%（买方2.5% / 卖方1.5%）</td></tr>
+        <tr><td>遗产税</td><td><strong>无</strong></td></tr>
+        <tr><td>个人财产税</td><td><strong>无</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">财政挑战与2025动态</div><div class="detail-text">特拉华<strong>无州销售税</strong>，为全美仅有的5个无销售税的州之一。房产税有效税率约 <strong>0.54%</strong>，为全美最低之一。州财政以公司注册费和特许经营税为独特来源。2025年面临联邦税收改革导致的 <strong>$4 亿</strong>收入缺口——州长 Meyer 签署 HB 255 填补缺口，并推动将州税与联邦税<strong>脱钩</strong>，以保护州财政收入。穆迪/标普信用评级为 <strong>Aaa/AAA</strong>，展望稳定。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="de-trans" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">主要机场</span><span class="data-value">ILG (威尔明顿)</span></div>
+        <div class="data-item"><span class="data-label">区域枢纽</span><span class="data-value">PHL / BWI</span></div>
+        <div class="data-item"><span class="data-label">州际公路</span><span class="data-value">I-95 / I-495</span></div>
+        <div class="data-item"><span class="data-label">通勤铁路</span><span class="data-value">SEPTA / MARC</span></div>
+        <div class="data-item"><span class="data-label">Amtrak</span><span class="data-value">Northeast Corridor</span></div>
+        <div class="data-item"><span class="data-label">港口</span><span class="data-value">威尔明顿港</span></div>
+      </div>
+      <div class="info-row"><span class="label">通勤特征</span><span class="value">大量居民通勤至费城、巴尔的摩、华盛顿</span></div>
+      <div class="info-row"><span class="label">铁路</span><span class="value">Amtrak Northeast Regional / Acela 经停威尔明顿</span></div>
+      <div class="tags"><span class="tag">I-95走廊</span><span class="tag">Amtrak经停</span><span class="tag">通勤三城</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text">威尔明顿机场（ILG）为通用航空。区域商业航空依赖<strong>费城国际机场（PHL）</strong>（宾夕法尼亚州）和<strong>巴尔的摩/华盛顿国际机场（BWI）</strong>（马里兰州）。特拉华居民也使用纽瓦克（EWR）和杜勒斯（IAD）机场。</div></div>
+      <div class="detail-section"><div class="detail-label">公路与铁路</div><div class="detail-text"><strong>公路：</strong>I-95 穿越威尔明顿（华盛顿-巴尔的摩-费城-纽约走廊），I-495 绕城，US-13 纵贯南北，US-113 连接南部海滩。<strong>铁路：</strong>Amtrak Northeast Regional 和 Acela 经停威尔明顿站，SEPTA 区域铁路（威尔明顿/纽瓦克线）连接费城，MARC 通勤铁路连接巴尔的摩/华盛顿。DART First State 公交覆盖全州。<strong>港口：</strong>威尔明顿港为特拉华河重要港口，处理汽车、钢铁和集装箱货物。<strong>通勤：</strong>大量居民通勤至费城、巴尔的摩和华盛顿，I-95 高峰拥堵显著。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="de-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025)</span><span class="data-value">$326,800</span></div>
+        <div class="data-item"><span class="data-label">中位挂牌价</span><span class="data-value">$433,317</span></div>
+        <div class="data-item"><span class="data-label">中位月租</span><span class="data-value">$1,341</span></div>
+        <div class="data-item"><span class="data-label">自有住房率</span><span class="data-value">72.3%</span></div>
+        <div class="data-item"><span class="data-label">5年增值</span><span class="data-value green">+53.2%</span></div>
+        <div class="data-item"><span class="data-label">待售天数</span><span class="data-value">19–22 天</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房成本</span><span class="value">高于南部州但低于东北走廊多数地区</span></div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">2025年市场降温 · 销量和价格较上年下降</span></div>
+      <div class="tags"><span class="tag">自有住房率72.3%</span><span class="tag">5年增值53%</span><span class="tag">市场降温</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">中位自住房价值 <strong>$326,800</strong>（2023年），中位挂牌价 <strong>$433,317</strong>。中位月租 <strong>$1,341</strong>。自有住房率 <strong>72.3%</strong>，高于全美平均。房价5年增值 <strong>53.2%</strong>，1年增值 <strong>5.4%</strong>。2025年市场降温——5月中位成交价 <strong>$396,482</strong>，同比下降0.6%，但较4月上涨1.9%。历史最高中位价为2025年6月的 <strong>$405,996</strong>。住房挂牌价格高于附近南部州，但仍比东北走廊多数地区可负担。业主成本负担率（30%+）<strong>19.1%</strong>，租户成本负担率 <strong>39.8%</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="de-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">湿润温带</span></div>
+        <div class="data-item"><span class="data-label">年均温</span><span class="data-value">54.2°F (12°C)</span></div>
+        <div class="data-item"><span class="data-label">年降水</span><span class="data-value">45 英寸</span></div>
+        <div class="data-item"><span class="data-label">北部年均温</span><span class="data-value">54.0°F</span></div>
+        <div class="data-item"><span class="data-label">南部沿海年均温</span><span class="data-value">58.1°F</span></div>
+        <div class="data-item"><span class="data-label">冬季均温</span><span class="data-value">~33°F (1月)</span></div>
+      </div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">飓风（沿海）· 暴风雪 · 洪水</span></div>
+      <div class="info-row"><span class="label">气候特征</span><span class="value">四季分明 · 降水均匀 · 夏季湿热</span></div>
+      <div class="tags"><span class="tag">湿润温带</span><span class="tag">降水均匀</span><span class="tag">沿海飓风风险</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">气温与降水</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润温带（柯本气候分类）</td></tr>
+        <tr><td>年均温（全州）</td><td>54.2°F (12.3°C)</td></tr>
+        <tr><td>年均温（北部 New Castle 县）</td><td>54.0°F</td></tr>
+        <tr><td>年均温（南部沿海）</td><td>58.1°F</td></tr>
+        <tr><td>年降水量</td><td>45.9 英寸（1991-2020 平均）</td></tr>
+        <tr><td>降水范围（历史）</td><td>27.4 英寸（1930）至 60.1 英寸（1948）</td></tr>
+        <tr><td>1月均温</td><td>~33°F</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">气候特征与极端天气</div><div class="detail-text">特拉华气候为<strong>湿润温带</strong>——夏季湿热、冬季温和。由于州域狭小，气候差异很小：北部 New Castle 县年均温 <strong>54.0°F</strong>，南部沿海 <strong>58.1°F</strong>。降水全年均匀分布，秋季和初冬略少。极端天气包括：沿海地区的<strong>飓风</strong>风险（2011年飓风艾琳、2012年飓风桑迪造成损失）、冬季<strong>暴风雪</strong>和春季<strong>洪水</strong>。夏季偶有龙卷风。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="de-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Matt Meyer (D)</span></div>
+        <div class="data-item"><span class="data-label">州参议院</span><span class="data-value">民主党多数</span></div>
+        <div class="data-item"><span class="data-label">州众议院</span><span class="data-value">民主党多数</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名民主党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">1 席 · 民主党</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">蓝州</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">153届议会 · 州长否决 <strong>2 项</strong>参议院法案 · 众议院法案无否决</span></div>
+      <div class="info-row"><span class="label">当前议题</span><span class="value">税收脱钩 · $4亿缺口 · AI沙盒 · 购枪许可</span></div>
+      <div class="tags"><span class="tag">蓝州</span><span class="tag">民主党三权</span><span class="tag">新州长Meyer</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">特拉华为<strong>蓝州</strong>，民主党在州长办公室、州参议院和州众议院均占多数。州长 <strong>Matt Meyer</strong>（民主党）于2025年1月21日就任，接替因辞职而短暂任职的 Hall-Long。联邦层面，两名参议员均为民主党，众议院唯一席位为民主党。前州长 John Carney 于2025年1月7日辞职，Lieutenant Governor Hall-Long 依法继任，随后 Meyer 于1月21日接任。</div></div>
+      <div class="detail-section"><div class="detail-label">2025年关键议题</div><div class="table-container"><table class="mini-table">
+        <tr><td>税收脱钩</td><td>州长 Meyer 推动州税与联邦税脱钩，保护州财政收入</td></tr>
+        <tr><td>$4亿收入缺口</td><td>联邦税收改革导致 · HB 255 填补缺口</td></tr>
+        <tr><td>AI沙盒</td><td>全国领先的 AI 安全测试计划</td></tr>
+        <tr><td>购枪许可</td><td>2025年11月16日生效</td></tr>
+        <tr><td>选举政策</td><td>提前投票 · 选民登记改革</td></tr>
+      </table></div></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="de-edu" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">KIDS COUNT 教育</span><span class="data-value orange">第37</span></div>
+        <div class="data-item"><span class="data-label">WalletHub 公校</span><span class="data-value green">第12</span></div>
+        <div class="data-item"><span class="data-label">数学恢复</span><span class="data-value green">第4 / 38州</span></div>
+        <div class="data-item"><span class="data-label">阅读恢复</span><span class="data-value green">第14 / 35州</span></div>
+        <div class="data-item"><span class="data-label">本科及以上</span><span class="data-value">35.3%</span></div>
+        <div class="data-item"><span class="data-label">特许学校</span><span class="data-value green">全州领先</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>University of Delaware</strong> · 全美百强公立</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Charter School of Wilmington · Caesar Rodney High</span></div>
+      <div class="tags"><span class="tag">数学恢复全美第4</span><span class="tag">公校全美第12</span><span class="tag">特许学校领先</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">特拉华教育排名存在显著差异——KIDS COUNT 数据手册将其列为<strong>全美第37</strong>，较上年上升8位；但 WalletHub 将其公校系统列为<strong>全美第12</strong>，安全维度表现突出。数学恢复排名<strong>全美第4</strong>（38州中），阅读恢复<strong>第14</strong>（35州中），但整体表现仍低于疫情前水平。顶尖高中包括 <strong>Charter School of Wilmington</strong>、<strong>Sussex Academy</strong>、<strong>Newark Charter School</strong> 和 <strong>Cab Calloway School of the Arts</strong>。U.S. News 排名中，Caesar Rodney High 和 Brandywine 位列全州前10。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Delaware</td><td>纽瓦克 · 全美百强公立 · 化工与海洋研究强</td></tr>
+        <tr><td>Delaware State University</td><td>多佛 · HBCU · 全美知名</td></tr>
+        <tr><td>Wilmington University</td><td>纽卡斯尔 · 私立 · 商科与护理</td></tr>
+        <tr><td>Goldey-Beacom College</td><td>威尔明顿 · 私立 · 商科</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="de-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">大学体育</span><span class="data-value">Delaware Blue Hens</span></div>
+        <div class="data-item"><span class="data-label">联盟</span><span class="data-value">CAA / FBS 过渡</span></div>
+        <div class="data-item"><span class="data-label">NCAA 冠军</span><span class="data-value green">1983 冰球</span></div>
+        <div class="data-item"><span class="data-label">FBS 过渡</span><span class="data-value green">Conference USA</span></div>
+      </div>
+      <div class="info-row"><span class="label">标志</span><span class="value">Blue Hens 为全美最独特的昵称之一</span></div>
+      <div class="info-row"><span class="label">校友</span><span class="value">Joe Biden（总统）· Joe Flacco（超级碗MVP）</span></div>
+      <div class="tags"><span class="tag">Blue Hens</span><span class="tag">1983冰球冠军</span><span class="tag">FBS过渡</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text">特拉华大学<strong>Blue Hens</strong>（战斗蓝母鸡）为全州最著名的体育品牌，拥有NCAA Division I 的21支男子和女子运动队。Blue Hens 自2001年起参加 <strong>Coastal Athletic Association（CAA）</strong>。1983年，特拉华大学赢得 <strong>NCAA Division I 冰球全国冠军</strong>。2025年，特拉华大学宣布从 FCS 过渡到 <strong>FBS</strong>，加入 <strong>Conference USA</strong>，开启体育新纪元。Blue Hens 是全美仅有的两所以“母鸡”为昵称的NCAA学校之一。著名校友包括美国总统 <strong>Joe Biden</strong> 和超级碗MVP <strong>Joe Flacco</strong>。</div></div>
+      <div class="detail-section"><div class="detail-label">其他体育</div><table class="mini-table">
+        <tr><td>Wilmington University</td><td>NCAA Division II · 棒球、篮球、高尔夫、长曲棍球</td></tr>
+        <tr><td>Delaware State University</td><td>NCAA Division I · MEAC 联盟</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="de-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">The News Journal</span></div>
+        <div class="data-item"><span class="data-label">数字平台</span><span class="data-value">Delaware Online</span></div>
+        <div class="data-item"><span class="data-label">公共广播</span><span class="data-value">Delaware Public Media</span></div>
+        <div class="data-item"><span class="data-label">非营利新闻</span><span class="data-value">Spotlight Delaware</span></div>
+        <div class="data-item"><span class="data-label">广播</span><span class="data-value">WDEL 电台</span></div>
+        <div class="data-item"><span class="data-label">电视</span><span class="data-value">DETV · WHYY</span></div>
+      </div>
+      <div class="info-row"><span class="label">媒体特点</span><span class="value">威尔明顿市场无商业电视台 · 费城媒体溢出</span></div>
+      <div class="info-row"><span class="label">创新</span><span class="value">Spotlight Delaware 为全州首个非营利新闻编辑室</span></div>
+      <div class="tags"><span class="tag">News Journal最大</span><span class="tag">Spotlight非营利</span><span class="tag">费城媒体溢出</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>The News Journal / Delaware Online</td><td>全州最大报纸 · Gannett/USA TODAY Co. 旗下</td></tr>
+        <tr><td>Delaware Public Media</td><td>全州唯一 NPR 附属 · 非商业公共媒体</td></tr>
+        <tr><td>Spotlight Delaware</td><td>全州首个非营利新闻编辑室（2024年3月启动）</td></tr>
+        <tr><td>WDEL 电台</td><td>威尔明顿 · 2022年百年纪念</td></tr>
+        <tr><td>DETV</td><td>威尔明顿社区电视 · 本地新闻</td></tr>
+        <tr><td>Delaware Business Now</td><td>商业新闻数字平台</td></tr>
+        <tr><td>El Tiempo Hispano</td><td>西语裔社区新闻</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">特拉华媒体市场受<strong>费城强烈溢出影响</strong>——威尔明顿市场无商业电视台，仅有一份日报。The News Journal（Delaware Online）为全州最大报纸，母公司 Gannett 于2025年更名为 <strong>USA TODAY Co.</strong>。<strong>Spotlight Delaware</strong> 为全州首个非营利、社区驱动的新闻编辑室（2024年3月启动），已联合7家本地新闻机构建立内容合作网络，包括 The News Journal、Delaware Business Now、Delmarva Public Media 等。<strong>Delaware Public Media</strong> 为全州唯一 NPR 附属广播，覆盖全州。州长 Meyer 的“Ask Governor Meyer”节目在 WHYY、DPM 和 YouTube 同步直播。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="de-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏖️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">国家历史公园</span><span class="data-value">First State NHP</span></div>
+        <div class="data-item"><span class="data-label">海滩</span><span class="data-value">Rehoboth · Bethany</span></div>
+        <div class="data-item"><span class="data-label">庄园</span><span class="data-value">Winterthur · Nemours</span></div>
+        <div class="data-item"><span class="data-label">州立公园</span><span class="data-value">Cape Henlopen 等</span></div>
+        <div class="data-item"><span class="data-label">历史遗迹</span><span class="data-value">New Castle · Dover</span></div>
+        <div class="data-item"><span class="data-label">特色体验</span><span class="data-value">Marshall Steam Museum</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">Rehoboth海滩 · Winterthur庄园 · Cape Henlopen</span></div>
+      <div class="info-row"><span class="label">历史</span><span class="value">First State NHP 覆盖全州多处历史遗址</span></div>
+      <div class="tags"><span class="tag">Rehoboth海滩</span><span class="tag">Winterthur庄园</span><span class="tag">First State NHP</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>Rehoboth Beach</strong> 和 <strong>Bethany Beach</strong> 为华盛顿-巴尔的摩都会区的“夏季首都”，海滩度假和木板路文化为标志性体验。<strong>Winterthur Museum, Garden and Library</strong> 为杜邦家族庄园，拥有全美最丰富的美国装饰艺术收藏。<strong>Nemours Estate</strong> 和 <strong>Hagley Museum</strong> 同为杜邦家族遗产，展示工业贵族生活方式。<strong>Cape Henlopen State Park</strong> 拥有超过 5 英里海滩、二战瞭望塔和自然保护区。<strong>First State National Historical Park</strong> 覆盖全州多处历史遗址，包括 New Castle 历史区、Dover Green（特拉华成为第一州的地点）和 John Dickinson Plantation。<strong>Marshall Steam Museum</strong> 展示古董蒸汽汽车和微型铁路。<strong>Zwaanendael Museum</strong>（Lewes）展示荷兰殖民历史和1774年英国商船残骸。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="de-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">可再生目标 (2035)</span><span class="data-value green">40%</span></div>
+        <div class="data-item"><span class="data-label">太阳能目标</span><span class="data-value">10%</span></div>
+        <div class="data-item"><span class="data-label">可再生系统</span><span class="data-value">~5,000</span></div>
+        <div class="data-item"><span class="data-label">社区太阳能用户</span><span class="data-value green">6,000+</span></div>
+        <div class="data-item"><span class="data-label">海上风电</span><span class="data-value">US Wind 协议</span></div>
+        <div class="data-item"><span class="data-label">能效计划</span><span class="data-value green">Delaware SHINES</span></div>
+      </div>
+      <div class="info-row"><span class="label">RPS 目标</span><span class="value">2025-26: 25% · 2030: 28% · 2035: <strong>40%</strong>（含10%太阳能）</span></div>
+      <div class="info-row"><span class="label">旗舰项目</span><span class="value">Delaware SHINES · 全美最全面太阳能+储能计划</span></div>
+      <div class="tags"><span class="tag">2035年40%可再生</span><span class="tag">海上风电协议</span><span class="tag">Delaware SHINES</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">可再生能源目标（RPS）</div><table class="mini-table">
+        <tr><td>2025-26 合规年</td><td>25%</td></tr>
+        <tr><td>2030年目标</td><td>28%</td></tr>
+        <tr><td>2035年最终目标</td><td><strong>40%</strong>（含10%太阳能）</td></tr>
+        <tr><td>当前可再生系统</td><td>约 5,000 个（主要为太阳能）</td></tr>
+        <tr><td>社区太阳能用户</td><td>6,000+</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">能源转型举措</div><div class="detail-text">特拉华正积极推进能源转型——<strong>Delaware SHINES</strong> 为全州首个、也是全美最全面的太阳能+电池储能计划，专为家庭设计。平均每月电费近 $200 的特拉华家庭通过加入社区太阳能项目，每年可节省超 <strong>$300</strong>。2025年州长 Carney 与 <strong>US Wind</strong> 签署协议，每年提供 <strong>150,000 个</strong>可再生能源证书（RECs）。多个社区太阳能项目正在 Kent 和 Sussex 县建设，其中 TurningPoint Energy 和 Standard Solar 合作的 <strong>11.2 MW</strong> 项目将为近 <strong>1,700 户</strong>家庭供电。Nautilus Solar 和 TurningPoint Energy 的 6 个太阳能项目正在推进中。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="de-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">AI 沙盒</span><span class="data-value green">全国领先</span></div>
+        <div class="data-item"><span class="data-label">生物科技</span><span class="data-value">NIIMBL 中心</span></div>
+        <div class="data-item"><span class="data-label">金融科技</span><span class="data-value green">人均全美第1</span></div>
+        <div class="data-item"><span class="data-label">R&D 增长</span><span class="data-value green">远超全美</span></div>
+        <div class="data-item"><span class="data-label">EDGE 2.0</span><span class="data-value">创新资助</span></div>
+        <div class="data-item"><span class="data-label">2025新岗位</span><span class="data-value green">933</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">金融科技 · 生物科技 · AI · 清洁能源 · 先进制造</span></div>
+      <div class="info-row"><span class="label">旗舰项目</span><span class="value"><strong>AI Sandbox</strong> · 全国首个受控 AI 测试环境</span></div>
+      <div class="tags"><span class="tag">AI Sandbox全国领先</span><span class="tag">金融科技创新第1</span><span class="tag">NIIMBL生物制造</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">AI 沙盒倡议</div><div class="detail-text">2025年7月，州长 Meyer 签署联合决议，启动 <strong>AI Sandbox 计划</strong>——为人工智能技术提供一个受控的测试环境，使其能够安全地开发和部署。这一举措巩固了特拉华作为<strong>负责任技术创新全国领导者</strong>的地位。州参议员 Brown 还领导立法创建了<strong>区块链与数字创新工作组</strong>，分析特拉华如何吸引和留住数字资产相关企业。</div></div>
+      <div class="detail-section"><div class="detail-label">创新生态</div><table class="mini-table">
+        <tr><td>金融科技创新</td><td>人均全美第1 · 第5整体 · 200+专利（2009-2018）</td></tr>
+        <tr><td>NIIMBL</td><td>生物制药先进制造创新中心</td></tr>
+        <tr><td>EDGE 2.0</td><td>创新资助竞赛 · Crystron Technologies、KiposTech 获奖</td></tr>
+        <tr><td>KiposTech</td><td>农业科技 · “等离子火箭炮”家禽生物安全</td></tr>
+        <tr><td>Innovate Delaware</td><td>2026年新计划 · 聚焦金融科技、清洁能源、化工</td></tr>
+        <tr><td>2025 DPP 成果</td><td>14个项目 · 933个新岗位</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>特拉华州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · CNBC · Delaware Health Association · DNREC · Choose Delaware</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
