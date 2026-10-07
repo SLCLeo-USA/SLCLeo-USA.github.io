@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AR</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-hover: #0077ed; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #e8f5e9 0%, #dcedc8 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --natural: #2e7d32;
+  }
+  [data-theme="dark"] {
+    --ground: #000000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-hover: #409cff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #0d1f0d 0%, #1a2e1a 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --natural: #4caf50;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--natural); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--natural); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); letter-spacing: 0.01em; }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s cubic-bezier(0.25,0.1,0.25,1); padding: 0 24px; background: var(--surface-secondary); transition: background 0.4s ease, max-height 0.55s ease, padding 0.55s ease; }
+  .card.expanded .card-detail { max-height: 2400px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; } .detail-section:last-child { margin-bottom: 0; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; letter-spacing: -0.005em; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; letter-spacing: -0.005em; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1); }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s, background 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; transition: stroke 0.2s; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; gap: 6px; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>阿肯色州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#sec-overview">概览</a><a href="#sec-population">人口</a><a href="#sec-economy">经济就业</a>
+      <a href="#sec-business">企业与产业</a><a href="#sec-healthcare">医疗</a><a href="#sec-safety">公共安全</a>
+      <a href="#sec-tax">税收财政</a><a href="#sec-transport">交通</a><a href="#sec-housing">住房</a>
+      <a href="#sec-climate">气候</a><a href="#sec-politics">政治政府</a><a href="#sec-education">教育</a>
+      <a href="#sec-sports">体育</a><a href="#sec-media">媒体</a><a href="#sec-tourism">旅游</a>
+      <a href="#sec-energy">能源</a><a href="#sec-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌲</div>
+  <h1>阿肯色州<br><em>Arkansas</em></h1>
+  <p class="subtitle">自然之州 · 沃尔玛故乡 · 蓝调与乡村音乐 · 低成本天堂</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>3,088,354</strong><span>人口 (2024)</span></div>
+    <div class="hero-stat"><strong>$188.7B</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>3.9%</strong><span>失业率 (2025.9)</span></div>
+    <div class="hero-stat"><strong>#1</strong><span>生活成本全美最低</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 最高个税 <b>3.9%</b> · 持续下调</span>
+    <span class="hero-badge orange">🛡️ <b>宪法携带州</b></span>
+    <span class="hero-badge red">📚 教育全美 <b>第37</b></span>
+    <span class="hero-badge">🛒 <b>Walmart #1</b> 全球总部</span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="sec-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1836年6月15日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">小石城</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">小石城</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">137,733 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">嘲鸫</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">苹果花</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">自然之州（The Natural State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Regnat Populus"（人民统治）</span></div>
+      <div class="tags"><span class="tag">Greater Appalachia</span><span class="tag">Ozarks</span><span class="tag">自然之州</span><span class="tag">沃尔玛故乡</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">阿肯色位于美国中南部，北接密苏里，东邻田纳西和密西西比，南界路易斯安那，西临得克萨斯和俄克拉荷马。在 Colin Woodard 的文化分区中，阿肯色西北部属于 <strong>Greater Appalachia</strong> 文化圈（欧扎克高原），东南部则带 Deep South 色彩。地形从密西西比河冲积平原到欧扎克高原和沃希托山脉，拥有 <strong>2,993 公里</strong>内河航道（全美第3）和 <strong>316 个</strong>机场。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1686年法国探险家首次记录。1803年作为路易斯安那购地一部分归美国。1836年6月15日成为美国第 <strong>25 个州</strong>。1957年小石城中央高中废除种族隔离事件为美国民权运动里程碑。20世纪后期，沃尔玛（1962年创立于本顿维尔）和 Tyson Foods 的崛起彻底重塑了州经济。2024年被 U.S. News 评为全美<strong>生活成本最低的州</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="sec-population" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2024)</span><span class="data-value">3,088,354</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">38.9 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$68,060</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$58,700</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value red">15.7%</span></div>
+        <div class="data-item"><span class="data-label">外国出生</span><span class="data-value">5.3%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 71.2% · 黑人 15.4% · 西语裔 8.2% · 亚裔 1.8%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">小石城 204,774 · Fayetteville 103,134 · Fort Smith 90,507</span></div>
+      <div class="tags"><span class="tag">生活成本全美最低</span><span class="tag">净迁入全美第1</span><span class="tag">贫困率高于全美</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2024)</td><td><strong>3,088,354</strong>（全美第33）</td></tr>
+        <tr><td>中位年龄</td><td>38.9 岁</td></tr>
+        <tr><td>主要城市</td><td>小石城 204,774 · Fayetteville 103,134</td></tr>
+        <tr><td>外国出生</td><td>5.3%</td></tr>
+        <tr><td>住房单元总数</td><td>1,435,645（2025.7）</td></tr>
+        <tr><td>自有住房率</td><td>66.4%（2020-2024）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$68,060</strong>（2025年），低于全美中位数。人均收入 <strong>$58,700</strong>（全美 $77,719）。贫困率 <strong>15.7%</strong>，高于全美平均。但阿肯色连续两年被评为<strong>全美净迁入率第1</strong>的州，2025年吸引大量来自加州、得克萨斯和佛罗里达的迁入者，主要驱动力为<strong>全美最低的生活成本</strong>（U.S. News 2024年排名第1）和<strong>全美第3最佳创业州</strong>（Forbes）。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="sec-economy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$188.7B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长</span><span class="data-value green">+6.9% (Q3 2024)</span></div>
+        <div class="data-item"><span class="data-label">总就业</span><span class="data-value">~1.4M</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">3.9%</span></div>
+        <div class="data-item"><span class="data-label">劳动参与率</span><span class="data-value">58.7%</span></div>
+        <div class="data-item"><span class="data-label">人均GDP增长</span><span class="data-value green">+16.4%</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">零售 · 农业食品 · 物流 · 航空航天</span></div>
+      <div class="info-row"><span class="label">就业增长</span><span class="value">南部16州中第2高（+1.6%）</span></div>
+      <div class="tags"><span class="tag">GDP增速全美第1</span><span class="tag">人均GDP增速领先</span><span class="tag">制造业15.8万人</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现</div><table class="mini-table">
+        <tr><td>Gross State Product (2025)</td><td><strong>$188.7B</strong>（全美第34）</td></tr>
+        <tr><td>GDP 增速 (Q3 2024)</td><td><strong>+6.9%</strong>（全美第1）</td></tr>
+        <tr><td>失业率 (2025.9)</td><td><strong>3.9%</strong>（全美 4.3%）</td></tr>
+        <tr><td>就业增长 (2024.8-2025.8)</td><td>+1.6%（南部16州第2）</td></tr>
+        <tr><td>人均GDP增长</td><td><strong>+16.4%</strong>（超过所有邻州）</td></tr>
+        <tr><td>制造业就业</td><td>158,681 人 · 2,545 家企业</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">阿肯色经济以<strong>零售业</strong>（Walmart 全球总部）和<strong>农业食品加工</strong>（Tyson Foods 全球最大肉类加工商）为双核心。物流业（J.B. Hunt、ArcBest）为第三支柱。近年来<strong>航空航天和国防</strong>成为新兴增长极——L3Harris 在 Calhoun County 建设超过 <strong>20 个</strong>大型固体火箭发动机生产设施。制造业雇佣 <strong>15.8 万人</strong>。2024年进入全美“最佳营商环境”第 <strong>12 位</strong>（Area Development）。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="sec-business" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">6 家</span></div>
+        <div class="data-item"><span class="data-label">全球第1</span><span class="data-value green">Walmart</span></div>
+        <div class="data-item"><span class="data-label">Fortune 1000</span><span class="data-value">8 家</span></div>
+        <div class="data-item"><span class="data-label">创业排名</span><span class="data-value green">全美第3</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级产业</span><span class="value">零售 · 食品加工 · 物流 · 航空航天 · 农业</span></div>
+      <div class="info-row"><span class="label">Fortune 500</span><span class="value">Walmart #1 · Tyson #85 · Murphy USA #279 · J.B. Hunt #348</span></div>
+      <div class="tags"><span class="tag">Walmart全球第1</span><span class="tag">Tyson全球最大肉类</span><span class="tag">J.B. Hunt物流</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500（2025）</div><table class="mini-table">
+        <tr><td>1. Walmart (#1)</td><td>本顿维尔 · $6810 亿营收 · 全球最大公司</td></tr>
+        <tr><td>2. Tyson Foods (#85)</td><td>斯普林代尔 · 全球最大肉类加工商</td></tr>
+        <tr><td>3. Murphy USA (#279)</td><td>埃尔多拉多 · 燃料零售</td></tr>
+        <tr><td>4. J.B. Hunt Transport (#348)</td><td>洛厄尔 · 货运物流</td></tr>
+        <tr><td>5. Dillard's (#439)</td><td>小石城 · 百货零售</td></tr>
+        <tr><td>6. Windstream Holdings (#474)</td><td>小石城 · 电信</td></tr>
+        <tr><td>7. ArcBest (#763)</td><td>Fort Smith · 物流（Fortune 1000）</td></tr>
+        <tr><td>8. Murphy Oil (#902)</td><td>埃尔多拉多 · 油气（Fortune 1000）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">产业集聚</div><div class="detail-text"><strong>农业食品加工：</strong>阿肯色为 Tyson Foods 总部所在地，同时吸引 PepsiCo、Nestlé、JBS USA、Kraft Heinz、Coca-Cola、Mars 等跨国食品巨头设厂。<strong>航空航天：</strong>L3Harris 在 Camden 建设超过 20 个大型固体火箭发动机生产设施。<strong>物流：</strong>J.B. Hunt 和 ArcBest 为全美领先货运公司，受益于阿肯色中部地理位置——全国 <strong>12 大</strong>公路网络之一。<strong>创业生态：</strong>Forbes 评为全美第3最佳创业州。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="sec-healthcare" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">Washington Regional</span></div>
+        <div class="data-item"><span class="data-label">连续第1</span><span class="data-value green">5 年</span></div>
+        <div class="data-item"><span class="data-label">Becker's 100</span><span class="data-value">全州唯一</span></div>
+        <div class="data-item"><span class="data-label">U.S. News 评估</span><span class="data-value">108 家</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">Washington Regional（Fayetteville）连续 5 年全州第1</span></div>
+      <div class="info-row"><span class="label">最佳区域医院</span><span class="value">4 家 · Baptist Health LR / Mercy NWA 并列第2</span></div>
+      <div class="tags"><span class="tag">Washington Regional第1</span><span class="tag">Becker's 100</span><span class="tag">Mercy分娩全州第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. Washington Regional (Fayetteville)</td><td>连续 5 年全州第1 · Becker's 100 Great</td></tr>
+        <tr><td>2. Baptist Health Medical Center-Little Rock</td><td>并列全州第2</td></tr>
+        <tr><td>3. Mercy Hospital Northwest Arkansas</td><td>并列全州第2 · Newsweek 全州第1</td></tr>
+        <tr><td>4. UAMS Medical Center</td><td>学术医疗中心</td></tr>
+        <tr><td>Arkansas Heart Hospital</td><td>小石城 · 心血管专科</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text">阿肯色共有 <strong>108 家</strong>医院接受 U.S. News 评估，其中 <strong>4 家</strong>达到“最佳区域医院”标准。Washington Regional 在 <strong>12 个</strong>医疗领域获评“高绩效”，为全州最多。Mercy Hospital Northwest Arkansas 被 Newsweek 评为<strong>全州最佳医院</strong>和<strong>全州最佳分娩医院</strong>。UAMS（阿肯色大学医学科学中心）为州内唯一学术医疗中心。农村医疗可及性为长期挑战，部分县缺乏产科和急诊服务。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="sec-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">持枪法规</span><span class="data-value green">宪法携带州</span></div>
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value">约 44%</span></div>
+        <div class="data-item"><span class="data-label">红旗法</span><span class="data-value">2025年提案</span></div>
+        <div class="data-item"><span class="data-label">公路死亡</span><span class="data-value">621 人/年</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>宪法携带州</strong> · 公园公开携带合法</span></div>
+      <div class="info-row"><span class="label">立法动态</span><span class="value">2025年提案恢复非暴力重罪犯持枪权 · 红旗法提案</span></div>
+      <div class="tags"><span class="tag">宪法携带</span><span class="tag">红旗法讨论</span><span class="tag">农村治安挑战</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">持枪法规</div><div class="detail-text">阿肯色为<strong>宪法携带州</strong>，允许公开携带。公园和体育赛事中公开携带合法，但市政建筑内禁止。2025年立法提案允许<strong>非暴力重罪犯恢复持枪权</strong>（已通过委员会），同时“阿肯色红旗法”提案正在审议中。持枪率约 <strong>44%</strong>。2020-2025年公路死亡 <strong>3,103 人</strong>，年均 <strong>621 人</strong>。</div></div>
+      <div class="detail-section"><div class="detail-label">警察与消防</div><div class="detail-text">小石城警察局为州内最大市警机构。阿肯色州警（Arkansas State Police）负责全州高速公路巡逻和刑事调查。农村社区多依赖县治安官和志愿消防队。阿肯色阿片类药物危机和农村犯罪率为长期挑战。2025年立法会议聚焦公共安全，通过多项执法培训和精神健康支持法案。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="sec-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value green">0%–3.9%</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">4.8%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">6.5%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value">6.5%–11.5%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value">~0.61%</span></div>
+        <div class="data-item"><span class="data-label">销售税全美排名</span><span class="data-value red">第3高</span></div>
+      </div>
+      <div class="info-row"><span class="label">税改趋势</span><span class="value">个税最高档从 4.4% 降至 <strong>3.9%</strong>（2025年）</span></div>
+      <div class="info-row"><span class="label">房产税减免</span><span class="value">Act 330 · 70.8 万房主节省 $5600 万</span></div>
+      <div class="tags"><span class="tag">个税持续下调</span><span class="tag">销售税全美第3高</span><span class="tag">房产税低</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td>0%（$5,499 以下）– <strong>3.9%</strong>（最高档）</td></tr>
+        <tr><td>企业所得税</td><td>4.8%</td></tr>
+        <tr><td>州销售税</td><td>6.5%</td></tr>
+        <tr><td>综合销售税</td><td>6.5%–11.5%</td></tr>
+        <tr><td>房产税</td><td>有效税率约 0.61%</td></tr>
+        <tr><td>遗产税</td><td><strong>无</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">阿肯色个人所得税最高档从2024年的4.4%降至2025年的 <strong>3.9%</strong>（Act 1 of 2024 Second Extraordinary Session）。企业所得税 <strong>4.8%</strong>。但销售税综合税率 <strong>6.5%–11.5%</strong> 为<strong>全美第3高</strong>。房产税有效税率约 <strong>0.61%</strong>，为全美较低水平。2025年 Act 330 为约 <strong>70.8 万</strong>房主节省 <strong>$5600 万</strong>房产税。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="sec-transport" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">机场总数</span><span class="data-value">316 个</span></div>
+        <div class="data-item"><span class="data-label">公路里程</span><span class="data-value">16,418 英里</span></div>
+        <div class="data-item"><span class="data-label">铁路里程</span><span class="data-value">4,184 km</span></div>
+        <div class="data-item"><span class="data-label">内河航道</span><span class="data-value green">2,993 km</span></div>
+        <div class="data-item"><span class="data-label">内河排名</span><span class="data-value green">全美第3</span></div>
+        <div class="data-item"><span class="data-label">公路网络</span><span class="data-value">全美第12</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要机场</span><span class="value">Clinton National (LIT) · 年旅客约 200 万</span></div>
+      <div class="info-row"><span class="label">一级铁路</span><span class="value">Union Pacific · BNSF · Kansas City Southern</span></div>
+      <div class="tags"><span class="tag">内河航道全美第3</span><span class="tag">公路网络全美第12</span><span class="tag">3条一级铁路</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>Bill & Hillary Clinton National Airport (LIT)</strong> 为阿肯色最大商业机场，年旅客约 <strong>200 万</strong>，每日 <strong>120+</strong> 航班，直飞 <strong>14 个</strong>国内/国际门户城市。<strong>Northwest Arkansas National Airport (XNA)</strong> 服务沃尔玛总部区域。Fort Smith Regional Airport 为西部枢纽。</div></div>
+      <div class="detail-section"><div class="detail-label">公路、铁路与水运</div><div class="detail-text"><strong>公路：</strong>主要州际公路 I-30、I-40、I-49、I-55，公路网络全美第 <strong>12 大</strong>。768 英里州际公路 + 15,683 英里州/国公路 + 86,100+ 英里县/市道路。<strong>铁路：</strong>3 条一级铁路（Union Pacific、BNSF、Kansas City Southern）+ 22 条短线，总长 <strong>4,184 km</strong>。<strong>水运：</strong>阿肯色拥有全美第 <strong>3 大</strong>内河航道系统（<strong>2,993 km</strong>），9 个河港，小石城港为最重要枢纽，服务 50+ 家企业、3,500+ 员工。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="sec-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025.10)</span><span class="data-value">$271,800</span></div>
+        <div class="data-item"><span class="data-label">年涨幅</span><span class="data-value orange">+5.5%</span></div>
+        <div class="data-item"><span class="data-label">中位自住房价值</span><span class="data-value">$188,000</span></div>
+        <div class="data-item"><span class="data-label">自有住房率</span><span class="data-value">66.4%</span></div>
+        <div class="data-item"><span class="data-label">待售房屋</span><span class="data-value">18,087</span></div>
+        <div class="data-item"><span class="data-label">建筑许可</span><span class="data-value">2,675 (+9%)</span></div>
+      </div>
+      <div class="info-row"><span class="label">特点</span><span class="value">全美最可负担住房市场之一 · Fayetteville 增长最快</span></div>
+      <div class="info-row"><span class="label">Fayetteville</span><span class="value">平均售价 $397,900 · 待售库存 4,150 套</span></div>
+      <div class="tags"><span class="tag">住房可负担</span><span class="tag">Fayetteville增长</span><span class="tag">净迁入推动需求</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025年10月阿肯色中位房价 <strong>$271,800</strong>，同比上涨 <strong>5.5%</strong>。中位自住房价值 <strong>$188,000</strong>（2020-2024），为全美最低之一。Fayetteville-Springdale-Rogers 都会区平均售价 <strong>$397,900</strong>，同比上涨近 <strong>3%</strong>。待售房屋 <strong>18,087 套</strong>，同比增长 12.6%。单户住宅许可 <strong>2,675 个</strong>，同比增长 <strong>9%</strong>。Pine Bluff 中位挂牌价仅 <strong>$139,950</strong>，不到全州中位价的一半。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>中位房价 (2025.10)</td><td>$271,800</td></tr>
+        <tr><td>中位自住房价值</td><td>$188,000</td></tr>
+        <tr><td>Fayetteville 平均售价</td><td>$397,900</td></tr>
+        <tr><td>自有住房率</td><td>66.4%</td></tr>
+        <tr><td>待售房屋</td><td>18,087 套</td></tr>
+        <tr><td>建筑许可</td><td>2,675 个（+9%）</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="sec-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">湿润亚热带</span></div>
+        <div class="data-item"><span class="data-label">年降水量</span><span class="data-value">49 英寸</span></div>
+        <div class="data-item"><span class="data-label">2025年特征</span><span class="data-value orange">HOT-ober</span></div>
+        <div class="data-item"><span class="data-label">十月均高</span><span class="data-value">77°F</span></div>
+        <div class="data-item"><span class="data-label">冬季均温</span><span class="data-value">~45°F</span></div>
+        <div class="data-item"><span class="data-label">生长季</span><span class="data-value">~210 天</span></div>
+      </div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">龙卷风 · 雷暴 · 洪水 · 冰暴</span></div>
+      <div class="info-row"><span class="label">2025特点</span><span class="value">前6月降水近38英寸 · 十月异常温暖</span></div>
+      <div class="tags"><span class="tag">湿润亚热带</span><span class="tag">龙卷风走廊</span><span class="tag">降水分布不均</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">气温与降水</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润亚热带（南部）/ 湿润大陆性（北部）</td></tr>
+        <tr><td>年降水量</td><td>约 49 英寸（正常 48.5 英寸）</td></tr>
+        <tr><td>2025年 1-6 月降水</td><td>近 38 英寸（异常偏多）</td></tr>
+        <tr><td>2025年 10 月均高</td><td>77°F（正常 70°F 左右）</td></tr>
+        <tr><td>2025年 10 月均低</td><td>57°F</td></tr>
+        <tr><td>生长季</td><td>约 210 天</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">极端天气</div><div class="detail-text">阿肯色位于<strong>龙卷风走廊</strong>东段，春季和秋季龙卷风活动频繁。2025年气候特征为<strong>降水分布极不均匀</strong>——1月至6月降水量接近 <strong>38 英寸</strong>（超过正常全年降水量的 3/4），但下半年偏干。10月出现异常温暖的“HOT-ober”，小石城月均高 <strong>77°F</strong>，远高于正常水平。冬季可能出现冰暴，影响交通和电力。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="sec-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Sarah Huckabee Sanders (R)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">共和党绝对多数</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名共和党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">4 席 · 全共和党</span></div>
+        <div class="data-item"><span class="data-label">2024大选</span><span class="data-value red">特朗普 +30</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">深红州</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">708 项法案 · 水基础设施 $5.75 亿 · 房产税减免</span></div>
+      <div class="info-row"><span class="label">教育优先</span><span class="value">教师加薪 · 择校扩展 · 职业教育</span></div>
+      <div class="tags"><span class="tag">深红州</span><span class="tag">Sanders改革</span><span class="tag">水基础设施投资</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">阿肯色为<strong>深红州</strong>，共和党在州长办公室、州参议院和州众议院均占绝对多数。州长 <strong>Sarah Huckabee Sanders</strong>（共和党）自2023年上任，推动雄心勃勃的教育改革（教师加薪、绩效激励、择校扩展）。联邦层面，两名参议员和全部4名众议员均为共和党。2024年大选特朗普以 <strong>+30</strong> 优势赢得阿肯色。</div></div>
+      <div class="detail-section"><div class="detail-label">2025年立法重点</div><table class="mini-table">
+        <tr><td>水基础设施</td><td>$5.75 亿投资（三项法案）</td></tr>
+        <tr><td>房产税减免</td><td>Act 330 · 70.8 万房主节省 $5600 万</td></tr>
+        <tr><td>教育</td><td>教师加薪 · 择校扩展 · 职业教育</td></tr>
+        <tr><td>能源</td><td>吸引可扩展能源基础设施投资</td></tr>
+        <tr><td>公共健康</td><td>氟化水计划保留（SB2 被否决）</td></tr>
+        <tr><td>生命权</td><td>Act 387 澄清医疗紧急情况定义</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="sec-education" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">教育质量排名</span><span class="data-value orange">全美第37</span></div>
+        <div class="data-item"><span class="data-label">教育自由度</span><span class="data-value green">全美第3</span></div>
+        <div class="data-item"><span class="data-label">数学进步</span><span class="data-value green">全美第22</span></div>
+        <div class="data-item"><span class="data-label">A级学区</span><span class="data-value">23 个</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>University of Arkansas</strong>（Fayetteville）</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Haas Hall Academy 系统 · 全州前2</span></div>
+      <div class="tags"><span class="tag">教育自由全美第3</span><span class="tag">Haas Hall特许</span><span class="tag">择校领先</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">阿肯色教育质量全美第 <strong>37</strong>（2025年），但<strong>教育自由度全美第3</strong>（ALEC 2025 Index of State Education Freedom），仅次于佛罗里达和亚利桑那。2025年新学区排名中，<strong>23 个</strong>学区获 A 级，98 个获 B 级，98 个获 C 级。数学学术增长全美第 <strong>22</strong>（2022-2025）。<strong>Haas Hall Academy</strong> 特许学校系统为全州顶尖，两所校区位列全州前2。阿肯色 PBS 制作本地体育赛事转播。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Arkansas</td><td>旗舰 · Fayetteville · 全美百强公立</td></tr>
+        <tr><td>Arkansas State University</td><td>Jonesboro · 区域强校</td></tr>
+        <tr><td>University of Central Arkansas</td><td>Conway · 教育与传统强</td></tr>
+        <tr><td>Arkansas Tech University</td><td>Russellville · 工程与农业</td></tr>
+        <tr><td>Harding University</td><td>私立 · Searcy</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="sec-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">大学橄榄球</span><span class="data-value">Arkansas Razorbacks</span></div>
+        <div class="data-item"><span class="data-label">联盟</span><span class="data-value">SEC</span></div>
+        <div class="data-item"><span class="data-label">棒球</span><span class="data-value">Arkansas Travelers (AA)</span></div>
+        <div class="data-item"><span class="data-label">篮球</span><span class="data-value">Razorbacks · 全美强队</span></div>
+      </div>
+      <div class="info-row"><span class="label">标志赛事</span><span class="value">Arkansas vs Texas · SEC 橄榄球</span></div>
+      <div class="info-row"><span class="label">媒体</span><span class="value">Hogs+ 官方内容网络 · 两届艾美奖</span></div>
+      <div class="tags"><span class="tag">Razorbacks SEC</span><span class="tag">Hogs+流媒体</span><span class="tag">高中橄榄球狂热</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text">阿肯色大学 <strong>Razorbacks</strong> 为州内最受欢迎的体育品牌，参加 <strong>SEC</strong>（东南联盟）。橄榄球为秋季最大盛事，篮球和棒球同样拥有狂热粉丝。Razorbacks 与 Texas 的 rivalry 为历史悠久的对抗。Hogs+ 为阿肯色体育官方内容网络，提供独家故事、采访和幕后内容，订阅费 <strong>$7.99/月</strong>，曾两次获得艾美奖。Arkansas PBS 每年转播高中橄榄球和排球州决赛。</div></div>
+      <div class="detail-section"><div class="detail-label">职业与地方体育</div><table class="mini-table">
+        <tr><td>Arkansas Travelers</td><td>MLB 双A · 西雅图水手附属</td></tr>
+        <tr><td>Northwest Arkansas Naturals</td><td>MLB 双A · 堪萨斯城皇家附属</td></tr>
+        <tr><td>Little Rock Rangers</td><td>USL 足球</td></tr>
+        <tr><td>Arkansas Wolves</td><td>室内足球</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="sec-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大报纸</span><span class="data-value">Arkansas Democrat-Gazette</span></div>
+        <div class="data-item"><span class="data-label">公共电视</span><span class="data-value">Arkansas PBS</span></div>
+        <div class="data-item"><span class="data-label">体育网络</span><span class="data-value">Hogs+</span></div>
+        <div class="data-item"><span class="data-label">广播网络</span><span class="data-value">Arkansas Radio Network</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要媒体</span><span class="value">Northwest Arkansas Democrat-Gazette · KUAF 公共广播</span></div>
+      <div class="info-row"><span class="label">媒体荣誉</span><span class="value">Arkansas PBS 获 11 项 Mid-America Emmy 提名</span></div>
+      <div class="tags"><span class="tag">Democrat-Gazette最大</span><span class="tag">Arkansas PBS</span><span class="tag">Hogs+两届艾美</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Arkansas Democrat-Gazette</td><td>全州最大报纸 · 小石城</td></tr>
+        <tr><td>Northwest Arkansas Democrat-Gazette</td><td>西北阿肯色版</td></tr>
+        <tr><td>Arkansas PBS</td><td>公共电视 · 11 项艾美提名</td></tr>
+        <tr><td>Hogs+</td><td>阿肯色体育官方流媒体 · 两届艾美奖</td></tr>
+        <tr><td>KUAF 91.3</td><td>NPR 附属 · Fayetteville</td></tr>
+        <tr><td>Arkansas Radio Network</td><td>Razorbacks 体育广播网络</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">阿肯色媒体市场以<strong>小石城</strong>和<strong>西北阿肯色</strong>为双中心。Arkansas Democrat-Gazette 为全州最大报纸，Northwest Arkansas Democrat-Gazette 服务沃尔玛总部区域。Arkansas PBS 为公共广播核心，2025年获 <strong>11 项</strong>Mid-America Emmy 提名，包括体育故事和短纪录片类别。Hogs+ 为大学体育内容创新标杆。阿肯色体育广播名人堂（Arkansas Sportscasters and Sportswriters Hall of Fame）每年表彰杰出体育媒体人。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="sec-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🏞️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客</span><span class="data-value">54.3M</span></div>
+        <div class="data-item"><span class="data-label">游客支出</span><span class="data-value">$10.2B</span></div>
+        <div class="data-item"><span class="data-label">经济影响</span><span class="data-value">$17.4B</span></div>
+        <div class="data-item"><span class="data-label">旅游就业</span><span class="data-value">71,000+</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">温泉国家公园 · 欧扎克 · 布法罗河 · 水晶桥</span></div>
+      <div class="info-row"><span class="label">游客增长</span><span class="value">2025年 +4% · 创纪录 5430 万人次</span></div>
+      <div class="tags"><span class="tag">温泉国家公园</span><span class="tag">水晶桥博物馆</span><span class="tag">布法罗河漂流</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济（2025）</div><table class="mini-table">
+        <tr><td>游客总数</td><td><strong>54.3M</strong>（创纪录，+4%）</td></tr>
+        <tr><td>游客支出</td><td><strong>$10.2B</strong></td></tr>
+        <tr><td>总经济影响</td><td><strong>$17.4B</strong></td></tr>
+        <tr><td>旅游就业</td><td>71,000+</td></tr>
+        <tr><td>同比增长</td><td>+2.3M 游客</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>温泉国家公园</strong>（Hot Springs National Park）为阿肯色唯一国家公园，以历史温泉浴场闻名。<strong>欧扎克国家森林</strong>为徒步、露营和漂流胜地。<strong>布法罗国家河流</strong>为美国第一条国家河流，以独木舟漂流闻名。<strong>水晶桥美国艺术博物馆</strong>（本顿维尔，沃尔玛创始人家族捐赠）为全美顶级艺术博物馆。<strong>小石城</strong>的克林顿总统图书馆和中央高中（民权运动地标）为历史景点。Arkansas Tourism Development Act 提供最高 <strong>15%</strong>销售税抵免和 <strong>4%</strong>所得税抵免。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="sec-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">可再生装机</span><span class="data-value">2,554 MW</span></div>
+        <div class="data-item"><span class="data-label">太阳能装机</span><span class="data-value">711 MW+</span></div>
+        <div class="data-item"><span class="data-label">首个风电</span><span class="data-value green">135 MW (2025)</span></div>
+        <div class="data-item"><span class="data-label">新增天然气</span><span class="data-value">450 MW</span></div>
+        <div class="data-item"><span class="data-label">新增太阳能</span><span class="data-value">600 MW</span></div>
+        <div class="data-item"><span class="data-label">储能</span><span class="data-value">350 MW</span></div>
+      </div>
+      <div class="info-row"><span class="label">Entergy 计划</span><span class="value">新增 <strong>2.6 GW</strong>发电容量</span></div>
+      <div class="info-row"><span class="label">Google 数据中心</span><span class="value">600MW 太阳能 + 储能配套</span></div>
+      <div class="tags"><span class="tag">首个风电2025</span><span class="tag">太阳能快速增长</span><span class="tag">核电延期</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">电力结构</div><table class="mini-table">
+        <tr><td>运营可再生装机</td><td><strong>2,554 MW</strong>（风、光、储能）</td></tr>
+        <tr><td>太阳能装机</td><td>711 MW+（Entergy）+ 100MW Searcy</td></tr>
+        <tr><td>首个公用事业风电</td><td>Crossover Wind Farm 135MW（2025）</td></tr>
+        <tr><td>水电</td><td>73 MW</td></tr>
+        <tr><td>净夏季容量 (2023)</td><td>15,000 MW</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">能源投资</div><div class="detail-text">Entergy Arkansas 2025年宣布 <strong>$26 亿</strong>投资计划，新增约 <strong>2.6 GW</strong>发电容量：包括 <strong>600 MW</strong>太阳能 + <strong>350 MW</strong>电池储能在 Jefferson County，以及 <strong>450 MW</strong> Ironwood 天然气电站。该太阳能项目将<strong>为 Google 数据中心供电</strong>。阿肯色首个公用事业规模风电项目 <strong>Crossover Wind Farm</strong>（135 MW）于2025年投运，每年为 Cross County 提供约 <strong>$95 万</strong>收入，全生命周期为土地所有者带来超 <strong>$5000 万</strong>。可再生能源倡导者面临碳生产商的反对。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="sec-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">科技排名</span><span class="data-value orange">全美第41</span></div>
+        <div class="data-item"><span class="data-label">初创迁入</span><span class="data-value green">Q3 2025: 7家</span></div>
+        <div class="data-item"><span class="data-label">加速器资金</span><span class="data-value">$200 万</span></div>
+        <div class="data-item"><span class="data-label">NASA 拨款</span><span class="data-value">$80 万</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">锂技术 · 火箭制造 · 农业科技 · 骑行科技</span></div>
+      <div class="info-row"><span class="label">重大投资</span><span class="value">L3Harris 20+ 火箭发动机设施 · Tate 制造</span></div>
+      <div class="tags"><span class="tag">初创迁入加速</span><span class="tag">锂技术加速器</span><span class="tag">L3Harris火箭</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">科技产业概况</div><div class="detail-text">阿肯色科技产业全美排名 <strong>第41</strong>（CNBC 2025），但正快速崛起。2025年Q3至少有 <strong>7 家</strong>早期科技公司将总部迁至阿肯色。AEDC 通过 <strong>Arkansas Business and Technology Accelerator Grant Program</strong> 向12个加速器项目拨款 <strong>$200 万</strong>，包括 Arkansas Lithium Technology Accelerator（$15 万）和 Arkansas Global Cycling Accelerator（$12.5 万）。L3Harris 在 Calhoun County 建设超过 <strong>20 个</strong>大型固体火箭发动机生产设施。Tate 在 Pocahontas 开设新制造工厂，新增 <strong>52 个</strong>岗位。阿肯色太空 Grant Consortium 获得 NASA <strong>$80 万</strong>拨款用于 STEM 教育。</div></div>
+      <div class="detail-section"><div class="detail-label">创新生态</div><table class="mini-table">
+        <tr><td>Arkansas Lithium Technology Accelerator</td><td>$150,000 · 锂技术</td></tr>
+        <tr><td>Arkansas Global Cycling Accelerator</td><td>$125,000 · 骑行科技</td></tr>
+        <tr><td>L3Harris</td><td>大型固体火箭发动机制造</td></tr>
+        <tr><td>Tate</td><td>Pocahontas 制造工厂 · 52 新岗位</td></tr>
+        <tr><td>NASA Grant</td><td>$800,000 · STEM 教育</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>阿肯色州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · Arkansas EDC · Arkansas DFA · Entergy</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
