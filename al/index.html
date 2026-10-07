@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阿拉巴马州 · 深度档案 | Alabama Deep Dive</title>
+<style>
+  :root {
+    --ground: #f5f5f7;
+    --surface: #ffffff;
+    --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed;
+    --radius-card: 18px;
+    --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #f5f5f7 0%, #e3e8ef 100%);
+    --table-stripe: #fafafa;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --crimson: #9e1b32;
+  }
+
+  [data-theme="dark"] {
+    --ground: #000000;
+    --surface: #1c1c1e;
+    --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-tertiary: #636366;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.3);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8);
+    --hero-gradient: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+    --table-stripe: #2c2c2e;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+    --crimson: #d64560;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-stack);
+    background: var(--ground);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  /* ========== 导航 ========== */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: var(--nav-bg);
+    border-bottom: 0.5px solid var(--divider);
+    transition: background 0.4s ease;
+  }
+  .nav-inner {
+    max-width: 1240px; margin: 0 auto; padding: 0 22px;
+    height: 52px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+  }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--crimson); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    font-size: 11.5px; font-weight: 500; color: var(--text-secondary);
+    text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill);
+    white-space: nowrap; transition: background 0.2s, color 0.2s;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  .theme-toggle {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 0.5px solid var(--divider); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all 0.25s ease;
+  }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+
+  /* ========== Hero ========== */
+  .hero {
+    text-align: center; padding: 72px 22px 52px;
+    max-width: 900px; margin: 0 auto;
+    background: var(--hero-gradient); border-radius: 0 0 32px 32px;
+    transition: background 0.4s ease;
+  }
+  .hero-flag {
+    font-size: 64px; margin-bottom: 12px; line-height: 1;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 58px); font-weight: 700;
+    letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px;
+  }
+  .hero h1 em { font-style: normal; color: var(--crimson); }
+  .hero .subtitle {
+    font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary);
+    margin-bottom: 32px; line-height: 1.6;
+  }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong {
+    display: block; font-size: 26px; font-weight: 700;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .hero-stat span {
+    font-size: 10.5px; color: var(--text-tertiary); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .hero-badges {
+    display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .hero-badge {
+    font-size: 11.5px; font-weight: 600; padding: 6px 14px;
+    border-radius: var(--radius-pill); line-height: 1.4;
+    background: var(--surface); border: 0.5px solid var(--divider);
+    color: var(--text-secondary);
+  }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+
+  /* ========== 卡片网格 ========== */
+  .grid {
+    max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    background: var(--surface); border-radius: var(--radius-card);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1),
+                background 0.4s ease;
+    cursor: pointer; position: relative;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-1px) scale(0.998); }
+
+  .card-head {
+    padding: 24px 24px 0; display: flex;
+    align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small {
+    display: block; font-size: 11.5px; font-weight: 500;
+    color: var(--text-tertiary); letter-spacing: 0; margin-top: 2px;
+  }
+  .card-icon {
+    font-size: 22px; flex-shrink: 0; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-secondary); border-radius: 10px;
+  }
+
+  .card-body { padding: 12px 24px 24px; }
+
+  /* 数据网格 */
+  .data-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px 14px; margin-bottom: 12px;
+  }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label {
+    font-size: 9.5px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-tertiary);
+  }
+  .data-value {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .data-value.green { color: var(--green); }
+  .data-value.orange { color: var(--orange); }
+  .data-value.red { color: var(--red); }
+
+  /* 信息行 */
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+
+  /* 标签 */
+  .tags {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 0.5px solid var(--divider);
+  }
+  .tag {
+    font-size: 10.5px; font-weight: 500; color: var(--text-secondary);
+    background: var(--surface-secondary); padding: 3px 9px;
+    border-radius: var(--radius-pill); letter-spacing: 0.01em;
+  }
+
+  /* 展开详情 */
+  .card-detail {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1),
+                padding 0.55s cubic-bezier(0.25,0.1,0.25,1);
+    padding: 0 24px; background: var(--surface-secondary);
+    transition: background 0.4s ease, max-height 0.55s ease, padding 0.55s ease;
+  }
+  .card.expanded .card-detail { max-height: 2200px; padding: 18px 24px 22px; }
+
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+
+  .detail-section { margin-bottom: 13px; }
+  .detail-section:last-child { margin-bottom: 0; }
+  .detail-label {
+    font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px;
+  }
+  .detail-text {
+    font-size: 12.5px; color: var(--text-secondary);
+    line-height: 1.65; letter-spacing: -0.005em;
+  }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+
+  /* 微型表格 */
+  .mini-table {
+    width: 100%; border-collapse: collapse; margin-top: 4px;
+    font-size: 12px; letter-spacing: -0.005em;
+  }
+  .mini-table td {
+    padding: 5px 7px; border-bottom: 0.5px solid var(--divider);
+    color: var(--text-secondary); vertical-align: top;
+  }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child {
+    color: var(--text-tertiary); font-weight: 500;
+    white-space: nowrap; width: 44%;
+  }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+
+  /* 安全/排名条 */
+  .bar-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 3px;
+  }
+  .bar-track {
+    flex: 1; height: 5px; border-radius: 3px;
+    background: var(--divider); overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .bar-fill.green { background: var(--green); }
+  .bar-fill.orange { background: var(--orange); }
+  .bar-fill.red { background: var(--red); }
+  .bar-fill.accent { background: var(--accent); }
+  .bar-score {
+    font-size: 11.5px; font-weight: 700; color: var(--text-primary);
+    font-variant-numeric: tabular-nums; min-width: 32px; text-align: right;
+  }
+
+  /* 展开指示 */
+  .expand-hint {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; padding: 9px 0 14px;
+    font-size: 10.5px; color: var(--text-tertiary);
+    font-weight: 500; transition: color 0.2s;
+  }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg {
+    width: 9px; height: 9px;
+    transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+
+  /* ========== 回到顶部 ========== */
+  .to-top {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 0.5px solid var(--divider);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    z-index: 200;
+  }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg {
+    width: 16px; height: 16px; stroke: var(--text-secondary);
+    stroke-width: 2.2; fill: none; transition: stroke 0.2s;
+  }
+
+  /* ========== 页脚 ========== */
+  .footer {
+    text-align: center; padding: 48px 22px 72px;
+    font-size: 12px; color: var(--text-tertiary); line-height: 1.9;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer .copyright {
+    margin-top: 20px; padding-top: 16px;
+    border-top: 0.5px solid var(--divider);
+    font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+
+  /* ========== 响应式 ========== */
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; gap: 14px; }
+    .card-head { padding: 20px 20px 0; }
+    .card-body { padding: 10px 20px 20px; }
+    .card-detail { padding: 0 20px; }
+    .card.expanded .card-detail { padding: 16px 20px 18px; }
+    .hero { padding: 52px 18px 40px; border-radius: 0 0 24px 24px; }
+    .hero-stats { gap: 24px; }
+    .data-grid { grid-template-columns: 1fr; gap: 6px; }
+    .nav-links a { font-size: 10.5px; padding: 4px 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== 导航 ==================== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>阿拉巴马州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#sec-overview">概览</a>
+      <a href="#sec-population">人口</a>
+      <a href="#sec-economy">经济就业</a>
+      <a href="#sec-business">企业与产业</a>
+      <a href="#sec-healthcare">医疗</a>
+      <a href="#sec-safety">公共安全</a>
+      <a href="#sec-tax">税收财政</a>
+      <a href="#sec-transport">交通</a>
+      <a href="#sec-housing">住房</a>
+      <a href="#sec-climate">气候</a>
+      <a href="#sec-politics">政治政府</a>
+      <a href="#sec-education">教育</a>
+      <a href="#sec-sports">体育</a>
+      <a href="#sec-media">媒体</a>
+      <a href="#sec-tourism">旅游</a>
+      <a href="#sec-agriculture">农业</a>
+      <a href="#sec-energy">能源</a>
+      <a href="#sec-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换深色模式">
+      <svg id="theme-icon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ==================== Hero ==================== -->
+<header class="hero">
+  <div class="hero-flag">🏴</div>
+  <h1>阿拉巴马州<br><em>Alabama</em></h1>
+  <p class="subtitle">迪克西之心 · 火箭之城 · 汽车制造带 · 民权运动摇篮</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>5,193,088</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$341.2B</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>2.7%</strong><span>失业率 (2025.11)</span></div>
+    <div class="hero-stat"><strong>#7</strong><span>可负担性全美排名</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 生活成本指数 <b>88.8</b>（低于全美均值）</span>
+    <span class="hero-badge orange">🏥 医疗全美 <b>第44</b></span>
+    <span class="hero-badge red">📚 教育全美 <b>第44</b></span>
+    <span class="hero-badge">🚀 亨茨维尔 = <b>火箭城</b></span>
+  </div>
+</header>
+
+<!-- ==================== 卡片网格 ==================== -->
+<div class="grid">
+
+  <!-- ========== 1. 概览 ========== -->
+  <div class="card" id="sec-overview" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">州概况<small>State Overview</small></div>
+      <div class="card-icon">📍</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1819年12月14日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">蒙哥马利</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">伯明翰</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">135,767 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">黄轴啄木鸟</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">山茶花</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">迪克西之心（Heart of Dixie）/ 棉花之州</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"We Dare Defend Our Rights"</span></div>
+      <div class="tags">
+        <span class="tag">Deep South</span><span class="tag">迪克西之心</span><span class="tag">民权之路</span><span class="tag">火箭城</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">地理与文化定位</div>
+        <div class="detail-text">
+          阿拉巴马位于美国东南部，北接田纳西，东邻佐治亚，南临佛罗里达和墨西哥湾，西界密西西比。在 Colin Woodard 的文化分区中，阿拉巴马是 <strong>Deep South（深南部）</strong>的核心地带——以种植园经济、非洲裔美国人文化传统和强烈的区域认同为特征。北部阿巴拉契亚山麓则属于 <strong>Greater Appalachia</strong> 文化圈。州内地形从墨西哥湾沿岸海滩到东北部阿巴拉契亚山脉，最高点 Cheaha Mountain 海拔 735 米。阿拉巴马拥有 <strong>21 个州立公园</strong>，从墨西哥湾海滩到阿巴拉契亚山区[reference:0]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">历史节点</div>
+        <div class="detail-text">
+          1819年成为美国第22个州。1861年脱离联邦加入邦联，蒙哥马利为邦联首个首都。20世纪50-60年代，蒙哥马利公交抵制（1955）、伯明翰民权运动（1963）和塞尔玛游行（1965）使阿拉巴马成为美国民权运动的核心舞台。1960年代后，亨茨维尔因 NASA 马歇尔太空飞行中心崛起为“火箭城”，汽车制造业（奔驰、本田、现代、丰田-马自达）在1990年代后重塑州经济。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 2. 人口与社会 ========== -->
+  <div class="card" id="sec-population" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">人口与社会<small>Population & Society</small></div>
+      <div class="card-icon">👥</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">5,193,088</span></div>
+        <div class="data-item"><span class="data-label">2020-2025 增长</span><span class="data-value green">+3.3%</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~40 岁</span></div>
+        <div class="data-item"><span class="data-label">65岁以上</span><span class="data-value">19.4%</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$67.7K</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value red">15.6%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 67.3% · 黑人 25.9% · 西语裔 6.5% · 亚裔 1.8%</span></div>
+      <div class="info-row"><span class="label">家庭</span><span class="value">户均 2.48 人 · 自有住房率 70.2%</span></div>
+      <div class="tags">
+        <span class="tag">黑人占比全美前列</span><span class="tag">贫困率高于全美</span><span class="tag">人口持续净流入</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">人口结构深度</div>
+        <table class="mini-table">
+          <tr><td>总人口 (2025.7)</td><td><strong>5,193,088</strong></td></tr>
+          <tr><td>2020-2025 变化</td><td>+167,651（+3.3%）</td></tr>
+          <tr><td>18岁以下</td><td>21.5%</td></tr>
+          <tr><td>65岁以上</td><td>19.4%</td></tr>
+          <tr><td>女性占比</td><td>51.8%</td></tr>
+          <tr><td>退伍军人</td><td>303,253 人</td></tr>
+          <tr><td>外国出生</td><td>4.0%</td></tr>
+          <tr><td>残疾（65岁以下）</td><td>11.8%</td></tr>
+          <tr><td>无医保（65岁以下）</td><td>10.0%</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">收入与贫困</div>
+        <div class="detail-text">
+          中位家庭收入 <strong>$67,700</strong>，低于全美中位数（约 $80,600）。人均收入约 <strong>$36,000</strong>（2020-2024）。贫困率 <strong>15.6%</strong>，高于全美约 11.1% 的水平。2025年净迁入 <strong>19,100 人</strong>，延续近年人口净流入趋势，主要来自加州、佛罗里达和得克萨斯[reference:1]。U.S. News 2026 排名中，阿拉巴马在<strong>机会（第19）</strong>和<strong>经济（第25）</strong>方面表现较好，但<strong>医疗和教育均列第44</strong>[reference:2]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 3. 经济与就业 ========== -->
+  <div class="card" id="sec-economy" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">经济与就业<small>Economy & Employment</small></div>
+      <div class="card-icon">📊</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$341.2B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长</span><span class="data-value green">+1.9%</span></div>
+        <div class="data-item"><span class="data-label">总就业</span><span class="data-value">2,226K</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">2.7%</span></div>
+        <div class="data-item"><span class="data-label">劳动参与率</span><span class="data-value">57.6%</span></div>
+        <div class="data-item"><span class="data-label">个人收入增长</span><span class="data-value">+4.4%</span></div>
+      </div>
+      <div class="info-row"><span class="label">就业排名</span><span class="value">U.S. News 全美 <strong>第14</strong></span></div>
+      <div class="info-row"><span class="label">经济增长</span><span class="value">U.S. News 全美 <strong>第18</strong> · 就业增长 1.4% vs 全美 0.9%</span></div>
+      <div class="tags">
+        <span class="tag">失业率低于全美</span><span class="tag">$69B 投资 / 10万岗位</span><span class="tag">汽车与航空双引擎</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">经济表现</div>
+        <table class="mini-table">
+          <tr><td>Gross State Product (2025)</td><td><strong>$341.2B</strong>（全美约第25位）</td></tr>
+          <tr><td>GDP 增速 (2025)</td><td>+1.9%（高于全美约1.5%）</td></tr>
+          <tr><td>总就业 (2025)</td><td>2,226,000 人</td></tr>
+          <tr><td>失业率 (2025.11)</td><td><strong>2.7%</strong>（全美 4.3%）</td></tr>
+          <tr><td>劳动参与率</td><td>57.6%（全美 62.5%）</td></tr>
+          <tr><td>个人收入增长</td><td>+4.4%</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">投资与就业创造</div>
+        <div class="detail-text">
+          自 2017 年州长 Ivey 上任以来，阿拉巴马累计吸引投资 <strong>$690 亿</strong>，创造超过 <strong>10 万个</strong>就业岗位[reference:3]。2025年单年记录投资 <strong>$146 亿</strong>。主要增长来自汽车制造（现代、奔驰、本田、丰田-马自达）、航空航天（Boeing、Lockheed Martin、Northrop Grumman）和科技（Meta 数据中心）[reference:4]。U.S. News 将阿拉巴马就业排名列 <strong>全美第14</strong>，经济增长列 <strong>第18</strong>[reference:5]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">就业结构</div>
+        <table class="mini-table">
+          <tr><td>医疗健康</td><td>约 121,110 人</td></tr>
+          <tr><td>消防 / 执法</td><td>约 44,750 人</td></tr>
+          <tr><td>制造业</td><td>汽车、航空、金属为前三</td></tr>
+          <tr><td>农业与林业</td><td>支撑超过 270,000 个岗位</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 4. 企业与产业 ========== -->
+  <div class="card" id="sec-business" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">企业与产业<small>Business & Industry</small></div>
+      <div class="card-icon">🏭</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">0（州内注册）</span></div>
+        <div class="data-item"><span class="data-label">最大雇主</span><span class="data-value">UAB 医疗系统</span></div>
+        <div class="data-item"><span class="data-label">汽车工厂</span><span class="data-value">4 大品牌</span></div>
+        <div class="data-item"><span class="data-label">航空航天雇主</span><span class="data-value">Boeing / Lockheed / Northrop</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级产业</span><span class="value">航空航天 · 汽车 · 生物科学 · 金属 · 旅游</span></div>
+      <div class="info-row"><span class="label">营商排名</span><span class="value">连续多年 <strong>全美前十</strong>（Business Facilities）</span></div>
+      <div class="tags">
+        <span class="tag">奔驰/本田/现代/丰田</span><span class="tag">火箭城航天</span><span class="tag">钢铁与金属加工</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">主要雇主（3,000+ 员工）</div>
+        <table class="mini-table">
+          <tr><td>M1 Support Services</td><td>飞机维护（国防）</td></tr>
+          <tr><td>Honda Alabama Auto Plant</td><td>汽车制造 / V-6 发动机</td></tr>
+          <tr><td>Mercedes-Benz US International</td><td>汽车制造（万斯工厂）</td></tr>
+          <tr><td>Hyundai Motor Manufacturing Alabama</td><td>汽车制造 / 发动机（蒙哥马利）</td></tr>
+          <tr><td>Anniston Army Depot (ANAD)</td><td>战斗车辆与轻武器（国防部）</td></tr>
+          <tr><td>Mazda Toyota Manufacturing</td><td>整车制造（亨茨维尔）</td></tr>
+          <tr><td>Boeing Co. – Huntsville</td><td>导弹防御 / 太空探索</td></tr>
+          <tr><td>Austal USA</td><td>造船（Mobile 船厂）</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">产业集聚</div>
+        <div class="detail-text">
+          <strong>汽车制造带：</strong>阿拉巴马是美国东南部汽车制造核心，奔驰（万斯）、本田（林肯）、现代（蒙哥马利）和丰田-马自达（亨茨维尔）四大整车厂齐聚，带动数百家零部件供应商。<strong>航空航天：</strong>亨茨维尔为 NASA 马歇尔太空飞行中心所在地，Boeing、Lockheed Martin、Northrop Grumman 均在此设有大型设施。<strong>金属与钢铁：</strong>伯明翰依托铁矿、煤炭和石灰石资源，形成美国东南部重要的钢铁与金属加工集群[reference:6]。<strong>国防制造：</strong>2025年 Austal USA 在 Mobile 船厂的扩建项目投资 <strong>$7.5 亿</strong>，创造 <strong>2,000 个</strong>岗位，获 Business Facilities “年度交易”奖[reference:7]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 5. 医疗健康 ========== -->
+  <div class="card" id="sec-healthcare" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">医疗健康<small>Healthcare</small></div>
+      <div class="card-icon">🏥</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">U.S. News 医疗排名</span><span class="data-value red">第44</span></div>
+        <div class="data-item"><span class="data-label">医疗可及性排名</span><span class="data-value orange">第32</span></div>
+        <div class="data-item"><span class="data-label">公共卫生排名</span><span class="data-value red">第44</span></div>
+        <div class="data-item"><span class="data-label">无医保率</span><span class="data-value">10.0%</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value"><strong>UAB Hospital</strong>（全美第59 · Newsweek 2026）</span></div>
+      <div class="info-row"><span class="label">最大系统</span><span class="value">UAB Health System · 133 个站点 · 30,000+ 员工</span></div>
+      <div class="tags">
+        <span class="tag">UAB 全球顶尖</span><span class="tag">医疗资源不均</span><span class="tag">农村医疗挑战</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">顶级医院排名（U.S. News 2025-2026）</div>
+        <table class="mini-table">
+          <tr><td>1. UAB Hospital</td><td>伯明翰 · 全美第59（Newsweek）</td></tr>
+          <tr><td>2. Huntsville Hospital</td><td>亨茨维尔 · 北阿拉巴马第一</td></tr>
+          <tr><td>3. Mobile Infirmary Medical Center</td><td>莫比尔</td></tr>
+          <tr><td>4. Southeast Health Medical Center</td><td>多森</td></tr>
+          <tr><td>5. UAB St. Vincent's Birmingham</td><td>伯明翰</td></tr>
+          <tr><td>6. Grandview Medical Center</td><td>伯明翰</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">UAB 医疗系统</div>
+        <div class="detail-text">
+          UAB Health System 是阿拉巴马最大的医疗系统，运营 <strong>133 个站点</strong>，服务全部 67 个县，员工超过 <strong>30,000 人</strong>，年服务 <strong>140 万</strong>独立患者。2024年11月收购 St. Vincent's 医院后，总床位数增至 <strong>3,173 张</strong>。系统年收入近 <strong>$75 亿</strong>，是州内最大的雇主和医疗研究机构[reference:8]。UAB 还通过支持 Russell Medical Center、Whitfield Regional Hospital 等合作医院，推动全州农村医疗可持续发展[reference:9]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">医疗挑战</div>
+        <div class="detail-text">
+          U.S. News 2026 将阿拉巴马医疗排名列为 <strong>全美第44</strong>，其中公共卫生排名同样为第44，医疗可及性与质量排名第32。无医保率 <strong>10.0%</strong>（65岁以下），高于全美平均。农村地区医疗资源匮乏，部分县缺乏产科和急诊服务。阿拉巴马在肥胖率、糖尿病和心血管疾病方面面临高于全美的挑战。州政府通过农村医院投资计划（RHIP）提供税收抵免，支持农村医院运营[reference:10]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 6. 公共安全 ========== -->
+  <div class="card" id="sec-safety" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">公共安全 · 警察 · 消防<small>Public Safety · Police · Fire</small></div>
+      <div class="card-icon">🚔</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">U.S. News 公共安全</span><span class="data-value orange">第27</span></div>
+        <div class="data-item"><span class="data-label">犯罪与矫正</span><span class="data-value">第31</span></div>
+        <div class="data-item"><span class="data-label">暴力犯罪率</span><span class="data-value">360 / 10万</span></div>
+        <div class="data-item"><span class="data-label">监禁率</span><span class="data-value red">394 / 10万</span></div>
+      </div>
+      <div class="info-row"><span class="label">执法人数</span><span class="value">约 44,750 人（含消防与执法）</span></div>
+      <div class="info-row"><span class="label">持枪率</span><span class="value">约 <strong>55.5%</strong> · 全美第2 · 宪法携带州</span></div>
+      <div class="tags">
+        <span class="tag">暴力犯罪率接近全美均值</span><span class="tag">监禁率高于全美</span><span class="tag">持枪率全美第二</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">犯罪与安全指标</div>
+        <table class="mini-table">
+          <tr><td>暴力犯罪率</td><td>360 / 10万（全美 359）</td></tr>
+          <tr><td>监禁率</td><td>394 / 10万（全美 318）</td></tr>
+          <tr><td>公共安全排名</td><td>全美第27</td></tr>
+          <tr><td>犯罪与矫正排名</td><td>全美第31</td></tr>
+          <tr><td>矫正结果排名</td><td>全美第38</td></tr>
+        </table>
+        <div class="detail-text" style="margin-top:5px;">阿拉巴马暴力犯罪率 <strong>360 / 10万</strong>，与全美平均（359）几乎持平。但监禁率 <strong>394 / 10万</strong> 显著高于全美 318 的水平[reference:11]。</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">警察与消防力量</div>
+        <div class="detail-text">
+          全州消防和执法岗位合计约 <strong>44,750 个</strong>。主要城市警察局包括伯明翰警察局、蒙哥马利警察局、亨茨维尔警察局和莫比尔警察局。亨茨维尔市拥有 <strong>20 个消防站</strong>，消防保险评级为 <strong>2 级</strong>（1-10 级，1 为最佳）[reference:12]。伯明翰、蒙哥马利等城市近年加强了警力部署和社区警务项目。州级执法机构包括阿拉巴马州执法局（ALEA）和阿拉巴马州调查局（SBI）。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">持枪法规</div>
+        <div class="detail-text">
+          阿拉巴马为<strong>宪法携带州</strong>（Constitutional Carry），2022年生效的法律允许年满18岁的居民无需许可即可隐蔽携枪。持枪率约 <strong>55.5%</strong>，为全美第二高，仅次于密西西比。这一高持枪率与接近全美平均的暴力犯罪率并存的“阿拉巴马模式”，常被引用为持枪权论证的案例。但伯明翰和蒙哥马利部分区域的枪支暴力问题仍较突出。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 7. 税收与财政 ========== -->
+  <div class="card" id="sec-tax" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">税收与财政<small>Tax & Fiscal</small></div>
+      <div class="card-icon">💰</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value">2%–5%</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">6.5%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">4.0%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value red">9.46%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value green">0.37%</span></div>
+        <div class="data-item"><span class="data-label">税竞争力排名</span><span class="data-value">全美第37</span></div>
+      </div>
+      <div class="info-row"><span class="label">人均税收</span><span class="value">$4,950（州与地方合计）</span></div>
+      <div class="info-row"><span class="label">财政特征</span><span class="value">销售税高 · 房产税全美最低 · 依赖消费税</span></div>
+      <div class="tags">
+        <span class="tag">房产税全美最低</span><span class="tag">销售税全美最高之一</span><span class="tag">无遗产税</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">税率明细（2026）</div>
+        <table class="mini-table">
+          <tr><td>个人所得税</td><td>2%–5% 累进（单身：$500以下2%，$500–$3,000为4%，$3,000以上5%）</td></tr>
+          <tr><td>企业所得税</td><td><strong>6.5%</strong></td></tr>
+          <tr><td>州销售税</td><td>4.0%（全美最低之一）</td></tr>
+          <tr><td>综合销售税</td><td><strong>9.46%</strong>（全美最高之一）</td></tr>
+          <tr><td>房产税（自住房）</td><td><strong>0.37%</strong>（全美最低）</td></tr>
+          <tr><td>汽油税</td><td>31 美分/加仑</td></tr>
+          <tr><td>卷烟税</td><td>$0.675 / 包</td></tr>
+          <tr><td>遗产税 / 继承税</td><td><strong>无</strong></td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">税收结构分析</div>
+        <div class="detail-text">
+          阿拉巴马的税收体系以<strong>高销售税、低房产税</strong>为核心特征。州销售税仅 4.0%，但地方附加后综合税率高达 <strong>9.46%</strong>，为全美最高之一[reference:13]。房产税有效税率仅 <strong>0.37%</strong>，为全美最低，人均房产税征收额同样全美最低[reference:14]。州财政收入主要来自：一般销售税（32.6%）、个人所得税（24.0%）和其他税收（21.6%）。人均税收 $4,950，人均债务 $5,470，公共养老金计划资金充足率 <strong>78%</strong>。2026年税收竞争力指数全美 <strong>第37</strong>[reference:15]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 8. 交通 ========== -->
+  <div class="card" id="sec-transport" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">交通基础设施<small>Transportation</small></div>
+      <div class="card-icon">🛣️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公路里程</span><span class="data-value">100,685 英里</span></div>
+        <div class="data-item"><span class="data-label">铁路里程</span><span class="data-value">3,227 英里</span></div>
+        <div class="data-item"><span class="data-label">机场</span><span class="data-value">6 大 + 90 公共</span></div>
+        <div class="data-item"><span class="data-label">内河航道</span><span class="data-value">1,270 英里</span></div>
+        <div class="data-item"><span class="data-label">桥梁</span><span class="data-value">16,155 座</span></div>
+        <div class="data-item"><span class="data-label">港口</span><span class="data-value">全美第9大海港</span></div>
+      </div>
+      <div class="info-row"><span class="label">交通排名</span><span class="value">U.S. News 全美 <strong>第21</strong> · 基础设施第30</span></div>
+      <div class="info-row"><span class="label">铁路公司</span><span class="value">25 家 · 含 6 家一级铁路</span></div>
+      <div class="tags">
+        <span class="tag">6条州际公路</span><span class="tag">Mobile港全美第9</span><span class="tag">亨茨维尔内陆港</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">公路与铁路</div>
+        <div class="detail-text">
+          <strong>公路：</strong>100,685 英里公共道路，6 条州际公路（I-10、I-20、I-22、I-59、I-65、I-85）合计 1,130 英里，19 条国道合计 3,850 英里[reference:16]。<strong>铁路：</strong>3,227 英里货运铁路，25 家铁路公司运营，包括 BNSF、Norfolk Southern、CSX、Union Pacific 和 Kansas City Southern 六家一级铁路[reference:17]。伯明翰地区有三家一级铁路交汇，为东南部重要铁路枢纽。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">航空与港口</div>
+        <table class="mini-table">
+          <tr><td>伯明翰-沙特尔斯沃思国际机场 (BHM)</td><td>最大机场 · 年旅客约 300 万</td></tr>
+          <tr><td>亨茨维尔国际机场 (HSV)</td><td>航空航天枢纽 · 内陆港</td></tr>
+          <tr><td>莫比尔地区机场 (MOB)</td><td>墨西哥湾海岸枢纽</td></tr>
+          <tr><td>蒙哥马利地区机场 (MGM)</td><td>州首府机场</td></tr>
+          <tr><td>多森地区机场 (DHN)</td><td>东南部区域机场</td></tr>
+          <tr><td>Mobile 港</td><td><strong>全美第9大海港</strong></td></tr>
+          <tr><td>亨茨维尔内陆港</td><td>连接东西海岸港口 · Norfolk Southern</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">客运铁路</div>
+        <div class="detail-text">
+          Amtrak Crescent（纽约-新奥尔良）每日经停伯明翰、安尼斯顿和塔斯卡卢萨。阿拉巴马客运铁路里程仅 <strong>357 英里</strong>，远低于货运铁路规模[reference:18]。伯明翰市长 2026 年提出伯明翰-亚特兰大快速客运铁路设想，尚在早期讨论阶段[reference:19]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 9. 住房 ========== -->
+  <div class="card" id="sec-housing" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">住房市场<small>Housing Market</small></div>
+      <div class="card-icon">🏠</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位房价 (2025)</span><span class="data-value">$233,969</span></div>
+        <div class="data-item"><span class="data-label">年涨幅</span><span class="data-value orange">+11%</span></div>
+        <div class="data-item"><span class="data-label">自有住房率</span><span class="data-value">70.2%</span></div>
+        <div class="data-item"><span class="data-label">中位月租</span><span class="data-value">$1,007</span></div>
+        <div class="data-item"><span class="data-label">有贷款月供</span><span class="data-value">$1,433</span></div>
+        <div class="data-item"><span class="data-label">无贷款月供</span><span class="data-value">$447</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房价值</span><span class="value">中位自住房价值 <strong>$209,900</strong></span></div>
+      <div class="info-row"><span class="label">建筑许可</span><span class="value">2025年 19,061 个</span></div>
+      <div class="tags">
+        <span class="tag">房价全美最低之一</span><span class="tag">2025年创历史新高</span><span class="tag">Baldwin县最贵</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">房价趋势</div>
+        <div class="detail-text">
+          2025年阿拉巴马中位销售价格达到 <strong>$233,969</strong>，为历史最高纪录，较2024年上涨 <strong>11%</strong>，远高于全美 1.7% 的涨幅[reference:20]。11月单月中位价达到 <strong>$253,201</strong>，同比上涨近 20%[reference:21]。尽管涨幅显著，阿拉巴马房价仍远低于全美中位数。Baldwin County（墨西哥湾沿岸）中位价 <strong>$352,000+</strong>，为州内最贵地区；Autauga County（蒙哥马利郊区）中位价约 <strong>$213,520</strong>[reference:22]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">住房成本</div>
+        <table class="mini-table">
+          <tr><td>中位自住房价值</td><td>$209,900</td></tr>
+          <tr><td>有贷款月供（中位）</td><td>$1,433</td></tr>
+          <tr><td>无贷款月供（中位）</td><td>$447</td></tr>
+          <tr><td>中位月租</td><td>$1,007</td></tr>
+          <tr><td>自有住房率</td><td>70.2%</td></tr>
+          <tr><td>住房单元总数 (2025)</td><td>2,406,306</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 10. 气候 ========== -->
+  <div class="card" id="sec-climate" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">气候<small>Climate</small></div>
+      <div class="card-icon">🌡️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">气候类型</span><span class="data-value">湿润亚热带</span></div>
+        <div class="data-item"><span class="data-label">年均温</span><span class="data-value">约 18°C (64°F)</span></div>
+        <div class="data-item"><span class="data-label">夏季均温</span><span class="data-value">79°F (26°C)</span></div>
+        <div class="data-item"><span class="data-label">冬季均温</span><span class="data-value">48°F (9°C)</span></div>
+        <div class="data-item"><span class="data-label">年降水量</span><span class="data-value">50–65 英寸</span></div>
+        <div class="data-item"><span class="data-label">生长季</span><span class="data-value">平均 199 天</span></div>
+      </div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">龙卷风 · 飓风（沿海）· 雷暴</span></div>
+      <div class="info-row"><span class="label">气候特征</span><span class="value">墨西哥湾影响显著 · 湿度高</span></div>
+      <div class="tags">
+        <span class="tag">龙卷风走廊</span><span class="tag">墨西哥湾沿岸飓风</span><span class="tag">湿润亚热带</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">气温与降水</div>
+        <table class="mini-table">
+          <tr><td>年均温</td><td>约 64°F (18°C)</td></tr>
+          <tr><td>夏季均温</td><td>79°F (26°C) · 最高可达 89°F (32°C)</td></tr>
+          <tr><td>冬季均温</td><td>48°F (9°C) · 最低约 32°F (0°C)</td></tr>
+          <tr><td>年降水量 · 北部</td><td>55–60 英寸</td></tr>
+          <tr><td>年降水量 · 中部</td><td>50–55 英寸</td></tr>
+          <tr><td>年降水量 · 南部</td><td>60–65 英寸</td></tr>
+          <tr><td>生长季</td><td>平均 199 天（最长 250 天）</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">极端天气风险</div>
+        <div class="detail-text">
+          阿拉巴马位于<strong>龙卷风走廊</strong>（Tornado Alley）的东段，春季和秋季龙卷风活动频繁。2011年4月27日的超级爆发造成全州 <strong>250+</strong> 人死亡，为美国历史上最致命的龙卷风事件之一。墨西哥湾沿岸（Mobile、Baldwin County）面临<strong>飓风</strong>直接登陆风险。夏季雷暴和洪水亦为常见灾害。阿拉巴马是全球少数自20世纪初以来<strong>未经历明显净变暖</strong>的地区之一，但近年极端降水事件频率有所增加[reference:23]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 11. 政治与政府 ========== -->
+  <div class="card" id="sec-politics" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">政治与政府<small>Politics & Government</small></div>
+      <div class="card-icon">🏛️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Kay Ivey (R)</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名共和党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">7 席 · 6R / 1D</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">共和党绝对多数</span></div>
+        <div class="data-item"><span class="data-label">2024大选</span><span class="data-value red">特朗普 +25</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value">深红州</span></div>
+      </div>
+      <div class="info-row"><span class="label">当前议题</span><span class="value">选区重划 · 特别初选（2026.8.11）</span></div>
+      <div class="info-row"><span class="label">州长状态</span><span class="value">Ivey 2026年发表<strong>最后一次</strong>州情咨文</span></div>
+      <div class="tags">
+        <span class="tag">深红州</span><span class="tag">共和党主导</span><span class="tag">选区重划争议</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">政府结构</div>
+        <div class="detail-text">
+          阿拉巴马为<strong>深红州</strong>，共和党在州长办公室、州参议院和州众议院均占绝对多数。州长 <strong>Kay Ivey</strong>（共和党）自2017年上任，2026年1月发表<strong>最后一次州情咨文</strong>，宣布不再竞选连任[reference:24]。联邦层面，两名参议员均为共和党，众议院7个席位中共和党占6席、民主党1席。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">选区重划争议</div>
+        <div class="detail-text">
+          2026年阿拉巴马面临重大<strong>选区重划</strong>争议。联邦法院裁定州议会绘制的州参议院地图涉嫌种族歧视，州总检察长 Marshall 向第十一巡回上诉法院提起上诉，要求恢复议会绘制的地图[reference:25]。州长 Ivey 已宣布<strong>2026年8月11日</strong>举行特别初选，大选仍定于11月3日[reference:26]。民主党人和民权组织则推动州宪法修正案，试图阻止被裁定歧视的地图重新生效[reference:27]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">2026 州情咨文重点</div>
+        <div class="detail-text">
+          Ivey 在最后一次州情咨文中强调：自2017年以来累计投资 <strong>$690 亿</strong>、创造 <strong>10 万+</strong>就业；阿拉巴马持续位列<strong>全美营商环境前十</strong>；蒙哥马利地区<strong>执法力量增强</strong>[reference:28]。州政府将劳动力发展列为优先事项，推动职业培训与产业需求对接。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 12. 教育 ========== -->
+  <div class="card" id="sec-education" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">教育<small>Education</small></div>
+      <div class="card-icon">🎓</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">U.S. News 教育</span><span class="data-value red">第44</span></div>
+        <div class="data-item"><span class="data-label">高中毕业率</span><span class="data-value green">90%</span></div>
+        <div class="data-item"><span class="data-label">本科及以上</span><span class="data-value">28.4%</span></div>
+        <div class="data-item"><span class="data-label">NAEP 数学</span><span class="data-value red">低于全美</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>Auburn</strong> · <strong>UAB</strong> · <strong>Alabama</strong></span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Madison City Schools · Mountain Brook</span></div>
+      <div class="tags">
+        <span class="tag">Auburn全美百强</span><span class="tag">UAB医学强校</span><span class="tag">K-12排名落后</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">高等教育</div>
+        <table class="mini-table">
+          <tr><td>1. Auburn University</td><td>公立 · 全美百强 · 工程与商科强</td></tr>
+          <tr><td>2. University of Alabama at Birmingham (UAB)</td><td>公立 · 医学与生物科技顶尖</td></tr>
+          <tr><td>3. The University of Alabama</td><td>公立 · 全美旗舰 · 商科与传媒强</td></tr>
+          <tr><td>University of Alabama in Huntsville</td><td>公立 · 工程与航天强</td></tr>
+          <tr><td>Tuskegee University</td><td>历史黑人大学 (HBCU) · 全美知名</td></tr>
+          <tr><td>Samford University</td><td>私立 · 教育学院获 NCTQ A+ 评级</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">K-12 教育</div>
+        <div class="detail-text">
+          U.S. News 2026 将阿拉巴马教育列为<strong>全美第44</strong>。高中毕业率 <strong>90%</strong>，高于全美平均 85.8%，但 NAEP 数学成绩持续低于全美平均[reference:29]。Madison City Schools（亨茨维尔郊区）和 Mountain Brook（伯明翰郊区）为全州顶尖学区。阿拉巴马在教师准备质量方面有亮点：Samford 大学教育学院获 NCTQ 最高评级，Jacksonville State 小学教育项目获 A 级评级[reference:30][reference:31]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 13. 体育 ========== -->
+  <div class="card" id="sec-sports" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">体育<small>Sports</small></div>
+      <div class="card-icon">🏈</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">大学橄榄球</span><span class="data-value">Alabama · Auburn</span></div>
+        <div class="data-item"><span class="data-label">职业橄榄球</span><span class="data-value">Birmingham Stallions (UFL)</span></div>
+        <div class="data-item"><span class="data-label">棒球</span><span class="data-value">Birmingham Barons (AA)</span></div>
+        <div class="data-item"><span class="data-label">足球</span><span class="data-value">Birmingham Legion FC</span></div>
+      </div>
+      <div class="info-row"><span class="label">标志赛事</span><span class="value">Iron Bowl（Alabama vs Auburn）</span></div>
+      <div class="info-row"><span class="label">赛车</span><span class="value">Talladega Superspeedway · Barber Motorsports</span></div>
+      <div class="tags">
+        <span class="tag">SEC橄榄球狂热</span><span class="tag">Iron Bowl</span><span class="tag">Talladega赛车</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">大学体育</div>
+        <div class="detail-text">
+          阿拉巴马大学（Crimson Tide）和奥本大学（Tigers）的<strong>Iron Bowl</strong> rivalry 是美国大学体育最激烈的对抗之一。阿拉巴马大学橄榄球队在 Nick Saban 时代（2007-2023）赢得 <strong>6 次</strong>全国冠军，为现代大学橄榄球王朝。奥本大学以2013年“Kick Six”回攻闻名。两校合计贡献了大量 NFL 球员。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">职业与赛车</div>
+        <table class="mini-table">
+          <tr><td>Birmingham Stallions</td><td>UFL 橄榄球 · 2022-2024 三连冠</td></tr>
+          <tr><td>Birmingham Barons</td><td>MLB 双A · 芝加哥白袜附属</td></tr>
+          <tr><td>Birmingham Legion FC</td><td>USL 足球</td></tr>
+          <tr><td>Huntsville City FC</td><td>USL 足球</td></tr>
+          <tr><td>Huntsville Havoc</td><td>SPHL 冰球</td></tr>
+          <tr><td>Birmingham Bulls</td><td>SPHL 冰球</td></tr>
+          <tr><td>Talladega Superspeedway</td><td>NASCAR 最高速赛道之一</td></tr>
+          <tr><td>Barber Motorsports Museum</td><td>全球最大摩托车收藏之一</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 14. 媒体 ========== -->
+  <div class="card" id="sec-media" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">媒体<small>Media</small></div>
+      <div class="card-icon">📰</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大新闻网站</span><span class="data-value">AL.com</span></div>
+        <div class="data-item"><span class="data-label">主要报纸</span><span class="data-value">Birmingham News</span></div>
+        <div class="data-item"><span class="data-label">电视市场</span><span class="data-value">伯明翰 · 蒙哥马利 · 莫比尔</span></div>
+        <div class="data-item"><span class="data-label">公共电视</span><span class="data-value">Alabama Public Television</span></div>
+      </div>
+      <div class="info-row"><span class="label">媒体集团</span><span class="value">Alabama Media Group · 旗下多份报纸</span></div>
+      <div class="info-row"><span class="label">新兴媒体</span><span class="value">1819 News · Alabama Reflector</span></div>
+      <div class="tags">
+        <span class="tag">AL.com 最大</span><span class="tag">传统报纸转型</span><span class="tag">数字媒体兴起</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">传统媒体</div>
+        <div class="detail-text">
+          <strong>Alabama Media Group</strong> 运营 AL.com（全州最大数字新闻网站），旗下拥有 <strong>The Birmingham News</strong>、<strong>The Huntsville Times</strong> 和 <strong>Press-Register</strong>（莫比尔）[reference:32]。其他主要报纸包括 <strong>Montgomery Advertiser</strong>（州首府主要新闻源）、<strong>Tuscaloosa News</strong> 和 <strong>Mobile Register</strong>。电视市场以伯明翰、蒙哥马利和莫比尔为三大枢纽，主要电视台包括 WBRC (Fox 6)、ABC 33/40、NBC 13 和 CBS 42[reference:33]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">新兴媒体</div>
+        <div class="detail-text">
+          <strong>1819 News</strong>（以建州年份命名）为近年崛起的数字媒体，聚焦州政治调查报道。<strong>Alabama Reflector</strong> 为非营利州级政治新闻网站，隶属 States Newsroom 网络。<strong>Spectrum News Alabama</strong> 于2025年8月上线，提供 24/7 本地新闻频道[reference:34]。Alabama Public Television 提供公共广播和教育内容。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 15. 旅游 ========== -->
+  <div class="card" id="sec-tourism" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">旅游<small>Tourism</small></div>
+      <div class="card-icon">🏖️</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州立公园</span><span class="data-value">21 个</span></div>
+        <div class="data-item"><span class="data-label">顶级景点</span><span class="data-value">Gulf Shores</span></div>
+        <div class="data-item"><span class="data-label">航天博物馆</span><span class="data-value">全球最大</span></div>
+        <div class="data-item"><span class="data-label">音乐遗产</span><span class="data-value">Muscle Shoals</span></div>
+      </div>
+      <div class="info-row"><span class="label">标志体验</span><span class="value">民权之路 · 墨西哥湾海滩 · 火箭城航天</span></div>
+      <div class="info-row"><span class="label">自然景观</span><span class="value">Little River Canyon · Cheaha Mountain</span></div>
+      <div class="tags">
+        <span class="tag">民权之路</span><span class="tag">Gulf Shores海滩</span><span class="tag">太空火箭中心</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">文化与历史景点</div>
+        <div class="detail-text">
+          <strong>民权之路（Civil Rights Trail）：</strong>蒙哥马利的 Rosa Parks 博物馆、民权纪念碑和国家和平与正义纪念馆；伯明翰的民权研究所和 16 街浸信会教堂；塞尔玛的埃德蒙·佩特斯大桥。这些遗址共同讲述了美国民权运动最核心的历史。<strong>Muscle Shoals：</strong>著名的 FAME Studios 和 Muscle Shoals Sound Studio 曾录制滚石乐队、Aretha Franklin 和 Lynyrd Skynyrd 的经典作品，为美国音乐地理圣地。<strong>美国太空与火箭中心（亨茨维尔）：</strong>全球最大航天博物馆，展示土星五号火箭和 NASA 马歇尔太空飞行中心历史。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">自然与休闲</div>
+        <table class="mini-table">
+          <tr><td>Gulf Shores / Orange Beach</td><td>墨西哥湾白沙滩 · 度假胜地</td></tr>
+          <tr><td>Little River Canyon National Preserve</td><td>美国东部最深峡谷之一</td></tr>
+          <tr><td>Cheaha State Park</td><td>阿拉巴马最高峰 · 徒步与露营</td></tr>
+          <tr><td>Dismals Canyon</td><td>85 英亩自然保护区 · 萤火虫奇观</td></tr>
+          <tr><td>Tannehill Ironworks</td><td>19世纪铁工业历史公园</td></tr>
+          <tr><td>Bellingrath Gardens</td><td>莫比尔 · 65 英亩花园庄园</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 16. 农业 ========== -->
+  <div class="card" id="sec-agriculture" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">农业与林业<small>Agriculture & Forestry</small></div>
+      <div class="card-icon">🌾</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">经济贡献</span><span class="data-value">$77.3B / 年</span></div>
+        <div class="data-item"><span class="data-label">就业支撑</span><span class="data-value">270,000+</span></div>
+        <div class="data-item"><span class="data-label">农场数量</span><span class="data-value">38,000+</span></div>
+        <div class="data-item"><span class="data-label">农业用地</span><span class="data-value">860 万英亩</span></div>
+      </div>
+      <div class="info-row"><span class="label">第一大产品</span><span class="value">肉鸡与鸡蛋（约占农业收入一半）</span></div>
+      <div class="info-row"><span class="label">其他产品</span><span class="value">牛 · 棉花 · 花生 · 木材 · 苗圃</span></div>
+      <div class="tags">
+        <span class="tag">农业林业为最大产业</span><span class="tag">肉鸡全美前列</span><span class="tag">木材 $30.6B</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">农业经济</div>
+        <div class="detail-text">
+          农业和林业是阿拉巴马的<strong>最大产业</strong>，每年贡献 <strong>$773 亿</strong>，支撑超过 <strong>27 万个</strong>就业岗位[reference:35]。全州有超过 <strong>38,000 个</strong>农场，覆盖约 <strong>860 万英亩</strong>土地[reference:36]。肉鸡和鸡蛋产业占农业收入的近一半，其次是林业（$30.6B / 91,372 岗位）、牛和犊牛、苗圃和温室产品、棉花和花生（各超 $1 亿）[reference:37][reference:38]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">主要农产品</div>
+        <table class="mini-table">
+          <tr><td>肉鸡与鸡蛋</td><td>农业收入约 50% · 全美前列</td></tr>
+          <tr><td>林业与木材</td><td>$30.6B · 91,372 岗位</td></tr>
+          <tr><td>牛和犊牛</td><td>$1 亿+</td></tr>
+          <tr><td>棉花</td><td>$1 亿+</td></tr>
+          <tr><td>花生</td><td>$1 亿+</td></tr>
+          <tr><td>苗圃与温室</td><td>$1 亿+</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 17. 能源 ========== -->
+  <div class="card" id="sec-energy" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">能源<small>Energy</small></div>
+      <div class="card-icon">⚡</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">电力生产排名</span><span class="data-value">全美第6</span></div>
+        <div class="data-item"><span class="data-label">核电排名</span><span class="data-value">全美第4</span></div>
+        <div class="data-item"><span class="data-label">水电排名</span><span class="data-value">全美第5</span></div>
+        <div class="data-item"><span class="data-label">人均电力消费</span><span class="data-value">全美第7高</span></div>
+      </div>
+      <div class="info-row"><span class="label">主要燃料</span><span class="value">天然气 ~45% · 核能 ~28% · 煤炭 ~15% · 水电 ~6%</span></div>
+      <div class="info-row"><span class="label">可再生能源</span><span class="value">23 座水电站 · 太阳能增长中</span></div>
+      <div class="tags">
+        <span class="tag">核电全美第4</span><span class="tag">水电全美第5</span><span class="tag">天然气主导</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">电力结构</div>
+        <table class="mini-table">
+          <tr><td>天然气</td><td>约 45%</td></tr>
+          <tr><td>核能</td><td>约 28% · 全美第4大核电生产州</td></tr>
+          <tr><td>煤炭</td><td>约 15% · 主要来自怀俄明、肯塔基、西弗吉尼亚</td></tr>
+          <tr><td>水电</td><td>约 6% · 23 座水电站 · 全美第5</td></tr>
+          <tr><td>太阳能 / 其他</td><td>约 6% · 快速增长中</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">能源特征</div>
+        <div class="detail-text">
+          阿拉巴马电力生产排名<strong>全美第6</strong>，人均消费<strong>全美第7高</strong>[reference:39]。Browns Ferry 核电站为美国最大核电站之一。Alabama Power 近年新增约 <strong>3,400 MW</strong> 天然气发电，并获批 <strong>$6.22 亿</strong>新建天然气电厂，以满足数据中心等新增负荷[reference:40]。太阳能潜力巨大，理论上可发电近 <strong>50,000 MW</strong>，足以使阿拉巴马成为能源出口州[reference:41]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 18. 科技 ========== -->
+  <div class="card" id="sec-tech" onclick="toggleCard(this)">
+    <div class="card-head">
+      <div class="card-name">科技与创新<small>Technology & Innovation</small></div>
+      <div class="card-icon">💻</div>
+    </div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">科技产出增长</span><span class="data-value green">+50% (2018-)</span></div>
+        <div class="data-item"><span class="data-label">科技占GDP</span><span class="data-value">目标 5.3% (2030)</span></div>
+        <div class="data-item"><span class="data-label">国防合同</span><span class="data-value">$104亿/年</span></div>
+        <div class="data-item"><span class="data-label">生物科学企业</span><span class="data-value">780 家</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">国防科技 · 生物技术 · 网络安全 · 农业科技</span></div>
+      <div class="info-row"><span class="label">数据中心</span><span class="value">Meta 蒙哥马利 $15 亿投资</span></div>
+      <div class="tags">
+        <span class="tag">国防科技第13</span><span class="tag">HudsonAlpha生物科技</span><span class="tag">Meta数据中心</span>
+      </div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section">
+        <div class="detail-label">科技产业概况</div>
+        <div class="detail-text">
+          阿拉巴马科技产业自2018年以来产出增长 <strong>50%</strong>，预计到2030年将占州 GDP 的 <strong>5.3%</strong>[reference:42]。国防科技为最大优势领域：阿拉巴马每年吸引 <strong>$104 亿</strong>国防合同（全美第13）和 <strong>$3.453 亿</strong>国防拨款（全美第10）[reference:43]。生物科学领域拥有 <strong>780 家</strong>企业，雇佣近 <strong>18,000 人</strong>，HudsonAlpha 生物技术研究所位于亨茨维尔，为全美领先基因组学研究机构[reference:44]。
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">重点企业与投资</div>
+        <table class="mini-table">
+          <tr><td>Meta</td><td>蒙哥马利数据中心 · 总投资 $15 亿</td></tr>
+          <tr><td>HudsonAlpha</td><td>亨茨维尔 · 基因组学与生物技术</td></tr>
+          <tr><td>Adtran</td><td>亨茨维尔 · 电信设备</td></tr>
+          <tr><td>StoneX Group</td><td>伯明翰 · 金融服务运营中心</td></tr>
+          <tr><td>Leidos / SAIC</td><td>国防科技与系统工程</td></tr>
+        </table>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">创新生态</div>
+        <div class="detail-text">
+          阿拉巴马经济发展伙伴关系（EDPA）2025年启动<strong>全州科技吸引战略</strong>，聚焦国防、生物技术、交通出行、林业和先进制造领域的成长期公司[reference:45]。Innovate Alabama 投资了 13 家优先领域的公司。阿拉巴马正通过可负担的生活成本、强化的劳动力和生活质量，留住更多本州毕业生并吸引外州专业人才[reference:46]。
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== 页脚 ==================== -->
+<footer class="footer">
+  <p><strong>阿拉巴马州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · Tax Foundation · Newsweek · WalletHub · Alabama Department of Labor · Fortune · Made in Alabama</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">
+    SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved
+  </div>
+</footer>
+
+<!-- ==================== 回到顶部 ==================== -->
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg>
+</div>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon(next);
+  }
+
+  function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    } else {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
+  }
+
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeIcon(saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      updateThemeIcon('dark');
+    }
+  })();
+
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('visible', window.scrollY > 600);
+  }, { passive: true });
+
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const offset = 60;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
