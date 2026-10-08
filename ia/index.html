@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --hawkeye: #2e7d32;
+  }
+  [data-theme="dark"] {
+    --ground: #000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #0d1f0d 0%, #1a2e1a 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --hawkeye: #4caf50;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--hawkeye); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--hawkeye); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s ease; padding: 0 24px; background: var(--surface-secondary); }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s ease; }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>艾奥瓦州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#ia-overview">概览</a><a href="#ia-pop">人口</a><a href="#ia-econ">经济就业</a>
+      <a href="#ia-biz">企业与产业</a><a href="#ia-health">医疗</a><a href="#ia-safety">公共安全</a>
+      <a href="#ia-tax">税收财政</a><a href="#ia-trans">交通</a><a href="#ia-housing">住房</a>
+      <a href="#ia-climate">气候</a><a href="#ia-politics">政治政府</a><a href="#ia-edu">教育</a>
+      <a href="#ia-sports">体育</a><a href="#ia-media">媒体</a><a href="#ia-tourism">旅游</a>
+      <a href="#ia-energy">能源</a><a href="#ia-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()"><svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌽</div>
+  <h1>艾奥瓦州<br><em>Iowa</em></h1>
+  <p class="subtitle">鹰眼之州 · 全美风电先驱 · 总统初选第一州 · 农业强州</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>3,241,488</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$277.1B</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>3.5%</strong><span>失业率 (2025.12)</span></div>
+    <div class="hero-stat"><strong>#2</strong><span>风电产能全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 个税 <b>3.8% 统一</b>（2025年新制）</span>
+    <span class="hero-badge green">⚡ <b>风电发电占比超60%</b></span>
+    <span class="hero-badge orange">🔫 <b>宪法携带州</b></span>
+    <span class="hero-badge">🌽 <b>玉米/乙醇全美第1</b></span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="ia-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1846年12月28日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">得梅因</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">得梅因</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">145,746 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">东部金翅雀</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">野玫瑰</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">鹰眼之州（The Hawkeye State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Our Liberties We Prize and Our Rights We Will Maintain"</span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Upper Midwest</span><span class="tag">鹰眼之州</span><span class="tag">总统初选</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">艾奥瓦位于美国中西部，北接明尼苏达，东邻威斯康星和伊利诺伊，南界密苏里，西临内布拉斯加和南达科他。在 Colin Woodard 的文化分区中属于 <strong>Midlands</strong>——贵格会宽容、中庸、多元的中间地带。全州地势平坦，密西西比河和密苏里河为东西边界。艾奥瓦是美国<strong>每四年首个举行总统党团会议（Caucus）</strong>的州，赋予其不成比例的政治影响力。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1673 年法国探险家若利埃和马尔凯特抵达。1803 年作为路易斯安那购地一部分归美国。1846 年 12 月 28 日成为美国第 <strong>29 个州</strong>。20 世纪，艾奥瓦发展为农业和制造业中心。1970 年代起，风电产业逐步兴起，使艾奥瓦成为全美可再生能源领导者。2025 年个人所得税转为 <strong>3.8% 统一税率</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="ia-pop" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">3,241,488</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~38.5 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$78,300</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$68,326</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">11.1%</span></div>
+        <div class="data-item"><span class="data-label">外国出生</span><span class="data-value">5.6%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 84.9% · 西语裔 6.9% · 黑人 4.2% · 亚裔 2.8%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">得梅因 214,000 · 锡达拉皮兹 · 达文波特</span></div>
+      <div class="tags"><span class="tag">人口全美第31</span><span class="tag">白人占比高</span><span class="tag">农业人口</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2025)</td><td><strong>3,241,488</strong>（全美第31）</td></tr>
+        <tr><td>中位年龄</td><td>~38.5 岁</td></tr>
+        <tr><td>白人占比</td><td><strong>84.9%</strong></td></tr>
+        <tr><td>西语裔占比</td><td>6.9%</td></tr>
+        <tr><td>黑人占比</td><td>4.2%</td></tr>
+        <tr><td>外国出生</td><td>5.6%</td></tr>
+        <tr><td>本科及以上</td><td>30.5%</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$78,300</strong>（2025），略低于全美中位数。人均收入 <strong>$68,326</strong>。贫困率 <strong>11.1%</strong>，与全美平均持平。艾奥瓦人口增长缓慢，2024 年失业率 <strong>3.0%</strong>，为全美并列第 7 低。Ames 和 Iowa City 都会区失业率最低（<strong>2.4%</strong>），Davenport-Moline-Rock Island 最高（<strong>4.6%</strong>）。Osceola 县失业率仅 <strong>1.9%</strong>，Marshall 县最高 <strong>5.7%</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="ia-econ" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$277.1B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长 (Q1)</span><span class="data-value red">-6.1%</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">3.5%</span></div>
+        <div class="data-item"><span class="data-label">CNBC 综合</span><span class="data-value">第24</span></div>
+        <div class="data-item"><span class="data-label">经济评级</span><span class="data-value red">D+ (第39)</span></div>
+        <div class="data-item"><span class="data-label">生活成本</span><span class="data-value green">B- (第9)</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">农业 · 制造业 · 保险 · 可再生能源 · 食品加工</span></div>
+      <div class="info-row"><span class="label">挑战</span><span class="value">WalletHub 经济排名全美最后 · Q1 GDP -6.1%</span></div>
+      <div class="tags"><span class="tag">GDP Q1 -6.1%</span><span class="tag">经济评级D+</span><span class="tag">生活成本第9低</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现 (CNBC 2025)</div><table class="mini-table">
+        <tr><td>GDP (2025)</td><td><strong>$277.1B</strong>（全美第30）</td></tr>
+        <tr><td>GDP 增速 (Q1 2025)</td><td><strong>-6.1%</strong></td></tr>
+        <tr><td>失业率 (May 2025)</td><td><strong>3.6%</strong>（全美 4.3%）</td></tr>
+        <tr><td>CNBC 综合排名</td><td><strong>第24</strong>（从第14下降）</td></tr>
+        <tr><td>经济评级</td><td><strong>D+</strong>（第39）</td></tr>
+        <tr><td>商业友好</td><td>B-（第24）</td></tr>
+        <tr><td>生活成本</td><td><strong>B-</strong>（第9）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">艾奥瓦经济以<strong>农业</strong>（玉米、大豆、猪肉、鸡蛋）、<strong>制造业</strong>（农业机械、食品加工）和<strong>保险业</strong>（得梅因为全美保险中心之一）为支柱。<strong>可再生能源</strong>为独特优势——风电发电占比超 60%，为全美最高之一。但 2025 年经济表现疲软，Q1 GDP 下降 <strong>6.1%</strong>，WalletHub 将艾奥瓦经济列为全美最后，反映 GDP 变化、创业活动和非农就业增长方面的弱势。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="ia-biz" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">2 家</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Principal Financial</span></div>
+        <div class="data-item"><span class="data-label">最大雇主</span><span class="data-value">UnityPoint Health</span></div>
+        <div class="data-item"><span class="data-label">乙醇产量</span><span class="data-value green">全美第1</span></div>
+        <div class="data-item"><span class="data-label">风电</span><span class="data-value green">全美第2</span></div>
+        <div class="data-item"><span class="data-label">保险中心</span><span class="data-value">得梅因</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级企业</span><span class="value">Principal · Casey's · Hy-Vee · Wells Fargo · Corteva</span></div>
+      <div class="info-row"><span class="label">农业</span><span class="value">玉米、大豆、猪肉、鸡蛋全美领先</span></div>
+      <div class="tags"><span class="tag">Principal保险</span><span class="tag">Casey's便利店</span><span class="tag">Hy-Vee超市</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500（2025）</div><table class="mini-table">
+        <tr><td>1. Principal Financial Group (#236)</td><td>得梅因 · 保险与资产管理 · $160 亿</td></tr>
+        <tr><td>2. Casey's General Stores (#329)</td><td>Ankeny · 便利店与加油站 · $150 亿</td></tr>
+        <tr><td>Hy-Vee</td><td>West Des Moines · 员工持股超市连锁</td></tr>
+        <tr><td>Corteva Agriscience</td><td>Johnston · 农业科技 · 杜邦拆分</td></tr>
+        <tr><td>Wells Fargo</td><td>West Des Moines · 金融运营中心</td></tr>
+        <tr><td>Vermeer Corporation</td><td>Pella · 农业与工业设备</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">产业集聚</div><div class="detail-text"><strong>农业与食品加工：</strong>艾奥瓦为全美最大玉米、猪肉和鸡蛋生产州之一，乙醇产量全美第 1。<strong>保险业：</strong>得梅因为全美保险业中心之一，Principal Financial 和 Wells Fargo 在此设有大型运营中心。<strong>可再生能源：</strong>风电产能全美第 2，发电占比超 60%。<strong>农业机械：</strong>Vermeer（Pella）和 Sukup Manufacturing 为全球领先的农业设备制造商。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="ia-health" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">UI Health Care Medical Center</span></div>
+        <div class="data-item"><span class="data-label">连续第1</span><span class="data-value green">多年</span></div>
+        <div class="data-item"><span class="data-label">全州第2</span><span class="data-value">MercyOne Des Moines</span></div>
+        <div class="data-item"><span class="data-label">全州第3</span><span class="data-value">Iowa Methodist</span></div>
+        <div class="data-item"><span class="data-label">成人专科排名</span><span class="data-value green">8 个</span></div>
+        <div class="data-item"><span class="data-label">儿童医院</span><span class="data-value green">Stead Family 全州唯一</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">UI Health Care · MercyOne · Iowa Methodist</span></div>
+      <div class="info-row"><span class="label">儿童医院</span><span class="value">Stead Family 中西部第12 · 6个儿科专科排名</span></div>
+      <div class="tags"><span class="tag">UI Health Care全州第1</span><span class="tag">Stead Family全州唯一</span><span class="tag">8个成人专科排名</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. UI Health Care Medical Center</td><td>Iowa City · 全州第1 · 8个成人专科全美排名</td></tr>
+        <tr><td>2. MercyOne Des Moines Medical Center</td><td>得梅因 · 全州第2</td></tr>
+        <tr><td>3. Iowa Methodist Medical Center</td><td>得梅因 · 全州第3</td></tr>
+        <tr><td>4. UnityPoint Health-St. Luke's</td><td>Cedar Rapids · 全州前列</td></tr>
+        <tr><td>5. Genesis Medical Center</td><td>Davenport · 全州前列</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">儿童医院</div><div class="detail-text"><strong>Stead Family Children's Hospital</strong>（Iowa City）为全州唯一全国排名的儿童医院，中西部第 <strong>12</strong>，在 <strong>6 个</strong>儿科专科中获全美排名。UI Health Care 在 8 个成人专科中获全美排名，包括癌症、心脏病、骨科和耳鼻喉科。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="ia-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">持枪法规</span><span class="data-value green">宪法携带州</span></div>
+        <div class="data-item"><span class="data-label">持枪年龄</span><span class="data-value green">18岁+无需许可</span></div>
+        <div class="data-item"><span class="data-label">公开携枪</span><span class="data-value green">合法</span></div>
+        <div class="data-item"><span class="data-label">隐蔽携枪</span><span class="data-value green">合法</span></div>
+        <div class="data-item"><span class="data-label">2021年变革</span><span class="data-value">HF 756 生效</span></div>
+        <div class="data-item"><span class="data-label">持枪率</span><span class="data-value">约 33%</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>宪法携带州</strong>（2021年）· 21岁+无需许可（2025年降至18岁）</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">HF 924 将持枪年龄从21岁降至18岁（2025年7月1日生效）</span></div>
+      <div class="tags"><span class="tag">宪法携带州</span><span class="tag">2025年降至18岁</span><span class="tag">无需许可</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">持枪法规</div><div class="detail-text">艾奥瓦为<strong>宪法携带州</strong>（2021 年 7 月 1 日起），允许居民<strong>无需许可</strong>购买和携带手枪，可公开或隐蔽携带。2025 年 <strong>HF 924</strong> 进一步将持枪年龄从 21 岁降至 <strong>18 岁</strong>（2025 年 7 月 1 日生效）。持枪率约 <strong>33%</strong>，接近全美平均。艾奥瓦的枪支法律在中西部属于较宽松的类别。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="ia-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value green">3.8% 统一</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">7.1%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">6.0%</span></div>
+        <div class="data-item"><span class="data-label">综合销售税</span><span class="data-value">6.0%–7.0%</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value red">~1.33%</span></div>
+        <div class="data-item"><span class="data-label">信用评级</span><span class="data-value green">Aaa/AAA</span></div>
+      </div>
+      <div class="info-row"><span class="label">税改</span><span class="value">2025年从累进税制转为 <strong>3.8% 统一税率</strong></span></div>
+      <div class="info-row"><span class="label">房产税</span><span class="value">全美较高 · 1.33% 有效税率</span></div>
+      <div class="tags"><span class="tag">个税3.8%统一</span><span class="tag">房产税1.33%较高</span><span class="tag">信用评级AAA</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>3.8%</strong> 统一（2025年起，从累进税制转为单一税率）</td></tr>
+        <tr><td>企业所得税</td><td><strong>7.1%</strong></td></tr>
+        <tr><td>州销售税</td><td>6.0%（地方附加后合计约 6.0%–7.0%）</td></tr>
+        <tr><td>房产税</td><td><strong>1.33%</strong> 有效税率（全美较高）</td></tr>
+        <tr><td>汽油税</td><td>48.4 美分/加仑</td></tr>
+        <tr><td>遗产税</td><td><strong>无</strong></td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">艾奥瓦 2025 年实施重大税改——个人所得税从累进税制转为 <strong>3.8% 统一税率</strong>，取代此前最高 6.0% 的累进税率。企业所得税 <strong>7.1%</strong>。销售税 <strong>6.0%</strong>，因食品未加工不征税，总体消费税负略低于平均。但房产税有效税率 <strong>1.33%</strong>，为全美较高水平。州信用评级 <strong>Aaa/AAA</strong>（稳定）。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="ia-trans" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">最大机场</span><span class="data-value">DSM</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value">第84繁忙</span></div>
+        <div class="data-item"><span class="data-label">一级铁路</span><span class="data-value">5 条</span></div>
+        <div class="data-item"><span class="data-label">铁路里程</span><span class="data-value">3,328 英里</span></div>
+        <div class="data-item"><span class="data-label">Amtrak</span><span class="data-value">California Zephyr</span></div>
+        <div class="data-item"><span class="data-label">Osceola站</span><span class="data-value">13,500+乘客</span></div>
+      </div>
+      <div class="info-row"><span class="label">航空</span><span class="value">得梅因国际机场（DSM）为全美第84繁忙 · 8月客运+1.0%</span></div>
+      <div class="info-row"><span class="label">铁路</span><span class="value">Amtrak California Zephyr 经停 · Osceola站 13,500+乘客</span></div>
+      <div class="tags"><span class="tag">DSM全美第84</span><span class="tag">5条一级铁路</span><span class="tag">California Zephyr</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text"><strong>得梅因国际机场（DSM）</strong>为艾奥瓦最大机场，全美第 <strong>84</strong> 繁忙商业机场（2025年）。2025 年 8 月商业服务机场客运量较 2024 年 8 月增长 <strong>1.0%</strong>。其他主要机场包括 Cedar Rapids（CID）、Davenport（DVN）和 Dubuque（DBQ）。</div></div>
+      <div class="detail-section"><div class="detail-label">铁路与公路</div><div class="detail-text"><strong>铁路：</strong>艾奥瓦有 <strong>3,328 英里</strong>一级铁路线，5 条一级铁路（Union Pacific、BNSF、Norfolk Southern、Kansas City Southern、Canadian National）。Amtrak California Zephyr 经停 Osceola、Ottumwa、Mount Pleasant 和 Burlington。Osceola 站 2025 财年服务 <strong>13,500+</strong>乘客。<strong>公路：</strong>I-80 横穿（得梅因-奥马哈-芝加哥），I-35 纵贯（得梅因-堪萨斯城-明尼阿波利斯），I-29 沿密苏里河。<strong>水运：</strong>密西西比河和密苏里河为重要内河航道。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="ia-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位销售价 (2025.10)</span><span class="data-value">$250,000</span></div>
+        <div class="data-item"><span class="data-label">年变化</span><span class="data-value orange">+6.4%</span></div>
+        <div class="data-item"><span class="data-label">9月中位价</span><span class="data-value">$245,000 (+6.5%)</span></div>
+        <div class="data-item"><span class="data-label">中位房屋价值</span><span class="data-value">$217,000</span></div>
+        <div class="data-item"><span class="data-label">得梅因中位价</span><span class="data-value">$315,000 (+5%)</span></div>
+        <div class="data-item"><span class="data-label">区域平均价</span><span class="data-value">$279,400</span></div>
+      </div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">房价稳步上涨 · 库存持续偏低</span></div>
+      <div class="info-row"><span class="label">可负担性</span><span class="value">中位价低于全美中位数</span></div>
+      <div class="tags"><span class="tag">中位价$250K</span><span class="tag">得梅因$315K</span><span class="tag">库存偏低</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025 年 10 月艾奥瓦中位销售价 <strong>$250,000</strong>，同比上涨 <strong>6.4%</strong>（上年同期 $235,000）。9 月中位价 <strong>$245,000</strong>（+6.5%），7 月 <strong>$255,000</strong>（+2.4%）。中位房屋价值 <strong>$217,000</strong>（2020-2024）。得梅因都会区中位价 <strong>$315,000</strong>（+5%）。区域平均房价 <strong>$279,400</strong>（+5%），艾奥瓦在区域中州均房价最低。Cedar Rapids 库存持续偏低。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>中位销售价 (2025.10)</td><td>$250,000</td></tr>
+        <tr><td>中位房屋价值</td><td>$217,000</td></tr>
+        <tr><td>得梅因中位价</td><td>$315,000（+5%）</td></tr>
+        <tr><td>区域平均价</td><td>$279,400</td></tr>
+        <tr><td>7 月中位价</td><td>$255,000（+2.4%）</td></tr>
+        <tr><td>库存趋势</td><td>持续偏低</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="ia-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">2025年年均温</span><span class="data-value">49.7°F (+1.3°F)</span></div>
+        <div class="data-item"><span class="data-label">年降水</span><span class="data-value red">33.60" (-1.95")</span></div>
+        <div class="data-item"><span class="data-label">夏季温度</span><span class="data-value">72.5°F (+1.1°F)</span></div>
+        <div class="data-item"><span class="data-label">夏季降水</span><span class="data-value green">18.16" (+4.60")</span></div>
+        <div class="data-item"><span class="data-label">秋季温度</span><span class="data-value red">54.6°F (+4.1°F)</span></div>
+        <div class="data-item"><span class="data-label">排名</span><span class="data-value">第25暖年</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">第25暖年 · 降水偏低1.95" · 秋季异常温暖（+4.1°F）</span></div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">暴雪 · 龙卷风 · 洪水 · 极端寒冷</span></div>
+      <div class="tags"><span class="tag">第25暖年</span><span class="tag">秋季+4.1°F</span><span class="tag">降水偏低1.95"</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">2025年气候</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润大陆性</td></tr>
+        <tr><td>2025年年均温</td><td><strong>49.7°F</strong>（+1.3°F）· 第25暖年</td></tr>
+        <tr><td>年降水 (2025)</td><td><strong>33.60 英寸</strong>（偏低 1.95 英寸）</td></tr>
+        <tr><td>夏季均温 (6-8月)</td><td>72.5°F（+1.1°F）</td></tr>
+        <tr><td>夏季降水</td><td><strong>18.16 英寸</strong>（偏高 4.60 英寸）</td></tr>
+        <tr><td>秋季均温 (9-11月)</td><td><strong>54.6°F</strong>（+4.1°F）</td></tr>
+        <tr><td>10月温度异常</td><td>+5.9°F</td></tr>
+        <tr><td>11月温度异常</td><td>+2.9°F</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">气候特征与极端天气</div><div class="detail-text">艾奥瓦 2025 年为<strong>第 25 暖年</strong>（1895 年以来），年均温 <strong>49.7°F</strong>（+1.3°F），降水 <strong>33.60 英寸</strong>（偏低 1.95 英寸）。夏季温暖湿润（温度 +1.1°F，降水 +4.60 英寸），秋季异常温暖（<strong>+4.1°F</strong>），10 月偏高 <strong>5.9°F</strong>。极端天气包括暴雪、龙卷风、洪水和极端寒冷。艾奥瓦位于龙卷风走廊东段。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="ia-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Kim Reynolds (R)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">共和党多数</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名共和党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">4 席 · 全共和党</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value red">红州</span></div>
+        <div class="data-item"><span class="data-label">2026州长</span><span class="data-value">开放选举</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">Reynolds 宣布不竞选连任 · 民主党赢得参议院特别选举</span></div>
+      <div class="info-row"><span class="label">2026年</span><span class="value">开放州长选举 · Rob Sand（民主党）参选</span></div>
+      <div class="tags"><span class="tag">红州</span><span class="tag">Reynolds不连任</span><span class="tag">民主党特别选举胜出</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">艾奥瓦为<strong>红州</strong>，共和党控制州长办公室和州议会两院。州长 <strong>Kim Reynolds</strong>（共和党）宣布<strong>不竞选连任</strong>，2026 年州长选举为<strong>开放选举</strong>。民主党在 2025 年两次赢得参议院特别选举，打破了共和党的<strong>三分之二绝对多数</strong>，使民主党在确认州长任命方面拥有一定话语权。州审计员 <strong>Rob Sand</strong>（民主党）为唯一全州当选的民主党人，正在竞选州长。</div></div>
+      <div class="detail-section"><div class="detail-label">2025-2026 关键议题</div><table class="mini-table">
+        <tr><td>2026 州长选举</td><td>开放选举 · 多位共和党人参选 · Rob Sand（D）</td></tr>
+        <tr><td>碳管道</td><td>Reynolds 否决加强监管 Summit 碳管道的法案</td></tr>
+        <tr><td>参议院特别选举</td><td>民主党两次翻盘 · 打破共和党绝对多数</td></tr>
+        <tr><td>税收</td><td>2025年实施 3.8% 统一税率</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="ia-edu" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">教育质量排名</span><span class="data-value orange">全美第21</span></div>
+        <div class="data-item"><span class="data-label">趋势</span><span class="data-value red">从第5降至第21</span></div>
+        <div class="data-item"><span class="data-label">数学恢复</span><span class="data-value red">第38/38</span></div>
+        <div class="data-item"><span class="data-label">阅读恢复</span><span class="data-value">第18/35</span></div>
+        <div class="data-item"><span class="data-label">UI写作</span><span class="data-value green">全美第10</span></div>
+        <div class="data-item"><span class="data-label">ISU工程</span><span class="data-value green">全美第1</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>University of Iowa</strong> · <strong>Iowa State</strong> · Drake</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Johnston 全州前12.5%</span></div>
+      <div class="tags"><span class="tag">教育质量第21</span><span class="tag">数学恢复最后</span><span class="tag">UI写作第10</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">艾奥瓦教育质量全美<strong>第 21</strong>（2025），但较 2018 年的第 5 名下降了 15 位。数学学术恢复<strong>全美最后</strong>（38 州中第 38），阅读恢复第 18（35 州中）。4 年级数学全美第 8 差，4 年级阅读第 13 差。Johnston 社区学区在全州 329 个学区中排名第 41（前 12.5%），为得梅因都会区最佳。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Iowa</td><td>Iowa City · 写作全美第10 · 护理第8 · 保险第9</td></tr>
+        <tr><td>Iowa State University</td><td>Ames · 工程全美第1（农业领域）· 全美第117</td></tr>
+        <tr><td>Drake University</td><td>得梅因 · 私立 · 法学与商科强</td></tr>
+        <tr><td>University of Northern Iowa</td><td>Cedar Falls · 教育与传统强</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="ia-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">大学橄榄球</span><span class="data-value">Iowa Hawkeyes</span></div>
+        <div class="data-item"><span class="data-label">2025赛季</span><span class="data-value green">9-4 · 碗赛冠军</span></div>
+        <div class="data-item"><span class="data-label">Iowa State</span><span class="data-value">Cyclones</span></div>
+        <div class="data-item"><span class="data-label">摔跤</span><span class="data-value green">全美强队</span></div>
+        <div class="data-item"><span class="data-label">女子篮球</span><span class="data-value green">Caitlin Clark时代</span></div>
+        <div class="data-item"><span class="data-label">职业体育</span><span class="data-value red">无</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年亮点</span><span class="value">Iowa橄榄球 9-4 · ReliaQuest Bowl冠军</span></div>
+      <div class="info-row"><span class="label">摔跤</span><span class="value">Iowa · Iowa State · UNI 均为全美强队</span></div>
+      <div class="tags"><span class="tag">Iowa Hawkeyes</span><span class="tag">摔跤全美强队</span><span class="tag">女子篮球热度</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text"><strong>Iowa Hawkeyes</strong> 橄榄球队 2025 年取得 <strong>9-4</strong> 战绩（Big Ten 6-3），在 ReliaQuest Bowl 中击败 Vanderbilt。Iowa State Cyclones 同样为 Big 12 强队。艾奥瓦在<strong>摔跤</strong>领域拥有全美最强的三个项目——Iowa、Iowa State 和 Northern Iowa（UNI）。<strong>Iowa 女子篮球</strong>在 Caitlin Clark 时代成为全美最受关注的大学体育项目之一。</div></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><div class="detail-text">艾奥瓦<strong>无四大联盟职业球队</strong>。大学体育为本地体育文化核心。Iowa Cubs（MLB 3A）和 Iowa Wild（AHL 冰球）为小联盟球队。</div></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="ia-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">主要报纸</span><span class="data-value">Des Moines Register</span></div>
+        <div class="data-item"><span class="data-label">被收购</span><span class="data-value">Cedar Rapids Gazette</span></div>
+        <div class="data-item"><span class="data-label">印刷关闭</span><span class="data-value red">Quad-City Times</span></div>
+        <div class="data-item"><span class="data-label">裁员</span><span class="data-value red">40+ 人</span></div>
+        <div class="data-item"><span class="data-label">收购</span><span class="data-value">News Printing Company</span></div>
+        <div class="data-item"><span class="data-label">地方所有权结束</span><span class="data-value">Gazette (1883-2025)</span></div>
+      </div>
+      <div class="info-row"><span class="label">挑战</span><span class="value">Quad-City Times 印刷厂关闭 · 40+ 人失业</span></div>
+      <div class="info-row"><span class="label">变迁</span><span class="value">Cedar Rapids Gazette 被 Adams MultiMedia 收购 · 结束 1883 年以来地方所有权</span></div>
+      <div class="tags"><span class="tag">Register最大</span><span class="tag">Gazette被收购</span><span class="tag">Quad-City停印</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Des Moines Register</td><td>得梅因 · 全州最大报纸 · Gannett 旗下</td></tr>
+        <tr><td>Cedar Rapids Gazette</td><td>2025年被 Adams MultiMedia 收购 · 结束1883年以来地方所有权</td></tr>
+        <tr><td>Quad-City Times</td><td>2025年9月印刷厂关闭 · 40+ 人失业</td></tr>
+        <tr><td>Sioux City Journal</td><td>2023年改为每周三天印刷</td></tr>
+        <tr><td>Newton News</td><td>2025年被 J. Louis Mullen 收购</td></tr>
+        <tr><td>Iowa Public Radio</td><td>公共广播 · NPR 附属</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">艾奥瓦媒体面临<strong>深刻的行业变革</strong>。Quad-City Times 印刷厂于 2025 年 9 月关闭，导致 <strong>40 多人</strong>失业。Sioux City Journal 于 2023 年改为每周三天印刷。Cedar Rapids Gazette 被 Adams MultiMedia 收购，结束了自 <strong>1883 年</strong>以来近 150 年的地方所有权。J. Louis Mullen 收购了中部艾奥瓦的 News Printing Company（含 Newton News 等）。<strong>Iowa Public Radio</strong> 为全州公共广播核心。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="ia-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🌾</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客</span><span class="data-value green">4,610万</span></div>
+        <div class="data-item"><span class="data-label">游客支出</span><span class="data-value green">$75亿</span></div>
+        <div class="data-item"><span class="data-label">旅游就业</span><span class="data-value">72,000</span></div>
+        <div class="data-item"><span class="data-label">Okoboji 游客</span><span class="data-value green">90万+</span></div>
+        <div class="data-item"><span class="data-label">Pottawattamie支出</span><span class="data-value green">$3.3亿+</span></div>
+        <div class="data-item"><span class="data-label">州博览会</span><span class="data-value">黄油雕塑</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">得梅因艺术中心 · Okoboji湖区 · 廊桥 · 州博览会</span></div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">Okoboji 全年游客 <strong>90万+</strong> · Pottawattamie 县支出 <strong>$3.3亿+</strong></span></div>
+      <div class="tags"><span class="tag">Okoboji湖区</span><span class="tag">得梅因艺术中心</span><span class="tag">州博览会黄油雕塑</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济（2025）</div><table class="mini-table">
+        <tr><td>年游客</td><td><strong>4,610 万</strong>（FY25）</td></tr>
+        <tr><td>游客支出</td><td><strong>$75 亿</strong></td></tr>
+        <tr><td>旅游就业</td><td>约 <strong>72,000 个</strong></td></tr>
+        <tr><td>Okoboji 全年游客</td><td><strong>90 万+</strong>（2025）</td></tr>
+        <tr><td>Pottawattamie 县支出</td><td><strong>$3.3 亿+</strong>（创纪录）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>得梅因艺术中心</strong>和<strong>州议会大厦</strong>为建筑地标。<strong>Okoboji 湖区</strong>为夏季度假胜地，2025 年接待 <strong>90 万+</strong>游客。<strong>麦迪逊县廊桥</strong>（Bridges of Madison County）因同名小说和电影闻名。<strong>密西西比河沿岸</strong>（Dubuque、Davenport）为河滨历史城镇。<strong>艾奥瓦州博览会</strong>（得梅因，8月）以<strong>黄油雕塑</strong>（Butter Cow）和农业展览为标志性文化符号。<strong>Loess Hills</strong>（黄土丘陵）为独特地质景观。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="ia-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">风电占比</span><span class="data-value green">61%</span></div>
+        <div class="data-item"><span class="data-label">风电产能</span><span class="data-value green">13 GW+</span></div>
+        <div class="data-item"><span class="data-label">全美排名</span><span class="data-value green">第2</span></div>
+        <div class="data-item"><span class="data-label">风电就业</span><span class="data-value">9,000+</span></div>
+        <div class="data-item"><span class="data-label">乙醇产量</span><span class="data-value green">全美第1</span></div>
+        <div class="data-item"><span class="data-label">太阳能增长</span><span class="data-value green">31倍 (vs 2016)</span></div>
+      </div>
+      <div class="info-row"><span class="label">风电</span><span class="value">发电占比超 <strong>60%</strong> · 全美第2大风电产能</span></div>
+      <div class="info-row"><span class="label">生物燃料</span><span class="value">全美最大乙醇和生物柴油生产州</span></div>
+      <div class="tags"><span class="tag">风电占比61%</span><span class="tag">全美第2风电</span><span class="tag">乙醇全美第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">可再生能源</div><table class="mini-table">
+        <tr><td>风电发电占比 (2024)</td><td><strong>63%</strong>（2025年约61%）</td></tr>
+        <tr><td>风电产能</td><td><strong>13 GW+</strong>（全美第2）</td></tr>
+        <tr><td>风电就业</td><td>9,000+</td></tr>
+        <tr><td>大型风电场</td><td>100+ 个 · 2 个新项目至2027年</td></tr>
+        <tr><td>太阳能增长</td><td><strong>31 倍</strong>（vs 2016）· 可供电 171,573 户</td></tr>
+        <tr><td>乙醇产能</td><td>全美第1 · 占全美产能超1/4</td></tr>
+        <tr><td>生物柴油产能</td><td>全美第1 · 占全美约1/5</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">能源转型</div><div class="detail-text">艾奥瓦为全美<strong>可再生能源领导者</strong>——风电发电占比超 <strong>60%</strong>（全美最高之一），风电产能全美第 2（<strong>13 GW+</strong>），支持超过 <strong>9,000 个</strong>就业。2025 年太阳能发电为 2016 年的 <strong>31 倍</strong>，可供电 <strong>171,573 户</strong>。艾奥瓦同时是<strong>全美最大乙醇和生物柴油生产州</strong>，占全美乙醇产能超过 <strong>1/4</strong>。但近年新风电项目因地方反对和联邦政策不确定性而放缓。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="ia-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">CNBC 科技</span><span class="data-value red">D+ (第29)</span></div>
+        <div class="data-item"><span class="data-label">Prometheus奖</span><span class="data-value">20届</span></div>
+        <div class="data-item"><span class="data-label">年度初创</span><span class="data-value">Tumbleweed</span></div>
+        <div class="data-item"><span class="data-label">年度科技公司</span><span class="data-value">Lean TECHniques</span></div>
+        <div class="data-item"><span class="data-label">IEDA投资</span><span class="data-value green">$10万</span></div>
+        <div class="data-item"><span class="data-label">AI竞赛</span><span class="data-value">Terraform Tillage</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">农业科技 · 生物科技 · AI · 网络安全</span></div>
+      <div class="info-row"><span class="label">旗舰项目</span><span class="value">Iowa Go-To-Market Accelerator · AI Pitch Competition</span></div>
+      <div class="tags"><span class="tag">农业科技领先</span><span class="tag">Tumbleweed年度初创</span><span class="tag">AI竞赛</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">科技创新生态</div><div class="detail-text">艾奥瓦科技产业以<strong>农业科技</strong>为特色。第 20 届 <strong>Prometheus Awards</strong> 将 <strong>Tumbleweed</strong> 评为年度初创科技公司，<strong>Lean TECHniques</strong> 为年度 IT 服务提供商，<strong>Growers Edge</strong> 为数据解决方案奖，<strong>Vermeer Corporation</strong> 为大型科技公司。<strong>IEDA</strong> 向 Pani Clean（Coralville）和 Halide Biologics（Iowa City）各提供 <strong>$10 万</strong>创新资助。<strong>Iowa Go-To-Market Accelerator</strong> 选择 Renner Ag Solutions、Ama AI 和 Terraform Tillage 为 2025 秋季队列。首届 <strong>AI Pitch Competition</strong> 中 Terraform Tillage 和 NeuroPred 并列第一。</div></div>
+      <div class="detail-section"><div class="detail-label">重点企业</div><table class="mini-table">
+        <tr><td>Vermeer Corporation</td><td>Pella · 农业与工业设备 · 大型科技公司奖</td></tr>
+        <tr><td>Corteva Agriscience</td><td>Johnston · 农业科技 · 杜邦拆分</td></tr>
+        <tr><td>Growers Edge</td><td>农业金融科技 · 数据解决方案奖</td></tr>
+        <tr><td>Tumbleweed</td><td>2025年年度初创科技公司</td></tr>
+        <tr><td>Halide Biologics</td><td>Iowa City · 蛋白质治疗 · IEDA资助</td></tr>
+        <tr><td>Terraform Tillage</td><td>AI 土壤压实测绘 · AI竞赛并列第1</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>艾奥瓦州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · CNBC · Tax Foundation · Iowa Workforce Development · Iowa DNR · Iowa Tourism Office</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
