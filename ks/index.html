@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KS</title>
+<style>
+  :root {
+    --ground: #f5f5f7; --surface: #ffffff; --surface-secondary: #fafafa;
+    --text-primary: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #aeaeb2;
+    --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+    --divider: #e8e8ed; --radius-card: 18px; --radius-pill: 980px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04); --shadow-hover: 0 8px 30px rgba(0,0,0,0.08);
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --nav-bg: rgba(245,245,247,0.72);
+    --hero-gradient: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    --table-stripe: #fafafa; --green: #34c759; --orange: #ff9500; --red: #ff3b30;
+    --sunflower: #e65100;
+  }
+  [data-theme="dark"] {
+    --ground: #000; --surface: #1c1c1e; --surface-secondary: #2c2c2e;
+    --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #636366;
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --divider: #38383a; --shadow-card: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
+    --nav-bg: rgba(28,28,30,0.8); --hero-gradient: linear-gradient(135deg, #2a1a00 0%, #3d2800 100%);
+    --table-stripe: #2c2c2e; --green: #30d158; --orange: #ff9f0a; --red: #ff453a;
+    --sunflower: #ffb74d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-stack); background: var(--ground); color: var(--text-primary); -webkit-font-smoothing: antialiased; line-height: 1.5; letter-spacing: -0.01em; transition: background 0.4s ease, color 0.4s ease; }
+  .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(20px); background: var(--nav-bg); border-bottom: 0.5px solid var(--divider); transition: background 0.4s ease; }
+  .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 22px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .nav-brand span { color: var(--sunflower); }
+  .nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid var(--divider); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.25s ease; }
+  .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .theme-toggle svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .theme-toggle:hover svg { stroke: var(--accent); }
+  .hero { text-align: center; padding: 72px 22px 52px; max-width: 900px; margin: 0 auto; background: var(--hero-gradient); border-radius: 0 0 32px 32px; transition: background 0.4s ease; }
+  .hero-flag { font-size: 64px; margin-bottom: 12px; line-height: 1; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); font-weight: 700; letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 10px; }
+  .hero h1 em { font-style: normal; color: var(--sunflower); }
+  .hero .subtitle { font-size: clamp(14px, 1.8vw, 17px); color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-stat span { font-size: 10.5px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-badge { font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-pill); line-height: 1.4; background: var(--surface); border: 0.5px solid var(--divider); color: var(--text-secondary); }
+  .hero-badge b { color: var(--text-primary); }
+  .hero-badge.green { border-color: var(--green); color: var(--green); }
+  .hero-badge.orange { border-color: var(--orange); color: var(--orange); }
+  .hero-badge.red { border-color: var(--red); color: var(--red); }
+  .grid { max-width: 1240px; margin: 0 auto; padding: 16px 22px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), box-shadow 0.35s cubic-bezier(0.25,0.1,0.25,1), background 0.4s ease; cursor: pointer; position: relative; }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card-head { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-name { font-size: 19px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.25; }
+  .card-name small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-tertiary); margin-top: 2px; }
+  .card-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-secondary); border-radius: 10px; }
+  .card-body { padding: 12px 24px 24px; }
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+  .data-item { display: flex; flex-direction: column; gap: 1px; }
+  .data-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+  .data-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .data-value.green { color: var(--green); } .data-value.orange { color: var(--orange); } .data-value.red { color: var(--red); }
+  .info-row { display: flex; gap: 8px; margin-bottom: 5px; font-size: 12.5px; line-height: 1.5; }
+  .info-row .label { color: var(--text-tertiary); font-weight: 500; flex-shrink: 0; min-width: 46px; }
+  .info-row .value { color: var(--text-secondary); }
+  .info-row .value strong { color: var(--text-primary); font-weight: 600; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--divider); }
+  .tag { font-size: 10.5px; font-weight: 500; color: var(--text-secondary); background: var(--surface-secondary); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.25,0.1,0.25,1), padding 0.55s ease; padding: 0 24px; background: var(--surface-secondary); }
+  .card.expanded .card-detail { max-height: 2600px; padding: 18px 24px 22px; }
+  .detail-divider { height: 0.5px; background: var(--divider); margin-bottom: 14px; }
+  .detail-section { margin-bottom: 13px; }
+  .detail-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 4px; }
+  .detail-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+  .detail-text strong { color: var(--text-primary); font-weight: 600; }
+  .mini-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  .mini-table td { padding: 5px 7px; border-bottom: 0.5px solid var(--divider); color: var(--text-secondary); vertical-align: top; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table td:first-child { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; width: 44%; }
+  .mini-table tr:nth-child(even) td { background: var(--table-stripe); }
+  .expand-hint { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 0 14px; font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; transition: color 0.2s; }
+  .card:hover .expand-hint { color: var(--accent); }
+  .expand-hint svg { width: 9px; height: 9px; transition: transform 0.35s ease; }
+  .card.expanded .expand-hint svg { transform: rotate(180deg); }
+  .to-top { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 0.5px solid var(--divider); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: scale(1.08); background: var(--accent); border-color: var(--accent); }
+  .to-top:hover svg { stroke: #fff; }
+  .to-top svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+  .footer { text-align: center; padding: 48px 22px 72px; font-size: 12px; color: var(--text-tertiary); line-height: 1.9; }
+  .footer .copyright { margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--divider); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; padding: 12px 16px 36px; } .card-head { padding: 20px 20px 0; } .card-body { padding: 10px 20px 20px; } .card-detail { padding: 0 20px; } .card.expanded .card-detail { padding: 16px 20px 18px; } .hero { padding: 52px 18px 40px; } .hero-stats { gap: 24px; } .data-grid { grid-template-columns: 1fr; } .nav-links a { font-size: 10.5px; padding: 4px 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">🇺🇸 <span>堪萨斯州</span> · 深度档案</div>
+    <div class="nav-links">
+      <a href="#ks-overview">概览</a><a href="#ks-pop">人口</a><a href="#ks-econ">经济就业</a>
+      <a href="#ks-biz">企业与产业</a><a href="#ks-health">医疗</a><a href="#ks-safety">公共安全</a>
+      <a href="#ks-tax">税收财政</a><a href="#ks-trans">交通</a><a href="#ks-housing">住房</a>
+      <a href="#ks-climate">气候</a><a href="#ks-politics">政治政府</a><a href="#ks-edu">教育</a>
+      <a href="#ks-sports">体育</a><a href="#ks-media">媒体</a><a href="#ks-tourism">旅游</a>
+      <a href="#ks-energy">能源</a><a href="#ks-tech">科技</a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()"><svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-flag">🌻</div>
+  <h1>堪萨斯州<br><em>Kansas</em></h1>
+  <p class="subtitle">向日葵之州 · 航空制造之都 · Q3 GDP增速全美第1 · 农业强州</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>2,977,220</strong><span>人口 (2025)</span></div>
+    <div class="hero-stat"><strong>$230B</strong><span>GDP (2025)</span></div>
+    <div class="hero-stat"><strong>3.8%</strong><span>失业率 (2025.12)</span></div>
+    <div class="hero-stat"><strong>#1</strong><span>Q3 GDP增速全美</span></div>
+  </div>
+  <div class="hero-badges">
+    <span class="hero-badge green">💰 个税 <b>5.25%→4.0%</b> 递减</span>
+    <span class="hero-badge green">✈️ <b>全球航空之都</b>（威奇托）</span>
+    <span class="hero-badge orange">🔫 <b>宪法携带州</b></span>
+    <span class="hero-badge">🌾 <b>小麦全美第1</b></span>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- 1. 概览 -->
+  <div class="card" id="ks-overview" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">州概况<small>State Overview</small></div><div class="card-icon">📍</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">建州</span><span class="data-value">1861年1月29日</span></div>
+        <div class="data-item"><span class="data-label">州首府</span><span class="data-value">托皮卡</span></div>
+        <div class="data-item"><span class="data-label">最大城市</span><span class="data-value">威奇托</span></div>
+        <div class="data-item"><span class="data-label">面积</span><span class="data-value">213,096 km²</span></div>
+        <div class="data-item"><span class="data-label">州鸟</span><span class="data-value">西部野云雀</span></div>
+        <div class="data-item"><span class="data-label">州花</span><span class="data-value">野生向日葵</span></div>
+      </div>
+      <div class="info-row"><span class="label">昵称</span><span class="value">向日葵之州（The Sunflower State）</span></div>
+      <div class="info-row"><span class="label">州训</span><span class="value">"Ad Astra per Aspera"（循此苦旅，以达星辰）</span></div>
+      <div class="tags"><span class="tag">Midlands</span><span class="tag">Southern Great Plains</span><span class="tag">向日葵之州</span><span class="tag">航空之都</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">地理与文化定位</div><div class="detail-text">堪萨斯位于美国中西部，北接内布拉斯加，东邻密苏里，南界俄克拉荷马，西临科罗拉多。在 Colin Woodard 的文化分区中属于 <strong>Midlands</strong>——贵格会宽容、中庸、多元的中间地带。全州地势平坦，为美国地理中心（黎巴嫩镇）。<strong>威奇托</strong>被誉为“世界航空之都”，塞斯纳、比奇和庞巴迪 Learjet 均在此设厂。堪萨斯为全美小麦产量第 1 的州。</div></div>
+      <div class="detail-section"><div class="detail-label">历史节点</div><div class="detail-text">1541 年西班牙探险家科罗纳多抵达。1803 年作为路易斯安那购地一部分归美国。1854 年《堪萨斯-内布拉斯加法》引发“流血的堪萨斯”自由州与蓄奴州冲突。1861 年 1 月 29 日成为美国第 <strong>34 个州</strong>。20 世纪，威奇托崛起为全球航空制造中心。2025 年 Q3 实际 GDP 增速 <strong>6.5%</strong>，全美第 1。</div></div>
+    </div>
+  </div>
+
+  <!-- 2. 人口 -->
+  <div class="card" id="ks-pop" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">人口与社会<small>Population & Society</small></div><div class="card-icon">👥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">人口 (2025)</span><span class="data-value">2,977,220</span></div>
+        <div class="data-item"><span class="data-label">中位年龄</span><span class="data-value">~37 岁</span></div>
+        <div class="data-item"><span class="data-label">中位家庭收入</span><span class="data-value">$80,100</span></div>
+        <div class="data-item"><span class="data-label">人均收入</span><span class="data-value">$62,000</span></div>
+        <div class="data-item"><span class="data-label">贫困率</span><span class="data-value orange">11.3%</span></div>
+        <div class="data-item"><span class="data-label">外国出生</span><span class="data-value">7.2%</span></div>
+      </div>
+      <div class="info-row"><span class="label">种族</span><span class="value">白人 75.0% · 西语裔 13.0% · 黑人 6.1% · 亚裔 3.2%</span></div>
+      <div class="info-row"><span class="label">主要城市</span><span class="value">威奇托 397,000 · 欧弗兰帕克 · 堪萨斯城</span></div>
+      <div class="tags"><span class="tag">人口全美第35</span><span class="tag">西语裔占比13%</span><span class="tag">中位收入高于全美</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">人口结构深度</div><table class="mini-table">
+        <tr><td>总人口 (2025)</td><td><strong>2,977,220</strong>（全美第35）</td></tr>
+        <tr><td>中位年龄</td><td>~37 岁</td></tr>
+        <tr><td>白人占比</td><td>75.0%</td></tr>
+        <tr><td>西语裔占比</td><td>13.0%</td></tr>
+        <tr><td>黑人占比</td><td>6.1%</td></tr>
+        <tr><td>外国出生</td><td>7.2%</td></tr>
+        <tr><td>本科及以上</td><td>34.0%</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">收入与人口趋势</div><div class="detail-text">中位家庭收入 <strong>$80,100</strong>（2025），高于全美中位数。人均收入 <strong>$62,000</strong>。贫困率 <strong>11.3%</strong>，与全美平均持平。威奇托都会区集中全州约 <strong>13%</strong> 人口。堪萨斯失业率 <strong>3.8%</strong>（2025年12月），低于全美平均 <strong>4.4%</strong>。2025 年 Q3 实际 GDP 增速 <strong>6.5%</strong>，全美第 1，远超全美 4.4% 的增速。</div></div>
+    </div>
+  </div>
+
+  <!-- 3. 经济就业 -->
+  <div class="card" id="ks-econ" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">经济与就业<small>Economy & Employment</small></div><div class="card-icon">📊</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">GDP (2025)</span><span class="data-value">$230B</span></div>
+        <div class="data-item"><span class="data-label">GDP 增长 (Q3)</span><span class="data-value green">+6.5%</span></div>
+        <div class="data-item"><span class="data-label">失业率</span><span class="data-value green">3.8%</span></div>
+        <div class="data-item"><span class="data-label">CNBC 综合</span><span class="data-value">第33</span></div>
+        <div class="data-item"><span class="data-label">经济评级</span><span class="data-value red">F (第48)</span></div>
+        <div class="data-item"><span class="data-label">生活成本</span><span class="data-value green">B+ (第2)</span></div>
+      </div>
+      <div class="info-row"><span class="label">经济特征</span><span class="value">航空航天 · 农业 · 石油天然气 · 制造业</span></div>
+      <div class="info-row"><span class="label">航空航天</span><span class="value">威奇托为全球航空制造之都 · Spirit AeroSystems</span></div>
+      <div class="tags"><span class="tag">Q3 GDP增速全美第1</span><span class="tag">航空制造之都</span><span class="tag">生活成本第2低</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">经济表现 (CNBC 2025)</div><table class="mini-table">
+        <tr><td>GDP (2025)</td><td><strong>$230B</strong>（全美第34）</td></tr>
+        <tr><td>GDP 增速 (Q3 2025)</td><td><strong>+6.5%</strong>（全美第1）</td></tr>
+        <tr><td>失业率 (Dec 2025)</td><td><strong>3.8%</strong>（全美 4.4%）</td></tr>
+        <tr><td>CNBC 综合排名</td><td><strong>第33</strong>（从第29下降）</td></tr>
+        <tr><td>经济评级</td><td><strong>F</strong>（第48）</td></tr>
+        <tr><td>商业友好</td><td><strong>A-</strong>（第8）</td></tr>
+        <tr><td>生活成本</td><td><strong>B+</strong>（第2）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">经济结构</div><div class="detail-text">堪萨斯经济以<strong>航空航天制造</strong>为标志性产业——<strong>威奇托</strong>被誉为“世界航空之都”，塞斯纳（Cessna）、比奇（Beechcraft）、庞巴迪 Learjet 和 Spirit AeroSystems（波音 737 机身主要供应商）均在此设厂。农业（小麦全美第 1、牛、高粱）和石油天然气为传统支柱。<strong>Garmin</strong>（奥拉西，GPS 导航设备）为州内最大科技企业。2025 年 Q3 实际 GDP 增速 <strong>6.5%</strong>，全美第 1，但 CNBC 经济评级仍为 <strong>F</strong>，反映长期结构性挑战。</div></div>
+    </div>
+  </div>
+
+  <!-- 4. 企业产业 -->
+  <div class="card" id="ks-biz" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">企业与产业<small>Business & Industry</small></div><div class="card-icon">🏭</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">Fortune 500 总部</span><span class="data-value">4 家</span></div>
+        <div class="data-item"><span class="data-label">最大企业</span><span class="data-value">Seaboard</span></div>
+        <div class="data-item"><span class="data-label">航空制造</span><span class="data-value green">全球之都</span></div>
+        <div class="data-item"><span class="data-label">Spirit AeroSystems</span><span class="data-value">波音供应商</span></div>
+        <div class="data-item"><span class="data-label">Garmin</span><span class="data-value">GPS全球领导者</span></div>
+        <div class="data-item"><span class="data-label">小麦产量</span><span class="data-value green">全美第1</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级企业</span><span class="value">Seaboard · Spirit AeroSystems · Garmin · Koch Industries</span></div>
+      <div class="info-row"><span class="label">航空集群</span><span class="value">Wichita 为全球航空制造核心 · 数百家供应商</span></div>
+      <div class="tags"><span class="tag">Spirit波音供应商</span><span class="tag">Garmin GPS</span><span class="tag">Koch工业巨头</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">Fortune 500（2025）</div><table class="mini-table">
+        <tr><td>1. Seaboard (#237)</td><td>Merriam · 猪肉加工 · $97 亿</td></tr>
+        <tr><td>2. Spirit AeroSystems (#365)</td><td>威奇托 · 航空结构 · $62 亿</td></tr>
+        <tr><td>3. Garmin (#441)</td><td>Olathe · GPS 导航 · $52 亿</td></tr>
+        <tr><td>4. Koch Industries (#22)</td><td>威奇托 · 工业集团 · $1,250 亿</td></tr>
+        <tr><td>Compass Minerals</td><td>Overland Park · 盐与矿物质</td></tr>
+        <tr><td>Yellow Corp</td><td>Overland Park · 货运（已停运）</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">产业集聚</div><div class="detail-text"><strong>航空航天：</strong>威奇托为全球航空制造之都——Spirit AeroSystems 为波音 737 机身主要供应商，塞斯纳、比奇和庞巴迪 Learjet 均在此设厂。<strong>农业：</strong>堪萨斯为全美小麦产量第 1 的州，牛和高粱同样领先。<strong>石油天然气：</strong>堪萨斯为全美重要油气产区。<strong>科技：</strong>Garmin（Olathe）为全球 GPS 导航领导者。Koch Industries（威奇托）为全美最大私营企业之一，年营收超 <strong>$1,250 亿</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 5. 医疗 -->
+  <div class="card" id="ks-health" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">医疗健康<small>Healthcare</small></div><div class="card-icon">🏥</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">全州第1</span><span class="data-value">University of Kansas Hospital</span></div>
+        <div class="data-item"><span class="data-label">连续第1</span><span class="data-value green">16 年</span></div>
+        <div class="data-item"><span class="data-label">全州第2</span><span class="data-value">Stormont Vail</span></div>
+        <div class="data-item"><span class="data-label">全州第3</span><span class="data-value">AdventHealth Shawnee Mission</span></div>
+        <div class="data-item"><span class="data-label">全美专科排名</span><span class="data-value green">7 个</span></div>
+        <div class="data-item"><span class="data-label">威奇托第1</span><span class="data-value">Wesley Healthcare</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级医院</span><span class="value">KU Hospital 连续 16 年全州第1 · 7个全美专科排名</span></div>
+      <div class="info-row"><span class="label">威奇托</span><span class="value">Wesley Healthcare 全州第4 · 威奇托第1</span></div>
+      <div class="tags"><span class="tag">KU Hospital 16年全州第1</span><span class="tag">7个全美专科</span><span class="tag">Wesley威奇托第1</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">顶级医院（U.S. News 2025-26）</div><table class="mini-table">
+        <tr><td>1. University of Kansas Hospital</td><td>Kansas City · 连续16年全州第1 · 7个全美专科排名</td></tr>
+        <tr><td>2. Stormont Vail Hospital</td><td>Topeka · 全州第2</td></tr>
+        <tr><td>3. AdventHealth Shawnee Mission</td><td>Shawnee Mission · 全州第3</td></tr>
+        <tr><td>4. Wesley Healthcare</td><td>威奇托 · 全州第4 · 威奇托第1</td></tr>
+        <tr><td>5. Olathe Medical Center</td><td>Olathe · 全州前5</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">医疗体系特点</div><div class="detail-text"><strong>University of Kansas Hospital</strong> 连续 <strong>16 年</strong>被评为全州最佳医院，在 <strong>7 个</strong>成人专科中获全美排名，是堪萨斯城地区唯一获此殊荣的医院。U.S. News 评估了堪萨斯 <strong>150 家</strong>医院，<strong>4 家</strong>达到“最佳区域医院”标准。Wesley Healthcare（威奇托）为威奇托地区第 1，全州第 4。KU Hospital 的产科获 2025 年“最佳产科医院”评级。</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 公共安全 -->
+  <div class="card" id="ks-safety" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">公共安全 · 警察 · 消防<small>Public Safety</small></div><div class="card-icon">🚔</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">持枪法规</span><span class="data-value green">宪法携带州</span></div>
+        <div class="data-item"><span class="data-label">持枪年龄</span><span class="data-value">21岁+无需许可</span></div>
+        <div class="data-item"><span class="data-label">18-20岁</span><span class="data-value">可申请临时许可</span></div>
+        <div class="data-item"><span class="data-label">公开携枪</span><span class="data-value green">合法</span></div>
+        <div class="data-item"><span class="data-label">隐蔽携枪</span><span class="data-value green">合法</span></div>
+        <div class="data-item"><span class="data-label">2025立法</span><span class="data-value">HB 2052</span></div>
+      </div>
+      <div class="info-row"><span class="label">持枪法规</span><span class="value"><strong>宪法携带州</strong> · 21岁+无需许可 · 18-20岁可申请临时许可</span></div>
+      <div class="info-row"><span class="label">2025立法</span><span class="value">HB 2052 允许18-20岁获得临时隐蔽携枪许可 · 21岁后换标准许可</span></div>
+      <div class="tags"><span class="tag">宪法携带州</span><span class="tag">21岁+无需许可</span><span class="tag">HB 2052 临时许可</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">持枪法规</div><div class="detail-text">堪萨斯为<strong>宪法携带州</strong>，年满 <strong>21 岁</strong>且未被法律禁止持枪的居民可<strong>无需许可</strong>公开或隐蔽携带手枪。2025 年 <strong>HB 2052</strong> 允许 <strong>18-20 岁</strong>居民申请<strong>临时隐蔽携枪许可</strong>（需满足法定要求和申请程序），年满 21 岁后可申请转为标准许可。持枪率约 <strong>36%</strong>，高于全美平均。堪萨斯的枪支法律在中西部属于较宽松的类别。</div></div>
+    </div>
+  </div>
+
+  <!-- 7. 税收财政 -->
+  <div class="card" id="ks-tax" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">税收与财政<small>Tax & Fiscal</small></div><div class="card-icon">💰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">个人所得税</span><span class="data-value orange">5.25%→4.0%</span></div>
+        <div class="data-item"><span class="data-label">企业所得税</span><span class="data-value">6.5%</span></div>
+        <div class="data-item"><span class="data-label">州销售税</span><span class="data-value">6.5%</span></div>
+        <div class="data-item"><span class="data-label">食品销售税</span><span class="data-value green">0% (2025)</span></div>
+        <div class="data-item"><span class="data-label">房产税</span><span class="data-value red">~1.41%</span></div>
+        <div class="data-item"><span class="data-label">信用评级</span><span class="data-value">Aa2/AA-</span></div>
+      </div>
+      <div class="info-row"><span class="label">税改</span><span class="value">2025年食品销售税降至 0% · 个税目标降至 4.0%</span></div>
+      <div class="info-row"><span class="label">房产税</span><span class="value">州级房产税取消 · 有效税率 1.41%</span></div>
+      <div class="tags"><span class="tag">食品销售税0%</span><span class="tag">个税目标4.0%</span><span class="tag">房产税1.41%</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">税率明细（2025）</div><table class="mini-table">
+        <tr><td>个人所得税</td><td><strong>5.25%</strong> 统一（目标降至 4.0%）</td></tr>
+        <tr><td>企业所得税</td><td>6.5%</td></tr>
+        <tr><td>州销售税</td><td>6.5%</td></tr>
+        <tr><td>食品销售税</td><td><strong>0%</strong>（2025年1月1日起）</td></tr>
+        <tr><td>房产税</td><td><strong>1.41%</strong> 有效税率 · 州级房产税取消</td></tr>
+        <tr><td>汽油税</td><td>43.44 美分/加仑</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">税收结构分析</div><div class="detail-text">堪萨斯 2025 年实施重大税改——<strong>食品销售税降至 0%</strong>，取消州级房产税征收。个人所得税从累进税制转为 <strong>5.25% 统一税率</strong>（此前最高 5.7%），目标降至 <strong>4.0%</strong>。企业所得税 <strong>6.5%</strong>。房产税有效税率 <strong>1.41%</strong>，因取消州级征收而有所降低，但仍处于全美较高水平。州信用评级 <strong>Aa2/AA-</strong>。</div></div>
+    </div>
+  </div>
+
+  <!-- 8. 交通 -->
+  <div class="card" id="ks-trans" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">交通基础设施<small>Transportation</small></div><div class="card-icon">🛣️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公路里程</span><span class="data-value">25,000 英里</span></div>
+        <div class="data-item"><span class="data-label">铁路里程</span><span class="data-value">4,257 英里</span></div>
+        <div class="data-item"><span class="data-label">机场</span><span class="data-value">140 个</span></div>
+        <div class="data-item"><span class="data-label">铁路枢纽</span><span class="data-value green">全美第2</span></div>
+        <div class="data-item"><span class="data-label">Amtrak</span><span class="data-value">Southwest Chief</span></div>
+        <div class="data-item"><span class="data-label">Heartland Flyer</span><span class="data-value">延伸至威奇托</span></div>
+      </div>
+      <div class="info-row"><span class="label">航空</span><span class="value">威奇托为航空制造核心 · 140 个公共机场</span></div>
+      <div class="info-row"><span class="label">铁路</span><span class="value">全美第2大铁路枢纽 · 4,257 英里</span></div>
+      <div class="tags"><span class="tag">全美第2铁路枢纽</span><span class="tag">140个机场</span><span class="tag">Heartland Flyer延伸</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">航空</div><div class="detail-text">堪萨斯有 <strong>140 个</strong>公共机场。威奇托为全球航空制造核心，拥有多个机场服务航空产业。堪萨斯城国际机场（MCI）服务都会区。<strong>Build Kansas Fund</strong> 资助多个机场基础设施项目，包括 Taxilane 和跑道改进。</div></div>
+      <div class="detail-section"><div class="detail-label">铁路与公路</div><div class="detail-text"><strong>铁路：</strong>堪萨斯拥有 <strong>4,257 英里</strong>铁路，为全美第 2 大铁路枢纽。Amtrak Southwest Chief 每日经停托皮卡、牛顿、哈钦森、道奇城和加登城。<strong>Heartland Flyer 延伸</strong>项目（Newton-Wichita）已获 SB 125 资助，将连接威奇托至俄克拉荷马城和沃斯堡。<strong>公路：</strong>I-70 横穿（堪萨斯城-托皮卡-海斯-丹佛），I-35 纵贯（威奇托-堪萨斯城-得梅因），I-135 连接威奇托与萨利纳。KDOT 运营 <strong>25,000 英里</strong>公路。</div></div>
+    </div>
+  </div>
+
+  <!-- 9. 住房 -->
+  <div class="card" id="ks-housing" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">住房市场<small>Housing Market</small></div><div class="card-icon">🏠</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">中位销售价 (2025.10)</span><span class="data-value">$302,800</span></div>
+        <div class="data-item"><span class="data-label">年变化</span><span class="data-value orange">+6.1%</span></div>
+        <div class="data-item"><span class="data-label">中位房屋价值</span><span class="data-value">$194,100</span></div>
+        <div class="data-item"><span class="data-label">中位挂牌价</span><span class="data-value">$290,000</span></div>
+        <div class="data-item"><span class="data-label">全美中位价</span><span class="data-value">$440,000</span></div>
+        <div class="data-item"><span class="data-label">Overland Park</span><span class="data-value">$639,000</span></div>
+      </div>
+      <div class="info-row"><span class="label">住房成本</span><span class="value">中位价显著低于全美 · 可负担性良好</span></div>
+      <div class="info-row"><span class="label">趋势</span><span class="value">房价稳步上涨 · 2025年10月 +6.1%</span></div>
+      <div class="tags"><span class="tag">中位价$302K</span><span class="tag">低于全美$440K</span><span class="tag">Overland Park $639K</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">房价趋势</div><div class="detail-text">2025 年 10 月堪萨斯中位销售价 <strong>$302,800</strong>，同比上涨 <strong>6.1%</strong>。中位房屋价值 <strong>$194,100</strong>（2025），显著低于全美中位数。中位挂牌价约 <strong>$290,000</strong>。Overland Park 中位挂牌价 <strong>$639,000</strong>。Salina 中位挂牌价约 <strong>$209,500</strong>。堪萨斯房价在全美处于<strong>中低水平</strong>，可负担性良好。</div></div>
+      <div class="detail-section"><div class="detail-label">住房成本</div><table class="mini-table">
+        <tr><td>中位销售价 (2025.10)</td><td>$302,800</td></tr>
+        <tr><td>中位房屋价值</td><td>$194,100</td></tr>
+        <tr><td>中位挂牌价</td><td>$290,000</td></tr>
+        <tr><td>全美中位价</td><td>$440,000</td></tr>
+        <tr><td>Overland Park 中位价</td><td>$639,000</td></tr>
+        <tr><td>Salina 中位价</td><td>$209,500</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 10. 气候 -->
+  <div class="card" id="ks-climate" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">气候<small>Climate</small></div><div class="card-icon">🌡️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">2025年年均温</span><span class="data-value">58°F (+0.3°F)</span></div>
+        <div class="data-item"><span class="data-label">Wichita降水</span><span class="data-value green">40.45"</span></div>
+        <div class="data-item"><span class="data-label">冬季排名</span><span class="data-value red">34年最暖</span></div>
+        <div class="data-item"><span class="data-label">夏季湿度</span><span class="data-value red">极高</span></div>
+        <div class="data-item"><span class="data-label">8月降水</span><span class="data-value green">高于正常</span></div>
+        <div class="data-item"><span class="data-label">干旱</span><span class="data-value orange">区域性</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">冬季34年最暖 · 夏季湿度极高 · Wichita降水40.45"</span></div>
+      <div class="info-row"><span class="label">极端天气</span><span class="value">龙卷风 · 暴雪 · 洪水 · 干旱</span></div>
+      <div class="tags"><span class="tag">冬季34年最暖</span><span class="tag">夏季高湿度</span><span class="tag">龙卷风走廊</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">2025年气候</div><table class="mini-table">
+        <tr><td>气候类型</td><td>湿润大陆性（东部）/ 半干旱（西部）</td></tr>
+        <tr><td>Wichita 年均温 (2025)</td><td><strong>58°F</strong>（+0.3°F）</td></tr>
+        <tr><td>Wichita 年降水</td><td><strong>40.45 英寸</strong></td></tr>
+        <tr><td>冬季排名</td><td><strong>34 年最暖</strong>（K-State）</td></tr>
+        <tr><td>夏季</td><td>极度潮湿 · 6-7月 Nebraska 潮湿 · 8月 Kansas 多雨</td></tr>
+        <tr><td>春季</td><td>温暖开局 · 多个县进入前5暖</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">气候特征与极端天气</div><div class="detail-text">堪萨斯 2025 年<strong>冬季为 34 年最暖</strong>，夏季极度潮湿（尤其 Kansas、Nebraska 和 South Dakota）。Wichita 年降水 <strong>40.45 英寸</strong>，年均温 <strong>58°F</strong>。春季温暖开局，数十个县进入前 5 暖。8 月降水转向 Kansas，部分地区高于正常。极端天气包括龙卷风（位于龙卷风走廊核心）、暴雪、洪水和干旱。西部半干旱地区面临区域性干旱风险。</div></div>
+    </div>
+  </div>
+
+  <!-- 11. 政治政府 -->
+  <div class="card" id="ks-politics" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">政治与政府<small>Politics & Government</small></div><div class="card-icon">🏛️</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">州长</span><span class="data-value">Laura Kelly (D)</span></div>
+        <div class="data-item"><span class="data-label">州议会</span><span class="data-value">共和党多数</span></div>
+        <div class="data-item"><span class="data-label">参议员</span><span class="data-value">2 名共和党</span></div>
+        <div class="data-item"><span class="data-label">众议院</span><span class="data-value">4 席 · 全共和党</span></div>
+        <div class="data-item"><span class="data-label">政治倾向</span><span class="data-value red">红州</span></div>
+        <div class="data-item"><span class="data-label">Kelly支持率</span><span class="data-value green">47%</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">Kelly 起诉总检察长 Kobach · 州长-总检察长宪法权力争议</span></div>
+      <div class="info-row"><span class="label">2026年</span><span class="value">州长选举 · Kelly 任期限制</span></div>
+      <div class="tags"><span class="tag">红州</span><span class="tag">Kelly民主党州长</span><span class="tag">起诉Kobach</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">政府结构</div><div class="detail-text">堪萨斯为<strong>红州</strong>，但民主党州长 <strong>Laura Kelly</strong> 在共和党控制的议会中保持平衡。Kelly 是堪萨斯最受欢迎的政治人物，支持率 <strong>47%</strong>，高于州议会（34%）、特朗普和国会。2025 年，Kelly 向堪萨斯最高法院<strong>起诉</strong>共和党总检察长 <strong>Kris Kobach</strong>，指控其试图违宪阻止州长在州和联邦法院中决定堪萨斯最佳利益。Kobach 被视为 2026 年州长选举的共和党热门候选人。</div></div>
+    </div>
+  </div>
+
+  <!-- 12. 教育 -->
+  <div class="card" id="ks-edu" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">教育<small>Education</small></div><div class="card-icon">🎓</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">公校系统排名</span><span class="data-value">全美第27</span></div>
+        <div class="data-item"><span class="data-label">生均支出</span><span class="data-value">$16,210 (第39)</span></div>
+        <div class="data-item"><span class="data-label">数学成绩</span><span class="data-value">274</span></div>
+        <div class="data-item"><span class="data-label">阅读成绩</span><span class="data-value">255</span></div>
+        <div class="data-item"><span class="data-label">顶尖高中</span><span class="data-value green">Blue Valley 全美第76</span></div>
+        <div class="data-item"><span class="data-label">旗舰大学</span><span class="data-value">KU · K-State</span></div>
+      </div>
+      <div class="info-row"><span class="label">旗舰大学</span><span class="value"><strong>University of Kansas</strong> · <strong>Kansas State</strong> · Wichita State</span></div>
+      <div class="info-row"><span class="label">顶尖高中</span><span class="value">Blue Valley 全州第1 · 全美第76 · De Soto 全州第2</span></div>
+      <div class="tags"><span class="tag">公校全美第27</span><span class="tag">Blue Valley全美第76</span><span class="tag">KU旗舰</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">K-12 教育</div><div class="detail-text">堪萨斯公校系统全美<strong>第 27</strong>。生均支出 <strong>$16,210</strong>（全美第 39）。2024 年数学成绩 <strong>274</strong>，阅读 <strong>255</strong>。<strong>Blue Valley School District</strong> 为全州最佳学区，全美排名 <strong>第 76</strong>（共 10,561 个学区）。De Soto 学区全州第 2（全美前 4%），Olathe 全州第 3。<strong>Corinth Elementary</strong>（Prairie Village）为全州最佳小学，Shawnee Mission 学区有 6 所小学进入全州前 25。</div></div>
+      <div class="detail-section"><div class="detail-label">高等教育</div><table class="mini-table">
+        <tr><td>University of Kansas</td><td>Lawrence · 旗舰公立 · 篮球名校</td></tr>
+        <tr><td>Kansas State University</td><td>Manhattan · 农业与工程强</td></tr>
+        <tr><td>Wichita State University</td><td>威奇托 · 航空工程强</td></tr>
+        <tr><td>Washburn University</td><td>Topeka · 中西部前100</td></tr>
+        <tr><td>Emporia State · Pittsburg State</td><td>中西部前100</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 13. 体育 -->
+  <div class="card" id="ks-sports" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">体育<small>Sports</small></div><div class="card-icon">🏈</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">NCAA篮球</span><span class="data-value green">Kansas Jayhawks</span></div>
+        <div class="data-item"><span class="data-label">2025-26排名</span><span class="data-value">AP第19</span></div>
+        <div class="data-item"><span class="data-label">K-State</span><span class="data-value">Wildcats</span></div>
+        <div class="data-item"><span class="data-label">足球</span><span class="data-value">Sporting KC</span></div>
+        <div class="data-item"><span class="data-label">排球</span><span class="data-value green">KU Sweet 16</span></div>
+        <div class="data-item"><span class="data-label">棒球</span><span class="data-value green">KU NCAA锦标赛</span></div>
+      </div>
+      <div class="info-row"><span class="label">2025年亮点</span><span class="value">KU排球 Sweet 16 · 棒球 NCAA锦标赛（2014年以来首次）</span></div>
+      <div class="info-row"><span class="label">篮球</span><span class="value">Kansas Jayhawks 2025-26 AP第19 · Allen Fieldhouse</span></div>
+      <div class="tags"><span class="tag">Kansas篮球名校</span><span class="tag">KU排球Sweet 16</span><span class="tag">Sporting KC</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">大学体育</div><div class="detail-text"><strong>Kansas Jayhawks</strong> 为全美最著名的大学篮球品牌之一，2025-26 赛季 AP 排名第 <strong>19</strong>，主场 Allen Fieldhouse 为大学篮球圣地。2025 年，KU <strong>排球</strong>和<strong>足球</strong>均进入 NCAA Sweet 16，<strong>棒球</strong>自 2014 年以来首次进入 NCAA 锦标赛。Kansas State Wildcats 同为 Big 12 强队，足球和篮球均具竞争力。</div></div>
+      <div class="detail-section"><div class="detail-label">职业体育</div><table class="mini-table">
+        <tr><td>Sporting Kansas City</td><td>MLS 足球 · 2013和2017年MLS杯冠军</td></tr>
+        <tr><td>Kansas City Royals</td><td>MLB（密苏里州堪萨斯城）· 2015年世界大赛冠军</td></tr>
+        <tr><td>Kansas City Chiefs</td><td>NFL（密苏里州堪萨斯城）· 2023和2024年超级碗冠军</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- 14. 媒体 -->
+  <div class="card" id="ks-media" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">媒体<small>Media</small></div><div class="card-icon">📰</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">报纸数量</span><span class="data-value">151 家</span></div>
+        <div class="data-item"><span class="data-label">周报占比</span><span class="data-value">约 90%</span></div>
+        <div class="data-item"><span class="data-label">20年损失</span><span class="data-value red">~50 家</span></div>
+        <div class="data-item"><span class="data-label">新闻荒漠县</span><span class="data-value red">60%+</span></div>
+        <div class="data-item"><span class="data-label">Marion赔偿</span><span class="data-value green">$300万</span></div>
+        <div class="data-item"><span class="data-label">Kansas Reflector</span><span class="data-value">非营利新闻</span></div>
+      </div>
+      <div class="info-row"><span class="label">挑战</span><span class="value">60%+ 县仅一个或更少新闻来源 · 过去20年损失约50家报纸</span></div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">Marion 县就 2023 年报社突袭赔偿 $300万</span></div>
+      <div class="tags"><span class="tag">151家报纸</span><span class="tag">60%新闻荒漠</span><span class="tag">Marion赔偿$300万</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">主要媒体</div><table class="mini-table">
+        <tr><td>Wichita Eagle</td><td>威奇托 · 全州最大报纸</td></tr>
+        <tr><td>Kansas City Star</td><td>堪萨斯城都会区主要报纸</td></tr>
+        <tr><td>Topeka Capital-Journal</td><td>托皮卡主要报纸</td></tr>
+        <tr><td>Lawrence Journal-World</td><td>Lawrence 主要报纸</td></tr>
+        <tr><td>Kansas Reflector</td><td>非营利数字新闻</td></tr>
+        <tr><td>Marion County Record</td><td>2023年遭警方突袭 · 2025年获赔$300万</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">媒体生态</div><div class="detail-text">堪萨斯媒体面临<strong>严峻的新闻荒漠化危机</strong>——过去 20 年损失约 <strong>50 家</strong>报纸，超过 <strong>60%</strong> 的县仅有一个或更少新闻来源。全州有 <strong>151 家</strong>报纸，约 <strong>90%</strong> 为周报。许多小型家族报纸所有者面临退休，未来不确定。<strong>2025 年</strong>，Marion 县同意就 2023 年 8 月警方突袭 Marion County Record 报社赔偿超过 <strong>$300 万</strong>并道歉，该事件引发了对新闻自由的广泛关注。</div></div>
+    </div>
+  </div>
+
+  <!-- 15. 旅游 -->
+  <div class="card" id="ks-tourism" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">旅游<small>Tourism</small></div><div class="card-icon">🌻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">年游客</span><span class="data-value green">3,900万</span></div>
+        <div class="data-item"><span class="data-label">经济影响</span><span class="data-value green">$135亿</span></div>
+        <div class="data-item"><span class="data-label">直接支出</span><span class="data-value green">$84亿</span></div>
+        <div class="data-item"><span class="data-label">国际游客</span><span class="data-value">7.9万</span></div>
+        <div class="data-item"><span class="data-label">Dodge City</span><span class="data-value">西部牛仔文化</span></div>
+        <div class="data-item"><span class="data-label">Monument Rocks</span><span class="data-value">白垩纪奇观</span></div>
+      </div>
+      <div class="info-row"><span class="label">顶级景点</span><span class="value">Dodge City · Monument Rocks · Flint Hills · 威奇托</span></div>
+      <div class="info-row"><span class="label">2025年</span><span class="value">游客 <strong>3,900 万</strong> · 经济影响 <strong>$135 亿</strong></span></div>
+      <div class="tags"><span class="tag">Dodge City牛仔</span><span class="tag">Flint Hills草原</span><span class="tag">Monument Rocks</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">旅游经济（2025）</div><table class="mini-table">
+        <tr><td>游客总数</td><td><strong>3,900 万</strong>（2025）</td></tr>
+        <tr><td>经济影响</td><td><strong>$135 亿</strong></td></tr>
+        <tr><td>直接游客支出</td><td><strong>$84 亿</strong>（+2.6%）</td></tr>
+        <tr><td>国际游客</td><td><strong>7.9 万</strong>（2025）</td></tr>
+        <tr><td>2024年经济影响</td><td>$132 亿 · 3,790 万游客</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">顶级景点</div><div class="detail-text"><strong>Dodge City</strong> 为西部牛仔文化圣地（Boot Hill Museum）。<strong>Flint Hills</strong> 为北美现存最大的原生高草草原，风景驾车路线为经典公路旅行。<strong>Monument Rocks</strong> 为白垩纪地质奇观（《国家地理》列为“世界奇观”之一）。<strong>威奇托</strong>的航空博物馆和 Exploration Place 为航空文化地标。<strong>Tallgrass Prairie National Preserve</strong> 为独特草原保护区。<strong>Kansas Speedway</strong> 为 NASCAR 赛车场。</div></div>
+    </div>
+  </div>
+
+  <!-- 16. 能源 -->
+  <div class="card" id="ks-energy" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">能源<small>Energy</small></div><div class="card-icon">⚡</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">可再生占比</span><span class="data-value green">44%</span></div>
+        <div class="data-item"><span class="data-label">风电</span><span class="data-value green">主要可再生来源</span></div>
+        <div class="data-item"><span class="data-label">天然气</span><span class="data-value">7%</span></div>
+        <div class="data-item"><span class="data-label">Lambs Draw Solar</span><span class="data-value">270 MW</span></div>
+        <div class="data-item"><span class="data-label">Ninnescah Solar</span><span class="data-value">200 MW</span></div>
+        <div class="data-item"><span class="data-label">RNG项目</span><span class="data-value green">Reno County</span></div>
+      </div>
+      <div class="info-row"><span class="label">风电</span><span class="value">可再生（主要为风电）占发电量 <strong>44%</strong></span></div>
+      <div class="info-row"><span class="label">太阳能</span><span class="value">Lambs Draw 270 MW · Ninnescah Flats 200 MW（2026）</span></div>
+      <div class="tags"><span class="tag">可再生占比44%</span><span class="tag">风电主导</span><span class="tag">Lambs Draw 270MW</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">可再生能源</div><table class="mini-table">
+        <tr><td>可再生占比</td><td><strong>44%</strong>（主要为风电）</td></tr>
+        <tr><td>天然气发电</td><td>7%</td></tr>
+        <tr><td>Lambs Draw Solar</td><td>Decatur County · 270 MWac · 2025 PPA 签约</td></tr>
+        <tr><td>Ninnescah Flats Solar</td><td>Pratt County · 200 MW · 2026 投运</td></tr>
+        <tr><td>RNG 项目</td><td>Reno County · 填埋气转可再生天然气</td></tr>
+        <tr><td>风电潜力</td><td>全美最高之一 · 但地方反对增加</td></tr>
+      </table></div>
+      <div class="detail-section"><div class="detail-label">能源转型</div><div class="detail-text">堪萨斯可再生能源（主要为风电）已占发电量的 <strong>44%</strong>，天然气仅占 7%。<strong>Lambs Draw Solar</strong>（270 MW，Decatur County）2025 年签署 PPA，由一家美国大型企业购买 100% 电力输出和可再生能源证书。<strong>Ninnescah Flats Solar</strong>（200 MW，Pratt County）计划 2026 年投运。Reno County 启动填埋气转<strong>可再生天然气（RNG）</strong>项目。堪萨斯风电潜力全美最高之一，但近年地方反对和联邦政策不确定性增加。</div></div>
+    </div>
+  </div>
+
+  <!-- 17. 科技 -->
+  <div class="card" id="ks-tech" onclick="toggleCard(this)">
+    <div class="card-head"><div class="card-name">科技与创新<small>Technology & Innovation</small></div><div class="card-icon">💻</div></div>
+    <div class="card-body">
+      <div class="data-grid">
+        <div class="data-item"><span class="data-label">CNBC 科技</span><span class="data-value red">D (第34)</span></div>
+        <div class="data-item"><span class="data-label">ACCEL-KS资助</span><span class="data-value">16 家</span></div>
+        <div class="data-item"><span class="data-label">Geoprobe</span><span class="data-value green">年度出口商</span></div>
+        <div class="data-item"><span class="data-label">Kodion Energy</span><span class="data-value">AI变压器</span></div>
+        <div class="data-item"><span class="data-label">Ainstein</span><span class="data-value">雷达技术</span></div>
+        <div class="data-item"><span class="data-label">无人机</span><span class="data-value green">$300万拨款</span></div>
+      </div>
+      <div class="info-row"><span class="label">重点领域</span><span class="value">雷达技术 · AI能源 · 农业无人机 · 网络安全</span></div>
+      <div class="info-row"><span class="label">旗舰项目</span><span class="value">ACCEL-KS · 16家企业获概念验证资助</span></div>
+      <div class="tags"><span class="tag">Ainstein雷达</span><span class="tag">Kodion AI变压器</span><span class="tag">农业无人机$300万</span></div>
+    </div>
+    <div class="expand-hint">展开详情 <svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="card-detail">
+      <div class="detail-divider"></div>
+      <div class="detail-section"><div class="detail-label">科技创新生态</div><div class="detail-text">堪萨斯科技产业以<strong>雷达技术、AI能源和农业无人机</strong>为特色。<strong>ACCEL-KS</strong> 向 <strong>16 家</strong>企业提供概念验证资助，包括 620 Fab Co.（便携冷藏集装箱）、Authentiya（AI 教育工具）和 Citizen Journal（AI 新闻）。<strong>Geoprobe Systems</strong>（Salina）被评为 2025 年州长年度出口商，专注工程与环境钻探设备。<strong>Kodion Energy</strong>（Paola）开发 AI 驱动的变压器，监测电网性能并预防故障。<strong>Ainstein</strong>（Lawrence）专注雷达技术，服务航空航天、特种车辆和 IoT。<strong>Heinen Brothers Agra</strong>（Seneca）获 <strong>$300 万</strong>州拨款用于农业无人机。</div></div>
+      <div class="detail-section"><div class="detail-label">重点企业</div><table class="mini-table">
+        <tr><td>Geoprobe Systems</td><td>Salina · 环境钻探设备 · 2025年度出口商</td></tr>
+        <tr><td>Kodion Energy</td><td>Paola · AI 变压器 · 电网监测</td></tr>
+        <tr><td>Ainstein</td><td>Lawrence · 雷达技术 · 航空航天/IoT</td></tr>
+        <tr><td>Garmin</td><td>Olathe · GPS 导航全球领导者</td></tr>
+        <tr><td>Invary</td><td>网络安全 · KU 创新园</td></tr>
+        <tr><td>Phoreus Biotech</td><td>基因技术精准递送 · KU 创新园</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p><strong>堪萨斯州 · 深度档案</strong></p>
+  <p>数据来源：U.S. Census Bureau · Bureau of Economic Analysis · U.S. News & World Report · CNBC · Tax Foundation · Kansas Department of Labor · KDOT · Kansas Tourism</p>
+  <p>文化分区参考 Colin Woodard《American Nations》</p>
+  <div class="copyright">SLC.LEO &amp; PHOTAXIS LAB © 2026 · All Rights Reserved</div>
+</footer>
+<div class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 16 16"><path d="M8 12V3M3 8l5-5 5 5"/></svg></div>
+<script>
+  function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);updateThemeIcon(n);}
+  function updateThemeIcon(t){const i=document.getElementById('theme-icon');if(t==='dark'){i.innerHTML='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';}else{i.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}}
+  (function(){const s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);updateThemeIcon(s);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');updateThemeIcon('dark');}})();
+  function toggleCard(c){c.classList.toggle('expanded');}
+  const tt=document.getElementById('toTop');window.addEventListener('scroll',()=>{tt.classList.toggle('visible',window.scrollY>600);},{passive:true});
+  document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t){const o=60,top=t.getBoundingClientRect().top+window.pageYOffset-o;window.scrollTo({top,behavior:'smooth'});}});});
+</script>
+</body>
+</html>
