@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>喂鹈鹕 · 文件品尝机</title>
+<style>
+  :root{
+    --ink: #15151a;
+    --red: #ff3b3b;
+    --yellow: #ffe500;
+    --cream: #fff6dc;
+    --blue: #2ec4ff;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; margin:0; }
+
+  body{
+    display:grid;
+    place-items:center;
+    background:#111;
+    font-family: "PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    overflow:hidden;
+  }
+
+  .stage{
+    position:relative;
+    width: min(96vw, 118vh, 900px);
+    aspect-ratio: 4 / 3;
+    background: var(--cream);
+    border: 4px solid var(--ink);
+    border-radius: 10px;
+    overflow:hidden;
+    box-shadow: 12px 12px 0 var(--red), 24px 24px 0 var(--ink);
+    cursor: pointer;
+    user-select: none;
+    transition: box-shadow .25s;
+  }
+
+  .stage.is-dragover{
+    box-shadow: 12px 12px 0 var(--yellow), 24px 24px 0 var(--ink),
+                0 0 0 10px rgba(255,59,59,.35);
+  }
+
+  .stage::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: radial-gradient(var(--ink) 1.3px, transparent 1.3px);
+    background-size: 24px 24px;
+    opacity:.13;
+    pointer-events:none;
+    z-index: 0;
+  }
+
+  .scene{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    display:block;
+    z-index:1;
+  }
+
+  @keyframes idleBob{
+    0%,100%{ transform: translateY(0) rotate(0deg); }
+    50%    { transform: translateY(-5px) rotate(-.8deg); }
+  }
+  .pelican{
+    transform-box: view-box;
+    transform-origin: 340px 400px;
+    animation: idleBob 1.7s ease-in-out infinite;
+  }
+
+  @keyframes hairWave{
+    0%,100%{ transform: rotate(-5deg); }
+    50%    { transform: rotate(7deg); }
+  }
+  .hair{
+    transform-box: view-box;
+    transform-origin: 480px 95px;
+    animation: hairWave 1.1s ease-in-out infinite;
+  }
+
+  @keyframes happyBounce{
+    0%   { transform: translateY(0) rotate(0); }
+    25%  { transform: translateY(-32px) rotate(-4deg); }
+    45%  { transform: translateY(0) rotate(0); }
+    65%  { transform: translateY(-18px) rotate(3deg); }
+    100% { transform: translateY(0) rotate(0); }
+  }
+  .pelican.anim-happy{
+    animation: happyBounce .75s cubic-bezier(.28,.84,.42,1);
+  }
+
+  @keyframes shake{
+    0%,100%{ transform: translateX(0) rotate(0); }
+    20%    { transform: translateX(-9px) rotate(-3deg); }
+    40%    { transform: translateX(9px) rotate(3deg); }
+    60%    { transform: translateX(-7px) rotate(-2deg); }
+    80%    { transform: translateX(7px) rotate(2deg); }
+  }
+  .pelican.anim-shake{
+    animation: shake .42s ease-in-out 2;
+  }
+
+  @keyframes choke{
+    0%,100%{ transform: translateY(0) scale(1) rotate(0); }
+    25%    { transform: translateY(-6px) scale(1.04) rotate(-2deg); }
+    50%    { transform: translateY(4px) scale(.97) rotate(2.5deg); }
+    75%    { transform: translateY(-3px) scale(1.02) rotate(-1deg); }
+  }
+  .pelican.anim-choke{
+    animation: choke .34s ease-in-out 4;
+  }
+
+  @keyframes drinkSway{
+    0%,100%{ transform: translateY(0) rotate(0); }
+    50%    { transform: translateY(-4px) rotate(1.5deg); }
+  }
+  .pelican.anim-drink{
+    animation: drinkSway .48s ease-in-out 4;
+  }
+
+  @keyframes nibble{
+    0%,100%{ transform: translateY(0) rotate(0); }
+    30%    { transform: translateY(-5px) rotate(-1.2deg); }
+    60%    { transform: translateY(-2px) rotate(1.2deg); }
+  }
+  .pelican.anim-nibble{
+    animation: nibble .34s ease-in-out 4;
+  }
+
+  @keyframes headTilt{
+    0%,100%{ transform: rotate(0deg); }
+    30%    { transform: rotate(-14deg); }
+    70%    { transform: rotate(12deg); }
+  }
+  .pelican.anim-tilt{
+    animation: headTilt .5s ease-in-out 4;
+  }
+
+  @keyframes sway{
+    0%,100%{ transform: translateY(0) rotate(-3.5deg); }
+    50%    { transform: translateY(-5px) rotate(3.5deg); }
+  }
+  .pelican.anim-sway{
+    animation: sway .55s ease-in-out 6;
+  }
+
+  @keyframes stare{
+    0%,100%{ transform: translateY(0) rotate(0) scale(1); }
+    50%    { transform: translateY(3px) rotate(1deg) scale(1.012); }
+  }
+  .pelican.anim-stare{
+    animation: stare 1.3s ease-in-out 3;
+  }
+
+  @keyframes sigh{
+    0%   { transform: translateY(0) scale(1) rotate(0); }
+    30%  { transform: translateY(6px) scale(.96) rotate(0); }
+    55%  { transform: translateY(-4px) scale(1.03) rotate(-1.5deg); }
+    100% { transform: translateY(0) scale(1) rotate(0); }
+  }
+  .pelican.anim-sigh{
+    animation: sigh 1.4s ease-in-out;
+  }
+
+  .bubble{
+    position:absolute;
+    top: 6%;
+    left: 4%;
+    max-width: 56%;
+    padding: 14px 22px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 6px 6px 0 var(--red);
+    font-size: clamp(14px, 1.9vw, 21px);
+    font-weight: 900;
+    line-height: 1.45;
+    color: var(--ink);
+    opacity: 0;
+    transform: translateY(12px) scale(.92);
+    transition: opacity .22s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+    pointer-events: none;
+    z-index: 5;
+  }
+  .bubble.show{
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .hint{
+    position:absolute;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 11px 26px;
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 100px;
+    font-size: clamp(11px, 1.5vw, 15px);
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    white-space: nowrap;
+    transition: opacity .3s, transform .3s, background .2s;
+    pointer-events: none;
+    z-index: 4;
+    box-shadow: 0 5px 0 rgba(0,0,0,.18);
+  }
+  .hint.hidden{
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px);
+  }
+  .stage.is-dragover .hint{
+    background: var(--red);
+    color: #fff;
+    transform: translateX(-50%) scale(1.1);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <svg class="scene" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg"
+       role="img" aria-label="一只猎奇的鹈鹕">
+    <line x1="70" y1="542" x2="730" y2="542"
+          stroke="#15151a" stroke-width="3" stroke-linecap="round" opacity="0.3"/>
+    <ellipse cx="400" cy="547" rx="270" ry="12" fill="#15151a" opacity="0.07"/>
+
+    <g class="pelican" id="pelican">
+
+      <path d="M 295 382 L 280 535" stroke="#15151a" stroke-width="9"
+            stroke-linecap="round" fill="none"/>
+      <path d="M 358 382 L 374 535" stroke="#15151a" stroke-width="9"
+            stroke-linecap="round" fill="none"/>
+      <path d="M 248 536 L 312 536" stroke="#15151a" stroke-width="9"
+            stroke-linecap="round" fill="none"/>
+      <path d="M 342 536 L 406 536" stroke="#15151a" stroke-width="9"
+            stroke-linecap="round" fill="none"/>
+
+      <path d="M 235 300
+               C 215 222, 312 188, 372 207
+               C 438 227, 452 306, 418 350
+               C 384 392, 274 387, 247 345
+               C 237 330, 231 312, 235 300 Z"
+            fill="#ffffff" stroke="#15151a" stroke-width="7"
+            stroke-linejoin="round"/>
+
+      <path d="M 352 245 Q 308 287 348 332 Q 384 294 372 252 Z"
+            fill="none" stroke="#15151a" stroke-width="5"
+            stroke-linejoin="round" opacity="0.5"/>
+
+      <path d="M 375 285 Q 405 200 458 165"
+            fill="none" stroke="#15151a" stroke-width="50"
+            stroke-linecap="round"/>
+      <path d="M 375 285 Q 405 200 458 165"
+            fill="none" stroke="#ffffff" stroke-width="36"
+            stroke-linecap="round"/>
+
+      <g id="head">
+
+        <ellipse cx="485" cy="140" rx="52" ry="48"
+                 fill="#ffffff" stroke="#15151a" stroke-width="7"
+                 transform="rotate(8 485 140)"/>
+
+        <path d="M 522 148 Q 570 268 688 230 Q 734 202 752 165 L 522 148 Z"
+              fill="#f7d9b6" stroke="#15151a" stroke-width="6"
+              stroke-linejoin="round"/>
+
+        <path d="M 515 110 L 754 158 L 522 148 Z"
+              fill="#ecdfc8" stroke="#15151a" stroke-width="6"
+              stroke-linejoin="round"/>
+
+        <circle cx="602" cy="130" r="4" fill="#15151a" opacity="0.35"/>
+
+        <circle cx="470" cy="122" r="11"
+                fill="#ffffff" stroke="#15151a" stroke-width="5"/>
+        <circle id="pupilSmall" cx="470" cy="122" r="4" fill="#15151a"/>
+
+        <circle cx="508" cy="112" r="24"
+                fill="#ffffff" stroke="#15151a" stroke-width="5"/>
+        <circle id="pupilBig" cx="508" cy="112" r="11" fill="#15151a"/>
+
+        <g class="hair" stroke="#15151a" stroke-width="3.5"
+           fill="none" stroke-linecap="round">
+          <path d="M 458 98 Q 454 74 448 62"/>
+          <path d="M 472 94 Q 474 68 480 54"/>
+          <path d="M 486 96 Q 496 76 506 66"/>
+        </g>
+      </g>
+    </g>
+  </svg>
+
+  <div class="bubble" id="bubble"></div>
+  <div class="hint" id="hint">📎 拖文件喂鹈鹕 · 点一下也行</div>
+</div>
+
+<input type="file" id="fileInput" hidden>
+
+<script>
+/* =========================================================
+   基础
+========================================================= */
+const stage     = document.getElementById('stage');
+const bubble    = document.getElementById('bubble');
+const hint      = document.getElementById('hint');
+const pelican   = document.getElementById('pelican');
+const pupilS    = document.getElementById('pupilSmall');
+const pupilB    = document.getElementById('pupilBig');
+const fileInput = document.getElementById('fileInput');
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const pick  = arr => arr[Math.floor(Math.random() * arr.length)];
+const extOf = n => (n || '').toLowerCase().split('.').pop();
+
+/* =========================================================
+   拖拽 + 点击
+========================================================= */
+['dragenter','dragover'].forEach(evt => {
+  stage.addEventListener(evt, e => {
+    e.preventDefault(); e.stopPropagation();
+    stage.classList.add('is-dragover');
+  });
+});
+
+stage.addEventListener('dragleave', e => {
+  e.preventDefault();
+  if (!stage.contains(e.relatedTarget)) stage.classList.remove('is-dragover');
+});
+
+stage.addEventListener('drop', e => {
+  e.preventDefault(); e.stopPropagation();
+  stage.classList.remove('is-dragover');
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) feed(f);
+});
+
+stage.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) feed(fileInput.files[0]);
+  fileInput.value = '';
+});
+
+/* =========================================================
+   读文件
+========================================================= */
+function readFile(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(new Uint8Array(reader.result));
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+/* =========================================================
+   ZIP / DOCX / XLSX / PPTX 解析
+========================================================= */
+async function unzipEntry(bytes, targetName){
+  if (!(bytes[0]===0x50 && bytes[1]===0x4b && bytes[2]===0x03 && bytes[3]===0x04)) return null;
+
+  let eocd = -1;
+  const minPos = Math.max(0, bytes.length - 65558);
+  for (let i = bytes.length - 22; i >= minPos; i--){
+    if (bytes[i]===0x50 && bytes[i+1]===0x4b && bytes[i+2]===0x05 && bytes[i+3]===0x06){
+      eocd = i; break;
+    }
+  }
+  if (eocd < 0) return null;
+
+  const cdCount = bytes[eocd+10] | (bytes[eocd+11]<<8);
+  const cdOff   = (bytes[eocd+16] | (bytes[eocd+17]<<8) |
+                   (bytes[eocd+18]<<16) | (bytes[eocd+19]<<24)) >>> 0;
+
+  let p = cdOff;
+  for (let i = 0; i < cdCount; i++){
+    if (!(bytes[p]===0x50 && bytes[p+1]===0x4b && bytes[p+2]===0x01 && bytes[p+3]===0x02)) return null;
+
+    const method    = bytes[p+10] | (bytes[p+11]<<8);
+    const compSize  = (bytes[p+20] | (bytes[p+21]<<8) |
+                       (bytes[p+22]<<16) | (bytes[p+23]<<24)) >>> 0;
+    const nameLen   = bytes[p+28] | (bytes[p+29]<<8);
+    const extraLen  = bytes[p+30] | (bytes[p+31]<<8);
+    const cmtLen    = bytes[p+32] | (bytes[p+33]<<8);
+    const localOff  = (bytes[p+42] | (bytes[p+43]<<8) |
+                       (bytes[p+44]<<16) | (bytes[p+45]<<24)) >>> 0;
+    const name      = new TextDecoder('utf-8').decode(bytes.subarray(p+46, p+46+nameLen));
+
+    if (name === targetName){
+      const lNameLen  = bytes[localOff+26] | (bytes[localOff+27]<<8);
+      const lExtraLen = bytes[localOff+28] | (bytes[localOff+29]<<8);
+      const dataStart = localOff + 30 + lNameLen + lExtraLen;
+      const compData  = bytes.subarray(dataStart, dataStart + compSize);
+
+      if (method === 0) return compData;
+      if (method === 8){
+        if (typeof DecompressionStream === 'undefined') return null;
+        try {
+          const ds = new DecompressionStream('deflate-raw');
+          const w  = ds.writable.getWriter();
+          w.write(compData); w.close();
+          const reader = ds.readable.getReader();
+          const chunks = [];
+          while (true){
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+          }
+          const total = chunks.reduce((s,c) => s + c.length, 0);
+          const out = new Uint8Array(total);
+          let off = 0;
+          for (const c of chunks){ out.set(c, off); off += c.length; }
+          return out;
+        } catch { return null; }
+      }
+      return null;
+    }
+    p += 46 + nameLen + extraLen + cmtLen;
+  }
+  return null;
+}
+
+function decodeXmlEntities(s){
+  return s
+    .replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&quot;/g,'"').replace(/&apos;/g,"'")
+    .replace(/&amp;/g,'&');
+}
+
+function xmlToText(xml){
+  return decodeXmlEntities(
+    xml
+      .replace(/<w:p[^>]*\/?>/g, '\n')
+      .replace(/<w:br[^>]*\/?>/g, '\n')
+      .replace(/<w:tab[^>]*\/?>/g, '\t')
+      .replace(/<[^>]+>/g, '')
+  )
+  .replace(/[ \t]+\n/g, '\n')
+  .replace(/\n{3,}/g, '\n\n')
+  .trim();
+}
+
+async function extractDocxText(bytes){
+  const xml = await unzipEntry(bytes, 'word/document.xml');
+  if (!xml || !xml.length) return null;
+  return xmlToText(new TextDecoder('utf-8', {fatal:false}).decode(xml));
+}
+
+async function extractXlsxText(bytes){
+  // sharedStrings.xml: 所有字符串
+  const sharedXml = await unzipEntry(bytes, 'xl/sharedStrings.xml');
+  let parts = [];
+  if (sharedXml && sharedXml.length){
+    const s = new TextDecoder('utf-8', {fatal:false}).decode(sharedXml);
+    const re = /<t[^>]*>([\s\S]*?)<\/t>/g;
+    let m;
+    while ((m = re.exec(s))) parts.push(decodeXmlEntities(m[1]));
+  }
+  // sheet1.xml 里的数字单元格
+  const sheetXml = await unzipEntry(bytes, 'xl/worksheets/sheet1.xml');
+  if (sheetXml && sheetXml.length){
+    const s = new TextDecoder('utf-8', {fatal:false}).decode(sheetXml);
+    const re = /<v>([\s\S]*?)<\/v>/g;
+    let m;
+    while ((m = re.exec(s))) parts.push(m[1]);
+  }
+  if (!parts.length) return null;
+  return parts.join('\n');
+}
+
+/* =========================================================
+   PDF 文本提取（简化版：解压 FlateDecode，抓 Tj / TJ）
+========================================================= */
+async function tryInflate(data, raw){
+  if (typeof DecompressionStream === 'undefined') return null;
+  try {
+    const ds = new DecompressionStream(raw ? 'deflate-raw' : 'deflate');
+    const w  = ds.writable.getWriter();
+    w.write(data); w.close();
+    const reader = ds.readable.getReader();
+    const chunks = [];
+    while (true){
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+    const total = chunks.reduce((s,c) => s + c.length, 0);
+    const out = new Uint8Array(total);
+    let off = 0;
+    for (const c of chunks){ out.set(c, off); off += c.length; }
+    return out;
+  } catch { return null; }
+}
+
+function pdfStreamsToText(streamBytes){
+  const latin = new TextDecoder('latin1').decode(streamBytes);
+  let out = '';
+
+  // (text) Tj
+  const reTj = /\(((?:\\.|[^\\()])*)\)\s*Tj/g;
+  let m;
+  while ((m = reTj.exec(latin))){
+    out += m[1].replace(/\\([()\\])/g, '$1') + '\n';
+  }
+
+  // [(a) -100 (b)] TJ
+  const reTJ = /\[([^\]]*)\]\s*TJ/g;
+  while ((m = reTJ.exec(latin))){
+    const inner = m[1];
+    const strRe = /\(((?:\\.|[^\\()])*)\)/g;
+    let s;
+    while ((s = strRe.exec(inner))){
+      out += s[1].replace(/\\([()\\])/g, '$1');
+    }
+    out += '\n';
+  }
+  return out;
+}
+
+async function extractPdfText(bytes){
+  let collected = '';
+  let pos = 0;
+
+  while (pos < bytes.length){
+    const idx = indexOfSeq(bytes, [0x73,0x74,0x72,0x65,0x61,0x6d], pos); // "stream"
+    if (idx < 0) break;
+
+    let start = idx + 6;
+    if (bytes[start] === 0x0D) start++;
+    if (bytes[start] === 0x0A) start++;
+
+    const endIdx = indexOfSeq(bytes, [0x65,0x6e,0x64,0x73,0x74,0x72,0x65,0x61,0x6d], start);
+    if (endIdx < 0) break;
+
+    let end = endIdx;
+    while (end > start && (bytes[end-1] === 0x0A || bytes[end-1] === 0x0D)) end--;
+
+    const raw = bytes.subarray(start, end);
+
+    // 优先试 FlateDecode
+    let decompressed = null;
+    if (raw.length > 0){
+      decompressed = await tryInflate(raw, false);
+    }
+    if (decompressed){
+      collected += pdfStreamsToText(decompressed);
+    } else {
+      // 尝试直接读取
+      collected += pdfStreamsToText(raw);
+    }
+
+    if (collected.length > 200000) break;   // 防止过大
+    pos = endIdx + 9;
+  }
+
+  collected = collected.replace(/\u0000/g, '').trim();
+  return collected.length >= 30 ? collected : null;
+}
+
+function indexOfSeq(buf, seq, from){
+  outer: for (let i = from; i <= buf.length - seq.length; i++){
+    for (let j = 0; j < seq.length; j++){
+      if (buf[i+j] !== seq[j]) continue outer;
+    }
+    return i;
+  }
+  return -1;
+}
+
+/* =========================================================
+   CSV / TSV / 纯文本
+========================================================= */
+function decodeText(bytes){
+  let text;
+  try {
+    text = new TextDecoder('utf-8', {fatal:false}).decode(bytes);
+  } catch { return null; }
+  const bad = (text.match(/\uFFFD/g) || []).length;
+  if (bad > 10 && bad / text.length > 0.03) return null;
+  return text;
+}
+
+/* =========================================================
+   分类器（打分制，取最高且 ≥ 阈值）
+========================================================= */
+const CLS = {};
+
+CLS.code = {
+  test(text){
+    let s = 0;
+    if (/^\s*(?:import|from|const|let|var|function|class|def|public|private|#include|package)\b/m.test(text)) s += 0.45;
+    if (/[{};]\s*$/m.test(text)) s += 0.15;
+    if (/(?:\/\/|#|\/\*|--)\s/.test(text)) s += 0.15;
+    if (/=>|::|->|\+\+|===|!==/.test(text)) s += 0.15;
+    if (/\b(?:if|else|for|while|return|try|catch)\s*[({]/.test(text)) s += 0.15;
+    const sym = (text.match(/[{};()=<>[\]]/g) || []).length / Math.max(1, text.length);
+    if (sym > 0.08) s += 0.15;
+    return Math.min(1, s);
+  }
+};
+
+CLS.chat = {
+  test(text){
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 6) return 0;
+
+    let s = 0;
+    // 时间戳行首
+    const timeLines = lines.filter(l => /^\s*[\[\(]?\d{1,2}:\d{2}/.test(l)).length;
+    if (timeLines / lines.length > 0.3) s += 0.35;
+
+    // 昵称：内容
+    const nickLines = lines.filter(l => /^.{1,22}[:：]\s?\S/.test(l) &&
+                                          !/\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(l)).length;
+    if (nickLines / lines.length > 0.35) s += 0.30;
+
+    // 平均行长短
+    const avgLen = lines.reduce((a,l) => a + l.length, 0) / lines.length;
+    if (avgLen < 32) s += 0.20;
+
+    // 口语词
+    const oral = (text.match(/哈哈|嗯嗯|哦哦|卧槽|草|啊这|233|hhh|呜呜|诶|诶嘿|咋|啥|捏|酱紫/g) || []).length;
+    if (oral / lines.length > 0.05) s += 0.20;
+
+    return Math.min(1, s);
+  }
+};
+
+CLS.contract = {
+  test(text){
+    let s = 0;
+    if (/甲方|乙方|丙方|丁方/.test(text))                    s += 0.30;
+    if (/本合同|本协议|协议书|合同编号|协议编号/.test(text))  s += 0.25;
+    if (/违约责任|赔偿|损失|争议|管辖|仲裁|诉讼/.test(text))  s += 0.20;
+    if (/兹|特此|鉴于|立约|订立/.test(text))                  s += 0.15;
+    if (/法定代表人|盖章|签字|签章|授权代表/.test(text))      s += 0.15;
+    const arts = (text.match(/第[一二三四五六七八九十百零0-9]+条/g) || []).length;
+    if (arts >= 3) s += 0.20;
+    return Math.min(1, s);
+  }
+};
+
+CLS.tech = {
+  test(text){
+    let s = 0;
+    if (/\bAPI\b|\bSDK\b|\bHTTP\b|\bJSON\b|\bXML\b|\bREST\b|接口|参数|配置|依赖/.test(text)) s += 0.25;
+    if (/安装|部署|编译|构建|运行|环境变量|版本号/.test(text)) s += 0.20;
+    if (/函数|方法|类|模块|组件|变量|对象|实例/.test(text)) s += 0.20;
+    if (/示例|用法|调用|请求|响应|返回值|文档/.test(text)) s += 0.15;
+    // 英文密度
+    const en = (text.match(/[A-Za-z]/g) || []).length / Math.max(1, text.length);
+    if (en > 0.25 && en < 0.7) s += 0.20;
+    return Math.min(1, s);
+  }
+};
+
+CLS.study = {
+  test(text){
+    let s = 0;
+    if (/知识点|考点|重点|难点|易错|必背/.test(text)) s += 0.30;
+    if (/复习|背诵|笔记|习题|练习|解析|答案|例题/.test(text)) s += 0.25;
+    if (/定义|定理|公式|概念|性质|结论/.test(text)) s += 0.20;
+    if (/(?:^|\n)\s*(?:[（(]?\d+[）)、.]|[一二三四五六七八九十]+[、.])\s*\S/.test(text)) s += 0.15;
+    const q = (text.match(/[？?]/g) || []).length;
+    if (q >= 5) s += 0.10;
+    return Math.min(1, s);
+  }
+};
+
+CLS.quarterly = {
+  test(text){
+    let s = 0;
+    if (/季度|Q[1-4]\b|财年|年度|月度|本季/.test(text)) s += 0.30;
+    if (/同比|环比|增长|下降|上升|回落/.test(text))     s += 0.25;
+    if (/完成率|达成|累计|占比|目标值/.test(text))       s += 0.20;
+    if (/总结|复盘|回顾/.test(text))                     s += 0.10;
+    // 数字/百分号密度
+    const num = (text.match(/\d+(?:\.\d+)?%?/g) || []).length / Math.max(1, text.length/20);
+    if (num > 0.6) s += 0.20;
+    return Math.min(1, s);
+  }
+};
+
+CLS.proposal = {
+  test(text){
+    let s = 0;
+    if (/方案|规划|计划|策划|实施/.test(text)) s += 0.25;
+    if (/目标|阶段|里程碑|节点|进度|排期/.test(text)) s += 0.20;
+    if (/建议|思路|策略|打法|抓手|落地/.test(text)) s += 0.20;
+    if (/PPT|演示|宣讲|展示/.test(text)) s += 0.15;
+    if (/(?:^|\n)\s*\d+[\.、)]\s*\S/m.test(text)) s += 0.15;
+    return Math.min(1, s);
+  }
+};
+
+CLS.data = {
+  test(text){
+    let s = 0;
+    const digits = (text.match(/\d/g) || []).length / Math.max(1, text.length);
+    if (digits > 0.18) s += 0.35;
+    if (/[,\t;]\s*-?\d/.test(text)) s += 0.20;
+    if (/合计|总计|平均|小计|汇总|count|sum|total/i.test(text)) s += 0.25;
+    if (/\d+\.\d+%|%/.test(text)) s += 0.15;
+    // 表格分隔符密度
+    const tbl = (text.match(/[,\t|]/g) || []).length / Math.max(1, text.split('\n').length);
+    if (tbl > 1.5) s += 0.20;
+    return Math.min(1, s);
+  }
+};
+
+CLS.literature = {
+  test(text){
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 12) return 0;
+
+    let s = 0;
+    const cjk = (text.match(/[\u4e00-\u9fa5]/g) || []).length / Math.max(1, text.length);
+    if (cjk > 0.55) s += 0.30;
+
+    const quotes = (text.match(/["""「」『』]/g) || []).length / lines.length;
+    if (quotes > 0.18) s += 0.25;
+
+    if (/第[一二三四五六七八九十百零0-9]+[章节回卷]|序章|楔子|尾声/.test(text)) s += 0.25;
+
+    const punct = (text.match(/[。！？!?…]/g) || []).length / Math.max(1, text.length);
+    if (punct > 0.02) s += 0.15;
+
+    // 平均行长
+    const avgLen = lines.reduce((a,l) => a + l.length, 0) / lines.length;
+    if (avgLen > 22) s += 0.10;
+
+    return Math.min(1, s);
+  }
+};
+
+function classifyText(text, fileName){
+  const charCount = text.length;
+  const lineCount = text.split(/\r?\n/).length;
+
+  // 代码优先（扩展名 + 内容特征）
+  const codeExts = ['md','html','htm','js','jsx','ts','tsx','css','scss',
+                    'py','java','c','cpp','h','go','rs','php','rb','swift',
+                    'kt','sql','json','xml','yml','yaml','sh','bat','vue',
+                    'svelte','toml','ini'];
+  const ext = extOf(fileName);
+  let kind = null, best = 0;
+
+  if (codeExts.includes(ext)){ kind = 'code'; best = 1; }
+
+  for (const [k, c] of Object.entries(CLS)){
+    if (k === 'code' && kind === 'code') continue;
+    let sc = 0;
+    try { sc = c.test(text); } catch { sc = 0; }
+    if (sc > best){ best = sc; kind = k; }
+  }
+
+  // 阈值：0.5 以上才认定
+  if (best < 0.5) kind = null;
+
+  // 兜底：通用分析
+  if (!kind){
+    const repetition = repetitionScore(text);
+    const order      = orderlinessScore(text);
+    if (repetition > 0.5){
+      kind = repetition > 0.8 ? 'water' : 'drink';
+    } else if (order < 0.32){
+      kind = 'chaos';
+    } else if (charCount < 400){
+      kind = 'dessert';
+    } else if (charCount > 12000){
+      kind = 'feast';
+    } else if (order > 0.62){
+      kind = 'goodDish';
+    } else {
+      kind = 'meh';
+    }
+  }
+  return { kind };
+}
+
+/* =========================================================
+   基础统计（兜底用）
+========================================================= */
+function repetitionScore(text){
+  const lines = text.split(/\r?\n/);
+  let maxRun = 1, cur = 1;
+  for (let i = 1; i < lines.length; i++){
+    if (lines[i] === lines[i-1] && lines[i].trim()){
+      cur++;
+      if (cur > maxRun) maxRun = cur;
+    } else cur = 1;
+  }
+  const lineRun = lines.length > 1 ? maxRun / lines.length : 0;
+
+  const freq = {}; let total = 0;
+  lines.forEach(l => { if (l.trim()){ freq[l] = (freq[l]||0)+1; total++; } });
+  const maxFreq = total ? Math.max(...Object.values(freq)) / total : 0;
+
+  const chars = text.replace(/\s/g,'');
+  let maxChar = 0, c = 1;
+  for (let i = 1; i < chars.length; i++){
+    if (chars[i] === chars[i-1]) c++;
+    else { if (c > maxChar) maxChar = c; c = 1; }
+  }
+  if (c > maxChar) maxChar = c;
+  const charRun = chars.length ? Math.min(1, maxChar/60) : 0;
+
+  return Math.max(lineRun*1.15, maxFreq*0.8, charRun);
+}
+
+function orderlinessScore(text){
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return 0.5;
+  const lens = lines.map(l => l.length);
+  const mean = lens.reduce((a,b) => a+b, 0) / lens.length;
+  const std  = Math.sqrt(lens.reduce((s,l) => s + (l-mean)**2, 0) / lens.length);
+  const cv   = mean > 0 ? std/mean : 1;
+  const lenScore = Math.max(0, Math.min(1, 1 - (cv - 0.3)/1.25));
+
+  const indentFreq = {};
+  lines.forEach(l => {
+    const m = l.match(/^[ \t]*/)[0].replace(/\t/g,'  ');
+    const b = Math.round(m.length/2);
+    indentFreq[b] = (indentFreq[b]||0)+1;
+  });
+  const indentScore = Math.max(...Object.values(indentFreq)) / lines.length;
+
+  const endFreq = {};
+  lines.forEach(l => {
+    const m = l.trimEnd().match(/([^\w\s])$/);
+    const e = m ? m[1] : '∅';
+    endFreq[e] = (endFreq[e]||0)+1;
+  });
+  const punctScore = Math.max(...Object.values(endFreq)) / lines.length;
+
+  return lenScore*0.5 + indentScore*0.25 + punctScore*0.25;
+}
+
+/* =========================================================
+   台词
+========================================================= */
+const LINES = {
+  empty: [
+    '你喂我一口西北风？',
+    '空的……这是空气味儿的？',
+    '零字节。好家伙，减肥餐是吧。',
+    '我怀疑你在逗我。'
+  ],
+  notfood: [
+    '呕——这什么鬼东西！',
+    '0和1做的压缩饼干？咽不下。',
+    '你把我当垃圾桶了是吧？',
+    '救命，我的喉囊在报警。'
+  ],
+  chaos: [
+    '呕——这是英国菜吗？',
+    '你这文件是拿脚打的吧？',
+    '一堆乱码糊在一起，厨师呢？',
+    '叫你们厨师出来，我要投诉。'
+  ],
+  dessert: ['小甜点，勉强塞牙缝。','精致，但不够吃啊。','开胃小菜，好评。'],
+  goodDish: ['嗯——米其林三星。','摆盘精致，火候刚好。','这才是正经饭，谢谢款待。'],
+  meh:     ['还行吧，家常菜水平。','凑合，给个及格分。','像食堂，饱是饱了，没什么灵魂。'],
+  feast:   ['好家伙，这是满汉全席啊！','量大管饱，良心商家。','我喉囊都快装不下了。'],
+  drink:   ['咕嘟咕嘟……这不就是白开水吗？','重复得我怀疑你在给我灌水。','喝是喝了，就是没什么味道。'],
+  water:   ['蒸馏水？一点味道都没有。','我喝了半天，喝了个寂寞。','复读机成精，建议送修。'],
+
+  image: [
+    '这是画？我尝不出颜色啊。',
+    '像素太多了，硌牙。',
+    '你喂我一张图？我又不能吃像素。',
+    '构图不错，但我饿。'
+  ],
+  audio: [
+    '动次打次，我这脖子自己动起来了。',
+    '这歌不错，可惜咽不下去。',
+    '音乐我收了，营养你拿走。',
+    '耳朵饱了，肚子还饿着。'
+  ],
+  video: [
+    '你让我看电影？我还得骑车呢。',
+    '一帧一帧的，我吃不过来。',
+    '视频？我这鹈鹕没耐心，快进。',
+    '你放视频不给我爆米花？'
+  ],
+  slide: [
+    '一页一页翻，我骑车的工夫都看完了。',
+    '动画效果太多了，我眼睛都花了。',
+    '最后一页是不是“谢谢聆听”？',
+    '一看就是改到半夜的，辛苦了。'
+  ],
+  sheet: [
+    '满屏的 #REF! 和 #VALUE!',
+    '这表格比我命还长。',
+    '冻结窗格？我想冻结这个文件。',
+    '行数太多了，我的脖子转不过来。'
+  ],
+  officeDoc: [
+    '排版这么密，眼睛疼。',
+    '红色批注，改了八遍了吧？',
+    '这一页一页的，全是血汗啊。',
+    '我建议你保存一下，别又白改了。'
+  ],
+
+  /* ===== 九大精细分类 ===== */
+  contract: [
+    '甲方乙方……我是哪方？',
+    '字我都认识，但连起来像咒语。',
+    '这玩意儿是不是要按手印？我不签。',
+    '违约责任……等等，是我违约吗？',
+    '第X条、第Y款，看得我头晕。',
+    '盖个章就行了吧？我爪印可以吗。',
+    '我总感觉这文件里藏着卖身契。',
+    '看不太懂，但感觉很吓人。'
+  ],
+
+  tech: [
+    '参数、接口、配置……外星文吧？',
+    '这玩意儿像鱼刺，扎喉囊。',
+    '我看不懂，但我大受震撼。',
+    '括号配对了吗？我强迫症犯了。',
+    '版本号这么多，是几胞胎？',
+    '一堆英文夹中文，我的脑子跟不上。',
+    '文档说“参见上一节”，我上哪找？',
+    '这东西看起来能跑，但我不敢吃。'
+  ],
+
+  proposal: [
+    '方案方案方案，你才像方案。',
+    '目标是这个，抓手是那个……抓手能吃吗？',
+    '我看这排版挺好看的，就是不懂。',
+    '能不能说人话？我鹈鹕听不懂黑话。',
+    '里程碑？我连石头都没见过。',
+    '“赋能”是什么意思，是给我加餐吗？',
+    '这文件长得好正经，我不配。',
+    '一句话里八个新词，消化不良。'
+  ],
+
+  quarterly: [
+    '全是数字，我看得头晕。',
+    '增长增长，我的工资怎么不增长。',
+    '同比环比，我来回比，比昏了。',
+    '完成率百分之多少？我算不过来。',
+    '数字太多了，我喉囊都装不下。',
+    '这曲线画得挺好看的，就是没看懂。',
+    '目标是达成了，那我可以吃了吗？',
+    '一页百分之八十是数字，剩下的是叹气。'
+  ],
+
+  study: [
+    '要考试了吗？我好慌。',
+    '重点？我全身上下没有重点。',
+    '这题我不会，下一题。',
+    '知识点密密麻麻，像一锅粥。',
+    '复习资料？我复习不了一点。',
+    '答案在哪？我找不到。',
+    '公式这么多，是不是要把我算死。',
+    '我怀疑我读完会变聪明，但我不想读。'
+  ],
+
+  literature: [
+    '密密麻麻的，像一群蚂蚁。',
+    '字太多了，我眼睛疼。',
+    '文盲不配看这个。',
+    '这画的是什么符？我一个字都不认识。',
+    '字我都认识，连起来就不认识了。',
+    '你是不是想让我读书？我连字都不识。',
+    '这故事好听，可惜我读不来。',
+    '你一页一页念，我脑子装不下。'
+  ],
+
+  chat: [
+    '这个我看得懂！（骄傲）',
+    '谁跟谁啊？快让我八卦一下。',
+    '就这？就这？再聊点别的。',
+    '这句是骂人的吗？我要不要躲。',
+    '短句多，我喜欢，好消化。',
+    '这聊天记录我能连吃三碗。',
+    '你们聊得挺嗨，能带我一个吗？',
+    '这个字我认识！这个我也认识！'
+  ],
+
+  code: [
+    '这鱼头怎么全戳出来了？死不瞑目啊！',
+    '符号像鱼刺，扎喉咙。',
+    '括号配对了吗？我数不过来。',
+    '分号呢？分号去哪了？',
+    '这玩意儿嚼起来像塑料。',
+    '看不懂，但看起来挺整齐。',
+    '这就是传说中的“代码”？能吃吗？',
+    '一堆英文加符号，我消化不良。'
+  ],
+
+  data: [
+    '一堆数字，我头大。',
+    '又涨又跌，我看得头晕。',
+    '合计是多少？我算不过来。',
+    '这表格里的数比我肚里的鱼还多。',
+    '小数点儿在哪儿？我找不到。',
+    '百分比、千分比，比来比去。',
+    '这数据看着挺整齐的，就是吃不下。',
+    '平均值我懂，我平均每天吃三条鱼。'
+  ]
+};
+
+/* =========================================================
+   表情 & 眼睛追踪
+========================================================= */
+const MOODS = {
+  neutral:  { ps: 4,  pb: 11, psx: 0,  psy: 0,  pbx: 0,  pby: 0  },
+  curious:  { ps: 5,  pb: 14, psx: 2,  psy: -2, pbx: 2,  pby: -2 },
+  happy:    { ps: 6,  pb: 15, psx: 0,  psy: -2, pbx: 0,  pby: -2 },
+  sick:     { ps: 2,  pb: 4,  psx: -2, psy: 3,  pbx: -3, pby: 4  },
+  confused: { ps: 4,  pb: 12, psx: 3,  psy: -2, pbx: -3, pby: 3  },
+  drink:    { ps: 4,  pb: 10, psx: 0,  psy: 1,  pbx: 0,  pby: 1  },
+  blank:    { ps: 3,  pb: 9,  psx: 0,  psy: 0,  pbx: 0,  pby: 0  },
+  tired:    { ps: 3,  pb: 8,  psx: 0,  psy: 2,  pbx: 0,  pby: 2  }
+};
+
+const EYE_SMALL = { x: 470, y: 122, r: 11 };
+const EYE_BIG   = { x: 508, y: 112, r: 24 };
+
+let currentMood = 'neutral';
+let mouseSVG    = { x: 400, y: 380 };
+let hasMouse    = false;
+let eyeRafId    = null;
+
+function computeOffset(eye, maxOff){
+  if (maxOff <= 0) return { x: 0, y: 0 };
+  const dx = mouseSVG.x - eye.x;
+  const dy = mouseSVG.y - eye.y;
+  const dist = Math.hypot(dx, dy) || 1;
+  const factor = Math.min(1, dist / 240);
+  const len = maxOff * factor;
+  return { x: (dx/dist)*len, y: (dy/dist)*len };
+}
+
+function applyEyes(){
+  const m = MOODS[currentMood] || MOODS.neutral;
+  const sMaxOff = Math.max(0, EYE_SMALL.r - m.ps);
+  const sOff = hasMouse ? computeOffset(EYE_SMALL, sMaxOff) : { x: 0, y: 0 };
+  const bMaxOff = Math.max(0, EYE_BIG.r - m.pb);
+  const bOff = hasMouse ? computeOffset(EYE_BIG, bMaxOff) : { x: 0, y: 0 };
+
+  pupilS.setAttribute('r', m.ps);
+  pupilS.setAttribute('cx', EYE_SMALL.x + m.psx + sOff.x);
+  pupilS.setAttribute('cy', EYE_SMALL.y + m.psy + sOff.y);
+
+  pupilB.setAttribute('r', m.pb);
+  pupilB.setAttribute('cx', EYE_BIG.x + m.pbx + bOff.x);
+  pupilB.setAttribute('cy', EYE_BIG.y + m.pby + bOff.y);
+}
+
+function setMood(mood){
+  currentMood = mood;
+  applyEyes();
+}
+
+document.addEventListener('mousemove', e => {
+  const rect = stage.getBoundingClientRect();
+  mouseSVG.x = ((e.clientX - rect.left) / rect.width)  * 800;
+  mouseSVG.y = ((e.clientY - rect.top)  / rect.height) * 600;
+  hasMouse = true;
+  if (!eyeRafId){
+    eyeRafId = requestAnimationFrame(() => { applyEyes(); eyeRafId = null; });
+  }
+});
+
+document.addEventListener('touchmove', e => {
+  if (!e.touches[0]) return;
+  const t = e.touches[0];
+  const rect = stage.getBoundingClientRect();
+  mouseSVG.x = ((t.clientX - rect.left) / rect.width)  * 800;
+  mouseSVG.y = ((t.clientY - rect.top)  / rect.height) * 600;
+  hasMouse = true;
+  applyEyes();
+}, { passive: true });
+
+/* =========================================================
+   动画切换
+========================================================= */
+function setAnim(cls, duration = 0){
+  pelican.classList.remove(
+    'anim-happy','anim-shake','anim-choke',
+    'anim-drink','anim-nibble','anim-tilt',
+    'anim-sway','anim-stare','anim-sigh'
+  );
+  if (!cls) return;
+  void pelican.offsetWidth;
+  pelican.classList.add(cls);
+  setTimeout(() => pelican.classList.remove(cls), duration);
+}
+
+function showBubble(text){
+  bubble.textContent = text;
+  bubble.classList.add('show');
+}
+
+/* =========================================================
+   反应映射
+========================================================= */
+const REACT = {
+  empty:    { mood:'confused', anim:'anim-shake',  dur: 900  },
+  notfood:  { mood:'sick',     anim:'anim-choke',  dur: 1500 },
+  chaos:    { mood:'sick',     anim:'anim-shake',  dur: 900  },
+  dessert:  { mood:'happy',    anim:'anim-nibble', dur: 1400 },
+  goodDish: { mood:'happy',    anim:'anim-happy',  dur: 800  },
+  meh:      { mood:'neutral',  anim: null,         dur: 0    },
+  feast:    { mood:'happy',    anim:'anim-happy',  dur: 800  },
+  drink:    { mood:'drink',    anim:'anim-drink',  dur: 2000 },
+  water:    { mood:'drink',    anim:'anim-drink',  dur: 2000 },
+
+  image:    { mood:'confused', anim:'anim-tilt',   dur: 2000 },
+  audio:    { mood:'happy',    anim:'anim-sway',   dur: 3300 },
+  video:    { mood:'blank',    anim:'anim-stare',  dur: 3900 },
+  slide:    { mood:'tired',    anim:'anim-sigh',   dur: 1400 },
+  sheet:    { mood:'tired',    anim:'anim-sigh',   dur: 1400 },
+  officeDoc:{ mood:'tired',    anim:'anim-sigh',   dur: 1400 },
+
+  /* 九大精细分类 */
+  contract: { mood:'tired',    anim:'anim-sigh',   dur: 1400 },
+  tech:     { mood:'confused', anim:'anim-tilt',   dur: 2000 },
+  proposal: { mood:'tired',    anim:'anim-sigh',   dur: 1400 },
+  quarterly:{ mood:'tired',    anim:'anim-sigh',   dur: 1400 },
+  study:    { mood:'confused', anim:'anim-tilt',   dur: 2000 },
+  literature:{ mood:'confused',anim:'anim-tilt',   dur: 2000 },
+  chat:     { mood:'happy',    anim:'anim-sway',   dur: 3300 },
+  code:     { mood:'sick',     anim:'anim-shake',  dur: 900  },
+  data:     { mood:'confused', anim:'anim-tilt',   dur: 2000 }
+};
+
+function react(kind, token){
+  const r = REACT[kind] || REACT.meh;
+  setMood(r.mood);
+  setAnim(r.anim, r.dur);
+  showBubble(pick(LINES[kind] || LINES.meh));
+  setTimeout(() => {
+    if (token === feedToken) setMood('neutral');
+  }, 4200);
+}
+
+/* =========================================================
+   按扩展名兜底分类
+========================================================= */
+const IMG_EXTS   = ['jpg','jpeg','png','gif','webp','svg','bmp','ico',
+                    'tiff','tif','avif','heic','heif','jfif'];
+const AUD_EXTS   = ['mp3','wav','flac','aac','ogg','oga','m4a','wma',
+                    'opus','aiff','aif','mid','midi','amr'];
+const VID_EXTS   = ['mp4','mov','avi','mkv','webm','flv','wmv','m4v',
+                    'mpg','mpeg','3gp','3g2','ts','rmvb','rm','ogv'];
+const SLIDE_EXTS = ['ppt','pptx','pps','ppsx','key','odp'];
+const SHEET_EXTS = ['xls','xlsx','numbers','ods'];
+const DOC_EXTS   = ['doc','pages','odt','rtf','pdf'];
+
+function extKind(name){
+  const e = extOf(name);
+  if (IMG_EXTS.includes(e))   return 'image';
+  if (AUD_EXTS.includes(e))   return 'audio';
+  if (VID_EXTS.includes(e))   return 'video';
+  if (SLIDE_EXTS.includes(e)) return 'slide';
+  if (SHEET_EXTS.includes(e)) return 'sheet';
+  if (DOC_EXTS.includes(e))   return 'officeDoc';
+  return null;
+}
+
+/* =========================================================
+   主流程
+========================================================= */
+let feedToken = 0;
+
+async function feed(file){
+  const token = ++feedToken;
+  hint.classList.add('hidden');
+  showBubble('嗯……让我尝尝……');
+  setMood('curious');
+
+  const ext = extOf(file.name);
+  const fallback = extKind(file.name);
+
+  /* 媒体：不读内容，直接反应 */
+  if (fallback === 'image' || fallback === 'audio' || fallback === 'video'){
+    await sleep(520);
+    if (token !== feedToken) return;
+    if (file.size === 0){ react('empty', token); return; }
+    react(fallback, token);
+    return;
+  }
+
+  /* 空文件 */
+  if (file.size === 0){ await sleep(520); react('empty', token); return; }
+
+  /* 尝试提取文本（不同格式用不同方法） */
+  let text = null;
+  let bytes = null;
+
+  try {
+    bytes = await readFile(file);
+  } catch {
+    showBubble('这文件坏了吧？');
+    setMood('confused');
+    return;
+  }
+
+  try {
+    if (ext === 'docx'){
+      text = await extractDocxText(bytes);
+    } else if (ext === 'xlsx'){
+      text = await extractXlsxText(bytes);
+    } else if (ext === 'pptx'){
+      // 简易版：只取 sharedStrings 里可能存在的字符串池
+      text = null;  // pptx 结构复杂，退回扩展名识别
+    } else if (ext === 'pdf'){
+      text = await extractPdfText(bytes);
+    } else if (ext === 'csv' || ext === 'tsv' || ext === 'txt' ||
+               ext === 'md'  || ext === 'json' || ext === 'log' ||
+               ext === 'srt' || ext === 'vtt'){
+      // 直接解码
+      const t = decodeText(bytes);
+      if (t !== null){
+        if (ext === 'csv' || ext === 'tsv'){
+          // 加一个表格分隔符的提示，方便 classifier
+          text = t;
+        } else {
+          text = t;
+        }
+      }
+    } else if (ext === 'doc' || ext === 'pages' || ext === 'odt' || ext === 'rtf'){
+      // 老格式 / 包结构，无法解析，退回扩展名
+      text = null;
+    } else {
+      // 未知扩展名：尝试直接解码
+      const t = decodeText(bytes);
+      if (t !== null) text = t;
+    }
+  } catch {
+    text = null;
+  }
+
+  await sleep(520);
+  if (token !== feedToken) return;
+
+  /* 提取成功 → 精细分类 */
+  if (text && text.trim().length > 0){
+    const result = classifyText(text, file.name);
+    react(result.kind, token);
+    return;
+  }
+
+  /* 提取失败 → 按扩展名走 */
+  if (fallback){
+    react(fallback, token);
+    return;
+  }
+
+  /* 未知格式：二进制 → notfood；纯文本 → 通用分类 */
+  const t = decodeText(bytes);
+  if (t === null){
+    react('notfood', token);
+    return;
+  }
+  if (t.trim().length === 0){
+    react('empty', token);
+    return;
+  }
+  const result = classifyText(t, file.name);
+  react(result.kind, token);
+}
+
+setMood('neutral');
+</script>
+</body>
+</html>
