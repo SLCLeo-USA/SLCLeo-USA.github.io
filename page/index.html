@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>加载中 · Loading · Chargement</title>
+<style>
+:root{
+  --bg:#f6f7f9;
+  --tx:#232323;
+  --mu:#8b8f95;
+  --lk:#1a73e8;
+  --ring:#dfe2e6;
+  --ring-top:#1a73e8;
+  --bar-bg:#e6e9ec;
+  --bar-glow:rgba(26,115,232,.35);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#17181a;
+    --tx:#e6e7e9;
+    --mu:#787c82;
+    --lk:#6ea8fe;
+    --ring:#2f3338;
+    --ring-top:#6ea8fe;
+    --bar-bg:#26292d;
+    --bar-glow:rgba(110,168,254,.35);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;padding:0;height:100%;overflow:hidden;
+  background:var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB",
+    "Microsoft YaHei",sans-serif;
+  color:var(--tx);
+  user-select:none;-webkit-user-select:none;
+  transition:background-color .3s;
+}
+.wrap{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:24px;
+}
+.ring{
+  width:56px;height:56px;
+  border-radius:50%;
+  border:3px solid var(--ring);
+  border-top-color:var(--ring-top);
+  animation:spn .9s linear infinite;
+  position:relative;
+}
+.ring::after{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:50%;
+  border:2px solid transparent;
+  border-bottom-color:var(--ring-top);
+  opacity:.45;
+  animation:spn 1.6s linear infinite reverse;
+}
+@keyframes spn{to{transform:rotate(360deg)}}
+
+.text-block{
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.line{
+  font-size:14px;
+  font-weight:500;
+  letter-spacing:.2px;
+}
+.line.en{
+  font-size:13px;
+  color:var(--mu);
+  font-weight:400;
+}
+.line.fr{
+  font-size:13px;
+  color:var(--mu);
+  font-weight:400;
+  font-style:italic;
+}
+
+.bar{
+  width:240px;height:4px;
+  border-radius:3px;
+  background:var(--bar-bg);
+  overflow:hidden;
+  position:relative;
+}
+.bar i{
+  display:block;height:100%;
+  width:0%;
+  border-radius:3px;
+  background:var(--lk);
+  box-shadow:0 0 8px var(--bar-glow);
+  transition:width .28s cubic-bezier(.3,.7,.4,1);
+  position:relative;
+  overflow:hidden;
+}
+.bar i::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,.35) 50%,
+    transparent 100%);
+  animation:shim 1.4s linear infinite;
+}
+.bar.stall i::after{
+  animation-duration:2.6s;
+  opacity:.55;
+}
+@keyframes shim{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(100%)}
+}
+.pct{
+  font-size:12px;
+  color:var(--mu);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.5px;
+  transition:color .3s;
+}
+.pct.stall{color:var(--lk)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="ring"></div>
+
+  <div class="text-block">
+    <div class="line">正在加载安全会话…</div>
+    <div class="line en">Loading secure session…</div>
+    <div class="line fr">Chargement de la session sécurisée…</div>
+  </div>
+
+  <div class="bar" id="bar"><i id="pg"></i></div>
+  <div class="pct" id="pct">0%</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var TOTAL    = 30000;
+var PHASE1   = 25000;
+var DEST     = 'https://slcleo-usa.github.io/list';
+
+var pgEl  = document.getElementById('pg');
+var pctEl = document.getElementById('pct');
+var barEl = document.getElementById('bar');
+
+var done    = false;
+var START   = Date.now();
+
+var progress = 0;
+var lastUpdate = START;
+var nextUpdateAt = START + 200;
+var stallPhase = false;
+
+var RATE = 99 / (PHASE1 / 1000);
+
+function go(){
+  if (done) return;
+  done = true;
+  window.location.href = DEST;
+}
+
+function render(){
+  var shown = progress;
+  pgEl.style.width = shown.toFixed(2) + '%';
+  pctEl.textContent = Math.round(shown) + '%';
+}
+
+function tick(now){
+  if (done) return;
+
+  var elapsed = Date.now() - START;
+
+  if (elapsed >= TOTAL){
+    progress = 100;
+    pgEl.style.width = '100%';
+    pctEl.textContent = '100%';
+    setTimeout(go, 320);
+    return;
+  }
+
+  if (elapsed < PHASE1){
+    if (stallPhase){
+      stallPhase = false;
+      barEl.classList.remove('stall');
+      pctEl.classList.remove('stall');
+    }
+
+    if (now >= nextUpdateAt){
+      var dt = (now - lastUpdate) / 1000;
+      lastUpdate = now;
+      nextUpdateAt = now + 90 + Math.random() * 240;
+
+      var baseStep = dt * RATE;
+      var factor = 0.72 + Math.random() * 0.56;
+      var step = baseStep * factor;
+
+      var expected = (elapsed / PHASE1) * 99;
+      var diff = progress - expected;
+
+      if (diff < -3){
+        step *= 1.55;
+      } else if (diff > 2){
+        step *= 0.35;
+      } else if (diff < -1.2){
+        step *= 1.2;
+      }
+
+      if (Math.random() < 0.06) step *= 0.2;
+
+      progress += step;
+
+      var cap = 99 - Math.random() * 0.15;
+      if (progress > cap) progress = cap;
+    }
+  } else {
+    if (!stallPhase){
+      stallPhase = true;
+      barEl.classList.add('stall');
+      pctEl.classList.add('stall');
+    }
+
+    if (progress < 98.9){
+      progress += (98.9 - progress) * 0.08;
+    } else {
+      progress = 99 + (Math.random() - 0.5) * 0.09;
+      if (progress > 99.05) progress = 99.05;
+      if (progress < 98.95) progress = 98.95;
+    }
+  }
+
+  render();
+  requestAnimationFrame(tick);
+}
+
+document.addEventListener('keydown', function(e){
+  var k = e.key ? e.key.toLowerCase() : '';
+  if (k === 'l'){
+    e.preventDefault();
+    go();
+  }
+});
+
+window.addEventListener('blur', function(){
+  lastUpdate = Date.now();
+  nextUpdateAt = Date.now() + 120;
+});
+
+document.addEventListener('visibilitychange', function(){
+  if (!document.hidden){
+    lastUpdate = Date.now();
+    nextUpdateAt = Date.now() + 120;
+  }
+});
+
+requestAnimationFrame(function(now){
+  lastUpdate = now;
+  nextUpdateAt = now + 200;
+  requestAnimationFrame(tick);
+});
+
+})();
+</script>
+</body>
+</html>
