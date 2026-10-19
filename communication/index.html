@@ -15,8 +15,7 @@
   --panel-rgba:rgba(20,24,33,.86);
   --panel2-rgba:rgba(26,31,42,.78);
   --bg-rgba:rgba(14,17,22,.45);
-  --body-bg:radial-gradient(circle at 50% 45%,#141c3a 0%,#0a0e1f 48%,#04050c 100%);
-  --stars-opacity:1;
+  --body-bg:radial-gradient(1200px 600px at 50% -10%,#171d2b 0%,rgba(14,17,22,0) 60%),linear-gradient(180deg,#0e1116 0%,#0a0d12 100%);
   --brand-grad:linear-gradient(135deg,#4f8cff,#3ecf8e);
 }
 [data-theme="light"]{
@@ -25,8 +24,7 @@
   --panel-rgba:rgba(255,255,255,.86);
   --panel2-rgba:rgba(246,248,252,.78);
   --bg-rgba:rgba(242,244,248,.55);
-  --body-bg:radial-gradient(circle at 50% 45%,#e6ecfa 0%,#eef2f8 48%,#e0e4ec 100%);
-  --stars-opacity:.35;
+  --body-bg:radial-gradient(1200px 600px at 50% -10%,#ffffff 0%,rgba(242,244,248,0) 60%),linear-gradient(180deg,#f5f7fb 0%,#eef2f8 100%);
   --brand-grad:linear-gradient(135deg,#2f6fe4,#1ea96c);
 }
 html,body{height:100%}
@@ -39,14 +37,6 @@ body{
   user-select:none;
   transition:background .25s,color .25s;
 }
-#stars-bg{
-  position:fixed;inset:0;z-index:0;
-  display:block;width:100%;height:100%;
-  touch-action:none;pointer-events:none;
-  opacity:var(--stars-opacity);
-  transition:opacity .4s;
-}
-#stars-bg.hidden{display:none}
 .topbar{position:relative;z-index:1}
 main{position:relative;z-index:1}
 .site-footer{position:relative;z-index:1}
@@ -366,8 +356,6 @@ main{flex:1;display:flex;min-height:0}
 </head>
 <body>
 
-<canvas id="stars-bg"></canvas>
-
 <header class="topbar">
   <div class="brand">
     <div class="logo">
@@ -597,238 +585,6 @@ main{flex:1;display:flex;min-height:0}
 <div class="toasts" id="toasts"></div>
 
 <script>
-/* ================================================================
-   星尘背景模块 —— 可独立启动/停止
-   ================================================================ */
-window.StarsBG = (function(){
-  const canvas = document.getElementById("stars-bg");
-  const ctx = canvas.getContext("2d", { alpha: true });
-  const TAU = Math.PI * 2;
-
-  let W=0, H=0, DPR=1;
-  let particles = [];
-  let lastTime = performance.now();
-  let mode = "interactive";
-  let running = false;
-  let rafId = null;
-
-  const pointer = { x:-9999, y:-9999, hover:false, down:false };
-
-  const CFG = {
-    linkDist:110, mouseR:160, G:16, SOFT:70, DEAD:60, REBOUND:0.55,
-    gravDamp:0.978, airDamp:0.995, hoverRepel:0.60,
-    density:4200, maxInteractive:280, maxView:340
-  };
-  const LINK2 = CFG.linkDist * CFG.linkDist;
-
-  function targetCount(){
-    const base = (W*H)/CFG.density;
-    if(mode==="view") return Math.round(Math.min(CFG.maxView, Math.max(120, base*1.4)));
-    return Math.round(Math.min(CFG.maxInteractive, Math.max(80, base*0.75)));
-  }
-
-  function makeParticle(){
-    const angle = Math.random()*TAU;
-    const speed = 0.06 + Math.random()*0.26;
-    return {
-      x:Math.random()*W, y:Math.random()*H,
-      dx:Math.cos(angle)*speed, dy:Math.sin(angle)*speed,
-      vx:0, vy:0,
-      r:0.7 + Math.random()*1.6,
-      hue:185 + Math.random()*95,
-      pulse:Math.random()*TAU,
-      fade:0
-    };
-  }
-
-  function resize(){
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
-    canvas.width = Math.floor(W*DPR);
-    canvas.height = Math.floor(H*DPR);
-    canvas.style.width = W+"px";
-    canvas.style.height = H+"px";
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-    const t = targetCount();
-    if(particles.length > t) particles.length = t;
-    while(particles.length < t) particles.push(makeParticle());
-  }
-
-  function updateParticle(p, dt){
-    const gravDamp = Math.pow(CFG.gravDamp, dt);
-    const airDamp = Math.pow(CFG.airDamp, dt);
-    if(mode==="interactive" && pointer.hover){
-      const ax = pointer.x - p.x, ay = pointer.y - p.y;
-      const d2 = ax*ax + ay*ay;
-      const d = Math.sqrt(d2) || 0.0001;
-      const ux = ax/d, uy = ay/d;
-      if(pointer.down){
-        const acc = CFG.G/(d + CFG.SOFT)*dt;
-        p.vx += ux*acc; p.vy += uy*acc;
-        if(d < CFG.DEAD){
-          const t = 1 - d/CFG.DEAD;
-          const bounce = CFG.REBOUND*t*t*dt;
-          p.vx -= ux*bounce; p.vy -= uy*bounce;
-        }
-        p.vx *= gravDamp; p.vy *= gravDamp;
-      } else if(d < CFG.mouseR){
-        const t = 1 - d/CFG.mouseR;
-        const force = t*t*CFG.hoverRepel*dt;
-        p.vx -= ux*force; p.vy -= uy*force;
-      }
-    }
-    p.vx *= airDamp; p.vy *= airDamp;
-    p.x += (p.dx + p.vx)*dt;
-    p.y += (p.dy + p.vy)*dt;
-    const m = 30;
-    if(p.x < -m) p.x = W+m; else if(p.x > W+m) p.x = -m;
-    if(p.y < -m) p.y = H+m; else if(p.y > H+m) p.y = -m;
-    p.pulse += 0.05*dt;
-    if(p.fade < 1) p.fade = Math.min(1, p.fade + 0.025*dt);
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    ctx.lineCap = "round";
-    const n = particles.length;
-    const linkAlpha = 0.26 * Math.min(1, 200/Math.max(n,1));
-
-    for(let i=0; i<n; i++){
-      const a = particles[i];
-      const ax = a.x, ay = a.y;
-      for(let j=i+1; j<n; j++){
-        const b = particles[j];
-        const dx = ax - b.x, dy = ay - b.y;
-        const d2 = dx*dx + dy*dy;
-        if(d2 > LINK2) continue;
-        const alpha = (1 - Math.sqrt(d2)/CFG.linkDist)*linkAlpha;
-        ctx.strokeStyle = `hsla(${(a.hue + b.hue)*0.5}, 90%, 74%, ${alpha})`;
-        ctx.lineWidth = 0.7;
-        ctx.beginPath();
-        ctx.moveTo(ax,ay); ctx.lineTo(b.x,b.y); ctx.stroke();
-      }
-    }
-
-    if(mode==="interactive" && pointer.hover){
-      const glow = pointer.down ? 0.24 : 0.10;
-      const g = ctx.createRadialGradient(pointer.x,pointer.y,0,pointer.x,pointer.y,200);
-      g.addColorStop(0, `rgba(140,170,255,${glow})`);
-      g.addColorStop(1, "rgba(140,170,255,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(pointer.x,pointer.y,200,0,TAU); ctx.fill();
-
-      const R2 = CFG.mouseR*CFG.mouseR;
-      for(const p of particles){
-        const dx = p.x - pointer.x, dy = p.y - pointer.y;
-        const d2 = dx*dx + dy*dy;
-        if(d2 > R2) continue;
-        const alpha = (1 - Math.sqrt(d2)/CFG.mouseR)*0.32;
-        ctx.strokeStyle = `hsla(${p.hue}, 95%, 78%, ${alpha})`;
-        ctx.lineWidth = 0.8;
-        ctx.beginPath();
-        ctx.moveTo(pointer.x,pointer.y); ctx.lineTo(p.x,p.y); ctx.stroke();
-      }
-    }
-
-    for(const p of particles){
-      const r = p.r*(1 + 0.35*Math.sin(p.pulse));
-      ctx.globalAlpha = p.fade;
-      ctx.beginPath(); ctx.arc(p.x,p.y,r,0,TAU);
-      ctx.fillStyle = `hsla(${p.hue}, 95%, 76%, 0.9)`;
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  function adapt(){
-    const t = targetCount();
-    if(particles.length < t){
-      const add = Math.min(3, t - particles.length);
-      for(let i=0; i<add; i++) particles.push(makeParticle());
-    } else if(particles.length > t){
-      particles.length -= Math.min(3, particles.length - t);
-    }
-  }
-
-  function frame(now){
-    if(!running) return;
-    const dt = Math.min((now - lastTime)/16.667, 3);
-    lastTime = now;
-    adapt();
-    for(const p of particles) updateParticle(p, dt);
-    draw();
-    rafId = requestAnimationFrame(frame);
-  }
-
-  function isUIElement(el){
-    if(!el || !el.closest) return false;
-    return !!el.closest('.topbar, .sidebar, .chat-head, .composer, .site-footer, .overlay, .ctxmenu, .lightbox, button, input, select, textarea, .dialog');
-  }
-
-  window.addEventListener("pointermove", (e) => {
-    if(isUIElement(e.target)){ pointer.hover = false; return; }
-    pointer.x = e.clientX; pointer.y = e.clientY; pointer.hover = true;
-  }, { passive: true });
-
-  window.addEventListener("pointerdown", (e) => {
-    if(isUIElement(e.target)) return;
-    pointer.x = e.clientX; pointer.y = e.clientY; pointer.hover = true; pointer.down = true;
-  }, { passive: true });
-
-  function release(){
-    if(!pointer.down) return;
-    pointer.down = false;
-    if(mode !== "interactive") return;
-    const R = 150, R2 = R*R;
-    for(const p of particles){
-      const dx = p.x - pointer.x, dy = p.y - pointer.y;
-      const d2 = dx*dx + dy*dy;
-      if(d2 > R2) continue;
-      const d = Math.sqrt(d2) || 0.001;
-      const t = 1 - d/R;
-      const kick = t*t*1.6;
-      p.vx += (dx/d)*kick*(0.6 + Math.random()*0.8);
-      p.vy += (dy/d)*kick*(0.6 + Math.random()*0.8);
-    }
-  }
-  window.addEventListener("pointerup", release, { passive: true });
-  window.addEventListener("pointercancel", release, { passive: true });
-  window.addEventListener("pointerleave", () => { pointer.hover = false; pointer.down = false; }, { passive: true });
-  window.addEventListener("blur", () => { pointer.hover = false; pointer.down = false; });
-
-  window.addEventListener("keydown", (e) => {
-    if(e.repeat) return;
-    if(isUIElement(e.target)) return;
-    if(e.key === "s" || e.key === "S"){
-      mode = (mode === "view") ? "interactive" : "view";
-      pointer.down = false; pointer.hover = false;
-    }
-  });
-
-  let rt;
-  window.addEventListener("resize", () => {
-    clearTimeout(rt);
-    rt = setTimeout(resize, 150);
-  }, { passive: true });
-
-  function start(){
-    if(running) return;
-    running = true;
-    lastTime = performance.now();
-    rafId = requestAnimationFrame(frame);
-  }
-  function stop(){
-    running = false;
-    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
-  }
-
-  resize();
-
-  return { start, stop, resize };
-})();
-</script>
-
-<script>
 (function(){
 'use strict';
 
@@ -853,7 +609,6 @@ cleanData:'立即清理过期消息',cleanDataDesc:'删除超过自动清理天�
 setTitle:'设置',langLabel:'语言',langHint:'选择界面语言',themeLabel:'主题',themeHint:'深色 / 浅色',darkOpt:'🌙 深色',lightOpt:'☀️ 浅色',
 myStatusL:'我的状态',myStatusHint:'对方会看到这个状态',myNameL:'我的昵称',myNameHint:'对方联系人列表中会显示这个名称',notSet:'未设置',myColorL:'我的头像颜色',
 notifL:'桌面通知',notifHint:'页面在后台时收到消息弹出系统通知',soundL:'提示音',soundHint:'收到消息时播放短音',
-starsBgL:'星空背景',starsBgHint:'显示粒子星尘动画背景（按 S 切换观赏模式）',
 enterL:'Enter 直接发送',enterHint:'关闭后需点击发送按钮',backupL:'自动备份提醒',backupHint:'超过 7 天未备份时提醒',neverBackup:'从未备份',
 autoCleanL:'自动清理',autoCleanHint:'超过指定天数的未固定消息将自动删除',noClean:'不清理',daysUnit:'天',
 bakNowL:'备份当前数据',bakNowHint:'立即导出 JSON 备份',bakNowBtn:'立即备份',cleanNowL:'清理过期消息',cleanNowHint:'按上面的天数立即清理一次',cleanNowBtn:'立即清理',
@@ -880,7 +635,6 @@ tFwdTo:'已转发给「',tShareAdded:'已通过邀请链接添加：',tAlreadyIn
 secLabel:'s',daysDays:' 天',contactOne:'位联系人',msgsUnit:' 条',tFwdEmpty:'暂无联系人',
 tInstallAsk:'点击安装到桌面',tInstallOk:'已安装到桌面',tInstallNo:'当前浏览器不支持自动安装，请用浏览器菜单「添加到主屏幕」',tInstallIos:'iOS Safari：点击分享按钮 → 添加到主屏幕',tInstallStandalone:'已作为桌面应用运行',
 tMqttConnecting:'正在连接跨网络通道…',tMqttOk:'跨网络通道已就绪',tMqttFail:'跨网络通道连接失败，仅局域网内可用',tMqttLost:'跨网络通道已断开',tMqttReconn:'跨网络通道正在重连…',
-tStarsOn:'已开启星空背景',tStarsOff:'已关闭星空背景',
 tLocalOnly:'🏠 本地回环联系人，仅在本浏览器标签页间通信',
 tRetryProbe:'正在重试与「',tRetryProbe2:'」的密钥交换…'},
 
@@ -903,7 +657,6 @@ cleanData:'Clean expired messages now',cleanDataDesc:'Delete unpinned messages p
 setTitle:'Settings',langLabel:'Language',langHint:'Choose interface language',themeLabel:'Theme',themeHint:'Dark / Light',darkOpt:'🌙 Dark',lightOpt:'☀️ Light',
 myStatusL:'My status',myStatusHint:'Others will see this status',myNameL:'My nickname',myNameHint:'Shown in your contacts lists',notSet:'Not set',myColorL:'My avatar color',
 notifL:'Desktop notifications',notifHint:'Show system notification when page is in background',soundL:'Notification sound',soundHint:'Play a short sound on new message',
-starsBgL:'Stardust background',starsBgHint:'Particle starfield animation (press S to toggle view mode)',
 enterL:'Enter to send',enterHint:'If off, use the send button',backupL:'Backup reminder',backupHint:'Remind if no backup for 7 days',neverBackup:'Never',
 autoCleanL:'Auto cleanup',autoCleanHint:'Delete unpinned messages older than N days',noClean:'Never',daysUnit:'days',
 bakNowL:'Backup now',bakNowHint:'Export JSON backup now',bakNowBtn:'Backup',cleanNowL:'Clean now',cleanNowHint:'Run the cleanup now',cleanNowBtn:'Clean',
@@ -930,7 +683,6 @@ tFwdTo:'Forwarded to "',tShareAdded:'Added via invite link: ',tAlreadyInList:'Al
 secLabel:'s',daysDays:' days',contactOne:' contacts',msgsUnit:' msgs',tFwdEmpty:'No contacts',
 tInstallAsk:'Install to desktop',tInstallOk:'Installed',tInstallNo:'Auto install not supported. Use the browser menu "Add to Home Screen".',tInstallIos:'iOS Safari: Tap Share → Add to Home Screen',tInstallStandalone:'Running as desktop app',
 tMqttConnecting:'Connecting cross-network channel…',tMqttOk:'Cross-network channel ready',tMqttFail:'Cross-network channel failed — LAN only',tMqttLost:'Cross-network channel disconnected',tMqttReconn:'Reconnecting cross-network channel…',
-tStarsOn:'Stardust background on',tStarsOff:'Stardust background off',
 tLocalOnly:'🏠 Local loopback contact — communicates only between tabs of this browser',
 tRetryProbe:'Retrying key exchange with "',tRetryProbe2:'"…'},
 
@@ -953,7 +705,6 @@ cleanData:'Nettoyer maintenant',cleanDataDesc:'Supprimer les messages non éping
 setTitle:'Paramètres',langLabel:'Langue',langHint:'Choisir la langue',themeLabel:'Thème',themeHint:'Sombre / Clair',darkOpt:'🌙 Sombre',lightOpt:'☀️ Clair',
 myStatusL:'Mon statut',myStatusHint:'Visible par les autres',myNameL:'Mon pseudo',myNameHint:'Affiché chez vos contacts',notSet:'Non défini',myColorL:'Couleur de mon avatar',
 notifL:'Notifications bureau',notifHint:'Notification système quand la page est en arrière-plan',soundL:'Son',soundHint:'Jouer un son court',
-starsBgL:'Fond étoilé',starsBgHint:'Animation de particules (S pour le mode contemplation)',
 enterL:'Entrée pour envoyer',enterHint:'Sinon, utilisez le bouton',backupL:'Rappel de sauvegarde',backupHint:'Rappeler après 7 jours',neverBackup:'Jamais',
 autoCleanL:'Nettoyage auto',autoCleanHint:'Supprimer les messages non épinglés après N jours',noClean:'Jamais',daysUnit:'jours',
 bakNowL:'Sauvegarder',bakNowHint:'Exporter JSON maintenant',bakNowBtn:'Sauvegarder',cleanNowL:'Nettoyer',cleanNowHint:'Lancer le nettoyage',cleanNowBtn:'Nettoyer',
@@ -967,7 +718,7 @@ msgPhIdle:'Sélectionnez un contact…',msgPhEnter:'Écrire (Entrée pour envoye
 sendBtn:'Envoyer',noSelection:'Aucun contact sélectionné',emptyChat:'Aucun message. Dites bonjour 👋',emptySelect:'Choisissez un contact à gauche,<br>ou cliquez « ＋ Ajouter »',
 e2ee:'Chiffré de bout en bout',waitingKey:'◌ Échange de clés…',noCrypto:'⚠ Chiffrement indisponible',localTag:'Local',localHint:'Contact de bouclage — sans chiffrement ni vérification',
 onlineStatus:'En ligne',awayStatus:'Absent',dndStatus:'Ne pas déranger',offlineStatus:'Hors ligne',typing:'en train d\'écrire…',you:'Moi',other:'Pair',
-recalled:'a rappelé un message',pinnedCount:'épinglés',edited:'modifié',statusSent:'Envoyé',statusDistributed:'Distribué',statusRead:'Lu',statusFailed:'Échec, appuyez pour réessayer',
+recalled:'a rappelé un message',pinnedCount:'épinglés',edited:'modifié',statusSent:'Envoyé',statusDelivered:'Distribué',statusRead:'Lu',statusFailed:'Échec, appuyez pour réessayer',
 statsContacts:'Contacts',statsMsgs:'Messages',statsFiles:'Fichiers / images',statsUnread:'Non lus',statsTop:'Top contacts',statsItems:' msgs',
 tCopied:'Copié',tCopyFailed:'Échec de copie',tRecalled:'Rappelé',tPinned:'Épinglé',tUnpinned:'Désépinglé',tDeletedLocal:'Supprimé localement',tDeleted:'Supprimé « ',tCleared:'Historique effacé',
 tMsgQueued:'Pair hors ligne, message en file',tEncryptFail:'Échec du chiffrement',tFileSent:'Fichier envoyé (chiffré)',tFilesSent:'Envoyé ',tFileTooBigFull:'Fichier > 4 Mo ignoré',tFileReadFail:'Échec de lecture « ',tFileReadFail2:' »',tFileTooBig:'Données indisponibles',
@@ -980,7 +731,6 @@ tFwdTo:'Transféré à « ',tShareAdded:'Ajouté via lien : ',tAlreadyInList:'D�
 secLabel:'s',daysDays:' jours',contactOne:' contacts',msgsUnit:' msgs',tFwdEmpty:'Aucun contact',
 tInstallAsk:'Installer sur le bureau',tInstallOk:'Installé',tInstallNo:'Installation auto non prise en charge.',tInstallIos:'iOS Safari : Partager → Sur l\'écran d\'accueil',tInstallStandalone:'Application de bureau',
 tMqttConnecting:'Connexion au canal inter-réseau…',tMqttOk:'Canal inter-réseau prêt',tMqttFail:'Canal inter-réseau indisponible — LAN uniquement',tMqttLost:'Déconnecté',tMqttReconn:'Reconnexion…',
-tStarsOn:'Fond étoilé activé',tStarsOff:'Fond étoilé désactivé',
 tLocalOnly:'🏠 Contact de bouclage — communication entre onglets de ce navigateur',
 tRetryProbe:'Nouvelle tentative d\'échange avec « ',tRetryProbe2:' »…'}
 };
@@ -1073,22 +823,10 @@ async function decryptJSON(key,ivB64,ctB64){const pt=await crypto.subtle.decrypt
 
 /* ============ 设置 ============ */
 const SET_KEY='seagull.settings.v1';
-const defaultSettings={theme:'dark',sound:true,notifications:true,myStatus:'online',myName:'',myAvatarColor:'#4f8cff',bubbleStyle:'default',autoCleanDays:30,enterToSend:true,autoBackup:false,lastBackupAt:0,lang:'zh',starsBg:true};
+const defaultSettings={theme:'dark',sound:true,notifications:true,myStatus:'online',myName:'',myAvatarColor:'#4f8cff',bubbleStyle:'default',autoCleanDays:30,enterToSend:true,autoBackup:false,lastBackupAt:0,lang:'zh'};
 let settings=Object.assign({},defaultSettings);
 function loadSettings(){try{const raw=localStorage.getItem(SET_KEY);if(raw)settings=Object.assign({},defaultSettings,JSON.parse(raw))}catch(e){}}
 function saveSettings(){try{localStorage.setItem(SET_KEY,JSON.stringify(settings))}catch(e){}}
-
-function applyStarsBg(){
-  const el=document.getElementById('stars-bg');
-  if(!el)return;
-  if(settings.starsBg){
-    el.classList.remove('hidden');
-    if(window.StarsBG)window.StarsBG.start();
-  }else{
-    el.classList.add('hidden');
-    if(window.StarsBG)window.StarsBG.stop();
-  }
-}
 
 /* ============ 状态 ============ */
 const STORE_KEY='seagull.state.v1';
@@ -1719,7 +1457,7 @@ $('#editOverlay').addEventListener('click',e=>{if(e.target.id==='editOverlay'){$
 function showSafety(c){if(isLoopback(c.ip)){alert(t('localHint'));return}const code=safetyCode(c);alert(t('ctSafety')+': '+code+'\n\n'+t('fpPrefix')+(identity?identity.fingerprint:'—')+'\n'+c.name+': '+(c.pubJwk&&c.pubJwk.x?c.pubJwk.x.slice(0,16):'—'))}
 
 /* ============ 二维码 / 邀请链接 ============ */
-function buildInviteUrl(){const base=location.href.split('?')[0].split('#')[0];const data={ip:me.ip,id:me.id,name:settings.myName||''};return base+'?invite='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))))}
+function buildInviteUrl(){const base=location.href.split('?')[0].split('#')[0];const data={ip:me.ip,id:me.id,name:settings.myName||''};return base+'?invite='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))))}}
 let qrTab='qr';
 function renderQrContent(){
   const url=buildInviteUrl();const box=$('#qrTabContent');
@@ -1923,7 +1661,6 @@ function renderSettings(){
   body.innerHTML=`
     <div class="set-row"><div class="set-label">${t('langLabel')}<div class="hint">${t('langHint')}</div></div><div class="set-body"><select class="set-select" id="setLang"><option value="zh"${settings.lang==='zh'?' selected':''}>中文</option><option value="en"${settings.lang==='en'?' selected':''}>English</option><option value="fr"${settings.lang==='fr'?' selected':''}>Français</option></select></div></div>
     <div class="set-row"><div class="set-label">${t('themeLabel')}<div class="hint">${t('themeHint')}</div></div><div class="set-body"><select class="set-select" id="setTheme"><option value="dark"${settings.theme==='dark'?' selected':''}>${t('darkOpt')}</option><option value="light"${settings.theme==='light'?' selected':''}>${t('lightOpt')}</option></select></div></div>
-    <div class="set-row"><div class="set-label">${t('starsBgL')}<div class="hint">${t('starsBgHint')}</div></div><div class="set-body"><div class="switch${settings.starsBg?' on':''}" id="setStarsBg"></div></div></div>
     <div class="set-row"><div class="set-label">${t('myStatusL')}<div class="hint">${t('myStatusHint')}</div></div><div class="set-body"><select class="set-select" id="setStatus"><option value="online"${settings.myStatus==='online'?' selected':''}>${t('online')}</option><option value="away"${settings.myStatus==='away'?' selected':''}>${t('away')}</option><option value="dnd"${settings.myStatus==='dnd'?' selected':''}>${t('dnd')}</option></select></div></div>
     <div class="set-row"><div class="set-label">${t('myNameL')}<div class="hint">${t('myNameHint')}</div></div><div class="set-body"><input type="text" id="setName" value="${esc(settings.myName||'')}" placeholder="${t('notSet')}" style="width:140px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 10px;color:var(--text);font-size:12.5px;outline:none;font-family:inherit"></div></div>
     <div class="set-row"><div class="set-label">${t('myColorL')}</div><div class="set-body"></div></div>
@@ -1942,12 +1679,6 @@ function renderSettings(){
   grid.querySelectorAll('.color-swatch').forEach(el=>{el.addEventListener('click',()=>{settings.myAvatarColor=el.dataset.color;saveSettings();renderSettings();post('heartbeat')})});
   document.getElementById('setLang').addEventListener('change',e=>{settings.lang=e.target.value;saveSettings();lang=settings.lang;applyI18n()});
   document.getElementById('setTheme').addEventListener('change',e=>{settings.theme=e.target.value;saveSettings();applyTheme()});
-  document.getElementById('setStarsBg').addEventListener('click',function(){
-    settings.starsBg=!settings.starsBg;saveSettings();
-    this.classList.toggle('on',settings.starsBg);
-    applyStarsBg();
-    toast(settings.starsBg?t('tStarsOn'):t('tStarsOff'));
-  });
   document.getElementById('setStatus').addEventListener('change',e=>{settings.myStatus=e.target.value;$('#statusSelect').value=e.target.value;saveSettings();post('heartbeat')});
   document.getElementById('setName').addEventListener('input',e=>{settings.myName=e.target.value.trim();saveSettings();clearTimeout(window._nameTimer);window._nameTimer=setTimeout(()=>{post('heartbeat')},600)});
   document.getElementById('setNotifications').addEventListener('click',async function(){settings.notifications=!settings.notifications;saveSettings();this.classList.toggle('on',settings.notifications);if(settings.notifications&&'Notification' in window&&Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}toast(settings.notifications?t('tNotifOn'):t('tNotifOff'))});
@@ -2083,7 +1814,6 @@ async function boot(){
   loadSettings();
   lang=settings.lang||'zh';
   applyTheme();
-  applyStarsBg();
   load();
   loadPending();
   setupPWA();
