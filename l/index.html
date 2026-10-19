@@ -95,23 +95,16 @@ html,body{
 .pg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
   margin-bottom:18px}
 .cl2{position:relative;aspect-ratio:1/1;background:var(--c1);
-  border:1px solid var(--c2);border-radius:4px;display:flex;
-  flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  color:var(--c3);font-size:9px;cursor:pointer;overflow:hidden;
-  transition:border-color .12s;line-height:1.2}
+  border:1px solid var(--c2);border-radius:4px;overflow:hidden;
+  cursor:pointer;transition:border-color .12s}
 .cl2:hover{border-color:var(--lk)}
-.cl2 svg{width:26px;height:26px;stroke:var(--c3);fill:none;stroke-width:1.5;
-  stroke-linecap:round;stroke-linejoin:round}
-.cl2 span{display:block;text-align:center}
-.cl2 .en{font-size:8px;opacity:.85}
-.cl2 .fr{font-size:8px;font-style:italic;opacity:.85}
-.cl2.s{border-color:var(--lk);box-shadow:0 0 0 1px var(--lk) inset;
-  background:rgba(26,115,232,.09)}
+.cl2 svg{display:block;width:100%;height:100%}
+.cl2.s{border-color:var(--lk);box-shadow:0 0 0 1px var(--lk) inset}
 .cl2.s::after{content:"";position:absolute;top:5px;right:5px;
   width:16px;height:16px;border-radius:50%;background:var(--lk);
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4.5 4.5L19 7' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
   background-size:10px 10px;background-repeat:no-repeat;
-  background-position:center}
+  background-position:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 .pf{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding-top:14px;border-top:1px solid var(--dv)}
 .pf .h{font-size:10px;color:var(--mu);line-height:1.3;text-align:center}
@@ -154,9 +147,9 @@ html,body{
 
 <div class="pp" id="pp">
   <div class="pc">
-    <div class="pt">请选择所有包含「自行车」的图片</div>
-    <div class="pt-en">Select all images containing a bicycle</div>
-    <div class="pt-fr">Sélectionnez toutes les images contenant un vélo</div>
+    <div class="pt" id="pt">请选择所有包含「鹈鹕骑车」的图片</div>
+    <div class="pt-en" id="ptEn">Select all images containing a pelican riding a bicycle</div>
+    <div class="pt-fr" id="ptFr">Sélectionnez toutes les images contenant un pélican à vélo</div>
     <div class="ps2">点击图片进行选择，完成后点击「提交」按钮</div>
     <div class="ps2-en">Click images to select, then press Submit</div>
     <div class="ps2-fr">Cliquez sur les images pour les sélectionner, puis validez</div>
@@ -434,15 +427,25 @@ var bbEl=document.getElementById('bb');
 var sbEl=document.getElementById('sb');
 var shEl=document.getElementById('sh');
 var gdEl=document.getElementById('gd');
+var ptEl=document.getElementById('pt');
+var ptEnEl=document.getElementById('ptEn');
+var ptFrEl=document.getElementById('ptFr');
 
+/* ===== 躲避逻辑：镜像 + 传送 + 弹簧，点击后回原位 ===== */
 var W=0,H=0,CX=0,CY=0;
-var home={x:0,y:0};
-var box={x:0,y:0};
-var tgt={x:0,y:0};
-var vel={x:0,y:0};
+var homeX=0,homeY=0;
+var boxX=0,boxY=0;
+var tgtX=0,tgtY=0;
+var vx=0,vy=0;
 var laid=false;
 
-var mouse={x:-9999,y:-9999,seen:false};
+var mouseX=-9999,mouseY=-9999,mouseSeen=false;
+
+var r2off=false;
+var firstDodgeAt=null;
+var r2th=R2_MIN+Math.random()*(R2_MAX-R2_MIN);
+var lastSafeAt=0;
+var mirrorAng=null;
 
 var verified=false;
 var phase='init';
@@ -450,12 +453,8 @@ var timedOut=false;
 var failReason='exp';
 var firstLoad=true;
 var imageMode=false;
+var settling=false;
 
-var r2off=false;
-var fdat=null;
-var r2th=R2_MIN+Math.random()*(R2_MAX-R2_MIN);
-var lsafe=0;
-var mang=null;
 var idleT=null;
 var phaseT=null;
 
@@ -467,18 +466,18 @@ function layout(){
   CX=W/2;
   CY=H/2;
   var r=cardEl.getBoundingClientRect();
-  home.x=r.left+20;
-  home.y=r.top+22;
+  homeX=r.left+20;
+  homeY=r.top+22;
   if(!laid){
-    box.x=home.x;box.y=home.y;
-    tgt.x=home.x;tgt.y=home.y;
+    boxX=homeX;boxY=homeY;
+    tgtX=homeX;tgtY=homeY;
     laid=true;
     cbEl.style.visibility='visible';
-    cbEl.style.transform='translate('+home.x+'px,'+home.y+'px)';
+    cbEl.style.transform='translate('+homeX+'px,'+homeY+'px)';
   }
 }
 
-function clamp(x,y){
+function clampPos(x,y){
   return{
     x:Math.max(6,Math.min(W-38,x)),
     y:Math.max(6,Math.min(H-38,y))
@@ -486,19 +485,19 @@ function clamp(x,y){
 }
 
 function safeSpot(){
-  var bcx=box.x+16,bcy=box.y+16;
+  var bcx=boxX+16,bcy=boxY+16;
   var best=null,bs=-Infinity;
   for(var i=0;i<60;i++){
     var x=8+Math.random()*(W-44);
     var y=8+Math.random()*(H-44);
     var cx=x+16,cy=y+16;
-    var dm=Math.hypot(cx-mouse.x,cy-mouse.y);
+    var dm=Math.hypot(cx-mouseX,cy-mouseY);
     if(dm<165) continue;
     var ds=Math.hypot(cx-bcx,cy-bcy);
     var sc=dm-ds*0.38;
     if(sc>bs){bs=sc;best={x:x,y:y}}
   }
-  if(!best) best=clamp(8+Math.random()*(W-44),8+Math.random()*(H-44));
+  if(!best) best=clampPos(8+Math.random()*(W-44),8+Math.random()*(H-44));
   return best;
 }
 
@@ -513,77 +512,77 @@ function mirrorPoint(px,py){
     var ang;
     if(d<4){
       var u=CX-px,v=CY-py;
-      if(Math.hypot(u,v)<20||mang===null){
-        mang=Math.random()*Math.PI*2;
+      if(Math.hypot(u,v)<20||mirrorAng===null){
+        mirrorAng=Math.random()*Math.PI*2;
       }else{
-        mang=Math.atan2(-v,-u);
+        mirrorAng=Math.atan2(-v,-u);
       }
-      ang=mang;
+      ang=mirrorAng;
     }else{
       ang=Math.atan2(dy,dx);
     }
     tx=px+Math.cos(ang)*MN-16;
     ty=py+Math.sin(ang)*MN-16;
   }
-  return clamp(tx,ty);
+  return clampPos(tx,ty);
 }
 
 function markDodge(now){
-  if(fdat===null) fdat=now;
+  if(firstDodgeAt===null) firstDodgeAt=now;
 }
 
 function updateTarget(now){
-  if(!r2off&&fdat!==null&&(now-fdat)>=r2th){
+  if(!r2off&&firstDodgeAt!==null&&(now-firstDodgeAt)>=r2th){
     r2off=true;
     _tel.push('r2off',{t:now});
   }
-  if(!mouse.seen){
-    tgt.x=home.x;tgt.y=home.y;
+  if(!mouseSeen){
+    tgtX=homeX;tgtY=homeY;
     return;
   }
-  var bcx=box.x+16,bcy=box.y+16;
-  var hcx=home.x+16,hcy=home.y+16;
-  var dBox=Math.hypot(mouse.x-bcx,mouse.y-bcy);
-  var dHome=Math.hypot(mouse.x-hcx,mouse.y-hcy);
+  var bcx=boxX+16,bcy=boxY+16;
+  var hcx=homeX+16,hcy=homeY+16;
+  var dBox=Math.hypot(mouseX-bcx,mouseY-bcy);
+  var dHome=Math.hypot(mouseX-hcx,mouseY-hcy);
 
   if(dBox>NEAR_THRESHOLD&&dHome>NEAR_THRESHOLD){
-    tgt.x=home.x;tgt.y=home.y;
+    tgtX=homeX;tgtY=homeY;
     return;
   }
   if(!r2off&&dBox<CLOSE_THRESHOLD){
-    if(now-lsafe>260){
+    if(now-lastSafeAt>260){
       var s=safeSpot();
-      tgt.x=s.x;tgt.y=s.y;
-      lsafe=now;
+      tgtX=s.x;tgtY=s.y;
+      lastSafeAt=now;
       _tel.push('safe',{d:dBox});
     }
     markDodge(now);
     return;
   }
-  var m=mirrorPoint(mouse.x,mouse.y);
-  tgt.x=m.x;tgt.y=m.y;
+  var m=mirrorPoint(mouseX,mouseY);
+  tgtX=m.x;tgtY=m.y;
   markDodge(now);
 }
 
 function stepPhysics(){
-  var dx=tgt.x-box.x;
-  var dy=tgt.y-box.y;
+  var dx=tgtX-boxX;
+  var dy=tgtY-boxY;
   var d=Math.hypot(dx,dy);
   var k=0.15,damp=0.76;
   if(d>160){k=0.19;damp=0.73}
   if(d>360){k=0.23;damp=0.70}
-  vel.x=(vel.x+dx*k)*damp;
-  vel.y=(vel.y+dy*k)*damp;
-  var sp=Math.hypot(vel.x,vel.y);
+  vx=(vx+dx*k)*damp;
+  vy=(vy+dy*k)*damp;
+  var sp=Math.hypot(vx,vy);
   var MV=52;
-  if(sp>MV){vel.x*=MV/sp;vel.y*=MV/sp}
+  if(sp>MV){vx*=MV/sp;vy*=MV/sp}
   if(sp<0.05&&d<0.3){
-    box.x=tgt.x;box.y=tgt.y;
-    vel.x=0;vel.y=0;
+    boxX=tgtX;boxY=tgtY;
+    vx=0;vy=0;
   }else{
-    box.x+=vel.x;box.y+=vel.y;
+    boxX+=vx;boxY+=vy;
   }
-  cbEl.style.transform='translate('+box.x.toFixed(2)+'px,'+box.y.toFixed(2)+'px)';
+  cbEl.style.transform='translate('+boxX.toFixed(2)+'px,'+boxY.toFixed(2)+'px)';
 }
 
 function frame(now){
@@ -591,26 +590,35 @@ function frame(now){
     updateTarget(now);
     stepPhysics();
   }else if(verified){
-    vel.x*=0.82;vel.y*=0.82;
-    box.x+=vel.x;box.y+=vel.y;
-    cbEl.style.transform='translate('+box.x.toFixed(2)+'px,'+box.y.toFixed(2)+'px)';
+    var ddx=homeX-boxX;
+    var ddy=homeY-boxY;
+    var dd=Math.hypot(ddx,ddy);
+    var spd=Math.hypot(vx,vy);
+    if(dd>0.3||spd>0.3){
+      tgtX=homeX;tgtY=homeY;
+      stepPhysics();
+    }else if(dd>0||spd>0){
+      boxX=homeX;boxY=homeY;
+      vx=0;vy=0;
+      cbEl.style.transform='translate('+homeX.toFixed(2)+'px,'+homeY.toFixed(2)+'px)';
+    }
   }
   requestAnimationFrame(frame);
 }
 
 function resetBoxToHome(){
-  box.x=home.x;box.y=home.y;
-  tgt.x=home.x;tgt.y=home.y;
-  vel.x=0;vel.y=0;
-  cbEl.style.transform='translate('+home.x+'px,'+home.y+'px)';
+  boxX=homeX;boxY=homeY;
+  tgtX=homeX;tgtY=homeY;
+  vx=0;vy=0;
+  cbEl.style.transform='translate('+homeX+'px,'+homeY+'px)';
 }
 
 function resetDodgeState(){
-  fdat=null;
+  firstDodgeAt=null;
   r2off=false;
   r2th=R2_MIN+Math.random()*(R2_MAX-R2_MIN);
-  lsafe=0;
-  mang=null;
+  lastSafeAt=0;
+  mirrorAng=null;
   resetBoxToHome();
   _tel.push('reset',{t:Date.now()});
 }
@@ -661,6 +669,8 @@ function setPhase(next){
   }
   else if(next==='checking'){
     cbEl.classList.remove('ck');
+    cbEl.classList.remove('hd');
+    stEl.classList.remove('hd');
     cbEl.classList.add('ld');
     cardEl.classList.remove('err');
     erEl.innerHTML='';
@@ -671,6 +681,8 @@ function setPhase(next){
   }
   else if(next==='failed'){
     cbEl.classList.remove('ld');
+    cbEl.classList.remove('hd');
+    stEl.classList.remove('hd');
     cardEl.classList.add('err');
     lbEl.innerHTML='<span>验证失败</span><span class="en">Verification failed</span><span class="fr">Échec de la vérification</span>';
     if(failReason==='exp'){
@@ -707,13 +719,13 @@ function triggerFail(reason){
 }
 
 window.addEventListener('pointermove',function(e){
-  mouse.x=e.clientX;
-  mouse.y=e.clientY;
-  mouse.seen=true;
+  mouseX=e.clientX;
+  mouseY=e.clientY;
+  mouseSeen=true;
 },{passive:true});
 
 window.addEventListener('pointerleave',function(){
-  mouse.seen=false;
+  mouseSeen=false;
 });
 
 cbEl.addEventListener('click',function(e){
@@ -726,27 +738,83 @@ cbEl.addEventListener('click',function(e){
   }
 
   verified=true;
+  settling=true;
   clearTimeout(idleT);
   clearTimeout(phaseT);
+
   cbEl.classList.remove('ld');
   cbEl.classList.add('ck');
   lbEl.innerHTML='<span>验证成功</span><span class="en">Verified</span><span class="fr">Vérifié</span>';
-  tgt.x=box.x;tgt.y=box.y;
+
+  /* 停止躲避，目标回到原位 */
+  tgtX=homeX;
+  tgtY=homeY;
+
   _tel.push('pass',{t:Date.now()});
+
+  /* 给勾选框 2.5 秒回原位，然后跳转 */
   setTimeout(function(){
     window.location.href=PASS_URL;
-  },480);
+  }, 2500);
 });
 
 document.addEventListener('contextmenu',function(e){
   if(phase==='ready'&&!verified){e.preventDefault()}
 });
 
-var BROKEN_SVG='<svg viewBox="0 0 24 24">'+
-  '<rect x="3" y="3" width="18" height="18" rx="2"/>'+
-  '<circle cx="8.6" cy="8.6" r="1.5"/>'+
-  '<path d="M21 15.5l-5.2-5.2L5 21"/>'+
-  '<path d="M3.2 3.2l17.6 17.6"/></svg>';
+/* ===== 图片：鹈鹕骑车 / 拉斯维加斯球 / 装饰 ===== */
+var SVG_PELICAN =
+  '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
+    '<rect width="100" height="100" fill="#e8f4ff"/>' +
+    '<rect y="84" width="100" height="16" fill="#c8e0f0"/>' +
+    '<circle cx="32" cy="74" r="13" fill="none" stroke="#4a5568" stroke-width="3"/>' +
+    '<circle cx="70" cy="74" r="13" fill="none" stroke="#4a5568" stroke-width="3"/>' +
+    '<path d="M32 74 L48 50 L70 74 M48 50 L56 74 M44 47 L54 47" fill="none" stroke="#4a5568" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<ellipse cx="50" cy="32" rx="14" ry="9" fill="#f7f7f7" stroke="#c8c8c8" stroke-width="1"/>' +
+    '<circle cx="63" cy="24" r="6" fill="#f7f7f7" stroke="#c8c8c8" stroke-width="1"/>' +
+    '<path d="M68 22 L86 21 L68 27 Z" fill="#ffb347"/>' +
+    '<circle cx="65" cy="23" r="1.5" fill="#333"/>' +
+    '<path d="M42 30 Q50 22 58 30" fill="none" stroke="#d8d8d8" stroke-width="2"/>' +
+  '</svg>';
+
+var SVG_SPHERE =
+  '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
+    '<defs><radialGradient id="sphereGrad" cx="38%" cy="32%" r="65%">' +
+      '<stop offset="0%" stop-color="#b8a6ff"/>' +
+      '<stop offset="45%" stop-color="#7b6cff"/>' +
+      '<stop offset="100%" stop-color="#3b2f8f"/>' +
+    '</radialGradient></defs>' +
+    '<rect width="100" height="100" fill="#141528"/>' +
+    '<circle cx="50" cy="50" r="34" fill="url(#sphereGrad)"/>' +
+    '<path d="M20 40 Q50 30 80 42" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>' +
+    '<path d="M18 55 Q50 62 82 52" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="2"/>' +
+    '<path d="M25 68 Q50 75 75 65" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>' +
+    '<circle cx="40" cy="37" r="6" fill="rgba(255,255,255,.45)"/>' +
+  '</svg>';
+
+var SVG_DECO1 =
+  '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
+    '<rect width="100" height="100" fill="#eef0f3"/>' +
+    '<circle cx="34" cy="40" r="18" fill="#b8c4d0"/>' +
+    '<rect x="52" y="52" width="28" height="28" rx="6" fill="#d0d8e0"/>' +
+    '<path d="M20 78 Q40 64 62 78" fill="none" stroke="#9aa8b4" stroke-width="3"/>' +
+  '</svg>';
+
+var SVG_DECO2 =
+  '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
+    '<rect width="100" height="100" fill="#f3eef8"/>' +
+    '<rect x="18" y="22" width="26" height="26" rx="4" fill="#c8b8e0"/>' +
+    '<circle cx="68" cy="38" r="14" fill="#d8c8f0"/>' +
+    '<path d="M24 72 L48 60 L72 72 L48 82 Z" fill="#b8a8d8"/>' +
+  '</svg>';
+
+var SVG_DECO3 =
+  '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
+    '<rect width="100" height="100" fill="#eef8f0"/>' +
+    '<circle cx="30" cy="30" r="12" fill="#b8dcc0"/>' +
+    '<rect x="50" y="50" width="30" height="20" rx="4" fill="#c8e8d0"/>' +
+    '<path d="M18 70 Q38 56 58 70 T90 70" fill="none" stroke="#9ac8a8" stroke-width="3"/>' +
+  '</svg>';
 
 var cset={},sset={},ccnt=0;
 
@@ -764,19 +832,44 @@ function buildGrid(){
 
   var _s=_fnv('grid_'+Date.now());
   void _s;
-  var _r=_resolveTimeout(_fnv('r')%3);
-  void _r;
 
-  var o=shuf([0,1,2,3,4,5,6,7,8]);
-  var k=3+Math.floor(Math.random()*7);
-  for(var i=0;i<k;i++) cset[o[i]]=true;
-  ccnt=k;
+  /* 随机题目：鹈鹕骑车 / 拉斯维加斯球 */
+  var askPelican = Math.random() < 0.5;
+  var hintZh, hintEn, hintFr;
+  var answerSvg;
+
+  if(askPelican){
+    hintZh='请选择所有包含「鹈鹕骑车」的图片';
+    hintEn='Select all images containing a pelican riding a bicycle';
+    hintFr='Sélectionnez toutes les images contenant un pélican à vélo';
+    answerSvg=SVG_PELICAN;
+  }else{
+    hintZh='请选择所有包含「拉斯维加斯球」的图片';
+    hintEn='Select all images containing the Las Vegas Sphere';
+    hintFr='Sélectionnez toutes les images contenant la Sphère de Las Vegas';
+    answerSvg=SVG_SPHERE;
+  }
+
+  ptEl.textContent=hintZh;
+  ptEnEl.textContent=hintEn;
+  ptFrEl.textContent=hintFr;
+
+  /* 池：3 鹈鹕 + 3 球 + 3 装饰 */
+  var pool=[];
+  for(var p=0;p<3;p++) pool.push(SVG_PELICAN);
+  for(var q=0;q<3;q++) pool.push(SVG_SPHERE);
+  pool.push(SVG_DECO1,SVG_DECO2,SVG_DECO3);
+  pool=shuf(pool);
 
   for(var x=0;x<9;x++){
     (function(i){
       var c=document.createElement('div');
       c.className='cl2';
-      c.innerHTML=BROKEN_SVG+'<span>加载失败</span><span class="en">Load failed</span><span class="fr">Échec</span>';
+      c.innerHTML=pool[i];
+      if(pool[i]===answerSvg){
+        cset[i]=true;
+        ccnt++;
+      }
       c.addEventListener('click',function(){
         if(sset[i]){delete sset[i];c.classList.remove('s')}
         else{sset[i]=true;c.classList.add('s')}
