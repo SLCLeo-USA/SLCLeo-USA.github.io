@@ -25,9 +25,9 @@
   <div class="card">
     <div class="header">
       <h3>PDF 在线预览</h3>
-      <a href="file:///D:/Downloads/ans=ls.pdf" target="_blank" class="btn btn-outline">新窗口打开</a>
+      <a href="file:///D:/Downloads/ans%3Dls.pdf" target="_blank" class="btn btn-outline">新窗口打开</a>
     </div>
-    <iframe id="pdfFrame" src="file:///D:/Downloads/ans=ls.pdf"></iframe>
+    <iframe id="pdfFrame" src="file:///D:/Downloads/ans%3Dls.pdf"></iframe>
     <div class="toolbar">
       <div style="display:flex; gap:8px; align-items:center;">
         <span style="font-size:13px; font-weight:500;">🔍 搜索</span>
@@ -43,31 +43,28 @@
     </div>
   </div>
   <script>
-    var baseUrl = "file:///D:/Downloads/ans=ls.pdf";
-    var frame = document.getElementById('pdfFrame');
-
+    var baseUrl = "file:///D:/Downloads/ans%3Dls.pdf";
+    var frame = document.getElementById("pdfFrame");
     function doSearch() {
-      var kw = document.getElementById('searchInput').value.trim();
-      if (!kw) { alert('请输入搜索词'); return; }
-      frame.src = baseUrl.split('#')[0] + '#search=' + encodeURIComponent(kw);
+      var kw = document.getElementById("searchInput").value.trim();
+      if (!kw) { alert("请输入搜索词"); return; }
+      frame.src = baseUrl.split("#")[0] + "#search=" + encodeURIComponent(kw);
     }
     function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      frame.src = baseUrl.split('#')[0];
+      document.getElementById("searchInput").value = "";
+      frame.src = baseUrl.split("#")[0];
     }
     function doJump() {
-      var num = parseInt(document.getElementById('pageInput').value, 10);
-      if (isNaN(num) || num < 1) { alert('请输入有效页码'); return; }
-      frame.src = baseUrl.split('#')[0] + '#page=' + num;
+      var num = parseInt(document.getElementById("pageInput").value, 10);
+      if (isNaN(num) || num < 1) { alert("请输入有效页码"); return; }
+      frame.src = baseUrl.split("#")[0] + "#page=" + num;
     }
-    
-    // E 键跳转 Bing
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener("keydown", function(e) {
       var tag = document.activeElement.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
-      if (e.key === 'e' || e.key === 'E') {
+      if (tag === "INPUT" || tag === "TEXTAREA" || document.activeElement.isContentEditable) return;
+      if (e.key === "e" || e.key === "E") {
         e.preventDefault();
-        window.open('https://www.bing.com', '_blank');
+        window.open("https://www.bing.com", "_blank");
       }
     });
   </script>
