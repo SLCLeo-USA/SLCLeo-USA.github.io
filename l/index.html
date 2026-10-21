@@ -431,7 +431,6 @@ var ptEl=document.getElementById('pt');
 var ptEnEl=document.getElementById('ptEn');
 var ptFrEl=document.getElementById('ptFr');
 
-/* ===== 躲避逻辑：镜像 + 传送 + 弹簧，点击后回原位 ===== */
 var W=0,H=0,CX=0,CY=0;
 var homeX=0,homeY=0;
 var boxX=0,boxY=0;
@@ -453,7 +452,6 @@ var timedOut=false;
 var failReason='exp';
 var firstLoad=true;
 var imageMode=false;
-var settling=false;
 
 var idleT=null;
 var phaseT=null;
@@ -738,7 +736,6 @@ cbEl.addEventListener('click',function(e){
   }
 
   verified=true;
-  settling=true;
   clearTimeout(idleT);
   clearTimeout(phaseT);
 
@@ -746,13 +743,11 @@ cbEl.addEventListener('click',function(e){
   cbEl.classList.add('ck');
   lbEl.innerHTML='<span>验证成功</span><span class="en">Verified</span><span class="fr">Vérifié</span>';
 
-  /* 停止躲避，目标回到原位 */
   tgtX=homeX;
   tgtY=homeY;
 
   _tel.push('pass',{t:Date.now()});
 
-  /* 给勾选框 2.5 秒回原位，然后跳转 */
   setTimeout(function(){
     window.location.href=PASS_URL;
   }, 2500);
@@ -762,7 +757,7 @@ document.addEventListener('contextmenu',function(e){
   if(phase==='ready'&&!verified){e.preventDefault()}
 });
 
-/* ===== 图片：鹈鹕骑车 / 拉斯维加斯球 / 装饰 ===== */
+/* ===== 鹈鹕骑车 ===== */
 var SVG_PELICAN =
   '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
     '<rect width="100" height="100" fill="#e8f4ff"/>' +
@@ -777,21 +772,69 @@ var SVG_PELICAN =
     '<path d="M42 30 Q50 22 58 30" fill="none" stroke="#d8d8d8" stroke-width="2"/>' +
   '</svg>';
 
+/* ===== 拉斯维加斯球（黄色熔岩/发光 LED 球体） ===== */
 var SVG_SPHERE =
   '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
-    '<defs><radialGradient id="sphereGrad" cx="38%" cy="32%" r="65%">' +
-      '<stop offset="0%" stop-color="#b8a6ff"/>' +
-      '<stop offset="45%" stop-color="#7b6cff"/>' +
-      '<stop offset="100%" stop-color="#3b2f8f"/>' +
-    '</radialGradient></defs>' +
-    '<rect width="100" height="100" fill="#141528"/>' +
-    '<circle cx="50" cy="50" r="34" fill="url(#sphereGrad)"/>' +
-    '<path d="M20 40 Q50 30 80 42" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>' +
-    '<path d="M18 55 Q50 62 82 52" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="2"/>' +
-    '<path d="M25 68 Q50 75 75 65" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>' +
-    '<circle cx="40" cy="37" r="6" fill="rgba(255,255,255,.45)"/>' +
+    '<defs>' +
+      '<radialGradient id="lvYellowBody" cx="42%" cy="35%" r="68%">' +
+        '<stop offset="0%" stop-color="#ffed8a"/>' +
+        '<stop offset="28%" stop-color="#ffd54a"/>' +
+        '<stop offset="58%" stop-color="#f5a623"/>' +
+        '<stop offset="82%" stop-color="#c47a0a"/>' +
+        '<stop offset="100%" stop-color="#6e3f00"/>' +
+      '</radialGradient>' +
+      '<radialGradient id="lvYellowGlow" cx="50%" cy="50%" r="50%">' +
+        '<stop offset="52%" stop-color="rgba(255,190,60,.35)"/>' +
+        '<stop offset="100%" stop-color="rgba(255,190,60,0)"/>' +
+      '</radialGradient>' +
+      '<radialGradient id="lvYellowHi" cx="32%" cy="28%" r="52%">' +
+        '<stop offset="0%" stop-color="rgba(255,255,255,.45)"/>' +
+        '<stop offset="100%" stop-color="rgba(255,255,255,0)"/>' +
+      '</radialGradient>' +
+    '</defs>' +
+    /* 夜空 */
+    '<rect width="100" height="100" fill="#0a0a14"/>' +
+    /* 星星 */
+    '<circle cx="14" cy="12" r=".6" fill="#fff" opacity=".45"/>' +
+    '<circle cx="82" cy="9" r=".5" fill="#fff" opacity=".35"/>' +
+    '<circle cx="22" cy="26" r=".4" fill="#fff" opacity=".3"/>' +
+    '<circle cx="76" cy="22" r=".6" fill="#fff" opacity=".4"/>' +
+    '<circle cx="9" cy="38" r=".4" fill="#fff" opacity=".25"/>' +
+    /* 城市天际线 */
+    '<path d="M0 84 L8 84 L8 76 L15 76 L15 81 L22 81 L22 73 L28 73 L28 84 L100 84 L100 100 L0 100 Z" fill="#0b0c15"/>' +
+    '<path d="M66 84 L72 84 L72 78 L78 78 L78 83 L84 83 L84 75 L90 75 L90 82 L96 82 L96 84 Z" fill="#0b0c15"/>' +
+    /* 地面 */
+    '<rect y="84" width="100" height="16" fill="#07080f"/>' +
+    /* 球体光晕 */
+    '<circle cx="50" cy="50" r="42" fill="url(#lvYellowGlow)"/>' +
+    /* 底座 */
+    '<ellipse cx="50" cy="83" rx="20" ry="3" fill="#1a1408"/>' +
+    /* 球体 */
+    '<circle cx="50" cy="50" r="31" fill="url(#lvYellowBody)"/>' +
+    /* LED 横向网格（曲面感） */
+    '<g stroke="rgba(255,220,120,.28)" stroke-width=".5" fill="none">' +
+      '<path d="M23 39 Q50 33 77 39"/>' +
+      '<path d="M20 47 Q50 42 80 47"/>' +
+      '<path d="M20 55 Q50 51 80 55"/>' +
+      '<path d="M23 63 Q50 59 77 63"/>' +
+      '<path d="M29 70 Q50 67 71 70"/>' +
+    '</g>' +
+    /* LED 纵向网格 */
+    '<g stroke="rgba(255,220,120,.18)" stroke-width=".45" fill="none">' +
+      '<ellipse cx="50" cy="50" rx="10" ry="31"/>' +
+      '<ellipse cx="50" cy="50" rx="21" ry="31"/>' +
+    '</g>' +
+    /* 熔岩/发光纹理：弯曲的光带 */
+    '<path d="M30 36 Q44 30 58 38 T76 50" fill="none" stroke="rgba(255,245,180,.55)" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<path d="M24 52 Q38 44 52 52 T78 58" fill="none" stroke="rgba(255,230,130,.4)" stroke-width="1.1" stroke-linecap="round"/>' +
+    '<path d="M32 66 Q46 60 60 66 T74 70" fill="none" stroke="rgba(255,210,90,.3)" stroke-width=".9" stroke-linecap="round"/>' +
+    /* 高光 */
+    '<circle cx="50" cy="50" r="31" fill="url(#lvYellowHi)"/>' +
+    /* 地面反光 */
+    '<ellipse cx="50" cy="85" rx="25" ry="3" fill="rgba(255,190,60,.18)"/>' +
   '</svg>';
 
+/* ===== 装饰图案 ===== */
 var SVG_DECO1 =
   '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
     '<rect width="100" height="100" fill="#eef0f3"/>' +
@@ -833,7 +876,6 @@ function buildGrid(){
   var _s=_fnv('grid_'+Date.now());
   void _s;
 
-  /* 随机题目：鹈鹕骑车 / 拉斯维加斯球 */
   var askPelican = Math.random() < 0.5;
   var hintZh, hintEn, hintFr;
   var answerSvg;
@@ -854,7 +896,6 @@ function buildGrid(){
   ptEnEl.textContent=hintEn;
   ptFrEl.textContent=hintFr;
 
-  /* 池：3 鹈鹕 + 3 球 + 3 装饰 */
   var pool=[];
   for(var p=0;p<3;p++) pool.push(SVG_PELICAN);
   for(var q=0;q<3;q++) pool.push(SVG_SPHERE);
