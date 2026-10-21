@@ -3,70 +3,729 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF 极简阅读器</title>
+  <title>通用 PDF 阅读器 · 路径编辑器</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f2f2f7; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; }
-    .card { width: 100%; max-width: 1100px; background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 92vh; }
-    .header { padding: 12px 20px; border-bottom: 1px solid #f0f0f5; display: flex; justify-content: space-between; align-items: center; }
-    .header h3 { font-size: 15px; color: #1c1c1e; }
-    .toolbar { padding: 10px 20px; background: #fff; border-top: 1px solid #f0f0f5; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
-    .toolbar input { padding: 8px 12px; border: 1px solid #d1d1d6; border-radius: 8px; font-size: 13px; outline: none; background: #f8f8fa; }
-    .toolbar input:focus { border-color: #007aff; background: #fff; }
-    .btn { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.15s; }
-    .btn-primary { background: #007aff; color: #fff; }
-    .btn-secondary { background: #f2f2f7; color: #1c1c1e; border: 1px solid #e5e5ea; }
-    .btn-outline { background: transparent; color: #007aff; border: 1px solid #c7d9f0; text-decoration: none; display: inline-flex; align-items: center; }
-    iframe { width: 100%; height: 100%; min-height: 80vh; border: none; flex: 1; }
-    @media (max-width: 640px) { .toolbar { flex-direction: column; align-items: stretch; } .toolbar input { width: 100%; } }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    /* 编辑器卡片 */
+    .editor-card {
+      width: 100%;
+      max-width: 1200px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+      transition: box-shadow 0.2s ease;
+    }
+
+    /* 编辑器顶部栏 */
+    .editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: #ffffff;
+      border-bottom: 1px solid #e9eef4;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .editor-header h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0b2b4a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .editor-header h2 svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: #2a6f97;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: #e3f0fa;
+      color: #1e5f86;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      letter-spacing: 0.3px;
+    }
+
+    /* 表单区域 */
+    .editor-body {
+      padding: 1.2rem 1.5rem 1.5rem;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      flex: 1 1 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .form-group label .hint-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background: #d0dfed;
+      color: #1e5f86;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: help;
+    }
+
+    .form-control {
+      padding: 0.65rem 1rem;
+      border: 1.5px solid #dae3ed;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      background: #fbfdff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      color: #0b2b4a;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      border-color: #2a6f97;
+      box-shadow: 0 0 0 3px rgba(42, 111, 151, 0.15);
+      background: #ffffff;
+    }
+
+    .form-control::placeholder {
+      color: #9aaec1;
+      font-family: inherit;
+      opacity: 0.7;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 0.4rem;
+    }
+
+    .btn {
+      padding: 0.65rem 1.4rem;
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      font-family: inherit;
+      line-height: 1.4;
+      white-space: nowrap;
+      border: 1.5px solid transparent;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: #1e5f86;
+      color: white;
+      box-shadow: 0 4px 10px -4px rgba(30, 95, 134, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: #164a68;
+      box-shadow: 0 6px 14px -4px rgba(30, 95, 134, 0.5);
+    }
+
+    .btn-secondary {
+      background: #eef3f9;
+      color: #1e3e5c;
+      border-color: #d3e0ec;
+    }
+
+    .btn-secondary:hover {
+      background: #e2ecf5;
+      border-color: #b8cee0;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #2a6f97;
+      border-color: #b8d0e4;
+    }
+
+    .btn-outline:hover {
+      background: #ecf4fa;
+      border-color: #2a6f97;
+    }
+
+    .btn svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* 状态提示条 */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      padding: 0.7rem 1rem;
+      background: #f6fafd;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: #3a5b78;
+      border-left: 4px solid #2a6f97;
+      transition: background 0.2s, border-color 0.2s;
+      word-break: break-all;
+    }
+
+    .status-bar.error {
+      background: #fef6f6;
+      border-left-color: #c0392b;
+      color: #8b3a3a;
+    }
+
+    .status-bar.success {
+      background: #f2faf5;
+      border-left-color: #27ae60;
+      color: #1e6b3e;
+    }
+
+    .status-bar .url-preview {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      background: #e4eef8;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #164a68;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* PDF 阅读器容器 */
+    .viewer-card {
+      width: 100%;
+      max-width: 1200px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1 0 auto;
+      min-height: 65vh;
+    }
+
+    .viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1.5rem;
+      background: #ffffff;
+      border-bottom: 1px solid #e9eef4;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .viewer-header .file-info {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      color: #2c3e50;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .viewer-header .file-info svg {
+      width: 1.2rem;
+      height: 1.2rem;
+      color: #c0392b;
+      flex-shrink: 0;
+    }
+
+    .viewer-header .viewer-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .viewer-embed-wrapper {
+      flex: 1 0 auto;
+      min-height: 65vh;
+      background: #eef3f8;
+      position: relative;
+    }
+
+    .viewer-embed {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 65vh;
+      border: none;
+      background: #ffffff;
+    }
+
+    /* 空状态 / 错误占位 */
+    .placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      background: #f6faff;
+      color: #4a6b88;
+      gap: 1rem;
+    }
+
+    .placeholder svg {
+      width: 4rem;
+      height: 4rem;
+      opacity: 0.4;
+      color: #7a9bb8;
+    }
+
+    .placeholder h3 {
+      font-weight: 500;
+      font-size: 1.1rem;
+      color: #1e3e5c;
+    }
+
+    .placeholder p {
+      font-size: 0.9rem;
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    .placeholder .btn {
+      margin-top: 0.4rem;
+    }
+
+    /* 小屏适配 */
+    @media (max-width: 640px) {
+      body {
+        padding: 0.6rem;
+      }
+
+      .editor-card,
+      .viewer-card {
+        border-radius: 16px;
+      }
+
+      .editor-header h2 {
+        font-size: 1rem;
+      }
+
+      .form-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+      }
+
+      .form-group {
+        flex: 1 1 auto;
+      }
+
+      .btn {
+        padding: 0.55rem 1.1rem;
+        font-size: 0.8rem;
+      }
+
+      .viewer-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .viewer-embed-wrapper,
+      .viewer-embed {
+        min-height: 60vh;
+      }
+
+      .status-bar {
+        flex-wrap: wrap;
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="header">
-      <h3>PDF 在线预览</h3>
-      <a href="file:///D:/Downloads/ans%3Dls.pdf" target="_blank" class="btn btn-outline">新窗口打开</a>
+
+  <!-- ===== 编辑器面板 ===== -->
+  <div class="editor-card">
+    <div class="editor-header">
+      <h2>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+        </svg>
+        PDF 路径编辑器
+      </h2>
+      <span class="badge">实时更新</span>
     </div>
-    <iframe id="pdfFrame" src="file:///D:/Downloads/ans%3Dls.pdf"></iframe>
-    <div class="toolbar">
-      <div style="display:flex; gap:8px; align-items:center;">
-        <span style="font-size:13px; font-weight:500;">🔍 搜索</span>
-        <input type="text" id="searchInput" placeholder="输入文字..." />
-        <button class="btn btn-primary" onclick="doSearch()">搜索</button>
-        <button class="btn btn-secondary" onclick="clearSearch()">清除</button>
+
+    <div class="editor-body">
+      <div class="form-row">
+        <!-- 路径输入 -->
+        <div class="form-group" style="flex: 3 1 320px;">
+          <label for="pdfPath">
+            PDF 文件路径 / 名称
+            <span class="hint-icon" title="你的PDF和网页在同级目录，直接写文件名即可，例如 ans=ls.pdf">?</span>
+          </label>
+          <input
+            type="text"
+            id="pdfPath"
+            class="form-control"
+            placeholder="例如：ans=ls.pdf"
+            value="ans=ls.pdf"
+            spellcheck="false"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- 按钮组 -->
+        <div class="btn-group" style="flex: 0 0 auto;">
+          <button class="btn btn-primary" id="loadBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9" />
+              <polyline points="21 3 21 9 15 9" />
+            </svg>
+            加载 PDF
+          </button>
+          <button class="btn btn-secondary" id="resetBtn" title="恢复为默认路径">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            重置
+          </button>
+          <button class="btn btn-outline" id="openNewTabBtn" title="在新标签页中打开当前 PDF">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+            新窗口
+          </button>
+        </div>
       </div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <span style="font-size:13px; font-weight:500;">📄 页码</span>
-        <input type="number" id="pageInput" min="1" value="1" style="width:70px; text-align:center;" />
-        <button class="btn btn-primary" onclick="doJump()">跳转</button>
+
+      <!-- 状态提示 -->
+      <div class="status-bar" id="statusBar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        <span>当前路径：<code class="url-preview" id="urlPreview">ans=ls.pdf</code></span>
       </div>
     </div>
   </div>
+
+  <!-- ===== PDF 阅读器 ===== -->
+  <div class="viewer-card">
+    <div class="viewer-header">
+      <div class="file-info">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
+        <span id="fileDisplay">ans=ls.pdf</span>
+      </div>
+      <div class="viewer-actions">
+        <button class="btn btn-outline" id="refreshBtn" style="padding:0.4rem 1rem; font-size:0.8rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+            <path d="M23 4v6h-6" />
+            <path d="M1 20v-6h6" />
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+          </svg>
+          刷新
+        </button>
+      </div>
+    </div>
+
+    <div class="viewer-embed-wrapper" id="viewerWrapper">
+      <!-- iframe 用于内嵌 PDF -->
+      <iframe
+        id="pdfIframe"
+        class="viewer-embed"
+        src=""
+        title="PDF 在线预览"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        style="display: none;"
+      ></iframe>
+
+      <!-- 占位 / 错误提示区 -->
+      <div class="placeholder" id="placeholder">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <circle cx="12" cy="16" r="1" />
+          <line x1="12" y1="12" x2="12" y2="14" />
+        </svg>
+        <h3>准备就绪</h3>
+        <p>在上方输入 PDF 文件路径或名称，然后点击“加载 PDF”即可预览。</p>
+        <p style="font-size:0.8rem; color:#7a9bb8;">支持相对路径、绝对路径和完整 URL</p>
+      </div>
+    </div>
+  </div>
+
   <script>
-    var baseUrl = "file:///D:/Downloads/ans%3Dls.pdf";
-    var frame = document.getElementById("pdfFrame");
-    function doSearch() {
-      var kw = document.getElementById("searchInput").value.trim();
-      if (!kw) { alert("请输入搜索词"); return; }
-      frame.src = baseUrl.split("#")[0] + "#search=" + encodeURIComponent(kw);
-    }
-    function clearSearch() {
-      document.getElementById("searchInput").value = "";
-      frame.src = baseUrl.split("#")[0];
-    }
-    function doJump() {
-      var num = parseInt(document.getElementById("pageInput").value, 10);
-      if (isNaN(num) || num < 1) { alert("请输入有效页码"); return; }
-      frame.src = baseUrl.split("#")[0] + "#page=" + num;
-    }
-    document.addEventListener("keydown", function(e) {
-      var tag = document.activeElement.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || document.activeElement.isContentEditable) return;
-      if (e.key === "e" || e.key === "E") {
-        e.preventDefault();
-        window.open("https://www.bing.com", "_blank");
+    (function() {
+      'use strict';
+
+      // ---------- DOM 引用 ----------
+      const pdfPathInput = document.getElementById('pdfPath');
+      const loadBtn = document.getElementById('loadBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const openNewTabBtn = document.getElementById('openNewTabBtn');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const statusBar = document.getElementById('statusBar');
+      const urlPreview = document.getElementById('urlPreview');
+      const fileDisplay = document.getElementById('fileDisplay');
+      const pdfIframe = document.getElementById('pdfIframe');
+      const placeholder = document.getElementById('placeholder');
+      const viewerWrapper = document.getElementById('viewerWrapper');
+
+      // 默认路径（改成了你的实际文件名）
+      const DEFAULT_PATH = 'ans=ls.pdf';
+
+      // 记录当前有效的路径（用于“新窗口打开”等操作）
+      let currentPath = DEFAULT_PATH;
+
+      // ---------- 辅助函数 ----------
+
+      /**
+       * 根据输入路径生成完整的显示/加载 URL
+       */
+      function resolveUrl(path) {
+        const trimmed = path.trim();
+        if (!trimmed) return '';
+
+        // 已经是完整 URL
+        if (/^https?:\/\//i.test(trimmed)) {
+          return trimmed;
+        }
+
+        try {
+          const base = window.location.href;
+          return new URL(trimmed, base).href;
+        } catch (e) {
+          return trimmed;
+        }
       }
-    });
+
+      /**
+       * 更新 UI 状态栏和文件显示
+       */
+      function updateStatus(message, type, pathForDisplay) {
+        statusBar.classList.remove('error', 'success');
+        if (type === 'error') statusBar.classList.add('error');
+        if (type === 'success') statusBar.classList.add('success');
+
+        const existingSvg = statusBar.querySelector('svg');
+        statusBar.innerHTML = '';
+        if (existingSvg) statusBar.appendChild(existingSvg);
+        else {
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('width', '16');
+          svg.setAttribute('height', '16');
+          svg.setAttribute('viewBox', '0 0 24 24');
+          svg.setAttribute('fill', 'none');
+          svg.setAttribute('stroke', 'currentColor');
+          svg.setAttribute('stroke-width', '2');
+          svg.setAttribute('stroke-linecap', 'round');
+          svg.setAttribute('stroke-linejoin', 'round');
+          svg.style.flexShrink = '0';
+          svg.innerHTML = '<circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />';
+          statusBar.appendChild(svg);
+        }
+
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = message;
+        statusBar.appendChild(textSpan);
+
+        if (pathForDisplay !== undefined) {
+          urlPreview.textContent = pathForDisplay;
+          fileDisplay.textContent = pathForDisplay;
+        }
+      }
+
+      /**
+       * 加载 PDF（核心逻辑）
+       */
+      function loadPDF(path) {
+        const rawPath = path.trim();
+
+        if (!rawPath) {
+          updateStatus('❌ 请输入 PDF 文件路径或名称', 'error', '(空)');
+          pdfIframe.style.display = 'none';
+          placeholder.style.display = 'flex';
+          placeholder.querySelector('h3').textContent = '路径不能为空';
+          placeholder.querySelector('p').textContent = '请在上方输入 PDF 文件的路径或名称。';
+          return;
+        }
+
+        const resolvedUrl = resolveUrl(rawPath);
+
+        currentPath = rawPath;
+        updateStatus(
+          `✅ 正在加载：<code class="url-preview">${escapeHtml(rawPath)}</code>`,
+          'success',
+          rawPath
+        );
+
+        pdfIframe.src = resolvedUrl;
+        pdfIframe.style.display = 'block';
+        placeholder.style.display = 'none';
+
+        try {
+          localStorage.setItem('pdf_reader_last_path', rawPath);
+        } catch (e) { /* 忽略存储错误 */ }
+
+        openNewTabBtn.title = `在新标签页中打开：${resolvedUrl}`;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function resetToDefault() {
+        pdfPathInput.value = DEFAULT_PATH;
+        loadPDF(DEFAULT_PATH);
+      }
+
+      // ---------- 事件绑定 ----------
+
+      loadBtn.addEventListener('click', function() {
+        loadPDF(pdfPathInput.value);
+      });
+
+      pdfPathInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          loadPDF(pdfPathInput.value);
+        }
+      });
+
+      pdfPathInput.addEventListener('input', function() {
+        const val = this.value.trim() || '(空)';
+        urlPreview.textContent = val;
+        fileDisplay.textContent = val;
+        if (!this.value.trim()) {
+          updateStatus('⚠️ 路径为空，请输入 PDF 文件路径', 'error', '(空)');
+        } else {
+          updateStatus(`📝 当前输入：<code class="url-preview">${escapeHtml(this.value.trim())}</code>`, '', this.value.trim());
+        }
+      });
+
+      resetBtn.addEventListener('click', resetToDefault);
+
+      openNewTabBtn.addEventListener('click', function() {
+        const rawPath = pdfPathInput.value.trim();
+        if (!rawPath) {
+          alert('请先输入 PDF 路径');
+          return;
+        }
+        const resolved = resolveUrl(rawPath);
+        window.open(resolved, '_blank', 'noopener,noreferrer');
+      });
+
+      refreshBtn.addEventListener('click', function() {
+        if (pdfIframe.src) {
+          const originalSrc = pdfIframe.src;
+          const baseSrc = originalSrc.split('?')[0];
+          pdfIframe.src = baseSrc + (baseSrc.includes('?') ? '&' : '?') + '_t=' + Date.now();
+          updateStatus(`🔄 已刷新：<code class="url-preview">${escapeHtml(currentPath)}</code>`, 'success', currentPath);
+        } else {
+          loadPDF(pdfPathInput.value);
+        }
+      });
+
+      pdfIframe.addEventListener('load', function() {
+        placeholder.style.display = 'none';
+        pdfIframe.style.display = 'block';
+      });
+
+      pdfIframe.addEventListener('error', function() {
+        pdfIframe.style.display = 'none';
+        placeholder.style.display = 'flex';
+        placeholder.querySelector('h3').textContent = '加载失败';
+        placeholder.querySelector('p').textContent = '无法加载 PDF 文件，请检查路径是否正确，或文件是否存在。';
+        updateStatus(`❌ 加载失败：<code class="url-preview">${escapeHtml(currentPath)}</code>`, 'error', currentPath);
+      });
+
+      // ---------- 初始化 ----------
+      (function init() {
+        let initialPath = DEFAULT_PATH;
+        try {
+          const saved = localStorage.getItem('pdf_reader_last_path');
+          if (saved && saved.trim()) {
+            initialPath = saved.trim();
+          }
+        } catch (e) { /* 忽略 */ }
+
+        pdfPathInput.value = initialPath;
+        urlPreview.textContent = initialPath;
+        fileDisplay.textContent = initialPath;
+
+        loadPDF(initialPath);
+      })();
+
+    })();
   </script>
 </body>
 </html>
