@@ -803,7 +803,7 @@ const I18N = {
 let LANG = 'en';
 
 /* ============================================================
-   机场数据
+   机场数据（已扩充：美、加、英、法、德、西、瑞、俄全面补齐）
    ============================================================ */
 const RAW = [
 /* 中国 */
@@ -870,10 +870,12 @@ const RAW = [
 ["MFM","澳门","Macau","Macao","澳门国际机场","中国澳门","Macau","Macao",22.1496,113.5916,480,"VMMC"],
 ["TPE","台北","Taipei","Taipei","桃园国际机场","中国台湾","Taiwan","Taïwan",25.0777,121.2328,480,"RCTP"],
 ["KHH","高雄","Kaohsiung","Kaohsiung","小港国际机场","中国台湾","Taiwan","Taïwan",22.5771,120.3499,480,"RCKH"],
+
 /* 日韩蒙 */
 ["NRT","东京","Tokyo","Tokyo","成田国际机场","日本","Japan","Japon",35.7720,140.3929,540,"RJAA"],
 ["HND","东京","Tokyo","Tokyo","羽田机场","日本","Japan","Japon",35.5494,139.7798,540,"RJTT"],
 ["KIX","大阪","Osaka","Osaka","关西国际机场","日本","Japan","Japon",34.4347,135.2440,540,"RJBB"],
+["ITM","大阪","Osaka","Osaka","伊丹机场","日本","Japan","Japon",34.7855,135.4382,540,"RJOO"],
 ["NGO","名古屋","Nagoya","Nagoya","中部国际机场","日本","Japan","Japon",34.8584,136.8054,540,"RJGG"],
 ["CTS","札幌","Sapporo","Sapporo","新千岁机场","日本","Japan","Japon",42.7752,141.6923,540,"RJCC"],
 ["FUK","福冈","Fukuoka","Fukuoka","福冈机场","日本","Japan","Japon",33.5859,130.4506,540,"RJFF"],
@@ -888,6 +890,7 @@ const RAW = [
 ["CJU","济州","Jeju","Jeju","济州国际机场","韩国","South Korea","Corée du Sud",33.5113,126.4930,540,"RKPC"],
 ["TAE","大邱","Daegu","Daegu","大邱国际机场","韩国","South Korea","Corée du Sud",35.8941,128.6589,540,"RKTN"],
 ["UBN","乌兰巴托","Ulaanbaatar","Oulan-Bator","成吉思汗国际机场","蒙古","Mongolia","Mongolie",47.6431,106.8195,480,"ZMCK"],
+
 /* 东南亚 */
 ["SIN","新加坡","Singapore","Singapour","樟宜机场","新加坡","Singapore","Singapour",1.3644,103.9915,480,"WSSS"],
 ["BKK","曼谷","Bangkok","Bangkok","素万那普机场","泰国","Thailand","Thaïlande",13.6900,100.7501,420,"VTBS"],
@@ -912,9 +915,11 @@ const RAW = [
 ["CXR","芽庄","Nha Trang","Nha Trang","金兰国际机场","越南","Vietnam","Viêt Nam",11.9982,109.2192,420,"VVCR"],
 ["PQC","富国岛","Phu Quoc","Phu Quoc","富国国际机场","越南","Vietnam","Viêt Nam",10.1697,103.9931,420,"VVPQ"],
 ["PNH","金边","Phnom Penh","Phnom Penh","金边国际机场","柬埔寨","Cambodia","Cambodge",11.5466,104.8441,420,"VDPP"],
+["REP","暹粒","Siem Reap","Siem Reap","暹粒国际机场","柬埔寨","Cambodia","Cambodge",13.4107,103.8130,420,"VDSR"],
 ["RGN","仰光","Yangon","Rangoun","仰光国际机场","缅甸","Myanmar","Birmanie",16.9073,96.1332,390,"VYYY"],
 ["VTE","万象","Vientiane","Vientiane","瓦岱国际机场","老挝","Laos","Laos",17.9883,102.5633,420,"VLVT"],
 ["BWN","斯里巴加湾","Bandar Seri Begawan","Bandar Seri Begawan","文莱国际机场","文莱","Brunei","Brunei",4.9442,114.9283,480,"WBSB"],
+
 /* 南亚 */
 ["DEL","德里","Delhi","Delhi","英迪拉·甘地国际机场","印度","India","Inde",28.5562,77.1000,330,"VIDP"],
 ["BOM","孟买","Mumbai","Bombay","贾特拉帕蒂·希瓦吉国际机场","印度","India","Inde",19.0896,72.8656,330,"VABB"],
@@ -922,6 +927,8 @@ const RAW = [
 ["MAA","金奈","Chennai","Madras","金奈国际机场","印度","India","Inde",12.9941,80.1709,330,"VOMM"],
 ["CCU","加尔各答","Kolkata","Calcutta","内塔吉·苏巴斯·钱德拉·鲍斯国际机场","印度","India","Inde",22.6547,88.4467,330,"VECC"],
 ["HYD","海得拉巴","Hyderabad","Hyderabad","拉吉夫·甘地国际机场","印度","India","Inde",17.2403,78.4294,330,"VOHS"],
+["COK","科钦","Kochi","Kochi","科钦国际机场","印度","India","Inde",10.1520,76.4019,330,"VOCI"],
+["TRV","特里凡得琅","Thiruvananthapuram","Thiruvananthapuram","特里凡得琅国际机场","印度","India","Inde",8.4821,76.9200,330,"VOTV"],
 ["DAC","达卡","Dhaka","Dacca","沙阿贾拉勒国际机场","孟加拉国","Bangladesh","Bangladesh",23.8433,90.3978,360,"VGHS"],
 ["KTM","加德满都","Kathmandu","Katmandou","特里布万国际机场","尼泊尔","Nepal","Népal",27.6966,85.3591,345,"VNKT"],
 ["CMB","科伦坡","Colombo","Colombo","班达拉奈克国际机场","斯里兰卡","Sri Lanka","Sri Lanka",7.1808,79.8841,330,"VCBI"],
@@ -929,6 +936,7 @@ const RAW = [
 ["LHE","拉合尔","Lahore","Lahore","阿拉马·伊克巴尔国际机场","巴基斯坦","Pakistan","Pakistan",31.5216,74.4036,300,"OPLA"],
 ["ISB","伊斯兰堡","Islamabad","Islamabad","伊斯兰堡国际机场","巴基斯坦","Pakistan","Pakistan",33.5607,72.8516,300,"OPIS"],
 ["MLE","马累","Malé","Malé","维拉纳国际机场","马尔代夫","Maldives","Maldives",4.1918,73.5291,300,"VRMM"],
+
 /* 中东 */
 ["DXB","迪拜","Dubai","Dubaï","迪拜国际机场","阿联酋","United Arab Emirates","Émirats arabes unis",25.2532,55.3657,240,"OMDB"],
 ["AUH","阿布扎比","Abu Dhabi","Abou Dabi","扎耶德国际机场","阿联酋","United Arab Emirates","Émirats arabes unis",24.4330,54.6511,240,"OMAA"],
@@ -945,20 +953,55 @@ const RAW = [
 ["BEY","贝鲁特","Beirut","Beyrouth","拉菲克·哈里里国际机场","黎巴嫩","Lebanon","Liban",33.8209,35.4884,120,"OLBA"],
 ["AMM","安曼","Amman","Amman","阿丽亚皇后国际机场","约旦","Jordan","Jordanie",31.7226,35.9932,180,"OJAI"],
 ["IKA","德黑兰","Tehran","Téhéran","伊玛目霍梅尼国际机场","伊朗","Iran","Iran",35.4161,51.1522,210,"OIIE"],
-/* 欧洲 */
+
+/* ═══════ 英国 ═══════ */
 ["LHR","伦敦","London","Londres","希思罗机场","英国","United Kingdom","Royaume-Uni",51.4700,-0.4543,0,"EGLL"],
 ["LGW","伦敦","London","Londres","盖特威克机场","英国","United Kingdom","Royaume-Uni",51.1537,-0.1821,0,"EGKK"],
+["STN","伦敦","London","Londres","斯坦斯特德机场","英国","United Kingdom","Royaume-Uni",51.8850,0.2350,0,"EGSS"],
+["LTN","伦敦","London","Londres","卢顿机场","英国","United Kingdom","Royaume-Uni",51.8747,-0.3683,0,"EGGW"],
+["LCY","伦敦","London","Londres","伦敦城市机场","英国","United Kingdom","Royaume-Uni",51.5053,0.0553,0,"EGLC"],
+["SEN","伦敦","London","Londres","绍森德机场","英国","United Kingdom","Royaume-Uni",51.5714,0.6950,0,"EGMC"],
 ["MAN","曼彻斯特","Manchester","Manchester","曼彻斯特机场","英国","United Kingdom","Royaume-Uni",53.3537,-2.2750,0,"EGCC"],
 ["EDI","爱丁堡","Edinburgh","Édimbourg","爱丁堡机场","英国","United Kingdom","Royaume-Uni",55.9500,-3.3725,0,"EGPH"],
 ["BHX","伯明翰","Birmingham","Birmingham","伯明翰机场","英国","United Kingdom","Royaume-Uni",52.4539,-1.7480,0,"EGBB"],
 ["GLA","格拉斯哥","Glasgow","Glasgow","格拉斯哥机场","英国","United Kingdom","Royaume-Uni",55.8719,-4.4331,0,"EGPF"],
+["BRS","布里斯托尔","Bristol","Bristol","布里斯托尔机场","英国","United Kingdom","Royaume-Uni",51.3827,-2.7191,0,"EGGD"],
+["NCL","纽卡斯尔","Newcastle","Newcastle","纽卡斯尔机场","英国","United Kingdom","Royaume-Uni",55.0375,-1.6917,0,"EGNT"],
+["LPL","利物浦","Liverpool","Liverpool","利物浦约翰·列侬机场","英国","United Kingdom","Royaume-Uni",53.3336,-2.8497,0,"EGGP"],
+["EMA","诺丁汉","Nottingham","Nottingham","东米德兰兹机场","英国","United Kingdom","Royaume-Uni",52.8311,-1.3281,0,"EGNX"],
+["BFS","贝尔法斯特","Belfast","Belfast","贝尔法斯特国际机场","英国","United Kingdom","Royaume-Uni",54.6575,-6.2158,0,"EGAA"],
+["BHD","贝尔法斯特","Belfast","Belfast","乔治·贝斯特城市机场","英国","United Kingdom","Royaume-Uni",54.6181,-5.8725,0,"EGAC"],
+["EXT","埃克塞特","Exeter","Exeter","埃克塞特国际机场","英国","United Kingdom","Royaume-Uni",50.7344,-3.4139,0,"EGTE"],
+["JER","泽西","Jersey","Jersey","泽西机场","英国","United Kingdom","Royaume-Uni",49.2079,-2.1955,0,"EGJJ"],
+["GCI","根西","Guernsey","Guernsey","根西机场","英国","United Kingdom","Royaume-Uni",49.4350,-2.6020,0,"EGJB"],
+["IOM","马恩岛","Isle of Man","Île de Man","马恩岛机场","英国","United Kingdom","Royaume-Uni",54.0833,-4.6239,0,"EGNS"],
+["ABZ","阿伯丁","Aberdeen","Aberdeen","阿伯丁机场","英国","United Kingdom","Royaume-Uni",57.2019,-2.1978,0,"EGPD"],
+["INV","因弗内斯","Inverness","Inverness","因弗内斯机场","英国","United Kingdom","Royaume-Uni",57.5425,-4.0475,0,"EGPE"],
+["SOU","南安普敦","Southampton","Southampton","南安普敦机场","英国","United Kingdom","Royaume-Uni",50.9503,-1.3568,0,"EGHI"],
+
+/* ═══════ 法国 ═══════ */
 ["CDG","巴黎","Paris","Paris","戴高乐机场","法国","France","France",49.0097,2.5479,60,"LFPG"],
 ["ORY","巴黎","Paris","Paris","奥利机场","法国","France","France",48.7233,2.3794,60,"LFPO"],
+["BVA","巴黎","Paris","Paris","博韦-蒂耶机场","法国","France","France",49.4544,2.1128,60,"LFOB"],
 ["NCE","尼斯","Nice","Nice","蔚蓝海岸机场","法国","France","France",43.6584,7.2159,60,"LFMN"],
 ["MRS","马赛","Marseille","Marseille","马赛普罗旺斯机场","法国","France","France",43.4393,5.2214,60,"LFML"],
 ["LYS","里昂","Lyon","Lyon","里昂圣埃克絮佩里机场","法国","France","France",45.7256,5.0811,60,"LFLL"],
 ["BOD","波尔多","Bordeaux","Bordeaux","波尔多机场","法国","France","France",44.8283,-0.7156,60,"LFBD"],
 ["TLS","图卢兹","Toulouse","Toulouse","图卢兹机场","法国","France","France",43.6294,1.3638,60,"LFBO"],
+["NTE","南特","Nantes","Nantes","南特机场","法国","France","France",47.1532,-1.6107,60,"LFRS"],
+["LIL","里尔","Lille","Lille","里尔机场","法国","France","France",50.5619,3.0894,60,"LFQQ"],
+["BSL","巴塞尔","Basel","Bâle","巴塞尔-米卢斯机场","法国","France","France",47.6000,7.5292,60,"LFSB"],
+["SXB","斯特拉斯堡","Strasbourg","Strasbourg","斯特拉斯堡机场","法国","France","France",48.5383,7.6283,60,"LFST"],
+["MPL","蒙彼利埃","Montpellier","Montpellier","蒙彼利埃机场","法国","France","France",43.5762,3.9630,60,"LFMT"],
+["RNS","雷恩","Rennes","Rennes","雷恩机场","法国","France","France",48.0695,-1.7348,60,"LFRN"],
+["AJA","阿雅克肖","Ajaccio","Ajaccio","阿雅克肖机场","法国","France","France",41.9236,8.8029,60,"LFKJ"],
+["BIA","巴斯蒂亚","Bastia","Bastia","巴斯蒂亚机场","法国","France","France",42.5527,9.4835,60,"LFKB"],
+["FSC","费加里","Figari","Figari","费加里机场","法国","France","France",41.5006,9.0978,60,"LFKF"],
+["PTP","皮特尔角城","Pointe-à-Pitre","Pointe-à-Pitre","皮特尔角城机场","法国","France","France",16.2653,-61.5319,-240,"TFFR"],
+["FDF","法兰西堡","Fort-de-France","Fort-de-France","法兰西堡机场","法国","France","France",14.5910,-61.0032,-240,"TFFF"],
+["RUN","留尼汪","Réunion","La Réunion","罗兰·加洛斯机场","法国","France","France",-20.8871,55.5154,240,"FMEE"],
+
+/* ═══════ 德国 ═══════ */
 ["FRA","法兰克福","Frankfurt","Francfort","法兰克福机场","德国","Germany","Allemagne",50.0379,8.5622,60,"EDDF"],
 ["MUC","慕尼黑","Munich","Munich","慕尼黑机场","德国","Germany","Allemagne",48.3537,11.7750,60,"EDDM"],
 ["BER","柏林","Berlin","Berlin","勃兰登堡机场","德国","Germany","Allemagne",52.3667,13.5033,60,"EDDB"],
@@ -968,24 +1011,73 @@ const RAW = [
 ["CGN","科隆","Cologne","Cologne","科隆/波恩机场","德国","Germany","Allemagne",50.8659,7.1427,60,"EDDK"],
 ["NUE","纽伦堡","Nuremberg","Nuremberg","纽伦堡机场","德国","Germany","Allemagne",49.4987,11.0669,60,"EDDN"],
 ["HAJ","汉诺威","Hanover","Hanovre","汉诺威机场","德国","Germany","Allemagne",52.4611,9.6850,60,"EDDV"],
+["LEJ","莱比锡","Leipzig","Leipzig","莱比锡/哈雷机场","德国","Germany","Allemagne",51.4239,12.2364,60,"EDDP"],
+["DRS","德累斯顿","Dresden","Dresde","德累斯顿机场","德国","Germany","Allemagne",51.1328,13.7672,60,"EDDC"],
+["FMO","明斯特","Münster","Munster","明斯特奥斯纳布吕克机场","德国","Germany","Allemagne",52.1346,7.6848,60,"EDDG"],
+["BRE","不来梅","Bremen","Brême","不来梅机场","德国","Germany","Allemagne",53.0475,8.7867,60,"EDDW"],
+["HHN","法兰克福","Frankfurt","Francfort","法兰克福-哈恩机场","德国","Germany","Allemagne",49.9487,7.2639,60,"EDFH"],
+["SCN","萨尔布吕肯","Saarbrücken","Sarrebruck","萨尔布吕肯机场","德国","Germany","Allemagne",49.2146,7.1095,60,"EDDR"],
+["FDH","腓特烈港","Friedrichshafen","Friedrichshafen","腓特烈港机场","德国","Germany","Allemagne",47.6713,9.5115,60,"EDNY"],
+
+/* ═══════ 西班牙 ═══════ */
+["MAD","马德里","Madrid","Madrid","巴拉哈斯机场","西班牙","Spain","Espagne",40.4936,-3.5668,60,"LEMD"],
+["BCN","巴塞罗那","Barcelona","Barcelone","埃尔普拉特机场","西班牙","Spain","Espagne",41.2974,2.0833,60,"LEBL"],
+["AGP","马拉加","Málaga","Málaga","马拉加机场","西班牙","Spain","Espagne",36.6749,-4.4991,60,"LEMG"],
+["PMI","帕尔马","Palma de Mallorca","Palma","帕尔马机场","西班牙","Spain","Espagne",39.5517,2.7388,60,"LEPA"],
+["ALC","阿利坎特","Alicante","Alicante","阿利坎特-埃尔切机场","西班牙","Spain","Espagne",38.2822,-0.5582,60,"LEAL"],
+["VLC","瓦伦西亚","Valencia","Valence","瓦伦西亚机场","西班牙","Spain","Espagne",39.4893,-0.4816,60,"LEVC"],
+["SVQ","塞维利亚","Seville","Séville","塞维利亚机场","西班牙","Spain","Espagne",37.4180,-5.8931,60,"LEZL"],
+["BIO","毕尔巴鄂","Bilbao","Bilbao","毕尔巴鄂机场","西班牙","Spain","Espagne",43.3011,-2.9106,60,"LEBB"],
+["IBZ","伊维萨","Ibiza","Ibiza","伊维萨机场","西班牙","Spain","Espagne",38.8729,1.3731,60,"LEIB"],
+["LPA","拉斯帕尔马斯","Las Palmas","Las Palmas","大加那利机场","西班牙","Spain","Espagne",27.9319,-15.3866,0,"GCLP"],
+["TFS","特内里费","Tenerife","Tenerife","特内里费南部机场","西班牙","Spain","Espagne",28.0445,-16.5725,0,"GCTS"],
+["TFN","特内里费","Tenerife","Tenerife","特内里费北部机场","西班牙","Spain","Espagne",28.4827,-16.3415,0,"GCXO"],
+["ACE","兰萨罗特","Lanzarote","Lanzarote","兰萨罗特机场","西班牙","Spain","Espagne",28.9455,-13.6052,0,"GCRR"],
+["FUE","富埃特文图拉","Fuerteventura","Fuerteventura","富埃特文图拉机场","西班牙","Spain","Espagne",28.4527,-13.8638,0,"GCFV"],
+["GRO","赫罗纳","Girona","Gérone","赫罗纳机场","西班牙","Spain","Espagne",41.9010,2.7606,60,"LEGE"],
+["REU","雷乌斯","Reus","Reus","雷乌斯机场","西班牙","Spain","Espagne",41.1474,1.1672,60,"LERS"],
+["SCQ","圣地亚哥","Santiago","Saint-Jacques","圣地亚哥机场","西班牙","Spain","Espagne",42.8963,-8.4151,60,"LEST"],
+["OVD","奥维耶多","Oviedo","Oviedo","阿斯图里亚斯机场","西班牙","Spain","Espagne",43.5636,-6.0346,60,"LEAS"],
+["EAS","圣塞瓦斯蒂安","San Sebastián","Saint-Sébastien","圣塞瓦斯蒂安机场","西班牙","Spain","Espagne",43.3565,-1.7906,60,"LESO"],
+
+/* ═══════ 瑞士 ═══════ */
+["ZRH","苏黎世","Zurich","Zurich","苏黎世机场","瑞士","Switzerland","Suisse",47.4647,8.5492,60,"LSZH"],
+["GVA","日内瓦","Geneva","Genève","日内瓦机场","瑞士","Switzerland","Suisse",46.2381,6.1090,60,"LSGG"],
+["BRN","伯尔尼","Bern","Berne","伯尔尼机场","瑞士","Switzerland","Suisse",46.9141,7.4971,60,"LSZB"],
+["LUG","卢加诺","Lugano","Lugano","卢加诺机场","瑞士","Switzerland","Suisse",46.0043,8.9106,60,"LSZA"],
+["ACH","圣加仑","St. Gallen","Saint-Gall","圣加仑-阿尔滕莱茵机场","瑞士","Switzerland","Suisse",47.4850,9.5608,60,"LSZR"],
+["SIR","锡永","Sion","Sion","锡永机场","瑞士","Switzerland","Suisse",46.2192,7.3268,60,"LSGS"],
+
+/* ═══════ 俄罗斯 ═══════ */
+["SVO","莫斯科","Moscow","Moscou","谢列梅捷沃机场","俄罗斯","Russia","Russie",55.9726,37.4146,180,"UUEE"],
+["DME","莫斯科","Moscow","Moscou","多莫杰多沃机场","俄罗斯","Russia","Russie",55.4088,37.9063,180,"UUDD"],
+["VKO","莫斯科","Moscow","Moscou","伏努科沃机场","俄罗斯","Russia","Russie",55.5915,37.2615,180,"UUWW"],
+["LED","圣彼得堡","Saint Petersburg","Saint-Pétersbourg","普尔科沃机场","俄罗斯","Russia","Russie",59.8003,30.2625,180,"ULLI"],
+["AER","索契","Sochi","Sotchi","索契国际机场","俄罗斯","Russia","Russie",43.4499,39.9566,180,"URSS"],
+["KZN","喀山","Kazan","Kazan","喀山国际机场","俄罗斯","Russia","Russie",55.6062,49.2787,180,"UWKD"],
+["OVB","新西伯利亚","Novosibirsk","Novossibirsk","托尔马切沃机场","俄罗斯","Russia","Russie",55.0198,82.6187,420,"UNNT"],
+["SVX","叶卡捷琳堡","Yekaterinburg","Iekaterinbourg","科利佐沃机场","俄罗斯","Russia","Russie",56.7431,60.8027,300,"USSS"],
+["KJA","克拉斯诺亚尔斯克","Krasnoyarsk","Krasnoïarsk","叶梅利亚诺沃机场","俄罗斯","Russia","Russie",56.1729,92.4933,420,"UNKL"],
+["VVO","符拉迪沃斯托克","Vladivostok","Vladivostok","符拉迪沃斯托克国际机场","俄罗斯","Russia","Russie",43.3990,132.1480,600,"UHWW"],
+["KHV","哈巴罗夫斯克","Khabarovsk","Khabarovsk","哈巴罗夫斯克新机场","俄罗斯","Russia","Russie",48.5280,135.1880,600,"UHHH"],
+["IKT","伊尔库茨克","Irkutsk","Irkoutsk","伊尔库茨克机场","俄罗斯","Russia","Russie",52.2680,104.3880,480,"UIII"],
+["KGD","加里宁格勒","Kaliningrad","Kaliningrad","哈拉布罗沃机场","俄罗斯","Russia","Russie",54.8900,20.5926,120,"UMKK"],
+["ROV","顿河畔罗斯托夫","Rostov-on-Don","Rostov-sur-le-Don","普拉托夫机场","俄罗斯","Russia","Russie",47.4939,39.9247,180,"URRP"],
+["KRR","克拉斯诺达尔","Krasnodar","Krasnodar","克拉斯诺达尔国际机场","俄罗斯","Russia","Russie",45.0347,39.1706,180,"URKK"],
+["UFA","乌法","Ufa","Oufa","乌法国际机场","俄罗斯","Russia","Russie",54.5575,55.8742,300,"UWUU"],
+["SAM","萨马拉","Samara","Samara","库鲁莫奇国际机场","俄罗斯","Russia","Russie",53.5049,50.1643,240,"UWWW"],
+["CEK","车里雅宾斯克","Chelyabinsk","Tcheliabinsk","车里雅宾斯克机场","俄罗斯","Russia","Russie",55.3058,61.5033,300,"USCC"],
+["PEE","彼尔姆","Perm","Perm","彼尔姆大萨维诺国际机场","俄罗斯","Russia","Russie",57.9145,56.0212,300,"USPP"],
+["SGC","苏尔古特","Surgut","Sourgout","苏尔古特国际机场","俄罗斯","Russia","Russie",61.3437,73.4018,360,"USRR"],
+["MMK","摩尔曼斯克","Murmansk","Mourmansk","摩尔曼斯克机场","俄罗斯","Russia","Russie",68.7817,32.7508,180,"ULMM"],
+["ARH","阿尔汉格尔斯克","Arkhangelsk","Arkhangelsk","塔拉吉机场","俄罗斯","Russia","Russie",64.6003,40.7167,180,"ULAA"],
+["PKC","堪察加彼得罗巴甫洛夫斯克","Petropavlovsk-Kamchatsky","Petropavlovsk-Kamtchatski","堪察加彼得罗巴甫洛夫斯克机场","俄罗斯","Russia","Russie",53.1679,158.4530,720,"UHPP"],
+["YKS","雅库茨克","Yakutsk","Iakoutsk","雅库茨克机场","俄罗斯","Russia","Russie",62.0933,129.7710,540,"UEEE"],
+
+/* 其他欧洲 */
 ["AMS","阿姆斯特丹","Amsterdam","Amsterdam","史基浦机场","荷兰","Netherlands","Pays-Bas",52.3105,4.7683,60,"EHAM"],
 ["BRU","布鲁塞尔","Brussels","Bruxelles","布鲁塞尔机场","比利时","Belgium","Belgique",50.9014,4.4844,60,"EBBR"],
 ["LUX","卢森堡","Luxembourg","Luxembourg","卢森堡机场","卢森堡","Luxembourg","Luxembourg",49.6233,6.2044,60,"ELLX"],
-["MAD","马德里","Madrid","Madrid","巴拉哈斯机场","西班牙","Spain","Espagne",40.4936,-3.5668,60,"LEMD"],
-["BCN","巴塞罗那","Barcelona","Barcelone","埃尔普拉特机场","西班牙","Spain","Espagne",41.2974,2.0833,60,"LEBL"],
-["VLC","瓦伦西亚","Valencia","Valence","瓦伦西亚机场","西班牙","Spain","Espagne",39.4893,-0.4816,60,"LEVC"],
-["AGP","马拉加","Málaga","Málaga","马拉加机场","西班牙","Spain","Espagne",36.6749,-4.4991,60,"LEMG"],
-["SVQ","塞维利亚","Seville","Séville","塞维利亚机场","西班牙","Spain","Espagne",37.4180,-5.8931,60,"LEZL"],
-["FCO","罗马","Rome","Rome","菲乌米奇诺机场","意大利","Italy","Italie",41.8003,12.2389,60,"LIRF"],
-["MXP","米兰","Milan","Milan","马尔彭萨机场","意大利","Italy","Italie",45.6306,8.7281,60,"LIMC"],
-["NAP","那不勒斯","Naples","Naples","那不勒斯国际机场","意大利","Italy","Italie",40.8860,14.2908,60,"LIRN"],
-["VCE","威尼斯","Venice","Venise","马可波罗机场","意大利","Italy","Italie",45.5053,12.3519,60,"LIPZ"],
-["FLR","佛罗伦萨","Florence","Florence","佩雷托拉机场","意大利","Italy","Italie",43.8100,11.2051,60,"LIRQ"],
-["PSA","比萨","Pisa","Pise","比萨国际机场","意大利","Italy","Italie",43.6839,10.3928,60,"LIRP"],
-["PMO","巴勒莫","Palermo","Palerme","巴勒莫机场","意大利","Italy","Italie",38.1759,13.0990,60,"LICJ"],
-["CTA","卡塔尼亚","Catania","Catane","卡塔尼亚机场","意大利","Italy","Italie",37.4668,15.0664,60,"LICC"],
-["ZRH","苏黎世","Zurich","Zurich","苏黎世机场","瑞士","Switzerland","Suisse",47.4647,8.5492,60,"LSZH"],
-["GVA","日内瓦","Geneva","Genève","日内瓦机场","瑞士","Switzerland","Suisse",46.2381,6.1090,60,"LSGG"],
 ["VIE","维也纳","Vienna","Vienne","维也纳国际机场","奥地利","Austria","Autriche",48.1103,16.5697,60,"LOWW"],
 ["CPH","哥本哈根","Copenhagen","Copenhague","凯斯楚普机场","丹麦","Denmark","Danemark",55.6180,12.6508,60,"EKCH"],
 ["ARN","斯德哥尔摩","Stockholm","Stockholm","阿兰达机场","瑞典","Sweden","Suède",59.6519,17.9186,60,"ESSA"],
@@ -1010,9 +1102,6 @@ const RAW = [
 ["IST","伊斯坦布尔","Istanbul","Istanbul","伊斯坦布尔机场","土耳其","Turkey","Turquie",41.2753,28.7519,180,"LTFM"],
 ["ESB","安卡拉","Ankara","Ankara","埃森博阿国际机场","土耳其","Turkey","Turquie",40.1281,32.9951,180,"LTAC"],
 ["AYT","安塔利亚","Antalya","Antalya","安塔利亚机场","土耳其","Turkey","Turquie",36.8987,30.8005,180,"LTAI"],
-["SVO","莫斯科","Moscow","Moscou","谢列梅捷沃机场","俄罗斯","Russia","Russie",55.9726,37.4146,180,"UUEE"],
-["DME","莫斯科","Moscow","Moscou","多莫杰多沃机场","俄罗斯","Russia","Russie",55.4088,37.9063,180,"UUDD"],
-["LED","圣彼得堡","Saint Petersburg","Saint-Pétersbourg","普尔科沃机场","俄罗斯","Russia","Russie",59.8003,30.2625,180,"ULLI"],
 ["KBP","基辅","Kyiv","Kiev","鲍里斯波尔机场","乌克兰","Ukraine","Ukraine",50.3450,30.8947,120,"UKBB"],
 ["ODS","敖德萨","Odesa","Odessa","敖德萨国际机场","乌克兰","Ukraine","Ukraine",46.4268,30.6765,120,"UKOO"],
 ["MSQ","明斯克","Minsk","Minsk","明斯克国际机场","白俄罗斯","Belarus","Biélorussie",53.8825,28.0308,180,"UMMS"],
@@ -1021,12 +1110,14 @@ const RAW = [
 ["BEG","贝尔格莱德","Belgrade","Belgrade","尼古拉·特斯拉机场","塞尔维亚","Serbia","Serbie",44.8184,20.3091,60,"LYBE"],
 ["ZAG","萨格勒布","Zagreb","Zagreb","萨格勒布机场","克罗地亚","Croatia","Croatie",45.7429,16.0688,60,"LDZA"],
 ["KEF","雷克雅未克","Reykjavík","Reykjavík","凯夫拉维克机场","冰岛","Iceland","Islande",63.9850,-22.6056,0,"BIKF"],
-/* 北美 */
+
+/* ═══════ 美国 ═══════ */
 ["JFK","纽约","New York","New York","肯尼迪国际机场","美国","United States","États-Unis",40.6413,-73.7781,-300,"KJFK"],
 ["EWR","纽约","New York","New York","纽瓦克自由国际机场","美国","United States","États-Unis",40.6895,-74.1745,-300,"KEWR"],
 ["LGA","纽约","New York","New York","拉瓜迪亚机场","美国","United States","États-Unis",40.7769,-73.8740,-300,"KLGA"],
 ["LAX","洛杉矶","Los Angeles","Los Angeles","洛杉矶国际机场","美国","United States","États-Unis",33.9416,-118.4085,-480,"KLAX"],
 ["ORD","芝加哥","Chicago","Chicago","奥黑尔国际机场","美国","United States","États-Unis",41.9742,-87.9073,-360,"KORD"],
+["MDW","芝加哥","Chicago","Chicago","中途国际机场","美国","United States","États-Unis",41.7868,-87.7524,-360,"KMDW"],
 ["SFO","旧金山","San Francisco","San Francisco","旧金山国际机场","美国","United States","États-Unis",37.6213,-122.3790,-480,"KSFO"],
 ["SEA","西雅图","Seattle","Seattle","西雅图-塔科马国际机场","美国","United States","États-Unis",47.4502,-122.3088,-480,"KSEA"],
 ["BOS","波士顿","Boston","Boston","洛根国际机场","美国","United States","États-Unis",42.3656,-71.0096,-300,"KBOS"],
@@ -1070,7 +1161,15 @@ const RAW = [
 ["ABQ","阿尔伯克基","Albuquerque","Albuquerque","阿尔伯克基国际机场","美国","United States","États-Unis",35.0402,-106.6091,-420,"KABQ"],
 ["TUS","图森","Tucson","Tucson","图森国际机场","美国","United States","États-Unis",32.1161,-110.9410,-420,"KTUS"],
 ["BOI","博伊西","Boise","Boise","博伊西机场","美国","United States","États-Unis",43.5644,-116.2228,-420,"KBOI"],
+["OGG","卡胡卢伊","Kahului","Kahului","卡胡卢伊机场","美国","United States","États-Unis",20.8986,-156.4305,-600,"PHOG"],
+["KOA","凯卢阿-科纳","Kailua-Kona","Kailua-Kona","科纳国际机场","美国","United States","États-Unis",19.7388,-156.0456,-600,"PHKO"],
+["LIH","利胡埃","Lihue","Lihue","利胡埃机场","美国","United States","États-Unis",21.9760,-159.3390,-600,"PHLI"],
+["GUM","关岛","Guam","Guam","安东尼奥·汪帕特机场","美国","United States","États-Unis",13.4834,144.7960,600,"PGUM"],
+["SPN","塞班","Saipan","Saipan","塞班国际机场","美国","United States","États-Unis",15.1190,145.7290,600,"PGSN"],
+
+/* ═══════ 加拿大 ═══════ */
 ["YYZ","多伦多","Toronto","Toronto","皮尔逊国际机场","加拿大","Canada","Canada",43.6777,-79.6248,-300,"CYYZ"],
+["YTZ","多伦多","Toronto","Toronto","比利·毕晓普多伦多城市机场","加拿大","Canada","Canada",43.6275,-79.3962,-300,"CYTZ"],
 ["YVR","温哥华","Vancouver","Vancouver","温哥华国际机场","加拿大","Canada","Canada",49.1967,-123.1815,-480,"CYVR"],
 ["YUL","蒙特利尔","Montreal","Montréal","特鲁多国际机场","加拿大","Canada","Canada",45.4706,-73.7408,-300,"CYUL"],
 ["YYC","卡尔加里","Calgary","Calgary","卡尔加里国际机场","加拿大","Canada","Canada",51.1315,-114.0106,-420,"CYYC"],
@@ -1079,21 +1178,39 @@ const RAW = [
 ["YWG","温尼伯","Winnipeg","Winnipeg","温尼伯国际机场","加拿大","Canada","Canada",49.9100,-97.2399,-360,"CYWG"],
 ["YHZ","哈利法克斯","Halifax","Halifax","哈利法克斯国际机场","加拿大","Canada","Canada",44.8808,-63.5086,-240,"CYHZ"],
 ["YQB","魁北克","Quebec City","Québec","让·勒萨热国际机场","加拿大","Canada","Canada",46.7911,-71.3933,-300,"CYQB"],
+["YYT","圣约翰斯","St. John's","Saint-Jean","圣约翰斯国际机场","加拿大","Canada","Canada",47.6186,-52.7519,-210,"CYYT"],
+["YXY","白马市","Whitehorse","Whitehorse","埃里克·尼尔森白马国际机场","加拿大","Canada","Canada",60.7096,-135.0670,-420,"CYXY"],
+["YZF","黄刀镇","Yellowknife","Yellowknife","黄刀镇机场","加拿大","Canada","Canada",62.4628,-114.4403,-420,"CYZF"],
+["YMM","麦克默里堡","Fort McMurray","Fort McMurray","麦克默里堡国际机场","加拿大","Canada","Canada",56.6533,-111.2219,-420,"CYMM"],
+["YXE","萨斯卡通","Saskatoon","Saskatoon","萨斯卡通约翰·G·迪芬贝克国际机场","加拿大","Canada","Canada",52.1708,-106.6997,-360,"CYXE"],
+["YQR","里贾纳","Regina","Regina","里贾纳国际机场","加拿大","Canada","Canada",50.4319,-104.6658,-360,"CYQR"],
+["YXX","阿伯茨福德","Abbotsford","Abbotsford","阿伯茨福德国际机场","加拿大","Canada","Canada",49.0253,-122.3610,-480,"CYXX"],
+["YKA","坎卢普斯","Kamloops","Kamloops","坎卢普斯机场","加拿大","Canada","Canada",50.7022,-120.4442,-480,"CYKA"],
+["YSJ","圣约翰","Saint John","Saint-Jean","圣约翰机场","加拿大","Canada","Canada",45.3161,-65.8903,-240,"CYSJ"],
+["YFC","弗雷德里克顿","Fredericton","Fredericton","弗雷德里克顿国际机场","加拿大","Canada","Canada",45.8689,-66.5372,-240,"CYFC"],
+["YQM","蒙克顿","Moncton","Moncton","大蒙克顿国际机场","加拿大","Canada","Canada",46.1122,-64.6786,-240,"CYQM"],
+
+/* 墨西哥 / 中美 / 加勒比 */
 ["MEX","墨西哥城","Mexico City","Mexico","贝尼托·华雷斯国际机场","墨西哥","Mexico","Mexique",19.4361,-99.0719,-360,"MMMX"],
 ["CUN","坎昆","Cancún","Cancún","坎昆国际机场","墨西哥","Mexico","Mexique",21.0365,-86.8771,-300,"MMUN"],
 ["GDL","瓜达拉哈拉","Guadalajara","Guadalajara","瓜达拉哈拉机场","墨西哥","Mexico","Mexique",20.5218,-103.3110,-360,"MMGL"],
 ["MTY","蒙特雷","Monterrey","Monterrey","蒙特雷国际机场","墨西哥","Mexico","Mexique",25.7785,-100.1070,-360,"MMMY"],
+["TIJ","蒂华纳","Tijuana","Tijuana","蒂华纳国际机场","墨西哥","Mexico","Mexique",32.5411,-116.9700,-480,"MMTJ"],
 ["HAV","哈瓦那","Havana","La Havane","何塞·马蒂国际机场","古巴","Cuba","Cuba",22.9892,-82.4091,-300,"MUHA"],
 ["SJO","圣何塞","San José","San José","胡安·圣玛丽亚机场","哥斯达黎加","Costa Rica","Costa Rica",9.9939,-84.2088,-360,"MROC"],
 ["PTY","巴拿马城","Panama City","Panama","托库门国际机场","巴拿马","Panama","Panama",9.0714,-79.3835,-300,"MPTO"],
+
 /* 南美 */
 ["BOG","波哥大","Bogotá","Bogota","埃尔多拉多国际机场","哥伦比亚","Colombia","Colombie",4.7016,-74.1469,-300,"SKBO"],
+["MDE","麦德林","Medellín","Medellín","何塞·玛丽亚·科尔多瓦国际机场","哥伦比亚","Colombia","Colombie",6.1645,-75.4231,-300,"SKRG"],
 ["LIM","利马","Lima","Lima","豪尔赫·查韦斯机场","秘鲁","Peru","Pérou",-12.0219,-77.1143,-300,"SPJC"],
 ["UIO","基多","Quito","Quito","马里斯卡尔·苏克雷机场","厄瓜多尔","Ecuador","Équateur",-0.1292,-78.3575,-300,"SEQM"],
 ["GYE","瓜亚基尔","Guayaquil","Guayaquil","何塞·华金·德奥尔梅多国际机场","厄瓜多尔","Ecuador","Équateur",-2.1572,-79.8841,-300,"SEGU"],
 ["SCL","圣地亚哥","Santiago","Santiago","阿图罗·梅里诺机场","智利","Chile","Chili",-33.3930,-70.7858,-240,"SCEL"],
 ["EZE","布宜诺斯艾利斯","Buenos Aires","Buenos Aires","埃塞萨国际机场","阿根廷","Argentina","Argentine",-34.8222,-58.5358,-180,"SAEZ"],
+["AEP","布宜诺斯艾利斯","Buenos Aires","Buenos Aires","豪尔赫·纽伯里机场","阿根廷","Argentina","Argentine",-34.5592,-58.4156,-180,"SABE"],
 ["GRU","圣保罗","São Paulo","São Paulo","瓜鲁柳斯国际机场","巴西","Brazil","Brésil",-23.4356,-46.4731,-180,"SBGR"],
+["CGH","圣保罗","São Paulo","São Paulo","孔戈尼亚斯机场","巴西","Brazil","Brésil",-23.6266,-46.6564,-180,"SBSP"],
 ["GIG","里约热内卢","Rio de Janeiro","Rio de Janeiro","加莱昂国际机场","巴西","Brazil","Brésil",-22.8090,-43.2506,-180,"SBGL"],
 ["BSB","巴西利亚","Brasília","Brasilia","巴西利亚国际机场","巴西","Brazil","Brésil",-15.8697,-47.9208,-180,"SBBR"],
 ["POA","阿雷格里港","Porto Alegre","Porto Alegre","小萨尔加多国际机场","巴西","Brazil","Brésil",-29.9939,-51.1711,-180,"SBPA"],
@@ -1104,10 +1221,12 @@ const RAW = [
 ["CCS","加拉加斯","Caracas","Caracas","迈克蒂亚国际机场","委内瑞拉","Venezuela","Venezuela",10.6012,-66.9910,-240,"SVMI"],
 ["LPB","拉巴斯","La Paz","La Paz","埃尔阿尔托国际机场","玻利维亚","Bolivia","Bolivie",-16.5133,-68.1923,-240,"SLLP"],
 ["VVI","圣克鲁斯","Santa Cruz","Santa Cruz","维鲁维鲁国际机场","玻利维亚","Bolivia","Bolivie",-17.6448,-63.1354,-240,"SLVR"],
+
 /* 非洲 */
 ["CAI","开罗","Cairo","Le Caire","开罗国际机场","埃及","Egypt","Égypte",30.1219,31.4056,120,"HECA"],
 ["HBE","亚历山大","Alexandria","Alexandrie","博格埃尔阿拉伯国际机场","埃及","Egypt","Égypte",30.9175,29.6961,120,"HEBA"],
 ["SSH","沙姆沙伊赫","Sharm El Sheikh","Charm el-Cheikh","沙姆沙伊赫国际机场","埃及","Egypt","Égypte",27.9772,34.3947,120,"HESH"],
+["HRG","赫尔格达","Hurghada","Hurghada","赫尔格达国际机场","埃及","Egypt","Égypte",27.1783,33.7994,120,"HEGN"],
 ["JNB","约翰内斯堡","Johannesburg","Johannesburg","奥利弗·坦博国际机场","南非","South Africa","Afrique du Sud",-26.1392,28.2460,120,"FAOR"],
 ["CPT","开普敦","Cape Town","Le Cap","开普敦国际机场","南非","South Africa","Afrique du Sud",-33.9715,18.6021,120,"FACT"],
 ["DUR","德班","Durban","Durban","沙卡国王国际机场","南非","South Africa","Afrique du Sud",-29.6144,31.1197,120,"FALE"],
@@ -1133,6 +1252,7 @@ const RAW = [
 ["SEZ","塞舌尔","Seychelles","Seychelles","塞舌尔国际机场","塞舌尔","Seychelles","Seychelles",-4.6743,55.5218,240,"FSIA"],
 ["WDH","温得和克","Windhoek","Windhoek","霍齐亚·库塔科机场","纳米比亚","Namibia","Namibie",-22.4799,17.4709,120,"FYWH"],
 ["GBE","哈博罗内","Gaborone","Gaborone","塞雷茨·卡马爵士机场","博茨瓦纳","Botswana","Botswana",-24.5552,25.9182,120,"FBSK"],
+
 /* 大洋洲 */
 ["SYD","悉尼","Sydney","Sydney","金斯福德·史密斯机场","澳大利亚","Australia","Australie",-33.9399,151.1753,600,"YSSY"],
 ["MEL","墨尔本","Melbourne","Melbourne","图拉马林机场","澳大利亚","Australia","Australie",-37.6690,144.8410,600,"YMML"],
@@ -1150,8 +1270,7 @@ const RAW = [
 ["ZQN","皇后镇","Queenstown","Queenstown","皇后镇机场","新西兰","New Zealand","Nouvelle-Zélande",-45.0211,168.7392,720,"NZQN"],
 ["NAN","楠迪","Nadi","Nadi","楠迪国际机场","斐济","Fiji","Fidji",-17.7554,177.4434,720,"NFFN"],
 ["NOU","努美阿","Nouméa","Nouméa","通图塔国际机场","新喀里多尼亚","New Caledonia","Nouvelle-Calédonie",-22.0146,166.2129,660,"NWWW"],
-["POM","莫尔兹比港","Port Moresby","Port Moresby","杰克逊国际机场","巴布亚新几内亚","Papua New Guinea","Papouasie-Nouvelle-Guinée",-9.4434,147.2200,600,"AYPY"],
-["GUM","关岛","Guam","Guam","安东尼奥·汪帕特机场","关岛","Guam","Guam",13.4834,144.7960,600,"PGUM"]
+["POM","莫尔兹比港","Port Moresby","Port Moresby","杰克逊国际机场","巴布亚新几内亚","Papua New Guinea","Papouasie-Nouvelle-Guinée",-9.4434,147.2200,600,"AYPY"]
 ];
 
 const AIRPORTS = RAW.map(r => ({
@@ -1385,14 +1504,13 @@ const LAND = [
 ];
 
 /* ============================================================
-   地图
+   地图（静态绘制，无持续动画）
    ============================================================ */
 const mapWrap = document.getElementById('mapWrap');
 const mapCanvas = document.getElementById('mapCanvas');
 const mapEmpty = document.getElementById('mapEmpty');
 let mapW = 0, mapH = 0, mapDpr = 1;
 let mapStatic = null;
-let dashOffset = 0;
 let showAllAirports = false;
 const MAP_LAT_MAX = 85, MAP_LAT_MIN = -85;
 
@@ -1404,10 +1522,7 @@ function mapTheme(){
     equator: dark ? '#233046' : '#d4d9e0',
     landFill: dark ? '#1c2436' : '#dde2e9',
     landStroke: dark ? '#2c3852' : '#c8d0da',
-    airportDot: dark ? 'rgba(10,132,255,0.55)' : 'rgba(0,113,227,0.42)',
-    planeRing: dark ? '#1c1c1e' : '#ffffff',
-    planeRingStr: dark ? 'rgba(10,132,255,0.7)' : 'rgba(0,113,227,0.6)',
-    routeDash: dark ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.85)'
+    airportDot: dark ? 'rgba(10,132,255,0.55)' : 'rgba(0,113,227,0.42)'
   };
 }
 function mapProj(lon, lat){
@@ -1521,15 +1636,16 @@ function drawMap(){
   }
   mapEmpty.classList.add('hide');
   const segs = buildMapSegments(o, d);
-  const pulse = (Math.sin(performance.now() / 520) + 1) / 2;
   c.lineCap = 'round'; c.lineJoin = 'round';
   for (const seg of segs){
+    // 光晕
     c.beginPath();
     c.moveTo(seg[0].x, seg[0].y);
     for (let i = 1; i < seg.length; i++) c.lineTo(seg[i].x, seg[i].y);
     c.strokeStyle = 'rgba(0,113,227,0.15)';
     c.lineWidth = 6;
     c.stroke();
+    // 渐变主航线
     const grad = c.createLinearGradient(seg[0].x, seg[0].y, seg[seg.length-1].x, seg[seg.length-1].y);
     grad.addColorStop(0,   '#0071e3');
     grad.addColorStop(0.5, '#5ac8fa');
@@ -1540,24 +1656,10 @@ function drawMap(){
     c.strokeStyle = grad;
     c.lineWidth = 2;
     c.stroke();
-    c.beginPath();
-    c.moveTo(seg[0].x, seg[0].y);
-    for (let i = 1; i < seg.length; i++) c.lineTo(seg[i].x, seg[i].y);
-    c.setLineDash([4, 9]);
-    c.lineDashOffset = -dashOffset * 1.2;
-    c.strokeStyle = T.routeDash;
-    c.lineWidth = 2;
-    c.stroke();
-    c.setLineDash([]);
   }
   const pO = mapProj(o.lon, o.lat);
   const pD = mapProj(d.lon, d.lat);
-  function marker(p, color, rgb){
-    c.beginPath();
-    c.arc(p.x, p.y, 4 + pulse * 6, 0, Math.PI * 2);
-    c.strokeStyle = `rgba(${rgb}, ${0.55 - pulse * 0.4})`;
-    c.lineWidth = 1.5;
-    c.stroke();
+  function marker(p, color){
     c.beginPath();
     c.arc(p.x, p.y, 4, 0, Math.PI * 2);
     c.fillStyle = color;
@@ -1566,34 +1668,8 @@ function drawMap(){
     c.lineWidth = 1.5;
     c.stroke();
   }
-  marker(pO, '#0071e3', '0,113,227');
-  marker(pD, '#ff9500', '255,149,0');
-  const mainSeg = segs.reduce((a, b) => b.length > a.length ? b : a, segs[0]);
-  if (mainSeg && mainSeg.length > 2){
-    const t = (performance.now() / 11000) % 1;
-    const idx = Math.min(mainSeg.length - 2, Math.floor(t * (mainSeg.length - 1)));
-    const p1 = mainSeg[idx], p2 = mainSeg[idx + 1];
-    const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-    c.save();
-    c.translate(p1.x, p1.y);
-    c.rotate(ang);
-    c.beginPath();
-    c.arc(0, 0, 8, 0, Math.PI * 2);
-    c.fillStyle = T.planeRing;
-    c.fill();
-    c.strokeStyle = T.planeRingStr;
-    c.lineWidth = 1;
-    c.stroke();
-    c.beginPath();
-    c.moveTo(4.5, 0);
-    c.lineTo(-3, -3.2);
-    c.lineTo(-1.6, 0);
-    c.lineTo(-3, 3.2);
-    c.closePath();
-    c.fillStyle = '#0071e3';
-    c.fill();
-    c.restore();
-  }
+  marker(pO, '#0071e3');
+  marker(pD, '#ff9500');
 }
 function resizeMap(){
   if (!mapWrap) return;
@@ -2019,7 +2095,6 @@ function applyLanguage(lang){
   buildMultiUI();
   globalSearch.placeholder = t.placeholder;
   ddChartFoxLabel.textContent = t.chartfoxBtn;
-  // 更新机场框 chart 按钮的 title
   document.querySelectorAll('.airport-chart').forEach(b => { b.title = t.chartfoxTip; });
 }
 
@@ -2030,13 +2105,8 @@ document.getElementById('langSwitch').addEventListener('click', e => {
 });
 
 /* ============================================================
-   启动
+   启动（无持续动画，仅按需重绘）
    ============================================================ */
-function frame(){
-  dashOffset += 0.55;
-  drawMap();
-  requestAnimationFrame(frame);
-}
 let rt;
 window.addEventListener('resize', () => {
   clearTimeout(rt);
@@ -2050,7 +2120,6 @@ window.addEventListener('orientationchange', () => {
 initSingle();
 applyLanguage('en');
 resizeMap();
-requestAnimationFrame(frame);
 </script>
 </body>
 </html>
